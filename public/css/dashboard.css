@@ -1,0 +1,735 @@
+/*
+ * Base structure
+ */
+
+
+ .my-custom-scrollbar {
+    position: relative;
+    height: 800px;
+    overflow: auto;
+    }
+    .table-wrapper-scroll-y {
+    display: block;
+    }
+    
+    /* Move down content because we have a fixed navbar that is 3.5rem tall */
+    body {
+      padding-top: 3.5rem;
+    }
+    
+    /*
+     * Typography
+     */
+    
+    h1 {
+      margin-bottom: 20px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    /*
+     * Sidebar
+     */
+    
+    .sidebar {
+      position: fixed;
+      top: 51px;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      padding: 20px;
+      overflow-x: hidden;
+      overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+      border-right: 1px solid #eee;
+    }
+    
+    /* Sidebar navigation */
+    .sidebar {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    
+    .sidebar .nav {
+      margin-bottom: 20px;
+    }
+    
+    .sidebar .nav-item {
+      width: 100%;
+    }
+    
+    .sidebar .nav-item + .nav-item {
+      margin-left: 0;
+    }
+    
+    .sidebar .nav-link {
+      border-radius: 0;
+    }
+    
+    /*
+     * Dashboard
+     */
+    
+     /* Placeholders */
+    .placeholders {
+      padding-bottom: 3rem;
+    }
+    
+    .placeholder img {
+      padding-top: 1.5rem;
+      padding-bottom: 1.5rem;
+    }
+    
+    
+    /*nav a.nav-link:hover, nav a.nav-link:active,
+     a:hover, nav a:active{
+      color:#4178be;
+    }
+    nav a.nav-link, a{
+      color:#4178be;
+    }*/
+    
+    nav{
+      -webkit-box-shadow:0 2px 4px rgba(0,0,0,.1); 
+      box-shadow:0 2px 4px rgba(0,0,0,.1); 
+    }
+    
+    .pagination li{
+      padding: 0 5px 0 5px;
+    }
+    
+    .bb_hbox {
+        display: -webkit-box;
+        -webkit-box-orient: horizontal;
+        -webkit-box-align: stretch;
+    }
+    
+    ul.groupbar {
+      list-style: none;
+        padding-left: 0px;
+        white-space: nowrap;
+       /* 
+        */
+        overflow: hidden;
+        
+        /*cursor: url(https://www.google.com/intl/en_ALL/mapfiles/closedhand.cur), move; */
+        height: 100px;
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+    
+    
+    .icon-bar {
+       background-color:#FF0000 !important;
+    }
+    .glyphicon-menu-hamburger {
+      font-size: 16px;
+    }
+    .navbar-toggler{
+      border:1px solid black !important;
+    }
+    
+    .table-responsive{
+      display: table;
+    }
+    
+    li.groupBarGroup a{
+      color:white;
+      text-decoration: underline;
+      text-wrap: wrap;
+      font-size: 12px;
+    }
+    li.groupBarGroup{
+      color:white;
+      text-align: center;
+      
+      padding: 10px 0px 10px 0px;
+    }
+    
+    .title_status{
+      color:white;
+    }
+    #taskTable .title_status td{
+      padding: 2px;
+    }
+    
+    
+    /**----------------------Tooltip show customers-----------------------------**/
+    
+    .tooltip-inner {
+        max-width: 559px;
+        background-color: white;
+        text-align: justify;
+        box-shadow: 0 0rem 1rem rgba(1, 1, 1, 1);
+        color: black
+    }
+    
+    .tooltip.show{
+    
+        opacity: 1; 
+    }
+    
+    .tooltip.bs-tooltip-auto[x-placement^=bottom] .arrow::before, .tooltip.bs-tooltip-bottom .arrow::before {
+        margin-left: -3px;
+        content: "";
+        border-width: 0 5px 5px;
+        border-bottom-color: #ffffff;
+    }
+    
+    i.fa.fa-question-circle.question {
+        color: #007bff;
+    }
+    
+    .box{
+    
+      height: 450px;
+      overflow: auto;
+    
+    }
+    
+    .box thead th {
+      position: sticky;
+      top: 0;
+      background-color: #f8f9fa;
+      color: black;
+    }
+    
+    .box tbody th {
+      background-color: #f8f9fa;
+      color: black;
+    }
+    
+    /**.row-center{
+      text-align: center;
+    }
+    
+    /**----------------------End tooltip show customers-----------------------------**/
+    
+    
+    /**------------Vertical aling th.verticalText {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    } -----------------**/
+    
+    .customer_status{
+      padding: 5px;
+      color: white;
+      border-radius: 10px;
+      font-size: small;
+    }
+    
+    .dashboard {
+        display: flex;
+        background-color: #ccc;
+    }
+    
+    .streak__groupBar_group {
+        --border-radius: 4px;
+        flex: 1 1 calc(var(--chevron-width) + 32px);
+        margin-left: calc(var(--chevron-width) * -1);
+        pointer-events: none;
+        transition: max-width .28s cubic-bezier(0.4, 0, 1, 1);
+    }
+    
+    .dashboard_item {
+        --border-radius: 4px;
+        flex: 1 1 calc(var(--chevron-width) + 32px);
+        margin-left: calc(var(--chevron-width) * -1);
+        pointer-events: none;
+        transition: max-width .28s cubic-bezier(0.4, 0, 1, 1);
+    }
+    
+    :root{
+        --chevron-width: 24px;
+        --count-font-size: 20px;
+        --group-details-left-margin: 0;
+        --group-vertical-padding: 8px;
+        --large-name-opacity: 1;
+        --small-name-opacity: 0;
+    
+        --google-font-family: 'Google Sans', Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+        --streak-text-size-28: 28px;
+        --streak-text-size-20: 20px;
+        --streak-text-size-16: 16px;
+        --streak-text-size-14: 14px;
+        --streak-text-size-13: 13px;
+        --streak-text-size-12: 12px;
+        --streak-text-size-11: 11px;
+        --streak-huge-text-size: 36px;
+        --streak-very-large-text-size: 24px;
+        --streak-larger-text-size: var(--streak-text-size-20);
+        --streak-large-text-size: var(--streak-text-size-16);
+        --streak-medium-text-size: 15px;
+        --streak-text-size: var(--streak-text-size-13);
+        --streak-small-text-size: var(--streak-text-size-11);
+        --streak-font-family-mono: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+        --streak-font-sans-serif: Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+    
+    
+        --streak-gmail-primary: rgb(26, 115, 232);
+        --streak-gmail-primary-light: rgb(41, 123, 230);
+        --streak-gmail-primary-onDark: rgb(130, 177, 255);
+        --streak-gmail-primary-hover: rgba(41, 123, 230, 0.12);
+        --streak-app-primary: rgb(63, 81, 181);
+        --streak-app-primary-light: rgb(95, 120, 218);
+        --streak-app-primary-onDark: rgb(165, 184, 255);
+        --streak-app-primary-hover: rgba(95, 120, 218, 0.12);
+        --streak-black-primary: rgba(0, 0, 0, 0.87);
+        --streak-black-secondary: rgba(0, 0, 0, 0.54);
+        --streak-black-disabled: rgba(0, 0, 0, 0.36);
+        --streak-black-shadow: rgba(0, 0, 0, 0.2);
+        --streak-black-divider: rgba(0, 0, 0, 0.12);
+        --streak-black-hover: rgba(0, 0, 0, 0.08);
+        --streak-black-surface: rgba(0, 0, 0, 0.04);
+        --streak-solid-black-secondary: rgb(117, 117, 117);
+        --streak-solid-black-divider: rgb(224, 224, 224);
+        --streak-solid-black-surface: rgb(245, 245, 245);
+        --streak-solid-white: rgb(255, 255, 255);
+        --streak-solid-white-hover: rgba(255, 255, 255, 0.12);
+        --streak-primary: var(--streak-app-primary);
+        --streak-primary-light: var(--streak-app-primary-light);
+        --streak-primary-onDark: var(--streak-app-primary-onDark);
+        --streak-primary-hover: var(--streak-app-primary-hover);
+        --streak-success: rgb(0, 201, 182);
+        --streak-success-text: rgb(21, 158, 146);
+        --streak-success-onDark: rgb(100, 255, 218);
+        --streak-success-hover: rgba(0, 201, 182, .12);
+        --streak-warning: rgb(246, 76, 85);
+        --streak-warning-text: rgb(221, 45, 40);
+        --streak-warning-onDark: rgb(255, 134, 124);
+        --streak-warning-hover: rgba(246, 76, 85, .12);
+        --streak-highlight: rgb(251, 192, 46);
+        --streak-highlight-text: rgb(230, 74, 25);
+        --streak-highlight-onDark: rgb(255, 229, 127);
+        --streak-highlight-hover: rgba(251, 192, 46, .12);
+        --streak-color-gradient: linear-gradient(135deg, rgb(255, 152, 5) 0%,rgb(246, 76, 85) 100%);
+        --streak-color-gradient-flat: rgb(251, 111, 48);
+        --streak-facebook-blue: rgb(59, 89, 152);
+        --streak-google-blue: var(--streak-gmail-primary);
+        --streak-google-red: rgb(217, 48, 37);
+        --streak-google-green: rgb(15, 157, 88);
+        --streak-instagram-red: rgb(251, 57, 88);
+        --streak-twitter: rgb(29, 161, 242);
+        --streak-linkedin: rgb(0, 119, 181);
+        --streak-compose-view-hover-background: rgba(251, 111, 48, 0.12);
+        --streak-compose-view-focus-background: rgba(251, 111, 48, 0.23);
+        --gmail-compose-view-hover-background: rgba(32, 33, 36, 0.059);
+        --gmail-compose-view-focus-background: rgba(32, 33, 36, 0.122);
+        --gmail-input-placeholder: rgb(153, 153, 153);
+        --gmail-icon-color: rgba(32, 33, 36, .71);
+        --streak-primary-color: var(--streak-app-primary);
+        --streak-accent-color: var(--streak-warning-text);
+        --streak-menu-hover-color: var(--streak-black-hover);
+        --streak-menu-footer-color: var(--streak-black-surface);
+        --streak-label-grey: var(--streak-black-disabled);
+        --streak-soft-label-grey: var(--streak-black-shadow);
+        --streak-pip-grey: var(--streak-black-disabled);
+        --streak-icon-grey: var(--streak-black-secondary);
+        --streak-eighty-seven-percent-black: var(--streak-black-primary);
+        --streak-fifty-four-percent-black: var(--streak-black-secondary);
+        --streak-thirty-six-percent-black: var(--streak-black-disabled);
+        --streak-twelve-percent-black: var(--streak-black-divider);
+        --streak-eight-percent-black: var(--streak-black-hover);
+        --streak-four-percent-black: var(--streak-black-surface);
+        --streak-sub-text-color: var(--streak-black-secondary);
+        --streak-borders-color: var(--streak-black-divider);
+        --streak-grey-content-background-color: var(--streak-black-surface);
+        --streak-gmail-compose-border-color: var(--streak-black-surface);
+        --streak-gmail-thread-border-grey: var(--streak-black-shadow);
+        --streak-gmail-thread-row-green: var(--streak-success);
+        --streak-gmail-unfold-more-grey: var(--streak-black-surface);
+        --streak-bold-error-red: var(--streak-warning-text);
+        --streak-subdued-error-red: var(--streak-warning-onDark);
+        --streak-PipelineToolbarSelectedBoxes: var(--streak-black-primary);
+        --streak-star-button-yellow: var(--streak-highlight);
+        --streak-pending-yellow: var(--streak-highlight);
+        --streak-highlight-yellow: var(--streak-highlight-hover);
+        --streak-orange: var(--streak-color-gradient-flat);
+        --streak-red: var(--streak-warning-text);
+        --streak-light-green: var(--streak-color-success);
+        --streak-light-red: var(--streak-warning);
+        --streak-light-blue: var(--streak-primary-onDark);
+        --streak-very-light-red: var(--streak-warning-hover);
+        --streak-very-light-blue: var(--streak-primary-hover);
+        --streak-task-due-orange: var(--streak-color-gradient-flat);
+        --streak-task-done-green: var(--streak-success);
+        --streak-task-reminder-grey: var(--streak-black-secondary);
+        --streak-thread-splitter-green: var(--streak-success);
+        --streak-gmail-blue: var(--streak-app-primary);
+        --streak-gmail-grey: var(--streak-black-surface);
+        --streak-sheets-green: var(--streak-success);
+        --streak-mdl-text-color: var(--streak-black-primary);
+        --streak-mdl-sub-text-color: var(--streak-black-secondary);
+        --streak-mdl-button-background: var(--streak-black-shadow);
+        --streak-mdl-link-hover: var(--streak-app-primary);
+        --streak-mdl-soft-shadow: var(--streak-black-divider);
+        --streak-mdl-bold-shadow: var(--streak-black-shadow);
+        --streak-shadow-border: 0 1px 2px 0 var(--streak-black-divider);
+        --streak-material-gmail-compose-divider: var(--streak-app-primary-hover);
+        --streak-material-gmail-thread-selected: var(--streak-app-primary-ondark);
+        --streak-material-modal-primary-action: var(--streak-app-primary);
+        --streak-material-modal-primary-action-hover: var(--streak-app-primary-light);
+    
+        --streak-menu-max-height: 400px;
+        --streak-menu-max-width: 386px;
+    
+        --streak-gmail-tasks-grey: rgb(189, 189, 189);
+        --streak-group-bottom-margin: 22px;
+        --streak-home-nav-upcoming-group-bottom-margin: 8px;
+    
+        --streak-boxView-panel-padding: 20px;
+    }
+    
+    
+    
+    .dashboard_body{
+        border-bottom-left-radius: var(--border-radius);
+        border-top-left-radius: var(--border-radius);
+        padding-left: 8px;
+    
+        -webkit-clip-path: polygon( 0 0, calc(100% - var(--chevron-width)) 0, 100% 50%, calc(100% - var(--chevron-width)) 100%, 0 100% );
+        clip-path: polygon( 0 0, calc(100% - var(--chevron-width)) 0, 100% 50%, calc(100% - var(--chevron-width)) 100%, 0 100% );
+        cursor: pointer;
+        display: flex;
+        height: 100%;
+        overflow: hidden;
+        padding-left: var(--chevron-width);
+        pointer-events: auto;
+        position: relative;
+    
+        --border-radius: 4px;
+        flex: 1 1 calc(var(--chevron-width) + 32px);
+        margin-left: calc(var(--chevron-width) * -1);
+        pointer-events: none;
+        transition: max-width .28s cubic-bezier(0.4, 0, 1, 1);
+    
+        --shadow-bottom-height: 12px;
+        --shadow-top-height: 8px;
+        --shadow-left-width: 8px;
+        margin-right: 16px;
+        overflow: auto;
+        margin-left: calc(var(--shadow-left-width) * -1);
+        margin-top: calc(var(--shadow-top-height) * -1);
+        padding-bottom: var(--shadow-bottom-height);
+        padding-left: calc(var(--shadow-left-width) + var(--chevron-width));
+        padding-top: var(--shadow-top-height);
+    
+        justify-content: center;
+        margin-left: var(--group-details-left-margin);
+        opacity: 0;
+        overflow: hidden;
+        padding-bottom: var(--group-vertical-padding);
+        padding-top: var(--group-vertical-padding);
+        transition: opacity .28s cubic-bezier(0.4, 0, 1, 1);
+        width: 100%;
+    }
+    
+    .customer_dates {
+        width: 200px;
+    }
+    .notes {
+      font-size: smaller;
+    }
+    
+    
+    
+    /***** stars *****/
+    
+    .stars-outer {
+      display: inline-block;
+      position: relative;
+      font-family: FontAwesome;
+    }
+     
+    .stars-outer::before {
+      content: "\f006 \f006 \f006 \f006";
+    }
+     
+    .stars-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+    }
+     
+    .stars-inner::before {
+      content: "\f005 \f005 \f005 \f005";
+      color: #f8ce0b;
+    }
+    
+    /***** end stars *****/
+    
+    
+    span.customer-label {
+        color: #ccc;
+        font-weight: lighter;
+        font-size: small;
+    }
+    
+    
+    /*styles chexbox emails*/
+     input[type="checkbox"].switch_1{
+     
+      -webkit-appearance: none;
+         -moz-appearance: none;
+              appearance: none;
+      width: 3.5em;
+      height: 1.5em;
+      background: #21252970;
+      border-radius: 3em;
+      position: relative;
+      cursor: pointer;
+      outline: none;
+      -webkit-transition: all .2s ease-in-out;
+      transition: all .2s ease-in-out;
+      }
+    
+      input[type="checkbox"].switch_1:checked{
+      background: #007bff;
+      }
+      
+      input[type="checkbox"].switch_1:after{
+      position: absolute;
+      content: "";
+      width: 1.5em;
+      height: 1.5em;
+      border-radius: 50%;
+      background: #fff;
+      -webkit-box-shadow: 0 0 .25em rgba(0,0,0,.3);
+              box-shadow: 0 0 .25em rgba(0,0,0,.3);
+      -webkit-transform: scale(.7);
+              transform: scale(.7);
+      left: 0;
+      -webkit-transition: all .2s ease-in-out;
+      transition: all .2s ease-in-out;
+      }
+      
+      input[type="checkbox"].switch_1:checked:after{
+      left: calc(100% - 1.5em);
+      }
+    
+      .tabs {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        border-bottom: 1px solid #ccc;
+      }
+      
+      .tab-link {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        float: left;
+        border-right: 1px solid #ccc;
+        color: #666;
+      }
+      
+      .tab-link:hover {
+        background-color: #f0f0f0;
+      }
+      
+      .active {
+        background-color: #ccc;
+        color: #fff;
+      }
+      
+      .tab-content {
+        display: none;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-top: none;
+      }
+      
+      .txtsurvey{
+        width: 100%;
+      }
+    
+      .td_submit{
+        text-align: -webkit-center;
+      }
+    
+    
+    
+    
+    
+    /*
+    
+    All grid code is placed in a 'supports' rule (feature query) at the bottom of the CSS (Line 320). 
+                
+    The 'supports' rule will only run if your browser supports CSS grid.
+    
+    Flexbox is used as a fallback so that browsers which don't support grid will still recieve an identical layout.
+    
+    */
+    
+    /* Base styles */
+    
+    
+    .columns {
+      display: flex;
+      justify-content: space-between;
+    
+    }
+    
+    
+    .column {
+      margin: 5px;
+      width: 200px;
+      
+      height: 500px ;
+      overflow: auto; 
+      margin-top: 7rem;
+    }
+    
+    .element {
+      border: 1px solid #d6d3d3; 
+      -webkit-box-shadow: 0px 1px 3px 0 rgba(0,0,0,0.2);
+      box-shadow: 0px 1px 3px 0 rgba(0,0,0,0.2);
+      padding: 5px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+    
+    .status_header{
+    border-radius: 5px;
+    padding: 5px;
+    margin-bottom: 11px;
+    
+    position: absolute;
+    width: 135px;
+    }
+    
+    .lead_name{
+      font-size: 1rem;
+    }
+    .lead_product{
+      font-size: small;
+      color: #999;
+    }
+    .lead_element:hover{
+      background-color: #eee;
+    }
+    .status_title{
+      font-size: large;
+      color: white;
+    }
+    .element.lead_element.width-10{
+      width: 10px;
+    }
+    @media ( max-width: 700px) {
+      .status_header{
+    
+        position: revert;
+    
+        width: 174px;
+        }
+      
+    }
+    
+    .groupBarGroup h3 {
+      font-size: 1.5rem;
+    }
+    
+    
+    p#text-english {
+      color: #fc636b!important  ;
+    }
+    
+    h1.customer_name{
+      padding: 0px;
+      margin: 0px;
+      border:0px;
+    }
+    
+    .borderless{
+      border: none;
+      outline: none;
+      background-color: transparent; /* Para quitar el fondo */
+      color: black; /* O el color que desees para el texto */
+      font-family: inherit; /* Para que use la misma fuente que el resto de tu diseÃ±o */
+      font-size: inherit; /* Para que use el mismo tamaÃ±o de fuente que el resto de tu diseÃ±o */
+      overflow: auto;
+    }
+    
+    input.readonly{
+      margin:0px;
+      border:0px;
+    }
+    
+    input.readonly {
+      margin: 0px;
+      padding: 0px;
+    }
+    .readonly:read-only {
+      cursor: default; /* O 'not-allowed' si prefieres ese estilo de cursor */
+      background-color: white;
+      overflow: auto;
+      width: 250px;
+    }
+    
+    #order-body label, 
+    #edit-order-body label,
+    #show-order-body label {
+      text-align: right;
+      font-weight: bold;
+      margin-bottom:0px;
+    }
+    
+    .customer-circle {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    div.initials {
+      width: 60px;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+    }
+    .customer_row {
+      background-color: #ffffff;
+      border-color: #ffffff;
+    }
+    
+    #sidenav .customer.customer_row:hover {
+      background-color: #f7cbd8;
+      border-color: #f7cbd8;
+    }
+    
+    .alert {
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid red;
+      background: red;
+      border-radius: 0.25rem;
+      width: 5vw;
+      text-align-last: center;
+      color: white;
+    }
+    
+    @media screen and (max-width: 992px) {
+      .responsive {
+        font-size: 8px;
+      }
+    }
+    
+    @media screen and (max-width: 600px) {
+      .responsive {
+        font-size: 8px;
+      }
+    }
+    
+    
+    #sidecontent #sidenav .customer.customer_row.row{
+      width: 100%;
+    }
