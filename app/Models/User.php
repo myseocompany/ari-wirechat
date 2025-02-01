@@ -29,7 +29,7 @@ class User extends Authenticatable
     {
         
         $customers = Customer::where('name', 'LIKE', "%{$query}%")
-            ->orWhere('phone_wp', 'LIKE', "%{$query}%")
+            ->orWhere('phone', 'LIKE', "%{$query}%")
             ->limit(20)
             ->get();
 
