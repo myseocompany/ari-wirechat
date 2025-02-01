@@ -26,6 +26,8 @@ use App\Http\Controllers\AudienceController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -354,5 +356,25 @@ Route::get('/reports/fm', [ReportController::class, 'RFM']);
 Route::get('/watoolbox/test', function(){
 
     return view('test');
+});
+
+
+Route::get('/reset_password', function(){
+
+    $hash = Hash::make('myseo2025');
+echo $hash."<br>";
+
+
+$contraseñaPlana = "myseo2025"; // o la contraseña que quieras verificar
+$hashAlmacenado = User::find(8)->password; // asumiendo que el modelo User tiene el campo password
+
+if (Hash::check($contraseñaPlana, $hashAlmacenado)) {
+    // La contraseña es correcta
+    echo "El hash es correcto.";
+} else {
+    // La contraseña no coincide
+    echo "El hash no coincide.";
+}
+
 });
 
