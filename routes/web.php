@@ -360,21 +360,25 @@ Route::get('/watoolbox/test', function(){
 
 
 Route::get('/reset_password', function(){
-
+    // Generar un hash de prueba
     $hash = Hash::make('myseo2025');
-echo $hash."<br>";
+    echo $hash."<br>";
 
+    $contraseñaPlana = "myseo2025"; // La contraseña a verificar
+    $usuario = User::find(8);
 
-$contraseñaPlana = "myseo2025"; // o la contraseña que quieras verificar
-$hashAlmacenado = User::find(8)->password; // asumiendo que el modelo User tiene el campo password
+    if (!$usuario) {
+        echo "Usuario con ID 8 no encontrado.";
+        return;
+    }
 
-if (Hash::check($contraseñaPlana, $hashAlmacenado)) {
-    // La contraseña es correcta
-    echo "El hash es correcto.";
-} else {
-    // La contraseña no coincide
-    echo "El hash no coincide.";
-}
+    $hashAlmacenado = $usuario->password;
+
+    if (Hash::check($contraseñaPlana, $hashAlmacenado)) {
+        echo "El hash es correcto.";
+    } else {
+        echo "El hash no coincide.";
+    }
 
 });
 
