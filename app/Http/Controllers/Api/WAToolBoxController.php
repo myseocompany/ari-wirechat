@@ -34,6 +34,8 @@ class WAToolBoxController extends Controller{
     
         Log::info('Receiving data at WAToolBoxController receiveMessage:', [$request->all()]);
 
+
+
     // Validar los datos del request
     $validatedData = $request->validate([
         'id' => 'required|string',
@@ -87,14 +89,15 @@ class WAToolBoxController extends Controller{
     
 
     Log::info('Telefono Nicolas '.$reciver_phone);
-    
-     $message = $coder->sendMessageTo($nicolas, $validatedData['content']);
+    logger(["content"=>$validatedData['content']]);
+    $message = $coder->sendMessageTo($nicolas, /*$validatedData['content']*/ "demo");
+
     $conversation = $message->conversation;
     Log::info('Telefono enviado '.$message);
     broadcast(new MessageCreated($message));
     NotifyParticipants::dispatch($message->conversation,$message);
 
-    if (false) {
+    if (isset($validatedData['content'])) {
         try {
             // Decodificar la imagen Base64 y guardarla
             
