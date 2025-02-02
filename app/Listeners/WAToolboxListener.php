@@ -5,7 +5,7 @@ namespace App\Listeners;
 use App\Models\Customer;
 use App\Models\User;
 use App\Services\WAToolboxService;
-use GuzzleHttp\Psr7\Message;
+
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -29,13 +29,8 @@ class WAToolboxListener
      */
     public function handle(object $event): void
     {
-        
-        
-        
-        
-        
         $sendable_type = $event->message->sendable_type;
-        logger(['message'=> $sendable_type ]);
+       //logger(['event'=> $event ]);
 
         if ($sendable_type === 'App\\Models\\User'){
             $message  = ModelsMessage::find( $event->message->id );
@@ -47,27 +42,30 @@ class WAToolboxListener
                         ->orWhere('participantable_type', '<>', $user->getMorphClass());
                 })->first();
             $customer = $customer->participantable;
-            logger(['customer' => $customer]);
+            //logger(['customer' => $customer]);
             // $phone_number = Customer::find( $event->message['body'] );
             $phone_number = $customer->phone;
 
         $this->defaultMessageSource = $user?->getUserDefaultMessageSource();
-        logger($this->defaultMessageSource->settings);
+        //logger($this->defaultMessageSource->settings);
         if ($this->defaultMessageSource) {
-            logger('reacched');
+            //logger('reacched');
             $this->waToolboxService = new WAToolboxService($this->defaultMessageSource);
-            logger('reacched 2');
-
-        
+            //logger('reacched 2');
                 Log::info('WAToolnbox MessageControler', [$this->defaultMessageSource->settings]);
-                
-                $message = $event->message['body'];
-                
-
-                $response = $this->waToolboxService->sendMessageToWhatsApp([
+                logger(['message'=>$message]);
+                $wa_message = $event->message['body'];
+                $payload = [
                     'phone_number' => $phone_number,
-                    'message' => $message,
-                ]);
+                    'message' => $wa_message,
+                ];
+                if(isset($message->attachment->file_path)){
+                    $payload['media_url'] = "/".$message->attachment->file_path;
+                    logger(['medial_url'=>$message->attachment->file_path]);
+                }
+
+                
+                $response = $this->waToolboxService->sendMessageToWhatsApp($payload);
 
             $webhookUrl = $this->defaultMessageSource->settings['webhook_url'];
             logger ($webhookUrl);

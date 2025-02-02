@@ -23,9 +23,9 @@ class WAToolboxService {
     {
         $response = Http::asJson()->post($this->end_point, [
             'action' => 'send-message',
-            'type' => 'text',
             'phone' => $data['phone_number'],
             'content' => $data['message'],
+            'type' => 'text',
             'is_outgoing' => true,
         ]);
 
