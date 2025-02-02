@@ -47,7 +47,7 @@ class WAToolboxListener
             $phone_number = $customer->phone;
 
         $this->defaultMessageSource = $user?->getUserDefaultMessageSource();
-        //logger($this->defaultMessageSource->settings);
+        
         if ($this->defaultMessageSource) {
             //logger('reacched');
             $this->waToolboxService = new WAToolboxService($this->defaultMessageSource);
