@@ -37,19 +37,19 @@ class WAToolboxListener
         $sendable_type = $event->message->sendable_type;
         logger(['message'=> $sendable_type ]);
 
-        if ($sendable_type === 'App\\Models\\Customer'){
+        if ($sendable_type === 'App\\Models\\User'){
             $message  = ModelsMessage::find( $event->message->id );
-        $response = null;
-        $user = $message->sendable; // get User
-        $customer = $message->conversation->participants()
-            ->where(function ($query) use ($user) {
-                $query->where('participantable_id', '<>', $user->id)
-                     ->orWhere('participantable_type', '<>', $user->getMorphClass());
-            })->first();
-        $customer = $customer->participantable;
-        logger($customer);
-        // $phone_number = Customer::find( $event->message['body'] );
-        $phone_number = $customer->phone;
+            $response = null;
+            $user = $message->sendable; // get User
+            $customer = $message->conversation->participants()
+                ->where(function ($query) use ($user) {
+                    $query->where('participantable_id', '<>', $user->id)
+                        ->orWhere('participantable_type', '<>', $user->getMorphClass());
+                })->first();
+            $customer = $customer->participantable;
+            logger(['customer' => $customer]);
+            // $phone_number = Customer::find( $event->message['body'] );
+            $phone_number = $customer->phone;
 
         $this->defaultMessageSource = $user?->getUserDefaultMessageSource();
         logger($this->defaultMessageSource->settings);
