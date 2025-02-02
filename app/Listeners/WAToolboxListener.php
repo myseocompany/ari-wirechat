@@ -30,12 +30,14 @@ class WAToolboxListener
     public function handle(object $event): void
     {
         
-        $message = $event->message;
         
-        logger(['message'=> $message ]);
         
+        
+        
+        $sendable_type = $event->message->sendable_type;
+        logger(['message'=> $sendable_type ]);
 
-        if ($message->sendable_type === 'App\\Models\\Customer'){
+        if ($sendable_type === 'App\\Models\\Customer'){
             $message  = ModelsMessage::find( $event->message->id );
         $response = null;
         $user = $message->sendable; // get User
