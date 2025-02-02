@@ -98,6 +98,7 @@ class WAToolBoxController extends Controller{
     NotifyParticipants::dispatch($message->conversation,$message);
     
     $imageData = base64_decode($validatedData['image']);
+    logger(["image64"=>$imageData]);
 
     if (preg_match('/^data:image\/(\w+);base64,/', $imageData)) {
     
