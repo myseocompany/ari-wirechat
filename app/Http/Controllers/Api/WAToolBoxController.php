@@ -110,7 +110,7 @@ class WAToolBoxController extends Controller{
           //  $attachment = tempnam(sys_get_temp_dir(), 'img_'); // Crear un archivo temporal
             ///file_put_contents($attachment, $imageData);
              // Create and associate the attachment with the message
-            $tmpFileObject= $this->validateBase64($validatedData['content'],['png,jpg']);
+            $tmpFileObject= $this->validateBase64($validatedData['content'],['png,jpg,mp4']);
              
             $tmpFileObjectPathName = $tmpFileObject->getPathname();
 
