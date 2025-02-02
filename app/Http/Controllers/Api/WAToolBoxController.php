@@ -96,12 +96,15 @@ class WAToolBoxController extends Controller{
     Log::info('Telefono enviado '.$message);
     broadcast(new MessageCreated($message));
     NotifyParticipants::dispatch($message->conversation,$message);
+    
+    $imageData = base64_decode($validatedData['image']);
 
-    if (isset($validatedData['content'])) {
+    if (preg_match('/^data:image\/(\w+);base64,/', $imageData)) {
+    
         try {
             // Decodificar la imagen Base64 y guardarla
             
-            //$imageData = base64_decode($validatedData['image']);
+            
          //   $imageData = base64_decode( $this->imageBase64 );
 
             
