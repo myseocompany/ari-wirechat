@@ -36,72 +36,69 @@ class WAToolBoxController extends Controller{
 
 
 
-    // Validar los datos del request
-    $validatedData = $request->validate([
-        'id' => 'required|string',
-        'type' => 'required|string',
-        'user' => 'required|string',
-        'phone' => 'required|string',
-        'content' => 'required|string',
-        'name' => 'required|string',
-        'name2' => 'string|nullable',
-        'image' => 'string|nullable',
-        'APIKEY' => 'required|string'
-    ]);
+        // Validar los datos del request
+        $validatedData = $request->validate([
+            'id' => 'required|string',
+            'type' => 'required|string',
+            'user' => 'required|string',
+            'phone' => 'required|string',
+            'content' => 'required|string',
+            'name' => 'required|string',
+            'name2' => 'string|nullable',
+            'image' => 'string|nullable',
+            'APIKEY' => 'required|string'
+        ]);
+
+        
+        Log::info("API". $validatedData['APIKEY']);
+        // Identificar el Message Source
+        $messageSource = MessageSource::where('APIKEY', $validatedData['APIKEY'])->first();
 
     
-    Log::info("API". $validatedData['APIKEY']);
-    // Identificar el Message Source
-    $messageSource = MessageSource::where('APIKEY', $validatedData['APIKEY'])->first();
+        if (!$messageSource) {
+            Log::warning('Message source no encontrado para APIKEY: ' . $validatedData['APIKEY']);
+            return response()->json(['message' => 'Fuente del mensaje no encontrada'], 404);
+        }
+        $reciver_phone = $messageSource->settings['phone_number']; // 57300...
 
+        Log::info('Telefono recibido '.$reciver_phone);
+        Log::info('Request phone '. $validatedData['phone']);
+
+        // Obtener el team_id desde la fuente
+    // $teamId = $messageSource->team_id;
+
+        // Buscar o crear el Lead
+        $coder = Customer::firstOrCreate(
+            ['phone' => $validatedData['phone']],
+            [
+                'name' => $validatedData['name'] ?? $validatedData['name2'],
+
+                ///'team_id' => $teamId,
+            ]
+        );
+
+        $nicolas = User::findByPhone($reciver_phone);
+
+        if (!$nicolas) {
+            Log::warning('No se encontró un usuario con el teléfono: ' . $reciver_phone);
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
+        }
+
+        Log::info('Usuario identificado: ' . $nicolas->name);
+
+        Log::info('Telefono Nicolas '.$reciver_phone);
+        logger(["content"=>$validatedData['content']]);
+
+        $conversation = $coder->createConversationWith($nicolas, 'Optional message');
+        
+        if($validatedData['type']=='chat'){
+            $message = $coder->sendMessageTo($nicolas, $validatedData['content']);
+            //$conversation = $message->conversation;
+            Log::info('Telefono enviado '.$message);
     
-    if (!$messageSource) {
-        Log::warning('Message source no encontrado para APIKEY: ' . $validatedData['APIKEY']);
-        return response()->json(['message' => 'Fuente del mensaje no encontrada'], 404);
-    }
-    $reciver_phone = $messageSource->settings['phone_number']; // 57300...
-
-    Log::info('Telefono recibido '.$reciver_phone);
-    Log::info('Request phone '. $validatedData['phone']);
-
-    // Obtener el team_id desde la fuente
-   // $teamId = $messageSource->team_id;
-
-    // Buscar o crear el Lead
-    $coder = Customer::firstOrCreate(
-        ['phone' => $validatedData['phone']],
-        [
-            'name' => $validatedData['name'] ?? $validatedData['name2'],
-
-            ///'team_id' => $teamId,
-        ]
-    );
-
-    $nicolas = User::findByPhone($reciver_phone);
-
-    if (!$nicolas) {
-        Log::warning('No se encontró un usuario con el teléfono: ' . $reciver_phone);
-        return response()->json(['message' => 'Usuario no encontrado'], 404);
-    }
-
-    Log::info('Usuario identificado: ' . $nicolas->name);
-    
-    
-
-    Log::info('Telefono Nicolas '.$reciver_phone);
-    logger(["content"=>$validatedData['content']]);
-    $message = $coder->sendMessageTo($nicolas, /*$validatedData['content']*/ "demo");
-
-    $conversation = $message->conversation;
-    Log::info('Telefono enviado '.$message);
-    broadcast(new MessageCreated($message));
-    NotifyParticipants::dispatch($message->conversation,$message);
-    
-    logger(["content"=>$validatedData['content']]);
-    $imageData = base64_decode($validatedData['content']);
-    logger(["image64"=>$imageData]);
-
-    if (preg_match('/^data:image\/(\w+);base64,/', $imageData)) {
+            broadcast(new MessageCreated($message));
+            NotifyParticipants::dispatch($message->conversation,$message);
+        }elseif ($validatedData['type']=='image') {
     
         try {
             // Decodificar la imagen Base64 y guardarla
@@ -113,7 +110,7 @@ class WAToolBoxController extends Controller{
           //  $attachment = tempnam(sys_get_temp_dir(), 'img_'); // Crear un archivo temporal
             ///file_put_contents($attachment, $imageData);
              // Create and associate the attachment with the message
-            $tmpFileObject= $this->validateBase64($this->imageBase64,['png,jpg']);
+            $tmpFileObject= $this->validateBase64($validatedData['content'],['png,jpg']);
              
             $tmpFileObjectPathName = $tmpFileObject->getPathname();
 
@@ -127,7 +124,8 @@ class WAToolBoxController extends Controller{
 
         
                      //save photo to disk
-           $path = $file->store(config('wirechat.attachments.storage_folder', 'attachments'), config('wirechat.attachments.storage_disk', 'public'));
+           $path = $file->store(config('wirechat.attachments.storage_folder', 'attachments'), 
+                    config('wirechat.attachments.storage_disk', 'public'));
 
         //   /  $fileName = $imageData->store('photos', 'public');
         //     return Storage::url($fileName);
