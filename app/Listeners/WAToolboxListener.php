@@ -31,7 +31,7 @@ class WAToolboxListener
     {
         logger(['event'=> $event ]);
         // $event->message['APIKEY']
-        if ($message->sendable_type === 'App\\Models\\Customer')
+        if ($message->sendable_type === 'App\\Models\\Customer'){
             $message  = ModelsMessage::find( $event->message->id );
         $response = null;
         $user = $message->sendable; // get User
