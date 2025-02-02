@@ -92,6 +92,7 @@ class WAToolboxService {
             if (isset($data['media_url'])) {
                 $payload['type'] = 'media';
                 $payload['attachments'] = [config('app.url') . $data['media_url']];
+                $payload['content'] = "";
                 
             } else {
                 $payload['type'] = 'text';
