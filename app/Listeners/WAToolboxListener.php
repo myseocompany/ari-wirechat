@@ -60,14 +60,18 @@ class WAToolboxListener
                     'message' => $wa_message,
                 ];
                 if(isset($message->attachment->file_path)){
+                    $response = $this->waToolboxService->sendMessageToWhatsApp($payload);
                     
                     $payload['media_url'] = $message->attachment->url;
                     logger(['medial_url'=>$payload['media_url']]);
+                    $response = $this->waToolboxService->sendMessageToWhatsApp($payload);
+                    
+                }else{
+                    $response = $this->waToolboxService->sendMessageToWhatsApp($payload);
                 }
 
                 
-                $response = $this->waToolboxService->sendMessageToWhatsApp($payload);
-
+                
             $webhookUrl = $this->defaultMessageSource->settings['webhook_url'];
             logger ($webhookUrl);
             logger ($response);
