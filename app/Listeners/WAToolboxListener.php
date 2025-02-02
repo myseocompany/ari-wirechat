@@ -29,7 +29,7 @@ class WAToolboxListener
      */
     public function handle(object $event): void
     {
-        //logger(['event'=> $event ]);
+        logger(['event'=> $event ]);
         // $event->message['APIKEY']
         if(true){
             $message  = ModelsMessage::find( $event->message->id );
