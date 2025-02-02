@@ -962,3 +962,320 @@
 [2025-02-02 09:37:56] local.DEBUG: array (
   'success' => true,
 )  
+[2025-02-02 09:44:20] local.DEBUG: array (
+  'WAToolboxService' => 
+  array (
+    'webhook_url' => 'https://api.watoolbox.com/webhooks/19YC5Q41W',
+    'phone_number' => '573004410097',
+  ),
+)  
+[2025-02-02 09:44:20] local.INFO: WAToolBox endpoint set to: https://api.watoolbox.com/webhooks/19YC5Q41W  
+[2025-02-02 09:44:20] local.INFO: WAToolnbox MessageControler [{"webhook_url":"https://api.watoolbox.com/webhooks/19YC5Q41W","phone_number":"573004410097"}] 
+[2025-02-02 09:44:20] local.DEBUG: array (
+  'message' => 
+  \Namu\WireChat\Models\Message::__set_state(array(
+     'connection' => 'mysql',
+     'table' => 'wire_messages',
+     'primaryKey' => 'id',
+     'keyType' => 'int',
+     'incrementing' => true,
+     'with' => 
+    array (
+    ),
+     'withCount' => 
+    array (
+    ),
+     'preventsLazyLoading' => false,
+     'perPage' => 15,
+     'exists' => true,
+     'wasRecentlyCreated' => false,
+     'escapeWhenCastingToString' => false,
+     'attributes' => 
+    array (
+      'id' => 84,
+      'conversation_id' => 5,
+      'sendable_id' => 8,
+      'sendable_type' => 'App\\Models\\User',
+      'reply_id' => NULL,
+      'body' => NULL,
+      'type' => 'attachment',
+      'kept_at' => NULL,
+      'deleted_at' => NULL,
+      'created_at' => '2025-02-02 09:44:20',
+      'updated_at' => '2025-02-02 09:44:20',
+    ),
+     'original' => 
+    array (
+      'id' => 84,
+      'conversation_id' => 5,
+      'sendable_id' => 8,
+      'sendable_type' => 'App\\Models\\User',
+      'reply_id' => NULL,
+      'body' => NULL,
+      'type' => 'attachment',
+      'kept_at' => NULL,
+      'deleted_at' => NULL,
+      'created_at' => '2025-02-02 09:44:20',
+      'updated_at' => '2025-02-02 09:44:20',
+    ),
+     'changes' => 
+    array (
+    ),
+     'casts' => 
+    array (
+      'type' => 'Namu\\WireChat\\Enums\\MessageType',
+      'kept_at' => 'datetime',
+      'deleted_at' => 'datetime',
+    ),
+     'classCastCache' => 
+    array (
+    ),
+     'attributeCastCache' => 
+    array (
+    ),
+     'dateFormat' => NULL,
+     'appends' => 
+    array (
+    ),
+     'dispatchesEvents' => 
+    array (
+    ),
+     'observables' => 
+    array (
+    ),
+     'relations' => 
+    array (
+      'sendable' => 
+      \App\Models\User::__set_state(array(
+         'connection' => 'mysql',
+         'table' => 'users',
+         'primaryKey' => 'id',
+         'keyType' => 'int',
+         'incrementing' => true,
+         'with' => 
+        array (
+        ),
+         'withCount' => 
+        array (
+        ),
+         'preventsLazyLoading' => false,
+         'perPage' => 15,
+         'exists' => true,
+         'wasRecentlyCreated' => false,
+         'escapeWhenCastingToString' => false,
+         'attributes' => 
+        array (
+          'id' => 8,
+          'name' => 'Nicolás Navarro',
+          'include_reports' => 0,
+          'last_assigned' => 0,
+          'status_id' => 1,
+          'email' => 'soporterapido@myseocompany.co',
+          'notify_email' => NULL,
+          'role_id' => 1,
+          'assignable' => NULL,
+          'image_url' => NULL,
+          'last_login' => NULL,
+          'email_verified_at' => NULL,
+          'password' => '$2y$12$zlTh.Vvn7iK9aaCw8OJIUuzpWUsdnqlKArLUxKO25Ioa3VdgCzS2W',
+          'remember_token' => 'Uof4eLsDI0Wfjrx0CA3YvYR9ieEcKPdqeASC137ZKcraqCOgKnqDk7ORujPT',
+          'created_at' => '2018-02-07 20:13:51',
+          'updated_at' => '2024-08-29 16:27:46',
+        ),
+         'original' => 
+        array (
+          'id' => 8,
+          'name' => 'Nicolás Navarro',
+          'include_reports' => 0,
+          'last_assigned' => 0,
+          'status_id' => 1,
+          'email' => 'soporterapido@myseocompany.co',
+          'notify_email' => NULL,
+          'role_id' => 1,
+          'assignable' => NULL,
+          'image_url' => NULL,
+          'last_login' => NULL,
+          'email_verified_at' => NULL,
+          'password' => '$2y$12$zlTh.Vvn7iK9aaCw8OJIUuzpWUsdnqlKArLUxKO25Ioa3VdgCzS2W',
+          'remember_token' => 'Uof4eLsDI0Wfjrx0CA3YvYR9ieEcKPdqeASC137ZKcraqCOgKnqDk7ORujPT',
+          'created_at' => '2018-02-07 20:13:51',
+          'updated_at' => '2024-08-29 16:27:46',
+        ),
+         'changes' => 
+        array (
+        ),
+         'casts' => 
+        array (
+          'email_verified_at' => 'datetime',
+          'password' => 'hashed',
+        ),
+         'classCastCache' => 
+        array (
+        ),
+         'attributeCastCache' => 
+        array (
+        ),
+         'dateFormat' => NULL,
+         'appends' => 
+        array (
+        ),
+         'dispatchesEvents' => 
+        array (
+        ),
+         'observables' => 
+        array (
+        ),
+         'relations' => 
+        array (
+        ),
+         'touches' => 
+        array (
+        ),
+         'timestamps' => true,
+         'usesUniqueIds' => false,
+         'hidden' => 
+        array (
+          0 => 'password',
+          1 => 'remember_token',
+        ),
+         'visible' => 
+        array (
+        ),
+         'fillable' => 
+        array (
+          0 => 'name',
+          1 => 'email',
+          2 => 'password',
+          3 => 'role_id',
+        ),
+         'guarded' => 
+        array (
+          0 => '*',
+        ),
+         'authPasswordName' => 'password',
+         'rememberTokenName' => 'remember_token',
+      )),
+      'conversation' => 
+      \Namu\WireChat\Models\Conversation::__set_state(array(
+         'connection' => 'mysql',
+         'table' => 'wire_conversations',
+         'primaryKey' => 'id',
+         'keyType' => 'int',
+         'incrementing' => true,
+         'with' => 
+        array (
+        ),
+         'withCount' => 
+        array (
+        ),
+         'preventsLazyLoading' => false,
+         'perPage' => 15,
+         'exists' => true,
+         'wasRecentlyCreated' => false,
+         'escapeWhenCastingToString' => false,
+         'attributes' => 
+        array (
+          'id' => 5,
+          'type' => 'private',
+          'disappearing_started_at' => NULL,
+          'disappearing_duration' => NULL,
+          'created_at' => '2025-02-02 09:36:56',
+          'updated_at' => '2025-02-02 09:44:20',
+        ),
+         'original' => 
+        array (
+          'id' => 5,
+          'type' => 'private',
+          'disappearing_started_at' => NULL,
+          'disappearing_duration' => NULL,
+          'created_at' => '2025-02-02 09:36:56',
+          'updated_at' => '2025-02-02 09:44:20',
+        ),
+         'changes' => 
+        array (
+        ),
+         'casts' => 
+        array (
+          'type' => 'Namu\\WireChat\\Enums\\ConversationType',
+          'updated_at' => 'datetime',
+          'disappearing_started_at' => 'datetime',
+        ),
+         'classCastCache' => 
+        array (
+        ),
+         'attributeCastCache' => 
+        array (
+        ),
+         'dateFormat' => NULL,
+         'appends' => 
+        array (
+        ),
+         'dispatchesEvents' => 
+        array (
+        ),
+         'observables' => 
+        array (
+        ),
+         'relations' => 
+        array (
+        ),
+         'touches' => 
+        array (
+        ),
+         'timestamps' => true,
+         'usesUniqueIds' => false,
+         'hidden' => 
+        array (
+        ),
+         'visible' => 
+        array (
+        ),
+         'fillable' => 
+        array (
+          0 => 'disappearing_started_at',
+          1 => 'disappearing_duration',
+        ),
+         'guarded' => 
+        array (
+          0 => '*',
+        ),
+      )),
+    ),
+     'touches' => 
+    array (
+    ),
+     'timestamps' => true,
+     'usesUniqueIds' => false,
+     'hidden' => 
+    array (
+    ),
+     'visible' => 
+    array (
+    ),
+     'fillable' => 
+    array (
+      0 => 'body',
+      1 => 'sendable_type',
+      2 => 'sendable_id',
+      3 => 'conversation_id',
+      4 => 'reply_id',
+      5 => 'type',
+      6 => 'kept_at',
+    ),
+     'guarded' => 
+    array (
+      0 => '*',
+    ),
+     'forceDeleting' => false,
+  )),
+)  
+[2025-02-02 09:44:20] local.DEBUG: array (
+  'medial_url' => 'attachments/GgwaAHGpSEITnPz6YG4mQRUr2XHoBb5vf9dDmPWa.jpg',
+)  
+[2025-02-02 09:44:20] local.INFO: sendMessageToWhatsApp  {"phone_number":"573006932642","message":null,"media_url":"/attachments/GgwaAHGpSEITnPz6YG4mQRUr2XHoBb5vf9dDmPWa.jpg"} 
+[2025-02-02 09:44:20] local.INFO: sendMessageToWhatsApp payload {"action":"send-message","phone":"573006932642","content":null,"type":"media","attachments":["http://localhost/attachments/GgwaAHGpSEITnPz6YG4mQRUr2XHoBb5vf9dDmPWa.jpg"]} 
+[2025-02-02 09:44:21] local.INFO: sendMessageToWhatsApp payload [200] 
+[2025-02-02 09:44:21] local.DEBUG: https://api.watoolbox.com/webhooks/19YC5Q41W  
+[2025-02-02 09:44:21] local.DEBUG: array (
+  'success' => true,
+)  

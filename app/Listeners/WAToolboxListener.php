@@ -60,7 +60,7 @@ class WAToolboxListener
                     'message' => $wa_message,
                 ];
                 if(isset($message->attachment->file_path)){
-                    $payload['media_url'] = "/".$message->attachment->file_path;
+                    $payload['media_url'] = "/storage/".$message->attachment->file_path;
                     logger(['medial_url'=>$message->attachment->file_path]);
                 }
 
