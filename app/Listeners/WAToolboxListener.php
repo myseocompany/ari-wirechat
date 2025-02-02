@@ -29,8 +29,12 @@ class WAToolboxListener
      */
     public function handle(object $event): void
     {
-        logger(['event'=> $event ]);
-        $message = $event->message['APIKEY'];
+        
+        $message = $event->message;
+        
+        logger(['message'=> $message ]);
+        
+
         if ($message->sendable_type === 'App\\Models\\Customer'){
             $message  = ModelsMessage::find( $event->message->id );
         $response = null;
