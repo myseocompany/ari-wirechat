@@ -33,9 +33,6 @@ class WAToolBoxController extends Controller{
     public function receiveMessage(Request $request){
     
         Log::info('Receiving data at WAToolBoxController receiveMessage:', [$request->all()]);
-
-
-
         // Validar los datos del request
         $validatedData = $request->validate([
             'id' => 'required|string',
@@ -49,31 +46,18 @@ class WAToolBoxController extends Controller{
             'APIKEY' => 'required|string'
         ]);
 
-        
-        Log::info("API". $validatedData['APIKEY']);
         // Identificar el Message Source
         $messageSource = MessageSource::where('APIKEY', $validatedData['APIKEY'])->first();
-
-    
         if (!$messageSource) {
-            Log::warning('Message source no encontrado para APIKEY: ' . $validatedData['APIKEY']);
             return response()->json(['message' => 'Fuente del mensaje no encontrada'], 404);
         }
         $reciver_phone = $messageSource->settings['phone_number']; // 57300...
-
-        Log::info('Telefono recibido '.$reciver_phone);
-        Log::info('Request phone '. $validatedData['phone']);
-
-        // Obtener el team_id desde la fuente
-    // $teamId = $messageSource->team_id;
 
         // Buscar o crear el Lead
         $coder = Customer::firstOrCreate(
             ['phone' => $validatedData['phone']],
             [
                 'name' => $validatedData['name'] ?? $validatedData['name2'],
-
-                ///'team_id' => $teamId,
             ]
         );
 
@@ -87,17 +71,22 @@ class WAToolBoxController extends Controller{
         Log::info('Usuario identificado: ' . $nicolas->name);
 
         Log::info('Telefono Nicolas '.$reciver_phone);
-        logger(["content"=>$validatedData['content']]);
-
         $conversation = $coder->createConversationWith($nicolas, 'Optional message');
         
         if($validatedData['type']=='chat'){
             $message = $coder->sendMessageTo($nicolas, $validatedData['content']);
-            //$conversation = $message->conversation;
-            Log::info('Telefono enviado '.$message);
-    
             broadcast(new MessageCreated($message));
             NotifyParticipants::dispatch($message->conversation,$message);
+            //Get Participant from conversation
+            $participant = $message->conversation->participant($nicolas);
+
+            Log::info('Telefono enviado '.$message);
+            
+            //Broadcast message to chat 
+            broadcast(new MessageCreated($message));
+
+            //Notify participant directly 
+            broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
         }elseif ($validatedData['type']=='image') {
     
         try {
