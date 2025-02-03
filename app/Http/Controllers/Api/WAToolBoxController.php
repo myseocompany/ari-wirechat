@@ -137,6 +137,16 @@ class WAToolBoxController extends Controller{
             ]);
             unlink($tmpFileObjectPathName); // delete temp file
             broadcast(new MessageCreated($message))->toOthers();
+            //Get Participant from conversation
+                $participant = $message->conversation->participant($nicolas);
+
+                Log::info('Telefono enviado '.$message);
+                
+                //Broadcast message to chat 
+                broadcast(new MessageCreated($message));
+
+                //Notify participant directly 
+                broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
 
         NotifyParticipants::dispatch($message->conversation,$message);
 
