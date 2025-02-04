@@ -141,11 +141,12 @@ class WAToolBoxController extends Controller{
             catch (\Exception $e) {
                 logger('error '.$e);
             } 
-    } elseif ($validatedData['type'] == 'audio') {
+    } elseif ($validatedData['type'] == 'ptt') {
         try {
             // Validar y procesar el archivo base64 recibido
             $tmpFileObject = $this->validateBase64($validatedData['content'], ['mp3', 'wav', 'ogg']);
             if (!$tmpFileObject) {
+                logger(['message' => 'Archivo de audio no válido']);
                 return response()->json(['message' => 'Archivo de audio no válido'], 400);
             }
     
@@ -190,6 +191,8 @@ class WAToolBoxController extends Controller{
             broadcast(new MessageCreated($message))->toOthers();
             broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
             NotifyParticipants::dispatch($message->conversation, $message);
+
+            $message = "Mensaje de audio procesado correctamente.";
     
             Log::info('Mensaje de audio procesado correctamente.');
         } catch (\Exception $e) {

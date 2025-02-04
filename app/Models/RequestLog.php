@@ -8,6 +8,6 @@ class RequestLog extends Model
 {
     use HasFactory;
 
-    protected $table = 'logs';
+    protected $table = 'request_logs';
     protected $fillable = ['request', 'action', 'user_id', 'phone', 'facebook_id', 'email'];
 }
