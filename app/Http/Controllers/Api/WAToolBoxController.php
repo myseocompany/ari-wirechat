@@ -88,56 +88,39 @@ class WAToolBoxController extends Controller{
             //Notify participant directly 
             broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
         }elseif ($validatedData['type']=='image') {
-    
-        try {
-            // Decodificar la imagen Base64 y guardarla
-            
-            
-         //   $imageData = base64_decode( $this->imageBase64 );
+            try {
+                $tmpFileObject= $this->validateBase64($validatedData['content'],['png,jpg,mp4']);
+                $tmpFileObjectPathName = $tmpFileObject->getPathname();
 
-            
-          //  $attachment = tempnam(sys_get_temp_dir(), 'img_'); // Crear un archivo temporal
-            ///file_put_contents($attachment, $imageData);
-             // Create and associate the attachment with the message
-            $tmpFileObject= $this->validateBase64($validatedData['content'],['png,jpg,mp4']);
-             
-            $tmpFileObjectPathName = $tmpFileObject->getPathname();
+                $file = new UploadedFile(
+                    $tmpFileObjectPathName,
+                    $tmpFileObject->getFilename(),
+                    $tmpFileObject->getMimeType(),
+                    0,
+                    true
+                );
 
-            $file = new UploadedFile(
-                $tmpFileObjectPathName,
-                $tmpFileObject->getFilename(),
-                $tmpFileObject->getMimeType(),
-                0,
-                true
-            );
-
-        
-                     //save photo to disk
-           $path = $file->store(config('wirechat.attachments.storage_folder', 'attachments'), 
-                    config('wirechat.attachments.storage_disk', 'public'));
-
-        //   /  $fileName = $imageData->store('photos', 'public');
-        //     return Storage::url($fileName);
-            
-            
-            logger('testing '.$conversation);
-            $message = ModelsMessage::create([
-                'conversation_id' => $conversation->id,
-                'sendable_type' => $coder->getMorphClass(), // Polymorphic sender type
-                'sendable_id' => $coder->id, // Polymorphic sender ID
-                'type' => MessageType::ATTACHMENT,
-                // 'body' => $this->body, // Add body if required
-            ]);
-            $message->attachment()->create([
-                'file_path' => $path,
-                'file_name' => basename($path),
-                'original_name' => $file->getClientOriginalName(),
-                'mime_type' => $file->getMimeType(),
-                'url' => Storage::url($path),
-            ]);
-            unlink($tmpFileObjectPathName); // delete temp file
-            broadcast(new MessageCreated($message))->toOthers();
-            //Get Participant from conversation
+                $path = $file->store(config('wirechat.attachments.storage_folder', 'attachments'), 
+                        config('wirechat.attachments.storage_disk', 'public'));
+                    
+                logger('testing '.$conversation);
+                $message = ModelsMessage::create([
+                    'conversation_id' => $conversation->id,
+                    'sendable_type' => $coder->getMorphClass(), // Polymorphic sender type
+                    'sendable_id' => $coder->id, // Polymorphic sender ID
+                    'type' => MessageType::ATTACHMENT,
+                    // 'body' => $this->body, // Add body if required
+                ]);
+                $message->attachment()->create([
+                    'file_path' => $path,
+                    'file_name' => basename($path),
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getMimeType(),
+                    'url' => Storage::url($path),
+                ]);
+                unlink($tmpFileObjectPathName); // delete temp file
+                broadcast(new MessageCreated($message))->toOthers();
+                //Get Participant from conversation
                 $participant = $message->conversation->participant($nicolas);
 
                 Log::info('Telefono enviado '.$message);
@@ -148,13 +131,70 @@ class WAToolBoxController extends Controller{
                 //Notify participant directly 
                 broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
 
-        NotifyParticipants::dispatch($message->conversation,$message);
+                NotifyParticipants::dispatch($message->conversation,$message);
 
 
+            }
+            catch (\Exception $e) {
+                logger('error '.$e);
+            } 
+    }} elseif ($validatedData['type'] == 'audio') {
+        try {
+            // Validar y procesar el archivo base64 recibido
+            $tmpFileObject = $this->validateBase64($validatedData['content'], ['mp3', 'wav', 'ogg']);
+            if (!$tmpFileObject) {
+                return response()->json(['message' => 'Archivo de audio no válido'], 400);
+            }
+    
+            // Obtener el path temporal
+            $tmpFileObjectPathName = $tmpFileObject->getPathname();
+    
+            // Convertirlo en un UploadedFile para manejarlo con Laravel
+            $file = new UploadedFile(
+                $tmpFileObjectPathName,
+                $tmpFileObject->getFilename(),
+                $tmpFileObject->getMimeType(),
+                0,
+                true
+            );
+    
+            // Guardar el archivo en el sistema de almacenamiento
+            $path = $file->store(config('wirechat.attachments.storage_folder', 'attachments'), 
+                    config('wirechat.attachments.storage_disk', 'public'));
+    
+            // Crear el mensaje en la conversación
+            $message = ModelsMessage::create([
+                'conversation_id' => $conversation->id,
+                'sendable_type' => $coder->getMorphClass(),
+                'sendable_id' => $coder->id,
+                'type' => MessageType::ATTACHMENT, // Indica que es un archivo adjunto
+            ]);
+    
+            // Asociar el archivo adjunto al mensaje
+            $message->attachment()->create([
+                'file_path' => $path,
+                'file_name' => basename($path),
+                'original_name' => $file->getClientOriginalName(),
+                'mime_type' => $file->getMimeType(),
+                'url' => Storage::url($path),
+            ]);
+    
+            // Eliminar el archivo temporal
+            unlink($tmpFileObjectPathName);
+    
+            // Notificar a los participantes
+            $participant = $message->conversation->participant($nicolas);
+            broadcast(new MessageCreated($message))->toOthers();
+            broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
+            NotifyParticipants::dispatch($message->conversation, $message);
+    
+            Log::info('Mensaje de audio procesado correctamente.');
         } catch (\Exception $e) {
-            logger('error '.$e);
-        } 
-    }    
+            Log::error('Error al procesar el audio: ' . $e->getMessage());
+            return response()->json(['message' => 'Error al procesar el audio'], 500);
+        }
+    }
+        
 
     return response()->json([
         'message' => 'Data processed successfully',

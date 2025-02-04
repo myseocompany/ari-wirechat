@@ -2514,12 +2514,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/myseocompany/wirechat.git",
-                "reference": "34d63cdcadeece395cb30a48d272684b44ef1551"
+                "reference": "10a0e28607579415e01578352993835ec47f5af7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myseocompany/wirechat/zipball/34d63cdcadeece395cb30a48d272684b44ef1551",
-                "reference": "34d63cdcadeece395cb30a48d272684b44ef1551",
+                "url": "https://api.github.com/repos/myseocompany/wirechat/zipball/10a0e28607579415e01578352993835ec47f5af7",
+                "reference": "10a0e28607579415e01578352993835ec47f5af7",
                 "shasum": ""
             },
             "require": {
@@ -2601,7 +2601,7 @@
                     "url": "https://github.com/namumakwembo"
                 }
             ],
-            "time": "2025-02-04T07:26:10+00:00"
+            "time": "2025-02-04T08:26:08+00:00"
         },
         {
             "name": "nesbot/carbon",
@@ -10100,6 +10100,6 @@
     "platform": {
         "php": "^8.2"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
