@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "435899083461f4ea3d61dc9f1ce6aca9",
+    "content-hash": "4c227b4b6d3c33685a7471e3ff6d98db",
     "packages": [
         {
             "name": "brick/math",
@@ -2510,16 +2510,16 @@
         },
         {
             "name": "namu/wirechat",
-            "version": "v0.0.7",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/namumakwembo/wirechat.git",
-                "reference": "db0091e0324f7558b35b5a6a2a2a828516333c87"
+                "url": "https://github.com/myseocompany/wirechat.git",
+                "reference": "63426bd36a58bb349696489afe145864e452099e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/namumakwembo/wirechat/zipball/db0091e0324f7558b35b5a6a2a2a828516333c87",
-                "reference": "db0091e0324f7558b35b5a6a2a2a828516333c87",
+                "url": "https://api.github.com/repos/myseocompany/wirechat/zipball/63426bd36a58bb349696489afe145864e452099e",
+                "reference": "63426bd36a58bb349696489afe145864e452099e",
                 "shasum": ""
             },
             "require": {
@@ -2534,6 +2534,7 @@
                 "pestphp/pest": "^2.34|^3.0.0",
                 "pestphp/pest-plugin-laravel": "^2.4|^3.0.0"
             },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -2547,7 +2548,41 @@
                     "Namu\\WireChat\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "Namu\\WireChat\\Tests\\": "tests/",
+                    "Workbench\\App\\": "workbench/app/",
+                    "Namu\\WireChat\\Workbench\\Database\\Factories\\": "workbench/database/factories/",
+                    "Namu\\WireChat\\Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+                }
+            },
+            "scripts": {
+                "post-autoload-dump": [
+                    "@clear",
+                    "@prepare"
+                ],
+                "clear": [
+                    "@php vendor/bin/testbench package:purge-skeleton --ansi"
+                ],
+                "prepare": [
+                    "@php vendor/bin/testbench package:discover --ansi"
+                ],
+                "build": [
+                    "@php vendor/bin/testbench workbench:build --ansi"
+                ],
+                "serve": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "@build",
+                    "@php vendor/bin/testbench serve"
+                ],
+                "lint": [
+                    "@php vendor/bin/phpstan analyse"
+                ],
+                "test": [
+                    "@php vendor/bin/pest --parallel",
+                    "@php vendor/bin/pint"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -2558,16 +2593,15 @@
             ],
             "description": "A Laravel Livewire messaging app for teams with private chats and group conversations.",
             "support": {
-                "issues": "https://github.com/namumakwembo/wirechat/issues",
-                "source": "https://github.com/namumakwembo/wirechat/tree/v0.0.7"
+                "source": "https://github.com/myseocompany/wirechat/tree/main"
             },
             "funding": [
                 {
-                    "url": "https://github.com/namumakwembo",
-                    "type": "github"
+                    "type": "github",
+                    "url": "https://github.com/namumakwembo"
                 }
             ],
-            "time": "2024-12-19T23:04:04+00:00"
+            "time": "2025-02-04T06:26:19+00:00"
         },
         {
             "name": "nesbot/carbon",
@@ -10058,7 +10092,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "namu/wirechat": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
