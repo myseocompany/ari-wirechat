@@ -27,8 +27,17 @@ class User extends Authenticatable
 
     public function searchChatables(string $query): Collection
     {
+        $only_my_customers = session('only_my_message_sources');
         
+
         $customers = Customer::where('name', 'LIKE', "%{$query}%")
+            
+            ->where(function($query)use($only_my_customers){
+                if($only_my_customers){
+                    $query->where('user_id', auth()->id());
+                }
+            })
+        
             ->orWhere('phone', 'LIKE', "%{$query}%")
             ->limit(20)
             ->get();

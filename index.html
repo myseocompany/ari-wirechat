@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grabación de Voz</title>
+</head>
+<body>
+    <h1>Grabador de Voz</h1>
+    <button id="startRecording">Iniciar Grabación</button>
+    <button id="stopRecording" disabled>Detener Grabación</button>
+    <p>Reproducción del audio grabado:</p>
+    <audio id="audioPlayback" controls></audio>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        const startButton = document.getElementById("startRecording");
+        const stopButton = document.getElementById("stopRecording");
+        const audioPlayback = document.getElementById("audioPlayback");
+
+        // Solicitar permisos para usar el micrófono
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then((stream) => {
+                // Inicializar MediaRecorder con el stream del micrófono
+                mediaRecorder = new MediaRecorder(stream);
+
+                // Evento que se dispara cuando hay datos disponibles
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                // Evento que se dispara al detener la grabación
+                mediaRecorder.onstop = () => {
+                    // Crear un blob a partir de los datos grabados
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioChunks = []; // Reiniciar el arreglo para futuras grabaciones
+
+                    // Crear una URL para reproducir el blob
+                    const audioURL = URL.createObjectURL(audioBlob);
+                    audioPlayback.src = audioURL; // Mostrar el audio en la etiqueta <audio>
+                };
+
+                // Configurar botones
+                startButton.addEventListener("click", () => {
+                    mediaRecorder.start();
+                    startButton.disabled = true;
+                    stopButton.disabled = false;
+                    console.log("Grabación iniciada...");
+                });
+
+                stopButton.addEventListener("click", () => {
+                    mediaRecorder.stop();
+                    startButton.disabled = false;
+                    stopButton.disabled = true;
+                    console.log("Grabación detenida.");
+                });
+            })
+            .catch((error) => {
+                console.error("Error al acceder al micrófono:", error);
+                alert("No se pudo acceder al micrófono. Por favor, verifica los permisos.");
+            });
+    </script>
+</body>
+</html>
