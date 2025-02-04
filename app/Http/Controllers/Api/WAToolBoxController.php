@@ -8,10 +8,12 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Customer;
 use App\Models\Message;
+
 use Illuminate\Support\Facades\Auth;
 
 use App\Services\MessageService;
 use App\Models\MessageSource;
+use App\Models\RequestLog;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\File as HttpFile;
@@ -31,6 +33,7 @@ class WAToolBoxController extends Controller{
     public $imageBase64 = "";
 
     public function receiveMessage(Request $request){
+        $this->saveRequestLog($request);
     
         Log::info('Receiving data at WAToolBoxController receiveMessage:', [$request->all()]);
         // Validar los datos del request
@@ -138,7 +141,7 @@ class WAToolBoxController extends Controller{
             catch (\Exception $e) {
                 logger('error '.$e);
             } 
-    }} elseif ($validatedData['type'] == 'audio') {
+    } elseif ($validatedData['type'] == 'audio') {
         try {
             // Validar y procesar el archivo base64 recibido
             $tmpFileObject = $this->validateBase64($validatedData['content'], ['mp3', 'wav', 'ogg']);
@@ -328,5 +331,22 @@ private function validateBase64(string $base64data, array $allowedMimeTypes)
         }
 
         return $type_id;
+    }
+
+    public function saveRequestLog(Request $request)
+    {
+        $model = new RequestLog();
+
+        // Verificar si la solicitud es JSON
+        if ($request->isJson()) {
+            $requestData = $request->json()->all();
+        } else {
+            // Si no es JSON, obtener todos los datos de la solicitud
+            $requestData = $request->all();
+        }
+
+        // Guardar la solicitud como JSON
+        $model->request = json_encode($requestData);
+        $model->save();
     }
 }
