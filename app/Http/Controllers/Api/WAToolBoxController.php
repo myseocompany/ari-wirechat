@@ -74,7 +74,7 @@ class WAToolBoxController extends Controller{
         Log::info('Usuario identificado: ' . $nicolas->name);
 
         Log::info('Telefono Nicolas '.$reciver_phone);
-        $conversation = $coder->createConversationWith($nicolas, 'Optional message');
+        $conversation = $coder->createConversationWith($nicolas);
         
         if($validatedData['type']=='chat'){
             $message = $coder->sendMessageTo($nicolas, $validatedData['content']);

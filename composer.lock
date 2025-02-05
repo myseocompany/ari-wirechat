@@ -2514,12 +2514,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/myseocompany/wirechat.git",
-                "reference": "e4e973e7ca176fa51e6c08acd8d0a99414617999"
+                "reference": "4cafd40bb98a54b8272d0f58f7f1cfe443514734"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/myseocompany/wirechat/zipball/e4e973e7ca176fa51e6c08acd8d0a99414617999",
-                "reference": "e4e973e7ca176fa51e6c08acd8d0a99414617999",
+                "url": "https://api.github.com/repos/myseocompany/wirechat/zipball/4cafd40bb98a54b8272d0f58f7f1cfe443514734",
+                "reference": "4cafd40bb98a54b8272d0f58f7f1cfe443514734",
                 "shasum": ""
             },
             "require": {
@@ -2601,7 +2601,7 @@
                     "url": "https://github.com/namumakwembo"
                 }
             ],
-            "time": "2025-02-05T21:35:07+00:00"
+            "time": "2025-02-05T21:37:19+00:00"
         },
         {
             "name": "nesbot/carbon",
