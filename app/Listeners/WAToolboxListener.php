@@ -46,7 +46,8 @@ class WAToolboxListener
             // $phone_number = Customer::find( $event->message['body'] );
             $phone_number = $customer->phone;
 
-        $this->defaultMessageSource = $user?->getUserDefaultMessageSource();
+        $this->defaultMessageSource = $user?->getDefaultMessageSource();
+        logger($this->defaultMessageSource );
         
         if ($this->defaultMessageSource) {
             //logger('reacched');

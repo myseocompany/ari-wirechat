@@ -83,6 +83,13 @@ class User extends Authenticatable
         return $this->messageSources()->wherePivot('is_default', true)->first() ?? $this->getFirstMessageSource();
     }
 
+    // Método corregido para obtener el message_source predeterminado global
+    public function getDefaultMessageSource()
+    {
+        return MessageSource::where('is_default', true)->first() ?? $this->getFirstMessageSource();
+    }
+
+
     use HasFactory, Notifiable;
 
     /**
