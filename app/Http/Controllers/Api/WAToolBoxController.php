@@ -78,8 +78,10 @@ class WAToolBoxController extends Controller{
         
         if($validatedData['type']=='chat'){
             $message = $coder->sendMessageTo($nicolas, $validatedData['content']);
-            broadcast(new MessageCreated($message));
-            NotifyParticipants::dispatch($message->conversation,$message);
+            
+            //broadcast(new MessageCreated($message));
+            //NotifyParticipants::dispatch($message->conversation,$message);
+
             //Get Participant from conversation
             $participant = $message->conversation->participant($nicolas);
 
