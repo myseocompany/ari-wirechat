@@ -61,8 +61,8 @@ class WAToolboxListener
                 ];
                 if(isset($message->attachment->file_path)){
 
-                    $payload['message'] = config('app.url') .$message->attachment->url;
-                    $response = $this->waToolboxService->sendMessageToWhatsApp($payload);
+                    /* $payload['message'] = config('app.url') .$message->attachment->url;
+                    $response = $this->waToolboxService->sendMessageToWhatsApp($payload); */
 
                     
                     
