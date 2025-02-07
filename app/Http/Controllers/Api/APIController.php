@@ -1206,10 +1206,10 @@ class APIController extends Controller
         // vericamos que no se inserte 2 veces
        
         $count = $this->isEqual($request);
-        dd($count);
+        
         $similar = $this->getSimilar($request);
 
-
+        dd($similar);
 
         if (is_null($count) || ($count == 0)) {
             // verificamos uno similar
