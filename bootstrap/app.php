@@ -14,7 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except:[
-            'api/watoolbox'
+            'api/watoolbox',
+            'api/customers/update'
+            
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
