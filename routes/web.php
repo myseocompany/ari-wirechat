@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\RDTestController;
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CustomerController;
@@ -151,7 +152,7 @@ Route::middleware('auth')->prefix('api')->group(function () {
     Route::post('/update_lead_score', [APIController::class, 'saveFromRD2']);
 });
 Route::get('api/customers/saveCustomer', [APIController::class, 'saveApi'])->withoutMiddleware(['auth']);
-Route::get('api/customers/update', [APIController::class, 'updateFromRD'])->withoutMiddleware(['auth']);
+Route::post('api/customers/update', [APIController::class, 'updateFromRD'])->withoutMiddleware(['auth']);
 
 // References Routes
 Route::middleware('auth')->prefix('references')->group(function () {
@@ -283,6 +284,7 @@ Route::get('/import', [ImportController::class, 'index']);
 // Mail Routes
 Route::get('/send-to-teacheable', [APIController::class, 'sendToTeacheable']);
 Route::get('/send-mail', [MailController::class, 'send']);
+
 Route::get('/wa/test', [WhatsAppAPIController::class, 'test']);
 
 // Clientify Contacts Routes
@@ -381,4 +383,7 @@ Route::get('/reset_password', function(){
     }
 
 });
+
+Route::get('/rdtest', [RDTestController::class, 'test']);
+Route::post('/rdtest', [RDTestController::class, 'handleRequest'])->name('rdtest.post');
 
