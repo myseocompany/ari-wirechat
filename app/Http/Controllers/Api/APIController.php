@@ -1,7 +1,8 @@
 <?php
 //MQE
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB;
 use Mail;
@@ -28,7 +29,7 @@ use App\Models\Session;
 use App\Models\Reference;
 use App\Models\RdStation;
 //use Illuminate\Support\Facades\Http;
-use App\Models\Log;
+use App\Models\RequestLog;
 
 class APIController extends Controller
 {
@@ -1203,10 +1204,12 @@ class APIController extends Controller
     {
         $this->saveLogFromRequest($request);
         // vericamos que no se inserte 2 veces
+       
         $count = $this->isEqual($request);
+        
         $similar = $this->getSimilar($request);
 
-
+        dd($similar);
 
         if (is_null($count) || ($count == 0)) {
             // verificamos uno similar
@@ -2408,7 +2411,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
 
     public function saveLogFromRequest(Request $request)
     {
-        $model = new Log();
+        $model = new RequestLog();
 
         // Verificar si la solicitud es JSON
         if ($request->isJson()) {

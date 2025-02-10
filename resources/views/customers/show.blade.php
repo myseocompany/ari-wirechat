@@ -924,7 +924,7 @@
   </div>
   <script>
     document.getElementById("btnCopiar").addEventListener("click", function() {
-      var textoCopiar = "https://crmquirky.com.co/metadata/{{$model->id}}/create/poe/40";
+      var textoCopiar = "https://arichat.co/metadata/{{$model->id}}/create/poe/40";
 
       var elementoInput = document.createElement("input");
       elementoInput.value = textoCopiar;
