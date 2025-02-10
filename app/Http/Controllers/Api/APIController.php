@@ -2434,7 +2434,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         $this->saveLogFromRequest($request);
 
         $json = $request->json()->all();
-        //dd($json);
+        
         $data = "";
         if (isset($json["leads"]))
             $data = $json["leads"][0];
@@ -2465,7 +2465,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
                     $model->notes .= " update2 " . $value;
             }
         }
-
+        
         $lead = $json["leads"][0]; // Toma el primer lead
 
         // Verifica si 'first_conversion', 'content' y 'note' están presentes

@@ -10,7 +10,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerStatusController;
 use App\Http\Controllers\ActionController;
 use App\Http\Controllers\CustomerFileController;
-use App\Http\Controllers\APIController;
+use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\ReferencesController;
 use App\Http\Controllers\WompiController;
 use App\Http\Controllers\MailController;
@@ -152,7 +152,7 @@ Route::middleware('auth')->prefix('api')->group(function () {
     Route::post('/update_lead_score', [APIController::class, 'saveFromRD2']);
 });
 Route::get('api/customers/saveCustomer', [APIController::class, 'saveApi'])->withoutMiddleware(['auth']);
-Route::post('api/customers/update', [APIController::class, 'updateFromRD'])->withoutMiddleware(['auth']);
+Route::post('api/customers/update', [APIController::class, 'updateFromRD'])->withoutMiddleware(['auth'])->name('updateRD');
 
 // References Routes
 Route::middleware('auth')->prefix('references')->group(function () {

@@ -8,9 +8,8 @@
 <body>
     <h1>Enviar Leads</h1>
 
-    <form action="{{ route('rdtest.post') }}" method="POST">
-        @csrf
-        <textarea name="json_data" rows="10" cols="50">
+    <form id="leadForm">
+        <textarea id="json_data" rows="10" cols="50">
 {
     "leads": [
         {
@@ -31,5 +30,24 @@
         <button type="submit">Enviar</button>
     </form>
 
+    <script>
+        document.getElementById("leadForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Evita la recarga del formulario
+
+            let jsonData = document.getElementById("json_data").value.trim();
+
+            fetch("{{ route('updateRD') }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                body: jsonData
+            })
+            .then(response => response.json())
+            .then(data => console.log("Respuesta del servidor:", data))
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
 </body>
 </html>
