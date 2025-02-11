@@ -27,6 +27,7 @@ use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Events\MessageCreated;
 use Namu\WireChat\Jobs\NotifyParticipants;
 use Namu\WireChat\Models\Message as ModelsMessage;
+use App\Enums\WAMessageType;
 
 
 class WAToolBoxController extends Controller{
@@ -351,7 +352,11 @@ private function validateBase64(string $base64data, array $allowedMimeTypes)
         }
 
         // Guardar la solicitud como JSON
-        $model->request = json_encode($requestData);
-        $model->save();
+        logger($requestData);
+        if($requestData["type"]!= WAMessageType::IMAGE->value){
+            $model->request =  json_encode($requestData);
+            $model->save();
+
+        }    
     }
 }
