@@ -58,7 +58,7 @@ class WAToolBoxController extends Controller{
         $reciver_phone = $messageSource->settings['phone_number']; // 57300...
 
         // Buscar o crear el Lead
-        $coder = Customer::firstOrCreate(
+        $sender = Customer::firstOrCreate(
             ['phone' => $validatedData['phone']],
             [
                 'name' => $validatedData['name'] ?? $validatedData['name2'],
@@ -67,26 +67,26 @@ class WAToolBoxController extends Controller{
             ]
         );
 
-        $nicolas = User::findByPhone($reciver_phone);
+        $receiver_user = User::findByPhone($reciver_phone);
 
-        if (!$nicolas) {
+        if (!$receiver_user) {
             Log::warning('No se encontró un usuario con el teléfono: ' . $reciver_phone);
             return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
 
-        Log::info('Usuario identificado: ' . $nicolas->name);
+        Log::info('Usuario identificado: ' . $receiver_user->name);
 
         Log::info('Telefono Nicolas '.$reciver_phone);
-        $conversation = $coder->createConversationWith($nicolas);
+        $conversation = $sender->createConversationWith($receiver_user);
         
         if($validatedData['type']=='chat'){
-            $message = $coder->sendMessageTo($nicolas, $validatedData['content']);
+            $message = $sender->sendMessageTo($receiver_user, $validatedData['content']);
             
             //broadcast(new MessageCreated($message));
             //NotifyParticipants::dispatch($message->conversation,$message);
 
             //Get Participant from conversation
-            $participant = $message->conversation->participant($nicolas);
+            $participant = $message->conversation->participant($receiver_user);
 
             Log::info('Telefono enviado '.$message);
             
@@ -114,8 +114,8 @@ class WAToolBoxController extends Controller{
                 logger('testing '.$conversation);
                 $message = ModelsMessage::create([
                     'conversation_id' => $conversation->id,
-                    'sendable_type' => $coder->getMorphClass(), // Polymorphic sender type
-                    'sendable_id' => $coder->id, // Polymorphic sender ID
+                    'sendable_type' => $sender->getMorphClass(), // Polymorphic sender type
+                    'sendable_id' => $sender->id, // Polymorphic sender ID
                     'type' => MessageType::ATTACHMENT,
                     // 'body' => $this->body, // Add body if required
                 ]);
@@ -129,7 +129,7 @@ class WAToolBoxController extends Controller{
                 unlink($tmpFileObjectPathName); // delete temp file
              //   broadcast(new MessageCreated($message))->toOthers();
                 //Get Participant from conversation
-                $participant = $message->conversation->participant($nicolas);
+                $participant = $message->conversation->participant($receiver_user);
 
                 Log::info('Telefono enviado '.$message);
                 
@@ -174,8 +174,8 @@ class WAToolBoxController extends Controller{
             // Crear el mensaje en la conversación
             $message = ModelsMessage::create([
                 'conversation_id' => $conversation->id,
-                'sendable_type' => $coder->getMorphClass(),
-                'sendable_id' => $coder->id,
+                'sendable_type' => $sender->getMorphClass(),
+                'sendable_id' => $sender->id,
                 'type' => MessageType::ATTACHMENT, // Indica que es un archivo adjunto
             ]);
     
@@ -192,7 +192,7 @@ class WAToolBoxController extends Controller{
             unlink($tmpFileObjectPathName);
     
             // Notificar a los participantes
-            $participant = $message->conversation->participant($nicolas);
+            $participant = $message->conversation->participant($receiver_user);
             broadcast(new MessageCreated($message))->toOthers();
             broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
             NotifyParticipants::dispatch($message->conversation, $message);
@@ -216,9 +216,9 @@ class WAToolBoxController extends Controller{
 
     // Si el lead existe pero no tiene nombre, actualizarlo
     /*
-    if (is_null($coder->name)) {
-        $coder->name = $validatedData['name2'];
-        $coder->save();
+    if (is_null($sender->name)) {
+        $sender->name = $validatedData['name2'];
+        $sender->save();
     }
 
 
