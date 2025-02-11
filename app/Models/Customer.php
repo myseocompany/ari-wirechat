@@ -30,7 +30,7 @@ class Customer extends Authenticatable
         // $image = null;
         // if($this->image_url)
         //     $image = $this->image_url;
-        return $this->image??null;  // Adjust 'avatar_url' to your field
+        return $this->image_url??null;  // Adjust 'avatar_url' to your field
     }
 
  
