@@ -41,7 +41,7 @@ x-init=" setTimeout(() => {
         
         {{-- include search if true --}}
         @includeWhen(config('wirechat.allow_chats_search', false) == true,'wirechat::livewire.chats.includes.search')
-        <div>s:
+        <div>Línea activa:
             
             {{auth()->user()?->getDefaultMessageSource()->settings['phone_number'];}}
         </div>
