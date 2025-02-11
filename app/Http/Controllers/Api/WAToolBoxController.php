@@ -66,6 +66,7 @@ class WAToolBoxController extends Controller{
                 
             ]
         );
+        logger(["image"=>$validatedData['image']]);
 
         $receiver_user = User::findByPhone($reciver_phone);
 
