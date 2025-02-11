@@ -125,7 +125,7 @@ class WAToolBoxController extends Controller{
                     'url' => Storage::url($path),
                 ]);
                 unlink($tmpFileObjectPathName); // delete temp file
-                broadcast(new MessageCreated($message))->toOthers();
+             //   broadcast(new MessageCreated($message))->toOthers();
                 //Get Participant from conversation
                 $participant = $message->conversation->participant($nicolas);
 
@@ -137,7 +137,7 @@ class WAToolBoxController extends Controller{
                 //Notify participant directly 
                 broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
 
-                NotifyParticipants::dispatch($message->conversation,$message);
+             //   NotifyParticipants::dispatch($message->conversation,$message);
 
 
             }
