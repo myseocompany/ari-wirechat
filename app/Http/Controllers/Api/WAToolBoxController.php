@@ -94,7 +94,7 @@ class WAToolBoxController extends Controller{
             broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
         }elseif ($validatedData['type']=='image') {
             try {
-                $tmpFileObject= $this->validateBase64($validatedData['content'],['png,jpg,mp4,heic']);
+                $tmpFileObject= $this->validateBase64($validatedData['content'],['png,jpg,mp4,heic,HEIC']);
                 $tmpFileObjectPathName = $tmpFileObject->getPathname();
 
                 $file = new UploadedFile(
