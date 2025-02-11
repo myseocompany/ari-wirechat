@@ -59,7 +59,7 @@
 
             <p class="card-text">
               <div><span class="lavel"><strong>IMAGE:</strong></span> {{$model->image_url}}
-              <img src="{{$model->image_url}}" alt="">
+              <img src="{{$model->image_url}}" alt="" width="100">
               </div>
             <div><span class="lavel"><strong>Nombre:</strong></span> {{$model->name}}</div>
             <div><span class="lavel"><strong>Teléfono:</strong></span> {{$model->phone}} <a href="https://wa.me/{{ clearWP($model->phone) }}" target="_empty">WP</a></div>

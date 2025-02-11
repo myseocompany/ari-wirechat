@@ -359,7 +359,7 @@ private function validateBase64(string $base64data, array $allowedMimeTypes)
 
         // Guardar la solicitud como JSON
         logger($requestData);
-        if($requestData["type"]!= WAMessageType::IMAGE->value){
+        if(isset($requestData["type"]) && ($requestData["type"]!= WAMessageType::IMAGE->value)){
             $model->request =  json_encode($requestData);
             $model->save();
 
