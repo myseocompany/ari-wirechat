@@ -132,6 +132,7 @@ class CustomerService
                 'customers.adset_name',
                 'customers.ad_name',
                 'customers.status_id',
+                'customers.image_url'
                 
             )
             ->orderBy('customers.created_at', 'DESC')
@@ -172,7 +173,8 @@ class CustomerService
                 'customers.phone2',
                 'customers.country',
                 'customers.email',
-                'customers.rd_public_url'
+                'customers.rd_public_url',
+                'customers.image_url'
             )
             ->where(
                 // Búsqueda por...
@@ -265,7 +267,8 @@ class CustomerService
                 'customers.updated_user_id',
                 'customers.count_empanadas',
                 'customers.empanadas_size',
-                'customers.number_venues'
+                'customers.number_venues',
+                'customers.image_url'
             )
             ->where(
                 // Búsqueda por...
@@ -355,7 +358,8 @@ class CustomerService
                 'customers.updated_user_id',
                 'customers.count_empanadas',
                 'customers.empanadas_size',
-                'customers.number_venues'
+                'customers.number_venues',
+                'customers.image_url'
             )
             ->orderBy('customer_statuses.weight', 'ASC')
             ->orderBy('customers.created_at', 'DESC')
