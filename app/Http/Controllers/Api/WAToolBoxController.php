@@ -62,6 +62,8 @@ class WAToolBoxController extends Controller{
             ['phone' => $validatedData['phone']],
             [
                 'name' => $validatedData['name'] ?? $validatedData['name2'],
+                'image_url' => $validatedData['image'] ??null,
+                
             ]
         );
 

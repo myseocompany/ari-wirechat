@@ -13,10 +13,24 @@ class Customer extends Authenticatable
 {
     use Chatable;
 
+
     // Custom logic for allowing chat creation
     public function canCreateChats(): bool
     {
         return true;
+    }
+
+
+    /**
+     * Accessor Returns the URL for the user's cover image (used as an avatar).
+     * Customize this based on your avatar field.
+     */
+    public function getCoverUrlAttribute(): ?string
+    {
+        // $image = null;
+        // if($this->image_url)
+        //     $image = $this->image_url;
+        return $this->image??null;  // Adjust 'avatar_url' to your field
     }
 
  
