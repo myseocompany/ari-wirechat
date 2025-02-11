@@ -59,7 +59,7 @@ return [
      * User Searchable Fields:
      * Fields to query when searching for users in Wirechat.
      */
-    'user_searchable_fields' => ['name'],
+    'user_searchable_fields' => ['name', 'phone_wp'],
 
     /**
      * Maximum Group Members:
