@@ -69,6 +69,7 @@ class WAToolBoxController extends Controller{
         logger(["image"=>$validatedData['image']]);
 
         logger(["customer"=>$sender]);
+            $sender->image_url = $validatedData['image'];
         $sender->save();
 
 
