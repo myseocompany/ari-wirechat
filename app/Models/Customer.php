@@ -73,6 +73,7 @@ class Customer extends Authenticatable
         'business_email',
         'business_address',
         'business_city',
+        'image_url'
         
         
     ];
