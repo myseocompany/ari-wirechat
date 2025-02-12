@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Listeners\WAToolboxListener;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +27,6 @@ class AppServiceProvider extends ServiceProvider
             \Namu\WireChat\Events\MessageCreated::class,
             WAToolboxListener::class,
           );
+        Paginator::useBootstrap();
     }
 }

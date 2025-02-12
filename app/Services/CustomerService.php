@@ -88,7 +88,7 @@ class CustomerService {
                 DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color') // Color por defecto
             )
             ->orderBy('customers.created_at', 'DESC')
-            ->paginate(60);
+            ->paginate(10);
         }
 
         $query->action = "customers/phase/" . $stage_id;
