@@ -169,7 +169,21 @@
              
           
   </script>
-  {!! $model->appends(request()->input())->links() !!}
+  <style>
+    ul.pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 15px;
+    padding: 10px;
+}
+
+  </style>
+<div class="row">
+  <div class="col-12 d-flex justify-content-center">
+      {!! $model->appends(request()->input())->links() !!}
+  </div>
+</div>
+
 
 @endsection
 
