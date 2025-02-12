@@ -449,6 +449,7 @@ class CustomerService {
         return $model;
     }
     
+    // funcion descontinuada
     public function countFilterCustomers($request,  $statuses, $stage_id)
     {
         $status_array = array();
