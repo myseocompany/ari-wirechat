@@ -256,7 +256,7 @@
      ?>%">
       <h3>{{$item->count}}</h3>
      
-      <div><a href="#" onclick="changeStatus({{$item->id}})"> @if( isset($item->status_name) ) {{$item->status_name}} @else sin estado @endif </a></div>
+      <div><a href="#" onclick="changeStatus({{$item->status_id}})"> @if( isset($item->status_name) ) {{$item->status_name}} @else sin estado @endif </a></div>
     </li>
     @php
       $sum_g += $item->count;
