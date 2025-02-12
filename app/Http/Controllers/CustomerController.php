@@ -227,9 +227,14 @@ class CustomerController extends Controller
 
         $statuses = $this->getStatuses($request, $pid);
         //$statuses = CustomerStatus::all();
-        $model = $this->customerService->getModelPhase($request, $statuses, $pid);
+        $model = $this->customerService->filterCustomers($request, $statuses, $pid, false);
+        //$model = $this->customerService->getModelPhase($request, $statuses, $pid);
 
-        $customersGroup = $this->customerService->countFilterCustomers($request, $statuses, $pid);
+        
+
+        //$customersGroup = $this->customerService->countFilterCustomers($request, $statuses, $pid);
+        $customersGroup = $this->customerService->filterCustomers($request, $statuses, $pid, true);
+        
         $pending_actions = $this->getPendingActions();
         $phase = CustomerStatusPhase::find($pid);
         $sources = CustomerSource::all();

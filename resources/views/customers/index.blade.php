@@ -12,7 +12,9 @@
 
 @section('list')
 <div class="col-12">
-  Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage() - 1 ) }}</strong>  a <strong>{{ $model->getActualRows}}</strong> de <strong>{{$model->total()}}</strong>
+  Registro <strong>{{ $model->firstItem() }}</strong> a 
+  <strong>{{ $model->lastItem() }}</strong> de 
+  <strong>{{ $model->total() }}</strong>
 </div>
  
 
@@ -230,7 +232,7 @@
   @endforeach
     @foreach($customersGroup as $item)
     @if($item->count!=0)
-    <li class="groupBarGroup" style="background-color: @if( isset($item->color) ) {{$item->color}}; @else #000000; @endif  width: <?php 
+    <li class="groupBarGroup" style="background-color: @if( isset($item->status_color) ) {{$item->status_color}}; @else #000000; @endif  width: <?php 
        
 
         if($customersGroup->count()!=0){
@@ -239,7 +241,7 @@
      ?>%">
       <h3>{{$item->count}}</h3>
      
-      <div><a href="#" onclick="changeStatus({{$item->id}})"> @if( isset($item->name) ) {{$item->name}} @else sin estado @endif </a></div>
+      <div><a href="#" onclick="changeStatus({{$item->id}})"> @if( isset($item->status_name) ) {{$item->status_name}} @else sin estado @endif </a></div>
     </li>
     @php
       $sum_g += $item->count;
