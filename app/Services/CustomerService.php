@@ -60,7 +60,9 @@ class CustomerService {
                             ->orWhere('customers.email', 'like', "%{$request->search}%")
                             ->orWhere('customers.document', 'like', "%{$request->search}%")
                             ->orWhere('customers.position', 'like', "%{$request->search}%")
-                            ->orWhere('customers.business', 'like', "%{$request->search}%");
+                            ->orWhere('customers.business', 'like', "%{$request->search}%")
+                            ->orWhere('customers.notes', 'like', "%{$request->search}%")
+                            ;
 
                         if ($this->looksLikePhoneNumber($request->search)) {
                             $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
@@ -76,7 +78,8 @@ class CustomerService {
                 DB::raw('count(distinct(customers.id)) as count'),
                 'customers.status_id',
                 DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
-                DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color') // Negro por defecto
+                DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color'),
+                
             )
             ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color') // Asegurar compatibilidad en MySQL
             ->orderBy('customer_statuses.name')
