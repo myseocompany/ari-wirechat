@@ -227,7 +227,7 @@ class CustomerController extends Controller
 
         $statuses = $this->getStatuses($request, $pid);
         //$statuses = CustomerStatus::all();
-        $model = $this->customerService->filterCustomers($request, $statuses, $pid, false, 5);
+        $model = $this->customerService->filterCustomers($request, $statuses, $pid, false, 10);
         //$model = $this->customerService->getModelPhase($request, $statuses, $pid);
 
         
@@ -1461,7 +1461,8 @@ $message->to("mateogiraldo420@gmail.com");
         $statuses = $this->getStatuses($request, 1);
 
         /* obtiene una lista de clientes a partir del request */
-        $model = $this->customerService->filterModelFull($request, $statuses);
+        //$model = $this->customerService->filterModelFull($request, $statuses);
+        $model = $this->customerService->filterCustomers($request, $statuses, 1);
         // dd($statuses, $model)
 
 
