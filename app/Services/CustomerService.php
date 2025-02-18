@@ -15,7 +15,7 @@ use App\Models\RoleProduct;
 class CustomerService {
 
 
-    public function filterCustomers(Request $request, $statuses, $stage_id, $countOnly = false)
+    public function filterCustomers(Request $request, $statuses, $stage_id, $countOnly = false, $pageSize = 0)
     {
         $status_array = CustomerStatus::where('stage_id', $stage_id)->pluck('id')->toArray();
         $dates = $this->getDates($request);
@@ -83,16 +83,24 @@ class CustomerService {
             )
             ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color') // Asegurar compatibilidad en MySQL
             ->orderBy('customer_statuses.weight', 'ASC')
-
             ->get();
         } else {
-            $query = $query->select(
-                'customers.*',
-                DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
-                DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color') // Color por defecto
-            )
-            ->orderBy('customers.created_at', 'DESC')
-            ->paginate(10);
+            if($pageSize>0){
+                $query = $query->select(
+                    'customers.*',
+                    DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
+                    DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color') // Color por defecto
+                )->orderBy('customers.created_at', 'DESC')
+                ->paginate(10);
+            }else{
+                $query = $query->select(
+                    'customers.*',
+                    DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
+                    DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color') // Color por defecto
+                )->orderBy('customers.created_at', 'DESC')
+                ->get();
+            }
+            
         }
 
         $query->action = "customers/phase/" . $stage_id;
