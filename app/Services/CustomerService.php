@@ -82,7 +82,8 @@ class CustomerService {
                 
             )
             ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color') // Asegurar compatibilidad en MySQL
-            ->orderBy('customer_statuses.name')
+            ->orderBy('customer_statuses.weight', 'ASC')
+
             ->get();
         } else {
             $query = $query->select(
