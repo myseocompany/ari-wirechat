@@ -85,13 +85,14 @@ class CustomerService {
             ->orderBy('customer_statuses.weight', 'ASC')
             ->get();
         } else {
+            
             if($pageSize>0){
                 $query = $query->select(
                     'customers.*',
                     DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
                     DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color') // Color por defecto
                 )->orderBy('customers.created_at', 'DESC')
-                ->paginate(10);
+                ->paginate($pageSize);
             }else{
                 $query = $query->select(
                     'customers.*',
