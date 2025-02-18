@@ -251,6 +251,8 @@ class CustomerService {
         return $model;
     }
 
+    // Funcion para borrar
+    /*
     public function filterModelFull(Request $request, $statuses)
     {
         $model = Customer::leftJoin('users', 'users.id', 'customers.user_id')
@@ -273,7 +275,7 @@ class CustomerService {
             ->where(
                 // Búsqueda por...
                 function ($query) use ($request) {
-                    /*  #MYSEO */
+                    
                     $dates = $this->getDates($request);
                     
                     if (isset($request->from_date) && ($request->from_date!="")) {
@@ -325,6 +327,7 @@ class CustomerService {
                
         return $model;
     }
+    */
 
     public function filterModel(Request $request, $statuses)
     {
