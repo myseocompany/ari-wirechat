@@ -200,78 +200,13 @@
       <option value="{{$status_option->id}}">{{$status_option->name}}</option>
       @endforeach
     </select>
-    <button class="btn btn-link" type="button" data-toggle="tooltip" data-html="true" data-placement="top" title='<h4>Clic para ver todos los estados</h4>
-      <div class="box">
-        <table class="table">
-          <thead class="thead-dark">
-            <tr>
-              <th scope="col">Estado</th>
-              <th scope="col">Descripción</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Nuevo</th>
-              <td scope="row">Recien entra a la base de datos y no se ha hecho un intento de contactarlo. Solo se le envió un correo automático</td>
-            </tr>
-            <tr>
-              <th scope="row">Seguimiento</th>
-              <td scope="row">Se llamó pero estaba ocupado, se envió WP pero no contestó. Se llamó pero no contestó</td>
-            </tr>
-            <tr>
-              <th scope="row">Contactado</th>
-              <td scope="row">Leyó correo de bienvenida - se debe llamar</td>
-            </tr>
-            <tr>
-              <th scope="row">Prospecto</th>
-              <td scope="row">Se le envió la información por whatsapp</td>
-            </tr>
-            <tr>
-              <th scope="row">Opotunidad</th>
-              <td scope="row">Contestó la llamada. Se conoce el número de empanadas que hace. Esta interesado. Hizo un nuevo intento de contacto y se le actualizó la fecha de creación</td>
-            </tr>
-            <tr>
-              <th scope="row">Prospecto</th>
-              <td scope="row">Demuestra interés a futuro y ya fabrica empanadas.</td>
-            </tr>
-            <tr>
-              <th scope="row">Negociación</th>
-              <td scope="row">Muy interesado se le envía cotización, no toma una decisión aún</td>
-            </tr>
-            <tr>
-              <th scope="row">VIP</th>
-              <td scope="row">Demuestra el nivel más alto de interés, pendiente a confirmar pago</td>
-            </tr>
-            <tr>
-              <th scope="row">Proyecto</th>
-              <td scope="row">Interesado, esta formando empresa no necesita la máquina por ahora</td>
-            </tr>
-            <tr>
-              <th scope="row">Ganado</th>
-              <td scope="row">Ya compró máquina de empanadas</td>
-            </tr>
-            <tr>
-              <th scope="row">Ganado otros</th>
-              <td scope="row">Ya compró máquina pero no de empanadas</td>
-            </tr>
-            <tr>
-              <th scope="row">Por Facturar</th>
-              <td scope="row">Ganado sin generar factura</td>
-            </tr>
-            <tr>
-              <th scope="row">Perdido</th>
-              <td scope="row">Pide explícitamente no contactarlo (habeas data)</td>
-            </tr>
-            <tr>
-              <th scope="row">No contesta</th>
-              <td scope="row">No contesta en 3 medios, 3 horarios, 3 fechas</td>
-            </tr>
-            <tr>
-              <th scope="row">Escuela</th>
-              <td scope="row">Se encuentra interesado o asistió a escuela</td>
-            </tr>
-          </tbody>
-        </table></div>'><i class="fa fa-question-circle question"></i></button>
+    @include('customers.status_table', ["statuses_options"=>$statuses_options])
+    
+    <button class="btn btn-link" type="button" data-toggle="tooltip" data-html="true" data-placement="top" title=''>
+      <span id="helpButton" style="cursor:pointer; color:blue;">  
+        <i class="fa fa-question-circle question"></i>
+      </span>
+    </button>
 
       </div>
       <div style="margin-bottom:1rem;">

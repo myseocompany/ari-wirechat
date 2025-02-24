@@ -33,6 +33,7 @@
         </script>
 
         <div>
+          
           @if(isset($customer->maker)&& ($customer->maker==1)) Hace empanadas @endif
           @if(isset($customer->maker)&& ($customer->maker==0)) Proyecto @endif
           @if(isset($customer->maker)&& ($customer->maker==2)) Desmechadora @endif

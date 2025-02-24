@@ -257,7 +257,10 @@ class CustomerController extends Controller
         $action_options = ActionType::orderby('weigth')->get();
         $histories = CustomerHistory::where('customer_id', '=', $id)->get();
         $email_options = Email::where('type_id', '=', 1)->where('active', '=', '1')->get();
-        $statuses_options = CustomerStatus::where('stage_id', $pid)->orderBy("weight", "ASC")->get();
+        $statuses_options = CustomerStatus::where('status_id', 1)
+            ->where('stage_id', $pid)
+            ->orderBy("weight", "ASC")
+            ->get();
         //$country_options = Country::leftJoin("customers", "customers.country", "countries.iso2")->get();
         $country_options =  Country::select(DB::raw("DISTINCT(customers.country)"))
             ->leftJoin("customers", "customers.country", "countries.iso2")
@@ -871,7 +874,10 @@ class CustomerController extends Controller
         $actions = Action::where('customer_id', '=', $id)->orderby("created_at", "DESC")->get();
         $histories = CustomerHistory::where('customer_id', '=', $id)->get();
         $email_options = Email::where('type_id', '=', 1)->where('active', '=', '1')->get();
-        $statuses_options = CustomerStatus::orderBy('stage_id', "ASC")->orderBy("weight", "ASC")->get();
+        $statuses_options = CustomerStatus::
+            where('status_id', 1)
+            ->orderBy('stage_id', "ASC")
+            ->orderBy("weight", "ASC")->get();
         $actual = true;
         $today = Carbon\Carbon::now();
         $audiences = Audience::all();
