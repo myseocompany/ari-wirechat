@@ -16,183 +16,14 @@
       <option value="{{$action_option->id}}">{{$action_option->name}}</option>
       @endforeach
     </select>
-    <button class="btn btn-link" type="button" data-toggle="tooltip" data-html="true" data-placement="top" title='<h4>Clic para ver todas las acciones</h4>
-      <div class="box">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Acción</th>
-              <th scope="col"> Entrada</th>
-              <th scope="col"> Salida</th>
-              <th scope="col">Descripción</th>
-            </tr>
-          </thead>
-          <tbody> 
-            <tr>
-              <th scope="row">Llamada de salida</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row">Se inicio la llamada pero no contestó</td>
-            </tr>
-            <tr>
-              <th scope="row">Llamada contacto</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row">Se le llamó, contestó, pero está ocupado</td>
-            </tr>
-            <tr>
-              <th scope="row">Llamada efectiva</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row">Explique el producto. Min 5 min</td>
-            </tr>
-            <tr>
-              <th scope="row">Llamada de entrada</th>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Email de salida</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row">x</td>
-              
-            </tr>
-            <tr>
-              <th scope="row">Visita web</th>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Leyó email</th>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">No se pudo enviar mail</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Email salida</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Facebook salida</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Instagram salida</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">WhatsApp salida</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Facebook entrada</th>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Instagram entrada</th>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">WhatsApp entrada</th>
-              <td class="row-center" scope="row">x</td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Video llamada</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Visitó MQE</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Visita empresa</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Soporte técnico</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Despacho</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Interacción Whatsapp Business</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">No contesta</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Actualización</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Escuela</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Pedido</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">PQR</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-            <tr>
-              <th scope="row">Acompañamiento de pago</th>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-              <td class="row-center" scope="row"></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>'> <i class="fa fa-question-circle question"></i></button>
+    @include('customers.actions_table', ["action_options"=>$action_options])
+    
+    <button class="btn btn-link" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
+      <span id="helpButtonAction" style="cursor:pointer; color:blue;">  
+        <i class="fa fa-question-circle question"></i>
+      </span>
+    </button>
+
     <select name="status_id" id="status_id">
       <option value="">Seleccione un estado</option>
       @foreach($statuses_options as $status_option)
@@ -202,8 +33,8 @@
 
     @include('customers.status_table', ["statuses_options"=>$statuses_options])
     
-    <button class="btn btn-link" type="button" data-toggle="tooltip" data-html="true" data-placement="top" title=''>
-      <span id="helpButton" style="cursor:pointer; color:blue;">  
+    <button class="btn btn-link" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
+      <span id="helpButtonStatus" style="cursor:pointer; color:blue;">  
         <i class="fa fa-question-circle question"></i>
       </span>
     </button>

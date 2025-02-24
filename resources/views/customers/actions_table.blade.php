@@ -1,6 +1,6 @@
-<div id="statusSidebar">
+<div id="actionsSidebar">
     
-    <span id="closeStatusSidebar">✖</span>
+    <span id="closeSidebarAction">✖</span>
             
     <div class="box2">
         <table class="table">
@@ -11,7 +11,7 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($statuses_options as $item)
+            @foreach ($action_options as $item)
                 <tr>
                     <th scope="row">{{$item->name}}</th>
                     <td scope="row">{{$item->description}}</td>
@@ -25,7 +25,7 @@
 
 <style>
     /* Estilos del statusSidebar */
-    #statusSidebar {
+    #actionsSidebar {
         position: fixed;
         top: 0;
         right: -300px;
@@ -38,11 +38,11 @@
         padding: 20px;
         z-index: 100000;
     }
-    #statusSidebar.active {
+    #actionsSidebar.active {
         right: 0;
         color:black!important;
     }
-    #closeStatusSidebar {
+    #closeSidebarAction {
         cursor: pointer;
         color: red;
         font-size: 18px;
@@ -55,15 +55,17 @@
 </style>
 
 <script>
-  $(document).ready(function(){
-    $("#helpButtonStatus").click(function(){
-      $("#statusSidebar").addClass("active");
-      $(".box").slideDown();
-    });
+    $(document).ready(function(){
+        // Mostrar el statusSidebar y la tabla cuando se haga clic en el botón de ayuda
+        $("#helpButtonAction").click(function(){
+            $("#actionsSidebar").addClass("active");
+            $(".box").slideDown();
+        });
 
-    $("#closeStatusSidebar").click(function(){
-      $(".box").slideUp();
-      $("#statusSidebar").removeClass("active");
+        // Cerrar el statusSidebar cuando se haga clic en la 'X'
+        $("#closeSidebarAction").click(function(){
+            $(".box").slideUp();
+            $("#actionsSidebar").removeClass("active");
+        });
     });
-  });
 </script>
