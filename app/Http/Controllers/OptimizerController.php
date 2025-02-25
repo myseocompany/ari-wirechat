@@ -192,7 +192,7 @@ function saveHistoryFromRequest($request)
         $statuses_options = CustomerStatus::all();
         $products = Product::all();
         $customers_source=CustomerSource::all();
-        $user=User::all();
+        $user=User::where("status_id", 1)->where("role_id", 2)->get();
         //$files=CustomerFile::all();
 
         $controller = $this;
