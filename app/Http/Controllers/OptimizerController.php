@@ -114,6 +114,7 @@ function saveFromRequest($request){
 function deleteFromRequest($request)
 {
     $customer_id_all = $request->customer_id_all;
+    
    
     //$model = Customer::where('email', 'like', '%' . $request->email . '%')->get();
     $model = Customer::whereIn('id', $customer_id_all)->get();
@@ -187,11 +188,12 @@ function saveHistoryFromRequest($request)
         
         $email = $request->email;
         $model = Customer::where('email', 'like', '%'.$email.'%')->get();
+        
         $statuses_options = CustomerStatus::all();
         $products = Product::all();
         $customers_source=CustomerSource::all();
         $user=User::all();
-        $files=CustomerFile::all();
+        //$files=CustomerFile::all();
 
         $controller = $this;
         if( !empty($model) ){

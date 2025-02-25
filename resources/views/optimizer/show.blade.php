@@ -24,7 +24,8 @@
             <td>Editar</td>
             <?php $cont2 = 0; ?>
             @foreach($model as $item)
-
+            <input type="hidden" name="customer_id_all[]" value="{{$item->id}}"  class="d-none2">
+                
             <td>
                 <input type="radio" name="customer_id" value="{{$item->id}}" @if($cont2==0) checked="checked" @endif >
                 <a href="/customers/{{$item->id}}/show">{{$item->id}}</a> 
@@ -180,17 +181,17 @@
         </tr>
     
         <tr>
-            <td><strong>Ordenes</strong></td>
+            <td><strong>Archivos</strong></td>
             <td></td>
             @foreach($model as $item)    
                <td>
                 
                 <ul>
-                    @foreach($item->orders as $item_order)
+                    @foreach($item->files as $item_file)
 
                          <li> 
-                             <input type="checkbox" name="order_all[]" checked="checked" value="{{ $item_order->id }}">
-                              {{ $item_order->id }}
+                             <input type="checkbox" name="file_all[]" checked="checked" value="{{ $item_file->id }}">
+                              {{ $item_file->url }}
 
                            
                          </li>

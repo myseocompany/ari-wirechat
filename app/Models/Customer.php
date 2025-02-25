@@ -91,6 +91,11 @@ class Customer extends Authenticatable
     function customer_files(){
         return $this->hasMany('App\Models\CustomerFile');
     }
+
+    function files(){
+        return $this->hasMany('App\Models\CustomerFile');
+    }
+
     public function status(){
     	return $this->belongsTo('App\Models\CustomerStatus');
     }
