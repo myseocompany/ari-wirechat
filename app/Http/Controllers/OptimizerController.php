@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use DB;
-use App\Customer;
-use App\Action;
-use App\CustomerStatus;
-use App\CustomerSource;
-use App\Product;
-use App\User;
-use App\CustomerFile;
-use App\CustomerHistory;
+use App\Models\Customer;
+use App\Models\Action;
+use App\Models\CustomerStatus;
+use App\Models\CustomerSource;
+use App\Models\Product;
+use App\Models\User;
+use App\Models\CustomerFile;
+use App\Models\CustomerHistory;
 
 
 class OptimizerController extends Controller{
