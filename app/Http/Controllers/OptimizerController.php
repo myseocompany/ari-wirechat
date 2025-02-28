@@ -145,19 +145,27 @@ function saveHistoryFromRequest($request)
 }
 
 
-	public function findDuplicates(Request $request){
-
-        
-        $model = Customer::select('email', DB::raw('count(email) as count'))
-            ->whereNotNull('email')->groupBy('email')
-            ->havingRaw('count(email) > 1')
-            ->orderby('email')
+    public function findDuplicates(Request $request)
+    {
+        $model = Customer::select('email', 'phone', DB::raw('count(*) as count'))
+            ->where(function($query) {
+                $query->whereNotNull('email')
+                    ->orWhereNotNull('phone');
+            })
+            ->groupBy('email', 'phone')
+            ->havingRaw('count(*) > 1')
+            ->orderBy('email')
+            ->orderBy('phone')
             ->get();
-    
+
+        if ($model->isEmpty()) {
+            return redirect()->back()->with('error', 'No se encontraron duplicados.');
+        }
+
         return view('optimizer.index', compact('model'));
-
-
     }
+
+
 
     public function getModelText($key, $model){
         $str = "";
@@ -184,23 +192,39 @@ function saveHistoryFromRequest($request)
     }
 
 
-    public function consolidateDuplicates(Request $request){
-        
-        $email = $request->email;
-        $model = Customer::where('email', 'like', '%'.$email.'%')->get();
-        
+    public function consolidateDuplicates(Request $request)
+    {
+        $query = $request->input('query'); // Se recibe el único campo de búsqueda
+
+        // Si el campo está vacío, redirigir con error
+        if (empty($query)) {
+            return redirect()->back()->with('error', 'Debe ingresar un correo o un teléfono para buscar duplicados.');
+        }
+
+        // Buscar en email y teléfono con OR
+        $model = Customer::where('email', 'like', "%$query%")
+                        ->orWhere('phone', 'like', "%$query%")
+                        ->get();
+
+        // Si no hay resultados, redirigir con error
+        if ($model->isEmpty()) {
+            return redirect()->back()->with('error', 'No se encontraron duplicados.');
+        }
+
         $statuses_options = CustomerStatus::all();
         $products = Product::all();
-        $customers_source=CustomerSource::all();
-        $user=User::where("status_id", 1)->where("role_id", 2)->get();
-        //$files=CustomerFile::all();
+        $customers_source = CustomerSource::all();
+        $user = User::where("status_id", 1)->where("role_id", 2)->get();
 
         $controller = $this;
-        if( !empty($model) ){
-            //$model->status_id = CustomerStatus::($model->status_id)
-            return view('optimizer.show', compact('model','statuses_options', 'controller','products','customers_source','user'));
-        }
+
+        return view('optimizer.show', compact('model', 'statuses_options', 'controller', 'products', 'customers_source', 'user'));
     }
+
+    
+    
+    
+    
 
     public function showDuplicates($email, Request $request){
         /*
