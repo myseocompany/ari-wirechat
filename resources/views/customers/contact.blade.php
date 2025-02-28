@@ -124,13 +124,14 @@
         <input type="hidden" name="country" id="country" value="{{$customer->country}}">
         <a class="btn btn-sm btn-primary" type="submit" title="Enviar Cliente a RD Station" onclick="sendToRDStation();" style="color: white; margin-top: 5px;">Enviar a RD</a>
 
-        <a href="/optimize/customers/consolidateDuplicates/?query={{ $customer->email ?? $customer->phone }}" 
+        <a href="/optimize/customers/consolidateDuplicates/?query={{ $customer->phone ?? $customer->email }}" 
    class="btn btn-sm btn-primary" 
    type="submit" 
    title="Buscar duplicados"  
    style="color: white; margin-top: 5px;">
     Buscar duplicados
 </a>
+
 
       @endif
 

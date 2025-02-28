@@ -194,16 +194,16 @@ function saveHistoryFromRequest($request)
 
     public function consolidateDuplicates(Request $request)
     {
-        $query = $request->input('query'); // Se recibe el único campo de búsqueda
+        $query = $request->input('query'); // Recibimos un solo parámetro de búsqueda
 
         // Si el campo está vacío, redirigir con error
         if (empty($query)) {
             return redirect()->back()->with('error', 'Debe ingresar un correo o un teléfono para buscar duplicados.');
         }
 
-        // Buscar en email y teléfono con OR
-        $model = Customer::where('email', 'like', "%$query%")
-                        ->orWhere('phone', 'like', "%$query%")
+        // Buscar por teléfono si el query es un número, o por email si no lo es
+        $model = Customer::where('phone', $query)
+                        ->orWhere('email', 'like', "%$query%")
                         ->get();
 
         // Si no hay resultados, redirigir con error
@@ -220,6 +220,7 @@ function saveHistoryFromRequest($request)
 
         return view('optimizer.show', compact('model', 'statuses_options', 'controller', 'products', 'customers_source', 'user'));
     }
+
 
     
     
