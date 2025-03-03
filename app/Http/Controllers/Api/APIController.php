@@ -2456,7 +2456,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
                 if (!str_contains($model->notes, $value))
                     $model->notes .=   " " . $value; //alimentec
                 if ($value == "pqr") {
-                    $model->status_id = 29; //Desmechadora
+                    $model->status_id = 29; //PQR
                     $status_id = 29;
                 }
                 if (!str_contains($model->notes, $value))
@@ -2631,7 +2631,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
                 $model->status_id = 41; //Desmechadora
             }
             if (isset($status) && (($status == 'Lead Qualificado'))) {
-                $model->status_id = 36; //Calificado
+               // $model->status_id = 36; //Calificado
             }
             if (isset($status) && (($status == 'Cliente'))) {
                 $model->status_id = 19; //Demo

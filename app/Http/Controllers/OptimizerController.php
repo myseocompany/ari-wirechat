@@ -60,29 +60,31 @@ class OptimizerController extends Controller{
 
 function saveFromRequest($request){
         $model = Customer::find($request->customer_id);
-         $model->status_id = $request->status_id_1;
-         $model->name = $request->name;
-         $model->document = $request->document;
-         $model->position = $request->position;
-         $model->business = $request->business;
-         $model->phone = $request->phone;
-         $model->phone2 = $request->phone2;
-         $model->phone_wp = $request->phone_wp;
-         $model->total_sold = $request->total_sold;
-         
-         $model->email = $request->email;
-         $model->address = $request->address;
-         $model->city = $request->city;
-         $model->country = $request->country;
-         $model->department = $request->department;
-         $model->notes = $request->notes;
-         $model->count_empanadas = $request->count_empanadas;
+        $model->status_id = $request->status_id_1;
+        $model->name = $request->name;
+        $model->document = $request->document;
+        $model->position = $request->position;
+        $model->business = $request->business;
+        $model->phone = $request->phone;
+        $model->phone2 = $request->phone2;
+        $model->phone_wp = $request->phone_wp;
+        $model->total_sold = $request->total_sold;
+        
+        $model->email = $request->email;
+        $model->address = $request->address;
+        $model->city = $request->city;
+        $model->country = $request->country;
+        $model->department = $request->department;
+        $model->notes = $request->notes;
+        $model->count_empanadas = $request->count_empanadas;
          //datos de contacto
         $model->contact_name = $request->contact_name;
         $model->contact_phone2 = $request->contact_phone2;
         $model->contact_email = $request->contact_email;
         $model->contact_position = $request->contact_position;
         $model->user_id = $request->user_id;
+        dd($request->all());
+
         $model->source_id = $request->source_id;
         $model->count_empanadas = $request->count_empanadas;
         if(isset( $model->date_bought)){

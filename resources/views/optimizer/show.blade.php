@@ -11,11 +11,31 @@
 <form class="form" action="/optimize/customers/mergeDuplicates/" method="GET">
     {{ csrf_field() }}
 
-                  <script>
-                        function updateControl(value,target){
-                            $("#"+target).val(value);
-                        }
-                 </script> 
+    <script>
+      function updateControl(value, target) {
+          var element = document.getElementById(target);
+          if (element) {
+              if (element.tagName === "SELECT") {
+                  element.value = value;
+                  // Disparar el evento 'change' manualmente
+                  var event = new Event("change", { bubbles: true });
+                  element.dispatchEvent(event);
+              } else {
+                  element.value = value;
+              }
+          }
+      }
+  
+      // Asignamos la función al evento change de los selects dinámicamente
+      document.addEventListener("DOMContentLoaded", function() {
+          document.querySelectorAll("select").forEach(select => {
+              select.addEventListener("change", function() {
+                  updateControl(this.value, this.id);
+              });
+          });
+      });
+  </script>
+  
 
     <table class="table table-striped">   
 
@@ -54,14 +74,20 @@
                      @endif
 
                      @if($key=='user_id')
-                     <select name="user_id" id="user_id" style="width:200px">
-                      <option value="" >Seleccione un usuario</option>
-                      @foreach($user as $customer_item)
-                      <option value="{{$customer_item->id}}" onclick="updateControl('{{$customer_item->id}}','{{$key}}')"   >
-                        {{$customer_item->name}}
-                      </option>
-                      @endforeach
-                    </select>
+                      <select name="user_id" id="user_id" style="width:200px">
+                        <option value="" >Seleccione un usuario:</option>
+                        @foreach($user as $subitem)
+                          <option value="{{$subitem->id}}">
+                            {{$subitem->name}}-{{$subitem->id}}
+                          </option>
+                        @endforeach
+                      </select>
+                      <script>
+                        funcion changeUserId(this){
+                          var selected = $(this).val();
+                          $("#user_id").val(selected);
+                        }
+                      </script>
                      @endif
 
                        @if($key=='source_id')
@@ -82,7 +108,10 @@
 
 
 
-                    <input style="width:200px"; @if($key=='date_bought') type="text" readonly="" @endif @if($key=='created_at') type="text" readonly="" @endif @if($key=='updated_at') type="text" readonly @endif @if($key=='status_id') type="hidden" readonly="" @endif @if($key=='user_id') type="hidden" readonly="" @endif 
+                    <input style="width:200px"; 
+                    @if($key=='date_bought') type="text" readonly="" @endif @if($key=='created_at') 
+                    type="text" readonly="" @endif @if($key=='updated_at') -ype="text" readonly @endif @if($key=='status_id') type="hidden" readonly="" @endif 
+                    @if($key=='user_id') type="hidden" readonly=""  @endif 
                     @if($key=='source_id') type="hidden" readonly="" @endif
                     @if($key=='scoring_interest') type="number" readonly="" @endif
                     @if($key=='vas') type="number" readonly="" @endif
@@ -116,7 +145,8 @@
 
                    
                     <input class="form-check-input" type="radio"  id="{{$key}}_{{$item->id}}" 
-                      value="{{$data[$key]}}" @if($cont==0) checked="checked" @endif  onclick="updateControl('{{$data[$key]}}','{{$key}}')" name="{{$key}}_1">
+                      value="{{$data[$key]}}" @if($cont==0) checked="checked" @endif  
+                        onclick="updateControl('{{$data[$key]}}','{{$key}}')" name="{{$key}}_1">
                    
                     <label class="form-check-label" for="{{$key}}">
                         {{$controller->getModelText($key, $item)}} {{$data[$key]}}</label>
