@@ -83,7 +83,6 @@ function saveFromRequest($request){
         $model->contact_email = $request->contact_email;
         $model->contact_position = $request->contact_position;
         $model->user_id = $request->user_id;
-        dd($request->all());
 
         $model->source_id = $request->source_id;
         $model->count_empanadas = $request->count_empanadas;
