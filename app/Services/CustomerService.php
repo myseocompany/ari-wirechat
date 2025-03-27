@@ -93,6 +93,7 @@ class CustomerService {
                 ->orderBy('customer_statuses.weight', 'ASC')
                 ->get();
         } else {
+            $query->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
             $selectColumns = ['customers.*'];
             if ($pageSize > 0 || $request->wants_status_info) {
                 $selectColumns[] = DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name');
