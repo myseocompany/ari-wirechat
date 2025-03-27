@@ -26,9 +26,11 @@ class CustomerService {
         }
 
         $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm) {
+            /*
             if (!empty($stage_id) && empty($searchTerm)) {
                 $query->where('customer_statuses.stage_id', $stage_id);
             }
+                */
 
             if (!empty($request->from_date)) {
                 $column = ($request->created_updated === "created") ? 'created_at' : 'updated_at';
