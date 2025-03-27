@@ -50,6 +50,8 @@ class WAToolBoxController extends Controller{
             'APIKEY' => 'required|string'
         ]);
 
+        Log::info('Validation data at WAToolBoxController validatedData:', [$validatedData]);
+
         // Identificar el Message Source
         $messageSource = MessageSource::where('APIKEY', $validatedData['APIKEY'])->first();
         if (!$messageSource) {
