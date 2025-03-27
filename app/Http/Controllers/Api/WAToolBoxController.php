@@ -28,6 +28,7 @@ use Namu\WireChat\Events\MessageCreated;
 use Namu\WireChat\Jobs\NotifyParticipants;
 use Namu\WireChat\Models\Message as ModelsMessage;
 use App\Enums\WAMessageType;
+use App\Services\ConversationService;
 
 
 class WAToolBoxController extends Controller{
@@ -74,7 +75,7 @@ class WAToolBoxController extends Controller{
 
 
         $receiver_user = User::findByPhone($reciver_phone);
-
+        
         if (!$receiver_user) {
             Log::warning('No se encontró un usuario con el teléfono: ' . $reciver_phone);
             return response()->json(['message' => 'Usuario no encontrado'], 404);
@@ -82,8 +83,15 @@ class WAToolBoxController extends Controller{
 
         Log::info('Usuario identificado: ' . $receiver_user->name);
 
-        Log::info('Telefono Nicolas '.$reciver_phone);
+        Log::info('Telefono Cliente '.$reciver_phone);
         $conversation = $sender->createConversationWith($receiver_user);
+
+        
+
+        
+
+        $conversation = ConversationService::getOrCreatePrivateConversation($sender, $receiver_user);
+
         
         if($validatedData['type']=='chat'){
             $message = $sender->sendMessageTo($receiver_user, $validatedData['content']);
