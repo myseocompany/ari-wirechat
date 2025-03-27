@@ -62,7 +62,7 @@ class CustomerService {
 
             if (!empty($searchTerm)) {
                 $normalizedSearch = $this->normalizePhoneNumber($searchTerm);
-                $query->where(function ($innerQuery) use ($request, $normalizedSearch) {
+                $query->where(function ($innerQuery) use ($request, $normalizedSearch, $searchTerm) {
                     
 
                     if ($this->looksLikePhoneNumber($searchTerm)) {
