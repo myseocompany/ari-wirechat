@@ -43,9 +43,7 @@ class CustomerController extends Controller
     protected $status_name;
     protected $customerService;
 
-    public function __construct(
-        CustomerService $customerService
-    ) {
+    public function __construct(CustomerService $customerService) {
         $this->customerService = $customerService;
     }
 

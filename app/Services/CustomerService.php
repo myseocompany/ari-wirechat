@@ -13,9 +13,99 @@ use App\Models\Customer;
 use App\Models\RoleProduct;
 
 class CustomerService {
-
-
     public function filterCustomers(Request $request, $statuses, $stage_id, $countOnly = false, $pageSize = 0)
+    {
+        $status_array = CustomerStatus::where('stage_id', $stage_id)->pluck('id')->toArray();
+        $dates = $this->getDates($request);
+
+        $query = Customer::query();
+
+        // Solo haces el join si se necesita para agrupar o mostrar status
+        if ($countOnly || $pageSize > 0) {
+            $query->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
+        }
+
+        $query->where(function ($query) use ($stage_id, $dates, $request) {
+            if (!empty($stage_id) && empty($request->search)) {
+                $query->where('customer_statuses.stage_id', $stage_id);
+            }
+
+            if (!empty($request->from_date)) {
+                $column = ($request->created_updated === "created") ? 'created_at' : 'updated_at';
+                $query->whereBetween("customers.$column", $dates);
+            }
+
+            if (!empty($request->user_id)) {
+                $query->where('customers.user_id', $request->user_id === "null" ? null : $request->user_id);
+            }
+
+            if (isset($request->maker)) {
+                is_numeric($request->maker) ? 
+                    $query->where('customers.maker', $request->maker) : 
+                    $query->whereNull('customers.maker');
+            }
+
+            if (!empty($request->product_id)) {
+                $query->whereIn(
+                    'customers.product_id', 
+                    $request->product_id == 1 ? [1, 6, 7, 8, 9, 10, 11] : [$request->product_id]
+                );
+            }
+
+            if (!empty($request->source_id)) $query->where('customers.source_id', $request->source_id);
+            if (!empty($request->country)) $query->where('customers.country', $request->country);
+            if (!empty($request->status_id)) $query->where('customers.status_id', $request->status_id);
+            if (!empty($request->scoring_interest)) $query->where('customers.scoring_interest', $request->scoring_interest);
+            if (!empty($request->inquiry_product_id)) $query->where('customers.inquiry_product_id', $request->inquiry_product_id);
+
+            if (!empty($request->search)) {
+                $normalizedSearch = $this->normalizePhoneNumber($request->search);
+                $query->where(function ($innerQuery) use ($request, $normalizedSearch) {
+                    $innerQuery->orWhere('customers.name', 'like', "%{$request->search}%")
+                        ->orWhere('customers.email', 'like', "%{$request->search}%")
+                        ->orWhere('customers.document', 'like', "%{$request->search}%")
+                        ->orWhere('customers.position', 'like', "%{$request->search}%")
+                        ->orWhere('customers.business', 'like', "%{$request->search}%")
+                        ->orWhere('customers.notes', 'like', "%{$request->search}%");
+
+                    if ($this->looksLikePhoneNumber($request->search)) {
+                        $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
+                        $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
+                        $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.contact_phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
+                    }
+                });
+            }
+        });
+
+        // RESULTADO
+        if ($countOnly) {
+            $result = $query->select(
+                    DB::raw('count(distinct(customers.id)) as count'),
+                    'customers.status_id',
+                    DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
+                    DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color'),
+                )
+                ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color')
+                ->orderBy('customer_statuses.weight', 'ASC')
+                ->get();
+        } else {
+            $selectColumns = ['customers.*'];
+            if ($pageSize > 0 || $request->wants_status_info) {
+                $selectColumns[] = DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name');
+                $selectColumns[] = DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color');
+            }
+
+            $result = $query->select($selectColumns)
+                ->orderBy('customers.created_at', 'DESC')
+                ->when($pageSize > 0, fn($q) => $q->paginate($pageSize), fn($q) => $q->get());
+        }
+
+        $result->action = "customers/phase/" . $stage_id;
+        return $result;
+    }
+
+
+    public function filterCustomers_2025_03(Request $request, $statuses, $stage_id, $countOnly = false, $pageSize = 0)
     {
         $status_array = CustomerStatus::where('stage_id', $stage_id)->pluck('id')->toArray();
         $dates = $this->getDates($request);
@@ -39,6 +129,7 @@ class CustomerService {
                         $query->where('customers.maker', $request->maker) : 
                         $query->whereNull('customers.maker');
                 }
+                
 
                 if (!empty($request->product_id)) {
                     $query->whereIn(
