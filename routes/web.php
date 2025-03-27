@@ -12,7 +12,7 @@ use App\Http\Controllers\ActionController;
 use App\Http\Controllers\CustomerFileController;
 use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\ReferencesController;
-use App\Http\Controllers\WompiController;
+//use App\Http\Controllers\WompiController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\JobController;
@@ -27,6 +27,7 @@ use App\Http\Controllers\AudienceController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\WhatsAppAPIController;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
@@ -166,7 +167,7 @@ Route::middleware('auth')->prefix('references')->group(function () {
 });
 
 // Wompi Routes
-Route::get('/wompi_link/{reference}', [WompiController::class, 'getLink']);
+//Route::get('/wompi_link/{reference}', [WompiController::class, 'getLink']);
 
 // Mail Routes
 Route::get('/testMail', [SiteController::class, 'testMail']);
@@ -239,10 +240,10 @@ Route::middleware('auth')->prefix('orders')->group(function () {
     Route::post('/', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/', [OrderController::class, 'index']);
     Route::get('/create', [OrderController::class, 'create'])->name('orders.create');
-    Route::get('/{cid}/quotes/create', [OrderController::class, 'create'])->name('orders.create');
+    //Route::get('/{cid}/quotes/create', [OrderController::class, 'create'])->name('orders.create');
+    //Route::get('/create/sid/{sid}', [OrderController::class, 'create'])->name('orders.create');
     Route::get('/{oid}/add/product', [OrderController::class, 'addProducts']);
     Route::get('/sid/{sid}', [OrderController::class, 'index']);
-    Route::get('/create/sid/{sid}', [OrderController::class, 'create'])->name('orders.create');
     Route::post('/search_customer', [OrderController::class, 'searchCustomer']);
     Route::get('/product/{pid}', [OrderController::class, 'orderProduct']);
     Route::post('/save', [OrderController::class, 'SaveOrder']);

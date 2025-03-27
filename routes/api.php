@@ -10,8 +10,13 @@ Route::middleware('api')->group(
 
         Route::post('/watoolbox', [WAToolBoxController::class, 'receiveMessage']);
         Route::post('/customers/update', [APIController::class, 'saveApi']);
+        Route::post('/watoolbox/webhook', [WAToolBoxController::class, 'receiveMessage']);
+        Route::post('/watoolbox/testping', function () {
+            return response()->json(['pong' => true]);
+        });
         
 });
+
 
 
 

@@ -44,7 +44,7 @@ class WAToolBoxController extends Controller{
             'user' => 'required|string',
             'phone' => 'required|string',
             'content' => 'required|string',
-            'name' => 'required|string',
+            'name' => 'string|nullable',
             'name2' => 'string|nullable',
             'image' => 'string|nullable',
             'APIKEY' => 'required|string'
@@ -70,7 +70,7 @@ class WAToolBoxController extends Controller{
         );
         logger(["image"=>$validatedData['image']]);
 
-        logger(["customer"=>$sender]);
+        logger(["customer"=>$sender->name]);
             $sender->image_url = $validatedData['image'];
         $sender->save();
 
