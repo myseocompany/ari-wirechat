@@ -61,17 +61,19 @@ class CustomerService {
             if (!empty($request->search)) {
                 $normalizedSearch = $this->normalizePhoneNumber($request->search);
                 $query->where(function ($innerQuery) use ($request, $normalizedSearch) {
-                    $innerQuery->orWhere('customers.name', 'like', "%{$request->search}%")
-                        ->orWhere('customers.email', 'like', "%{$request->search}%")
-                        ->orWhere('customers.document', 'like', "%{$request->search}%")
-                        ->orWhere('customers.position', 'like', "%{$request->search}%")
-                        ->orWhere('customers.business', 'like', "%{$request->search}%")
-                        ->orWhere('customers.notes', 'like', "%{$request->search}%");
+                    
 
                     if ($this->looksLikePhoneNumber($request->search)) {
                         $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
                         $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
                         $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.contact_phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
+                    }else{
+                        $innerQuery->orWhere('customers.name', 'like', "%{$request->search}%")
+                        ->orWhere('customers.email', 'like', "%{$request->search}%")
+                        ->orWhere('customers.document', 'like', "%{$request->search}%")
+                        ->orWhere('customers.position', 'like', "%{$request->search}%")
+                        ->orWhere('customers.business', 'like', "%{$request->search}%")
+                        ->orWhere('customers.notes', 'like', "%{$request->search}%");
                     }
                 });
             }
