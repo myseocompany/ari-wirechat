@@ -15,7 +15,7 @@ use App\Models\RoleProduct;
 class CustomerService {
     public function filterCustomers(Request $request, $statuses, $stage_id, $countOnly = false, $pageSize = 0)
     {
-        $status_array = CustomerStatus::where('stage_id', $stage_id)->pluck('id')->toArray();
+        $searchTerm = $request->search;
         $dates = $this->getDates($request);
 
         $query = Customer::query();
@@ -25,8 +25,8 @@ class CustomerService {
             $query->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
         }
 
-        $query->where(function ($query) use ($stage_id, $dates, $request) {
-            if (!empty($stage_id) && empty($request->search)) {
+        $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm) {
+            if (!empty($stage_id) && empty($searchTerm)) {
                 $query->where('customer_statuses.stage_id', $stage_id);
             }
 
@@ -58,24 +58,24 @@ class CustomerService {
             if (!empty($request->scoring_interest)) $query->where('customers.scoring_interest', $request->scoring_interest);
             if (!empty($request->inquiry_product_id)) $query->where('customers.inquiry_product_id', $request->inquiry_product_id);
 
-            if (!empty($request->search)) {
-                $normalizedSearch = $this->normalizePhoneNumber($request->search);
+            if (!empty($searchTerm)) {
+                $normalizedSearch = $this->normalizePhoneNumber($searchTerm);
                 $query->where(function ($innerQuery) use ($request, $normalizedSearch) {
                     
 
-                    if ($this->looksLikePhoneNumber($request->search)) {
+                    if ($this->looksLikePhoneNumber($searchTerm)) {
                         $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
                         $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
                         $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.contact_phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
-                    } elseif ($this->looksLikeEmail($request->search)) {
-                        $innerQuery->orWhere('customers.email', 'like', "%{$request->search}%")
-                            ->orWhere('customers.contact_email', 'like', "%{$request->search}%");
+                    } elseif ($this->looksLikeEmail($searchTerm)) {
+                        $innerQuery->orWhere('customers.email', 'like', "%{$searchTerm}%")
+                            ->orWhere('customers.contact_email', 'like', "%{$searchTerm}%");
                     } else {
-                        $innerQuery->orWhere('customers.name', 'like', "%{$request->search}%")
-                            ->orWhere('customers.document', 'like', "%{$request->search}%")
-                            ->orWhere('customers.position', 'like', "%{$request->search}%")
-                            ->orWhere('customers.business', 'like', "%{$request->search}%")
-                            ->orWhere('customers.notes', 'like', "%{$request->search}%");
+                        $innerQuery->orWhere('customers.name', 'like', "%{$searchTerm}%")
+                            ->orWhere('customers.document', 'like', "%{$searchTerm}%")
+                            ->orWhere('customers.position', 'like', "%{$searchTerm}%")
+                            ->orWhere('customers.business', 'like', "%{$searchTerm}%")
+                            ->orWhere('customers.notes', 'like', "%{$searchTerm}%");
                     }
                 });
             }
@@ -93,13 +93,8 @@ class CustomerService {
                 ->orderBy('customer_statuses.weight', 'ASC')
                 ->get();
         } else {
-            $query->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
             $selectColumns = ['customers.*'];
-            if ($pageSize > 0 || $request->wants_status_info) {
-                $selectColumns[] = DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name');
-                $selectColumns[] = DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color');
-            }
-
+            
             $result = $query->select($selectColumns)
                 ->orderBy('customers.created_at', 'DESC')
                 ->when($pageSize > 0, fn($q) => $q->paginate($pageSize), fn($q) => $q->get());
@@ -779,16 +774,21 @@ class CustomerService {
 
     public function getDates($request)
     {
-        $to_date = Carbon\Carbon::today()->subDays(2); // ayer
-        $from_date = Carbon\Carbon::today()->subDays(5000);
-        if (isset($request->from_date) && ($request->from_date != null)) {
-            $from_date = Carbon\Carbon::createFromFormat('Y-m-d', $request->from_date);
-            $to_date = Carbon\Carbon::createFromFormat('Y-m-d', $request->to_date);
+        if (empty($request->from_date) && empty($request->search)) {
+            // Sin filtros → mostrar solo leads de hoy
+            $from_date = Carbon\Carbon::today()->format('Y-m-d');
+            $to_date = Carbon\Carbon::today()->format('Y-m-d') . " 23:59:59";
+        } else {
+            // Filtros personalizados
+            $from_date = Carbon\Carbon::createFromFormat('Y-m-d', $request->from_date ?? Carbon\Carbon::today()->subDays(5000)->format('Y-m-d'));
+            $to_date = Carbon\Carbon::createFromFormat('Y-m-d', $request->to_date ?? Carbon\Carbon::today()->subDays(2)->format('Y-m-d'));
+            $from_date = $from_date->format('Y-m-d');
+            $to_date = $to_date->format('Y-m-d') . " 23:59:59";
         }
-        $to_date = $to_date->format('Y-m-d') . " 23:59:59";
-        $from_date = $from_date->format('Y-m-d');
-        return array($from_date, $to_date);
+    
+        return [$from_date, $to_date];
     }
+    
 
     public function getLead($lead)
     {
