@@ -78,7 +78,7 @@ return [
 
         // Media Config
         'media_mimes' => ['png', 'jpg', 'jpeg', 'gif', 'mov', 'mp4'],
-        'media_max_upload_size' => 12288, // 12 MB
+        'media_max_upload_size' => 22288, // 12 MB
 
         // File Config
         'file_mimes' => ['zip', 'rar', 'txt', 'pdf'],
