@@ -41,6 +41,7 @@ x-init=" setTimeout(() => {
         
         {{-- include search if true --}}
         @includeWhen(config('wirechat.allow_chats_search', false) == true,'wirechat::livewire.chats.includes.search')
+        <!--
         <div>Línea activa:
             
             {{auth()->user()?->getDefaultMessageSource()->settings['phone_number'];}}
@@ -53,6 +54,7 @@ x-init=" setTimeout(() => {
             <label class="dark:text-white" for="only_my_customers">Ver solo mis Clientes</label>
     
         </div>
+    -->
         @if (count($conversations) > 0)
         
             <ul wire:loading.delay.long.remove wire:target="search" class="p-2 grid w-full spacey-y-2">
