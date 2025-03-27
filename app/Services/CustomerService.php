@@ -21,7 +21,7 @@ class CustomerService {
         $query = Customer::query();
 
         // Solo haces el join si se necesita para agrupar o mostrar status
-        if ($countOnly || $pageSize > 0) {
+        if ($countOnly) {
             $query->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
         }
 
@@ -67,13 +67,15 @@ class CustomerService {
                         $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
                         $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
                         $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.contact_phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
-                    }else{
+                    } elseif ($this->looksLikeEmail($request->search)) {
+                        $innerQuery->orWhere('customers.email', 'like', "%{$request->search}%")
+                            ->orWhere('customers.contact_email', 'like', "%{$request->search}%");
+                    } else {
                         $innerQuery->orWhere('customers.name', 'like', "%{$request->search}%")
-                        ->orWhere('customers.email', 'like', "%{$request->search}%")
-                        ->orWhere('customers.document', 'like', "%{$request->search}%")
-                        ->orWhere('customers.position', 'like', "%{$request->search}%")
-                        ->orWhere('customers.business', 'like', "%{$request->search}%")
-                        ->orWhere('customers.notes', 'like', "%{$request->search}%");
+                            ->orWhere('customers.document', 'like', "%{$request->search}%")
+                            ->orWhere('customers.position', 'like', "%{$request->search}%")
+                            ->orWhere('customers.business', 'like', "%{$request->search}%")
+                            ->orWhere('customers.notes', 'like', "%{$request->search}%");
                     }
                 });
             }
@@ -835,5 +837,9 @@ class CustomerService {
     {
         return preg_replace('/[^0-9]/', '', $phoneNumber);
     }
-    
+    function looksLikeEmail($input)
+    {
+        return filter_var($input, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
 }
