@@ -65,7 +65,8 @@ class WAToolBoxController extends Controller{
             [
                 'name' => $validatedData['name'] ?? $validatedData['name2'],
                 'image_url' => $validatedData['image'],
-                
+                'status_id' => 1,
+                'source_id' => 76,
             ]
         );
         logger(["image"=>$validatedData['image']]);
