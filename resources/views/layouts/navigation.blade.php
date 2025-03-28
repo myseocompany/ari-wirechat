@@ -73,7 +73,7 @@
          @if (!Auth::guest())
           <form class="form-inline mt-2 mt-md-0" action="/customers/phase/1" method="GET">
 
-            <input class="form-control mr-sm-2" type="text" placeholder="Busca o escribe" aria-label="Cliente" id="name_" name="search" @if (isset($request->search)) value="{{$request->search}}" @endif>
+            <input class="form-control mr-sm-2" type="text" placeholder="Busca o escribe..." aria-label="Cliente" id="name_" name="search" @if (isset($request->search)) value="{{$request->search}}" @endif>
             <button class="btn btn-primary my-2 my-sm-0" type="submit">Ir</button>
           </form>  
         @endif
