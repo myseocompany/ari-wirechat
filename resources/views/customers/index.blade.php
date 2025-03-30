@@ -89,7 +89,7 @@
                   @endif
                   <div>
                       @if(isset($item->phone)|| isset($item->phone2))
-                      <a href="/customers/{{$item->id}}/edit">
+                      <a href="/customers/{{$item->id}}/show">
                           <span>{{ isset($item->phone) ? $item->phone : $item->phone2 }}</span>
                       </a>
                       @endif
