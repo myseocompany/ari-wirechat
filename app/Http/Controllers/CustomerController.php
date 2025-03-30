@@ -1675,14 +1675,14 @@ $message->to("mateogiraldo420@gmail.com");
     public function startConversationFromCRM(Request $request)
     {
         $customer = Customer::findOrFail($request->customer_id);
-        $customerUser = $customer->getChatUser(); // el User equivalente al Customer
+        //$customerUser = $customer->getChatUser(); // el User equivalente al Customer
         $waUser = User::find(2); // Usuario con WA Toolbox activo
     
         // Crear conversación o usar existente
-        $conversation = $waUser->createConversationWith($customerUser);
+        $conversation = $waUser->createConversationWith($customer);
     
         // Enviar mensaje como WAUser
-        $message = $waUser->sendMessageTo($customerUser, $request->mensaje);
+        $message = $waUser->sendMessageTo($customer, $request->mensaje);
     
         // Redirigir al chat en una nueva pestaña
         $chatUrl = url("/chats/{$conversation->id}");
