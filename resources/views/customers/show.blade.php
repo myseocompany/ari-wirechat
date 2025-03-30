@@ -59,7 +59,7 @@
 
             <p class="card-text">
               <div>
-                <button onclick="startChat({{ $customer->id }})">Iniciar Chat</button>
+                <button onclick="startChat({{ $model->id }})">Iniciar Chat</button>
 
                 <script>
                 function startChat(customerId) {
