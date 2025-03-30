@@ -24,9 +24,8 @@
     </button>
 
     <select name="status_id" id="status_id">
-      <option value="">Seleccione un estado</option>
       @foreach($statuses_options as $status_option)
-      <option value="{{$status_option->id}}">{{$status_option->name}}</option>
+      <option value="{{$status_option->id}}" @if($model->status_id == $status_option->id) selected="selected" @endif>{{$status_option->name}}</option>
       @endforeach
     </select>
 
