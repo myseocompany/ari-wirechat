@@ -109,7 +109,10 @@
       <div class="customer_description">creado el: 
         {{$customer->created_at}} / 
       </div>
+      <div>
+        @include('customers.wire_chat_link')
 
+      </div>
 
 
 
