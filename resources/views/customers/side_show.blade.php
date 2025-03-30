@@ -110,6 +110,10 @@
         {{$customer->created_at}} / 
       </div>
       <div>
+        <a href="javascript:void(0)" class="btn btn-outline-primary btn-sm mb-2" onclick="startChat({{ $customer->id }})">
+          <i class="fas fa-comments"></i> Iniciar Chat
+        </a>
+        
         @include('customers.wire_chat_link')
 
       </div>

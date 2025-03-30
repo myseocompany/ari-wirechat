@@ -1,7 +1,4 @@
-<button class="btn btn-outline-secondary btn-sm" title="Iniciar chat con WhatsApp" onclick="startChat({{ $model->id }})">
-    <i class="fas fa-comment-dots"></i>
-  </button>
-  
+
 
   <script>
   function startChat(customerId) {
