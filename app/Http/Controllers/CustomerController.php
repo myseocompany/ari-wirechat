@@ -1671,4 +1671,28 @@ $message->to("mateogiraldo420@gmail.com");
         }
         return view('customers.daily', compact('model', 'request', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'phase', 'menu'));
     }
+
+    public function startConversationFromCRM(Request $request)
+    {
+        $customer = Customer::findOrFail($request->customer_id);
+        $customerUser = $customer->getChatUser(); // el User equivalente al Customer
+        $waUser = User::find(2); // Usuario con WA Toolbox activo
+    
+        // Crear conversación o usar existente
+        $conversation = $waUser->createConversationWith($customerUser);
+    
+        // Enviar mensaje como WAUser
+        $message = $waUser->sendMessageTo($customerUser, $request->mensaje);
+    
+        // Redirigir al chat en una nueva pestaña
+        $chatUrl = url("/chats/{$conversation->id}");
+    
+        return response()->json([
+            'success' => true,
+            'chat_url' => $chatUrl,
+            'conversation_id' => $conversation->id,
+        ]);
+    }
+    
+
 }

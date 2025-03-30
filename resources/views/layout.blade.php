@@ -104,5 +104,12 @@ $(document).ready(function(){
   @yield('footer_scripts')
       <script src="/js/scripts.js?id=<?php echo rand(1,10000) ?>"></script> 
       <!-- script src="/js/addInput.js?id=<?php echo rand(1,10000) ?>"--> 
+      <script>
+        $(document).ready(function(){
+          setTimeout(function(){
+            $(".alert").fadeOut("slow");
+          }, 4000); // desaparece después de 4 segundos
+        });
+      </script>
     </body>
     </html>

@@ -58,13 +58,44 @@
 
 
             <p class="card-text">
-              <div><span class="lavel"><strong>Imagen:</strong></span>
+              <div>
+                <button onclick="startChat({{ $customer->id }})">Iniciar Chat</button>
+
+                <script>
+                function startChat(customerId) {
+                  fetch('/customers/start-chat', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                      customer_id: customerId,
+                      mensaje: '¡Hola, te hablo de parte de maquiempandas! ¿En qué puedo ayudarte?'
+                    })
+                  })
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.success) {
+                      window.open(data.chat_url, '_blank'); // nueva pestaña con WireChat
+                    } else {
+                      alert('No se pudo iniciar el chat');
+                    }
+                  });
+                }
+                </script>
+
+              </div>
+              <div>
+                
+                <span class="lavel"><strong>Imagen:</strong></span>
                 <a href="{{$model->image_url}}">Link</a>
                 
               
               </div>
             <div><span class="lavel"><strong>Nombre:</strong></span> {{$model->name}}</div>
-            <div><span class="lavel"><strong>Teléfono:</strong></span> {{$model->phone}} <a href="https://wa.me/{{ clearWP($model->phone) }}" target="_empty">WP</a></div>
+            <div><span class="lavel"><strong>Teléfono:</strong></span> {{$model->phone}} 
+              <a href="https://wa.me/{{ clearWP($model->phone) }}" target="_empty">WP</a></div>
             <div><span class="lavel"><strong>Celular:</strong></span> {{$model->phone2}}</div>
             <div><span class="lavel"><strong>Email:</strong></span> {{$model->email}}</div>
             <div><span class="lavel"><strong>País:</strong></span> {{$model->country}}</div>
@@ -120,9 +151,7 @@
             <div>
               <span class="lavel"><strong>Campaña:</strong></span> {{$model->campaign_name}}
             </div>
-            <div>
-              <span class="lavel"><strong>Visitas Técnicas:</strong></span> {{$model->technical_visit}}
-            </div>
+           
             </p>
 
             <?php $customer = $model; ?>
