@@ -72,6 +72,9 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     Route::get('/{customer}/action/updateAjax', [CustomerController::class, 'updateAjaxStatus']);
     Route::get('/phase/{pid}', [CustomerController::class, 'customers']);
     Route::get('/{pid}', [CustomerController::class, 'dragleads']);
+    Route::get('/{pid}', [CustomerController::class, 'dragleads']);
+    Route::post('/start-chat', [CustomerController::class, 'startConversationFromCRM'])
+        ->name('customers.start-chat');
 });
 
 // Optimizer Routes
