@@ -9,7 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class StartChatTest extends TestCase
 {
-    use RefreshDatabase;
+    //use RefreshDatabase;
 
     public function test_start_chat_endpoint_creates_conversation()
     {
