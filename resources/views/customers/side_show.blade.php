@@ -14,11 +14,18 @@
         <?php
         ?>
         @if($customer->isBanned())
-        <h2 class="mb-2 pb-0" style="border-bottom: 1px solid #fff !important; color:red; "> <i class="fa fa-exclamation-circle" style="color:gray; "></i> {{$customer->name}} </h2>
+        <h2 class="mb-2 pb-0" style="border-bottom: 1px solid #fff !important; color:red; "> <i class="fa fa-exclamation-circle" style="color:gray; "></i> 
+          
+          @if(isset($customer->maker)&& ($customer->maker==1)) 🥟 @endif
+          @if(isset($customer->maker)&& ($customer->maker==0)) 💡 @endif
+          @if(isset($customer->maker)&& ($customer->maker==2))🍗🥩⚙️ @endif
+
+          {{$customer->name}} </h2>
 
         @else
 
-        <h1 class="mb-2 pb-0" style="border-bottom: 1px solid #fff !important;">@if(isset($customer->maker)&& ($customer->maker==1)) 🥟 @endif
+        <h1 class="mb-2 pb-0" style="border-bottom: 1px solid #fff !important;">
+          @if(isset($customer->maker)&& ($customer->maker==1)) 🥟 @endif
           @if(isset($customer->maker)&& ($customer->maker==0)) 💡 @endif
           @if(isset($customer->maker)&& ($customer->maker==2))🍗🥩⚙️ @endif
 
