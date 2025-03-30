@@ -93,9 +93,9 @@
 
 
       <div>@if(isset($customer->phone))
-        <a  href="/customers/{{$customer->id}}/show" target="_empty">{{$customer->phone}}</a>/@endif
+        <a  href="/customers/{{$customer->id}}/show">{{$customer->phone}}</a>/@endif
         @if(isset($customer->phone2)) 
-        <a href="/customers/{{$customer->id}}/show"  target="_empty">{{$customer->phone2}}</a>@endif
+        <a href="/customers/{{$customer->id}}/show" >{{$customer->phone2}}</a>@endif
         / {{$customer->email}}
 
 
