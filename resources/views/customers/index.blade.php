@@ -46,12 +46,12 @@
                   }
                   ?>
                   <a href="{{$url}}">
-                      <?php if($item->id==173929){ } ?>
+                      
                       @if(isset($item->name)&& ($item->name!=""))
-                      @if(isset($item->maker) && ($item->maker==1) )  🥟 Hace empanadas @endif
-                      @if(isset($item->maker) && ($item->maker==0) )  💡 Proyecto @endif
-                      @if(isset($item->maker) && ($item->maker==2) )  🍗🥩⚙️ Desmechadora @endif
-                      {{ substr($item->name, 0, 21) }}@if (strlen($item->name)>21) ...@endif
+                      @if(isset($item->maker) && ($item->maker==1) )🥟@endif
+                      @if(isset($item->maker) && ($item->maker==0) )💡@endif
+                      @if(isset($item->maker) && ($item->maker==2) )🍗🥩⚙️@endif
+                      &nbsp;{{ substr($item->name, 0, 21) }}@if (strlen($item->name)>21) ...@endif
                       @else
                           Sin nombre
                       @endif
