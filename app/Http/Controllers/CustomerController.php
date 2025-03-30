@@ -1677,9 +1677,15 @@ $message->to("mateogiraldo420@gmail.com");
         $customer = Customer::findOrFail($request->customer_id);
         //$customerUser = $customer->getChatUser(); // el User equivalente al Customer
         $waUser = User::find(1); // Usuario con WA Toolbox activo
+        $adminUser = Auth::user(); // Usuario logueado en el CRM
     
         // Crear conversación o usar existente
         $conversation = $waUser->createConversationWith($customer);
+
+        // Asegurarse de que el admin también esté en la conversación
+        if (!$adminUser->belongsToConversation($conversation)) {
+            $conversation->addParticipant($adminUser);
+        }
     
         // Enviar mensaje como WAUser
         $message = $waUser->sendMessageTo($customer, $request->mensaje);

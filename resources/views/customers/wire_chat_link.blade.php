@@ -16,7 +16,7 @@
     .then(res => res.json())
     .then(data => {
       if (data.success) {
-        //window.open(data.chat_url, '_blank'); // nueva pestaña con WireChat
+        window.open(data.chat_url, '_blank'); // nueva pestaña con WireChat
         alert('Mensaje enviado. Revisa con la sesión del usuario chat');
       } else {
         alert('No se pudo iniciar el chat');
