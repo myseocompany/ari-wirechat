@@ -1674,10 +1674,13 @@ $message->to("mateogiraldo420@gmail.com");
 
     public function startConversationFromCRM(Request $request)
     {
+
+        dd($request->all());
         $customer = Customer::findOrFail($request->customer_id);
         //$customerUser = $customer->getChatUser(); // el User equivalente al Customer
         $waUser = User::find(1); // Usuario con WA Toolbox activo
-        $adminUser = auth()->user();
+        
+        $adminUser = User::find(Auth::id());
         // Usuario logueado en el CRM
     
         // Crear conversación o usar existente
