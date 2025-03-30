@@ -1676,7 +1676,7 @@ $message->to("mateogiraldo420@gmail.com");
     {
         $customer = Customer::findOrFail($request->customer_id);
         //$customerUser = $customer->getChatUser(); // el User equivalente al Customer
-        $waUser = User::find(2); // Usuario con WA Toolbox activo
+        $waUser = User::find(1); // Usuario con WA Toolbox activo
     
         // Crear conversación o usar existente
         $conversation = $waUser->createConversationWith($customer);
