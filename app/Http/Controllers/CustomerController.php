@@ -1696,12 +1696,16 @@ $message->to("mateogiraldo420@gmail.com");
     
         // Redirigir al chat en una nueva pestaña
         $chatUrl = url("/chats/{$conversation->id}");
-    
+
+        /*
         return response()->json([
             'success' => true,
             'chat_url' => $chatUrl,
             'conversation_id' => $conversation->id,
         ]);
+*/
+        return redirect($chatUrl);
+
     }
     
 
