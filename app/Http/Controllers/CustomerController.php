@@ -9,7 +9,7 @@ use Illuminate\Support\Arr;
 use DB;
 use Mail;
 use File;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Carbon;
 use App\Models\Customer;
 use App\Models\CustomerStatus;
@@ -1675,7 +1675,7 @@ $message->to("mateogiraldo420@gmail.com");
     public function startConversationFromCRM(Request $request)
     {
 
-        dd($request->all());
+//        dd($request->all());
         $customer = Customer::findOrFail($request->customer_id);
         //$customerUser = $customer->getChatUser(); // el User equivalente al Customer
         $waUser = User::find(1); // Usuario con WA Toolbox activo
