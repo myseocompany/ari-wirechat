@@ -6,7 +6,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
   <meta name="google-site-verification" content="LxHKqj-7LHr4nr1F8SSnd7J2_vI1H0lgTg2s1hb-t7A" />
-  <link rel="icon" type="image/png" href="/img/icono-sitio-mqe.png">
+  <link rel="icon" type="image/png" href="/img/logo-mqe.png">
   <title>@yield('title') - AriCRM</title>
   {{--<script src="/js/jquery-3.2.1.slim.min.js"></script>--}}
   <script  src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
