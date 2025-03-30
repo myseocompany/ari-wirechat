@@ -7,11 +7,18 @@
   <meta name="author" content="">
   <meta name="google-site-verification" content="LxHKqj-7LHr4nr1F8SSnd7J2_vI1H0lgTg2s1hb-t7A" />
   <link rel="icon" type="image/png" href="/img/icono-sitio-mqe.png">
-  <title>@yield('title') - Create</title>
+  <title>@yield('title') - AriCRM</title>
+  {{--<script src="/js/jquery-3.2.1.slim.min.js"></script>--}}
+  <script  src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!-- Popper.js (versión compatible con Bootstrap 4) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <!-- fonts online -->
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">    
+
   <link rel="stylesheet" href="/css/dashboard.css?id=<?php echo rand(1,1000);?>">
  
   {{-- drag and drop --}}
@@ -57,18 +64,6 @@
     </div> 
   </section>
 </div>
-
-  {{--<script src="/js/jquery-3.2.1.slim.min.js"></script>--}}
-  <script
-  src="https://code.jquery.com/jquery-3.4.1.js"
-  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
-  crossorigin="anonymous"></script>
-
-
-
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="/js/popper.min.js"></script>
-      
 
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
     <!-- Bootstrap core JavaScript
