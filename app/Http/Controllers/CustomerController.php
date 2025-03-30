@@ -928,6 +928,7 @@ class CustomerController extends Controller
         $model = Customer::find($id);
         $customer_statuses = CustomerStatus::orderBy("stage_id", "ASC")
             ->where("stage_id", $stage_id)
+            ->where('status_id', "1")
             ->orderBy("weight", "ASC")
             ->get();
         $customer_sources = CustomerSource::all();
