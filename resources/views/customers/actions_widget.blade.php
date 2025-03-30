@@ -11,7 +11,6 @@
     </div>
     <div>
      <select name="type_id" id="type_id" required>
-      <option value="">Seleccione una acción</option>
       @foreach($action_options as $action_option)
       <option value="{{$action_option->id}}">{{$action_option->name}}</option>
       @endforeach
