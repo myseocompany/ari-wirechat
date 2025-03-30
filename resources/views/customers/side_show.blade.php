@@ -92,13 +92,17 @@
 
 
 
-      <div>
-        <a @if(isset($customer->phone)) href="https://wa.me/{{ clearWP($customer->getPhone()) }}" @else href="" @endif target="_empty">{{$customer->phone}}</a>/
-        <a @if(isset($customer->phone2)) href="https://wa.me/{{ clearWP($customer->getPhone()) }}" @else href="" @endif target="_empty">{{$customer->phone2}}</a>
+      <div>@if(isset($customer->phone))
+        <a  href="/customers/{{$customer->id}}/show" @else href=""  target="_empty">{{$customer->phone}}</a>/@endif
+        @if(isset($customer->phone2)) 
+        <a href="/customers/{{$customer->id}}/show"  href="" @endif target="_empty">{{$customer->phone2}}</a>@else
         / {{$customer->email}}
 
 
 
+      </div>
+      <div class="">creado el: 
+        {{$customer->created_at}} / 
       </div>
 
 

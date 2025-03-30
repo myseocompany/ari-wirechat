@@ -88,7 +88,9 @@
                   @endif
                   <div>
                       @if(isset($item->phone)|| isset($item->phone2))
+                      <a href="/customers/{{$item->id}}/edit">
                           <span>{{ isset($item->phone) ? $item->phone : $item->phone2 }}</span>
+                      </a>
                       @endif
                   </div>
                   <div>
