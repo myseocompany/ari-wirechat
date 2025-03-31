@@ -109,6 +109,7 @@
       <div class="customer_description">creado el: 
         {{$customer->created_at}} / 
       </div>
+      <!--
       <div>
         <form method="POST" action="/customers/start-chat" id="wire_chat">
           @csrf
@@ -130,6 +131,7 @@
       </form>
 
       </div>
+    -->
 
 
 

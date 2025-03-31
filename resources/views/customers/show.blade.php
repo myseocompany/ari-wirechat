@@ -58,7 +58,7 @@
 
             <p class="card-text">
               <div>
-
+<!--
                 <form method="POST" action="/customers/start-chat" id="wire_chat">
                   @csrf
                   <input type="hidden" name="customer_id" value="{{ $model->id }}">
@@ -78,7 +78,7 @@
                   </button>
               </form>
 
-
+            -->
               
               </div>
             

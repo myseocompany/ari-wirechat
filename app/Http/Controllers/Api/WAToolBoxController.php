@@ -1,9 +1,6 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-use Namu\WireChat\Enums\ConversationType;
-use Namu\WireChat\Enums\ParticipantRole;
-use Namu\WireChat\Models\Conversation;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -88,35 +85,9 @@ class WAToolBoxController extends Controller{
 
         Log::info('Usuario identificado: ' . $receiver_user->name);
 
-        Log::info('Telefono del User '.$reciver_phone);
-        //$conversation = $sender->createConversationWith($receiver_user);
+        Log::info('Telefono Nicolas '.$reciver_phone);
+        $conversation = $sender->createConversationWith($receiver_user);
         
-
-
-        // 1. Buscar conversación existente tipo grupo
-        $conversation = Conversation::where('type', ConversationType::GROUP)
-            ->whereHas('participants', function ($q) use ($receiver_user) {
-                $q->where('participantable_id', $receiver_user->id)
-                ->where('participantable_type', $receiver_user->getMorphClass());
-            })
-            ->whereHas('participants', function ($q) use ($sender) {
-                $q->where('participantable_id', $sender->id)
-                ->where('participantable_type', $sender->getMorphClass());
-            })
-            ->first();
-
-        // 2. Si no existe, crear grupo
-        if (!$conversation) {
-            $conversation = $receiver_user->createGroup(
-                name: 'Chat con ' . $sender->name,
-                description: 'Desde WhatsApp - WAToolbox'
-            );
-             // Agregar al asesor (receiver_user) como ADMIN
-            $conversation->addParticipant($receiver_user, ParticipantRole::ADMIN);
-            $conversation->addParticipant($sender, ParticipantRole::PARTICIPANT);
-        }
-
-
         if($validatedData['type']=='chat'){
             $message = $sender->sendMessageTo($receiver_user, $validatedData['content']);
             
