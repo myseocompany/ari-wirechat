@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 
 use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Enums\ParticipantRole;
+use Namu\WireChat\Enums\ConversationType;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -1729,17 +1730,25 @@ public function startConversationFromCRM(Request $request)
     $waUser = User::find(1); // Usuario "robot" o herramienta WA Toolbox
     $adminUser = User::find(auth()->id()); // Usuario actual logueado
 
-    $participants = [$waUser, $adminUser, $customer];
-
+    
     // Buscar si ya existe un grupo con estos 3 participantes
-    $conversation = Conversation::whereHas('participants', function ($q) use ($participants) {
-        foreach ($participants as $user) {
-            $q->where(function ($q2) use ($user) {
-                $q2->where('participantable_id', $user->id)
-                    ->where('participantable_type', $user->getMorphClass());
-            });
-        }
-    }, '=', count($participants))->where('type', \Namu\WireChat\Enums\ConversationType::GROUP)->first();
+
+
+    // Buscar conversaciones grupales existentes del waUser
+    $conversation = Conversation::where('type', ConversationType::GROUP)
+        ->whereHas('participants', function ($q) use ($waUser) {
+            $q->where('participantable_id', $waUser->id)
+              ->where('participantable_type', $waUser->getMorphClass());
+        })
+        ->whereHas('participants', function ($q) use ($adminUser) {
+            $q->where('participantable_id', $adminUser->id)
+              ->where('participantable_type', $adminUser->getMorphClass());
+        })
+        ->whereHas('participants', function ($q) use ($customer) {
+            $q->where('participantable_id', $customer->id)
+              ->where('participantable_type', $customer->getMorphClass());
+        })
+        ->first();
 
     // Si no existe, se crea
     if (!$conversation) {
@@ -1751,6 +1760,9 @@ public function startConversationFromCRM(Request $request)
         // Añadir participantes
         $conversation->addParticipant($adminUser, ParticipantRole::ADMIN);
         $conversation->addParticipant($customer, ParticipantRole::PARTICIPANT);
+        logger('No se encontró la conversación en grupo');
+    }else{
+        logger('Si se encontró la conversación en grupo');
     }
 
     // Enviar mensaje inicial

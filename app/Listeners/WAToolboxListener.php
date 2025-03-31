@@ -30,18 +30,24 @@ class WAToolboxListener
     public function handle(object $event): void
     {
         $sendable_type = $event->message->sendable_type;
-       //logger(['event'=> $event ]);
+        logger(['event'=> $event ]);
 
         if ($sendable_type === 'App\\Models\\User'){
             $message  = ModelsMessage::find( $event->message->id );
             $response = null;
             $user = $message->sendable; // get User
-            $customer = $message->conversation->participants()
+            $customerParticipant = $message->conversation->participants()
                 ->where(function ($query) use ($user) {
                     $query->where('participantable_id', '<>', $user->id)
-                        ->orWhere('participantable_type', '<>', $user->getMorphClass());
+                        //->orWhere('participantable_type', '<>', $user->getMorphClass());
+                        ->where('participantable_type', 'App\\Models\\Customer');
                 })->first();
-            $customer = $customer->participantable;
+
+            if (!$customerParticipant) {
+                logger('No se encontró al customer en la conversación');
+                return;
+            }
+            $customer = $customerParticipant->participantable;
             //logger(['customer' => $customer]);
             // $phone_number = Customer::find( $event->message['body'] );
             $phone_number = $customer->phone;
