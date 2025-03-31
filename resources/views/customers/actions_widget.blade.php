@@ -15,7 +15,6 @@
       <option value="{{$action_option->id}}">{{$action_option->name}}</option>
       @endforeach
     </select>
-    @include('customers.actions_table', ["action_options"=>$action_options])
     
     <button class="btn btn-link" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
       <span id="helpButtonAction" style="cursor:pointer; color:blue;">  
@@ -29,7 +28,6 @@
       @endforeach
     </select>
 
-    @include('customers.status_table', ["statuses_options"=>$statuses_options])
     
     <button class="btn btn-link" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
       <span id="helpButtonStatus" style="cursor:pointer; color:blue;">  
@@ -55,7 +53,10 @@
 
 
       <input class="btn btn-primary btn-sm" type="submit" value="Enviar acción">
-      <input type="hidden" id="customer_id" name="customer_id" value="{{$model->id}}">
+      
     </div>
   </form>
+  @include('customers.status_table', ["statuses_options"=>$statuses_options])
+  @include('customers.actions_table', ["action_options"=>$action_options])
+
 </div>

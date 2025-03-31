@@ -23,6 +23,10 @@ class User extends Authenticatable
     {
         return true;
     }
+    public function canCreateGroups(): bool
+    {
+        return true;
+    }
 
 
     public function searchChatables(string $query): Collection

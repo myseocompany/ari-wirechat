@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 // Customer Routes
+/*
 Route::middleware('auth')->prefix('customers')->group(function () {
     Route::get('/', [CustomerController::class, 'leads'])->name('customers');
     Route::get('/create', [CustomerController::class, 'create']);
@@ -75,6 +76,46 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     Route::get('/{pid}', [CustomerController::class, 'dragleads']);
     Route::post('/start-chat', [CustomerController::class, 'startConversationFromCRM'])
         ->name('customers.start-chat');
+});
+*/
+
+// Customer Routes
+Route::middleware('auth')->prefix('customers')->group(function () {
+    Route::get('/', [CustomerController::class, 'leads'])->name('customers');
+    Route::get('/create', [CustomerController::class, 'create']);
+    Route::post('/', [CustomerController::class, 'store']);
+    // Chat
+    Route::post('/start-chat', [CustomerController::class, 'startConversationFromCRM'])->name('customers.start-chat');
+
+    // Rutas con parámetros específicos
+    Route::get('/{customer}/edit', [CustomerController::class, 'edit'])->whereNumber('customer');
+    Route::post('/{customer}/update', [CustomerController::class, 'update'])->whereNumber('customer');
+    Route::get('/{customer}/show', [CustomerController::class, 'show'])->whereNumber('customer');
+    Route::get('/{customer}/show/{action}', [CustomerController::class, 'showAction'])->whereNumber('customer');
+    Route::get('/{customer}/destroy', [CustomerController::class, 'destroy'])->whereNumber('customer');
+    Route::post('/{customer}/action/store', [CustomerController::class, 'storeAction'])->whereNumber('customer');
+    Route::post('/{customer}/action/sale', [CustomerController::class, 'saleAction'])->whereNumber('customer');
+    Route::post('/{customer}/action/opportunity', [CustomerController::class, 'opportunityAction'])->whereNumber('customer');
+    Route::post('/{customer}/action/poorly_rated', [CustomerController::class, 'poorlyRatedAction'])->whereNumber('customer');
+    Route::post('/{customer}/action/pqr', [CustomerController::class, 'pqrAction'])->whereNumber('customer');
+    Route::post('/{customer}/action/spare', [CustomerController::class, 'spareAction'])->whereNumber('customer');
+    Route::post('/{customer}/action/mail', [CustomerController::class, 'storeMail'])->whereNumber('customer');
+    Route::get('/{customer}/assignMe', [CustomerController::class, 'assignMe'])->whereNumber('customer');
+    Route::post('/{customer}/audience', [CustomerController::class, 'storeAudience'])->whereNumber('customer');
+    Route::get('/history/{customer}/show', [CustomerController::class, 'showHistory'])->whereNumber('customer');
+
+    // Específicas
+    Route::get('/ajax/update_user', [CustomerController::class, 'updateAjax']);
+    Route::get('/logistica', [CustomerController::class, 'newIndex']);
+    Route::get('/{customer}/action/updateAjax', [CustomerController::class, 'updateAjaxStatus'])->whereNumber('customer');
+
+    // Rutas de fases
+    Route::get('/phase/{pid}', [CustomerController::class, 'customers'])->whereNumber('pid');
+
+    // Esta debe ir al final para no interceptar las anteriores
+    Route::get('/{pid}', [CustomerController::class, 'dragleads'])->whereNumber('pid');
+
+    
 });
 
 // Optimizer Routes

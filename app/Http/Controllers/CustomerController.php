@@ -4,6 +4,10 @@
 
 namespace App\Http\Controllers;
 
+
+use Namu\WireChat\Models\Conversation;
+use Namu\WireChat\Enums\ParticipantRole;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use DB;
@@ -269,11 +273,7 @@ class CustomerController extends Controller
         $today = Carbon\Carbon::now();
         $audiences = Audience::all();
         $messages = CampaignMessage::where('campaign_id', 11)->get();
-        $references = null;
-        if ($customer != null) {
-            $references = Reference::where('customer_id', '=', $customer->id)->orderby("created_at", "DESC")->get();
-        }
-        return view('customers.index', compact('country_options', 'inquiry_products', 'model', 'request',   'messages', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'phase', 'menu'));
+        return view('customers.index', compact('country_options', 'inquiry_products', 'model', 'request',   'messages', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences',  'phase', 'menu'));
     }
 
 
@@ -1672,10 +1672,10 @@ $message->to("mateogiraldo420@gmail.com");
         return view('customers.daily', compact('model', 'request', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'phase', 'menu'));
     }
 
-    public function startConversationFromCRM(Request $request)
+    public function startConversationFromCRM2(Request $request)
     {
 
-//        dd($request->all());
+       // dd($request->all());
         $customer = Customer::findOrFail($request->customer_id);
         //$customerUser = $customer->getChatUser(); // el User equivalente al Customer
         $waUser = User::find(1); // Usuario con WA Toolbox activo
@@ -1683,12 +1683,26 @@ $message->to("mateogiraldo420@gmail.com");
         $adminUser = User::find(Auth::id());
         // Usuario logueado en el CRM
     
+        // Participantes
+        $participants = collect([$waUser, $adminUser, $customer]);
+
         // Crear conversación o usar existente
         $conversation = $waUser->createConversationWith($customer);
 
-        // Asegurarse de que el admin también esté en la conversación
-        if (!$adminUser->belongsToConversation($conversation)) {
+        $existingConversation = $conversation::withParticipants($participants)->first();
+
+        if ($existingConversation) {
+            $conversation = $existingConversation;
+        } else {
+            // Crear conversación grupal
+            $conversation = $waUser->createGroup(
+                name: 'Chat con ' . $customer->name,
+                description: 'Conversación iniciada desde CRM'
+            );
+
+            // Agregar participantes
             $conversation->addParticipant($adminUser);
+            $conversation->addParticipant($customer);
         }
     
         // Enviar mensaje como WAUser
@@ -1704,9 +1718,48 @@ $message->to("mateogiraldo420@gmail.com");
             'conversation_id' => $conversation->id,
         ]);
 */
-        return redirect($chatUrl);
+//        return redirect($chatUrl);
 
     }
+
+
+public function startConversationFromCRM(Request $request)
+{
+    $customer = Customer::findOrFail($request->customer_id);
+    $waUser = User::find(1); // Usuario "robot" o herramienta WA Toolbox
+    $adminUser = User::find(auth()->id()); // Usuario actual logueado
+
+    $participants = [$waUser, $adminUser, $customer];
+
+    // Buscar si ya existe un grupo con estos 3 participantes
+    $conversation = Conversation::whereHas('participants', function ($q) use ($participants) {
+        foreach ($participants as $user) {
+            $q->where(function ($q2) use ($user) {
+                $q2->where('participantable_id', $user->id)
+                    ->where('participantable_type', $user->getMorphClass());
+            });
+        }
+    }, '=', count($participants))->where('type', \Namu\WireChat\Enums\ConversationType::GROUP)->first();
+
+    // Si no existe, se crea
+    if (!$conversation) {
+        $conversation = $waUser->createGroup(
+            name: 'Chat con ' . $customer->name,
+            description: 'Conversación iniciada desde CRM'
+        );
+
+        // Añadir participantes
+        $conversation->addParticipant($adminUser, ParticipantRole::ADMIN);
+        $conversation->addParticipant($customer, ParticipantRole::PARTICIPANT);
+    }
+
+    // Enviar mensaje inicial
+    $waUser->sendMessageTo($conversation, $request->mensaje);
+
+    // Redirigir al chat
+    return redirect("/chats/{$conversation->id}");
+}
+
     
 
 }
