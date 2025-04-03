@@ -20,21 +20,14 @@
 
 
                     @if($item->url =="/logout")
-                            <a class="nav-link" href="{{ route('logout') }}"
-                                onclick="event.preventDefault();
-                                         document.getElementById('logout-form').submit();">
-                                Salir
-                            </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                {{ csrf_field() }}
-                            </form>
-                        @else
-                        <a class="nav-link" href="{{$item->url}}" @if($item->hasChildren()) class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" @endif> 
-                        
-                            {{$item->name}} @if($item->hasChildren()) - @endif
                             
-                        </a>
-                        @endif
+                    @else
+                    <a class="nav-link" href="{{$item->url}}" @if($item->hasChildren()) class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" @endif> 
+                    
+                        {{$item->name}} @if($item->hasChildren()) - @endif
+                        
+                    </a>
+                    @endif
                     @if($item->hasChildren())
                       <ul class="dropdown-menu" role="menu">
                       @foreach($item->getChildren() as $subitem)
@@ -62,7 +55,15 @@
                       </ul> 
                     @endif 
                 </li>     
-            @endforeach     
+            @endforeach
+            <a class="nav-link" href="{{ route('logout') }}"
+                                onclick="event.preventDefault();
+                                         document.getElementById('logout-form').submit();">
+                                Salir
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                {{ csrf_field() }}
+            </form>     
           @endif      
          
         </ul>
