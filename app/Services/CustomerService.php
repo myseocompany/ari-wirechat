@@ -58,6 +58,8 @@ class CustomerService {
             if (!empty($request->country)) $query->where('customers.country', $request->country);
             if (!empty($request->status_id)) $query->where('customers.status_id', $request->status_id);
             if (!empty($request->scoring_interest)) $query->where('customers.scoring_interest', $request->scoring_interest);
+            if (isset($request->scoring_profile)  && ($request->scoring_profile != null))
+                        $query->where('customers.scoring_profile', $request->scoring_profile);
             if (!empty($request->inquiry_product_id)) $query->where('customers.inquiry_product_id', $request->inquiry_product_id);
 
             if (!empty($searchTerm)) {
