@@ -66,7 +66,7 @@
                   @if(isset($item->scoring_interest) && ($item->scoring_interest>0))
                       <span style="background-color: #ccc; border-radius: 50%; width: 25px; height: 25px; text-align: center; color: white; align-items: left; font-size: 12px; padding: 2px;">{{$item->scoring_interest}}</span>
                   @endif
-                  {{$item->getScoringToNumber()}}
+                  
                   <div class="stars-outer">
                       <div class="stars-inner" id="star{{$cont++}}"></div>
                       <script type="text/javascript">

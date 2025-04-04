@@ -130,10 +130,12 @@
       <select name="scoring_interest" class="form-control" id="scoring_interest" onchange="submit();">
         <option value="">Interes...</option>
         @foreach($scoring_interest as $item)
-          <option value="{{$item->scoring_interest}}" @if ($request->scoring_interest == $item->scoring_interest) selected="selected" @endif>
-             {{ $item->scoring_interest }}
-            
-          </option>
+        <option value="{{ $item->scoring_interest }}" 
+          @if ($request->scoring_interest !== null && $request->scoring_interest == $item->scoring_interest) 
+            selected="selected" 
+          @endif>
+          {{ $item->scoring_interest }}
+        </option>
         @endforeach
       </select>
     </div>
