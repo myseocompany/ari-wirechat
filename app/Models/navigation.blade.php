@@ -1,6 +1,6 @@
      <nav class="navbar navbar-expand-md navbar-white fixed-top bg-white container">
       
-    <a class="navbar-brand" href="/customers/phase/1"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
+    <a class="navbar-brand" href="/customers"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
       <button class="navbar-toggler d-lg-none collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -71,7 +71,7 @@
           
 
          @if (!Auth::guest())
-          <form class="form-inline mt-2 mt-md-0" action="/customers/phase/1" method="GET">
+          <form class="form-inline mt-2 mt-md-0" action="/customers" method="GET">
 
             <input class="form-control mr-sm-2" type="text" placeholder="Busca o escribe" aria-label="Cliente" id="name_" name="search" @if (isset($request->search)) value="{{$request->search}}" @endif>
             <button class="btn btn-primary my-2 my-sm-0" type="submit">Ir</button>

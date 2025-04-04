@@ -92,6 +92,10 @@ class Customer extends Authenticatable
         return $this->hasMany('App\Models\CustomerFile');
     }
 
+    function histories(){
+        return $this->hasMany('App\Models\CustomerHistory');
+    }
+
     function files(){
         return $this->hasMany('App\Models\CustomerFile');
     }
@@ -250,14 +254,18 @@ class Customer extends Authenticatable
         return $phone;
     }
 
-    public function getScoringToNumber(){
-        $pos = 0;
-        $score = array('d', 'c', 'b', 'a');
-        if(isset($this->scoring_profile) && ($this->scoring_profile!=""))
-        $pos = array_search($this->scoring_profile, $score)+1;
-        return $pos;
+    public function getScoringToNumber(): int
+    {
+        $scores = ['d', 'c', 'b', 'a']; // orden de menor a mayor
+    
+        if (!empty($this->scoring_profile)) {
+            $index = array_search(strtolower($this->scoring_profile), $scores);
+            return $index !== false ? $index + 1 : 0;
+        }
+    
+        return 0;
     }
-
+    
 
 
 

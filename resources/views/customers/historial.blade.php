@@ -2,7 +2,7 @@
 <div class="table-responsive">
   <ul class="list-group">
     <?php $now = \Carbon\Carbon::now();?>
-    @foreach($histories as $history)
+    @foreach($customer->histories as $history)
       <li class="list-group-item">
         <a href="/customers/history/{{$history->id}}/show">{{$history->updated_at}} </a>
         @if(isset($history->updated_user)) Modificado por <strong>{{$history->updated_user->name}}.</strong> @endif

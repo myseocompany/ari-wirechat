@@ -33,7 +33,7 @@
   <nav class="col-sm-12 col-md-4">
     <div id="sidenav">
       <div id="brand">
-        <a class="navbar-brand" href="/customers/phase/1"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
+        <a class="navbar-brand" href="/customers/"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
 
         <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
               <span class="fas fa-bars"></span>

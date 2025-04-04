@@ -102,7 +102,7 @@ class CustomerService {
                 ->when($pageSize > 0, fn($q) => $q->paginate($pageSize), fn($q) => $q->get());
         }
 
-        $result->action = "customers/phase/" . $stage_id;
+        $result->action = "customers";
         return $result;
     }
 
@@ -197,7 +197,7 @@ class CustomerService {
             
         }
 
-        $query->action = "customers/phase/" . $stage_id;
+        $query->action = "customers";
         return $query;
     }
 
@@ -340,7 +340,7 @@ class CustomerService {
                     $items->status_name = $status->name;
             }
         }
-        $model->action = "customers/phase/" . $phase_id;
+        $model->action = "customers" ;
         return $model;
     }
 
@@ -758,21 +758,7 @@ class CustomerService {
             ->get();
         return $menu;
     }
-    public function getCustomerWithParent($pid)
-    {
 
-        $parent = CustomerStatus::select(DB::raw('customer_statuses.*'))
-            //->whereNotNull('customer_statuses.next_id')
-            ->join('customer_statuses AS next', 'next.id', '=', 'customer_statuses.next_id')
-            ->where('next.stage_id', '=', $pid)
-            ->orderBy('customer_statuses.weight', 'ASC');
-        $model = CustomerStatus::where('stage_id', '=', $pid)
-            ->union($parent)
-            ->orderBy('weight', 'ASC')
-            ->get();
-        //    dd($parent);
-        return $model;
-    }
 
     public function getDates($request)
     {

@@ -43,7 +43,7 @@
       <div style="margin-bottom:1rem;">
         <label for="example-datetime-local-input" class="col-form-label">Fecha y hora</label>
         <div>
-         <input class="form-control" name="date_programed" type="datetime-local" value="{{$today}}" id="example-datetime-local-input">
+         <input class="form-control" name="date_programed" type="datetime-local"  id="example-datetime-local-input">
        </div>
      </div>
      <div>

@@ -1,9 +1,9 @@
-@if($actions->count()>0)
+@if($customer->actions->count()>0)
 <h2>Acciones</h2>
 
   <table class="table table-striped">
   <tbody>
-    @foreach($actions as $action)
+    @foreach($customer->actions as $action)
     <tr>
       <td>
         <div>

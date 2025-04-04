@@ -1,6 +1,6 @@
 <?php
 //*****  mqe
-//*****  ultimo cambio 2014_11_04
+//*****  ultimo cambio 2025_04_04
 
 namespace App\Http\Controllers;
 
@@ -54,12 +54,57 @@ class CustomerController extends Controller
 
     public function index(Request $request)
     {
-        return $this->customers(1, $request);
+        $menu = $this->customerService->getUserMenu(Auth::user());
+
+        $statuses = CustomerStatus::all();
+        $model = $this->customerService->filterCustomers($request, $statuses, null, false, 5);
+        $customersGroup = $this->customerService->filterCustomers($request, $statuses, null, true);
+        
+        $customer = $model[0] ?? null;
+        if ($request->filled('customer_id')) {
+            $customer = Customer::find($request->customer_id);
+        }
+
+        $id = $customer?->id ?? 0;
+
+        return view('customers.index', [
+            'request'           => $request,
+            'menu'              => $menu,
+            'users'             => $this->getUsers(),
+            'statuses'          => $statuses,
+            'model'             => $model,
+            'customersGroup'    => $customersGroup,
+            'pending_actions'   => $this->getPendingActions(),
+            'products'          => Product::all(),
+            'sources'           => CustomerSource::all(),
+            'inquiry_products'  => Product::all(),
+            'scoring_interest'  => $this->getInterestOptions($request),
+            'scoring_profile'   => $this->getProfileOptions($request),
+            'customer'          => $customer,
+            'action_options'    => ActionType::orderBy('weigth')->get(),
+            'email_options'     => Email::where('type_id', 1)->where('active', 1)->get(),
+            'statuses_options'  => CustomerStatus::orderBy('weight')->get(),
+            'country_options'   => Country::all(),
+        ]);
     }
+
     public function indexPhase($pid, Request $request)
     {
-        return $this->customers($pid, $request);
+        return redirect()->route('customers.index');
     }
+
+    public function customersByStage($sid, Request $request)
+    {
+        return redirect()->route('customers.index');
+    }
+
+    public function leads(Request $request)
+    {
+        return redirect()->route('customers.index');
+    }
+
+
+
     public function getPendingActions()
     {
         $model = Action::whereNotNull('due_date')
@@ -70,68 +115,14 @@ class CustomerController extends Controller
     }
     public function getInterestOptions(Request $request)
     {
-        $model = DB::table('customers')
-            ->select(DB::raw('distinct scoring_interest'))
-            ->where(
-                // Búsqueda por...
-                function ($query) use ($request) {
-                    if (isset($request->from_date) && ($request->from_date != null)) {
-                        if (isset($request->created_updated)  && ($request->created_updated == "updated"))
-                            $query = $query->whereBetween('customers.updated_at', array($request->from_date, $request->to_date));
-                        if (isset($request->created_updated)  && ($request->created_updated == "created"))
-                            $query = $query->whereBetween('customers.created_at', array($request->from_date, $request->to_date));
-                    }
-                    /*
-                $date_at = $request->created_updated === "updated" ? 'customers.updated_at' : 'customers.created_at';
-                                if(isset($request->from_date) && $request->from_date != "") {
-                    $query->whereBetween($date_at, $dates);
-                }
-                */
-                    if (isset($request->product_id)  && ($request->product_id != null)) {
-                        if ($request->product_id == 1)
-                            $query = $query->whereIn('customers.product_id', array(1, 6, 7, 8, 9, 10, 11));
-                        else
-                            $query = $query->where('customers.product_id', $request->product_id);
-                    }
-                    if (isset($request->user_id)  && ($request->user_id != null))
-                        $query = $query->where('customers.user_id', $request->user_id);
-                    if (isset($request->source_id)  && ($request->source_id != null))
-                        $query = $query->where('customers.source_id', $request->source_id);
-                    if (isset($request->status_id)  && ($request->status_id != null))
-                        $query = $query->where('customers.status_id', $request->status_id);
-                    if (isset($request->scoring_interest)  && ($request->scoring_interest != null))
-                        $query->where('customers.scoring_interest', $request->scoring_interest);
-                    if (isset($request->scoring_profile)  && ($request->scoring_profile != null))
-                        $query->where('customers.scoring_profile', $request->scoring_profile);
-                    if (isset($request->search)) {
-                        $query = $query->where(
-                            function ($innerQuery) use ($request) {
-                                $innerQuery->orwhere('customers.name', "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.email',   "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.document', "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.position', "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.business', "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.phone',   "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.phone2',   "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.notes',   "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.city',    "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.country', "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.bought_products', "like", "%" . $request->search . "%");
-                                //$innerQuery->orwhere('customers.status_temp',"like", "%".$request->search."%");
-                                $innerQuery->orwhere('customers.contact_name', "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.contact_phone2', "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.contact_email', "like", "%" . $request->search . "%");
-                                $innerQuery->orwhere('customers.contact_position', "like", "%" . $request->search . "%");
-                            }
-                        );
-                    }
-                }
-            )
-            ->orderby('scoring_interest', 'ASC')
+        return DB::table('customers')
+            ->select('scoring_interest')
             ->whereNotNull('scoring_interest')
+            ->distinct()
+            ->orderBy('scoring_interest', 'DESC')
             ->get();
-        return $model;
     }
+    
     public function getProfileOptions(Request $request)
     {
         $model = Customer::select(DB::raw('distinct scoring_profile'))
@@ -219,108 +210,7 @@ class CustomerController extends Controller
     */
 
 
-    public function customers($pid, Request $request)
-    {
-        $menu = $this->customerService->getUserMenu(Auth::user(1));
-
-        session(['stage_id' => $pid]);
-        $users = $this->getUsers();
-
-        $customer_options = $this->customerService->getCustomerWithParent($pid);
-
-        $statuses = $this->getStatuses($request, $pid);
-        //$statuses = CustomerStatus::all();
-        $model = $this->customerService->filterCustomers($request, $statuses, $pid, false, 5);
-        //$model = $this->customerService->getModelPhase($request, $statuses, $pid);
-
-        
-
-        //$customersGroup = $this->customerService->countFilterCustomers($request, $statuses, $pid);
-        $customersGroup = $this->customerService->filterCustomers($request, $statuses, $pid, true);
-        
-        $pending_actions = $this->getPendingActions();
-        $phase = CustomerStatusPhase::find($pid);
-        $sources = CustomerSource::all();
-        $products = Product::all();
-        $scoring_interest = $this->getInterestOptions($request);
-        $scoring_profile = $this->getProfileOptions($request);
-        $inquiry_products = Product::all();
-        $customer = null;
-        $id = 0;
-        if ($model && isset($model[0])) {
-            $customer = $model[0];
-            $id = $customer->id;
-        }
-        if (isset($request->customer_id)) {
-            $customer = Customer::find($request->customer_id);
-            $id = $request->customer_id;
-        }
-        //dd($model->scoring_profile);
-        $actions = Action::where('customer_id', '=', $id)->orderby("created_at", "DESC")->get();
-        $action_options = ActionType::orderby('weigth')->get();
-        $histories = CustomerHistory::where('customer_id', '=', $id)->get();
-        $email_options = Email::where('type_id', '=', 1)->where('active', '=', '1')->get();
-        $statuses_options = CustomerStatus::where('status_id', 1)
-            ->where('stage_id', $pid)
-            ->orderBy("weight", "ASC")
-            ->get();
-        //$country_options = Country::leftJoin("customers", "customers.country", "countries.iso2")->get();
-        $country_options =  Country::select(DB::raw("DISTINCT(customers.country)"))
-            ->leftJoin("customers", "customers.country", "countries.iso2")
-            ->orderBy("customers.country", "ASC")
-            ->get();
-        //dd($country_options);
-        $actual = true;
-        $today = Carbon\Carbon::now();
-        $audiences = Audience::all();
-        $messages = CampaignMessage::where('campaign_id', 11)->get();
-        return view('customers.index', compact('country_options', 'inquiry_products', 'model', 'request',   'messages', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences',  'phase', 'menu'));
-    }
-
-
-    public function customersByStage($sid, Request $request)
-    {
-        $menu = $this->customerService->getUserMenu(Auth::user(1));
-        session(['stage_id' => $sid]);
-        $users = $this->getUsers();
-        $customer_options = $this->customerService->getCustomerWithParent($sid);
-        $statuses = $this->getStatuses($request, $sid);
-        //$statuses = CustomerStatus::all();
-        $model = $this->customerService->getModelPhase($request, $statuses, $sid);
-        $customersGroup = $this->customerService->countFilterCustomers($request, $statuses, $sid);
-        $pending_actions = $this->getPendingActions();
-        $phase = CustomerStatusPhase::find($sid);
-        $sources = CustomerSource::all();
-        $products = Product::all();
-        $scoring_interest = $this->getInterestOptions($request);
-        $scoring_profile = $this->getProfileOptions($request);
-        $customer = null;
-        $id = 0;
-        if ($model && isset($model[0])) {
-            //dd($model);
-            $customer = $model[0];
-            $id = $customer->id;
-        }
-        if (isset($request->customer_id)) {
-            $customer = Customer::find($request->customer_id);
-            $id = $request->customer_id;
-        }
-        //dd($model->scoring_profile);
-        $actions = Action::where('customer_id', '=', $id)->orderby("created_at", "DESC")->get();
-        $action_options = ActionType::orderby('weigth')->get();
-        $histories = CustomerHistory::where('customer_id', '=', $id)->get();
-        $email_options = Email::where('type_id', '=', 1)->where('active', '=', '1')->get();
-        $statuses_options = CustomerStatus::where('stage_id', $sid)->orderBy("weight", "ASC")->get();
-        $actual = true;
-        $today = Carbon\Carbon::now();
-        $audiences = Audience::all();
-        $messages = CampaignMessage::where('campaign_id', 11)->get();
-        $references = null;
-        if ($customer != null) {
-            $references = Reference::where('customer_id', '=', $customer->id)->orderby("created_at", "DESC")->get();
-        }
-        return view('customers.index', compact('model', 'request',   'messages', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'phase', 'menu'));
-    }
+    
     public function dragleads(Request $request)
     {
         $pid =  substr($request->path(), -1);
@@ -371,53 +261,7 @@ class CustomerController extends Controller
     }
 
 
-    public function leads(Request $request)
-    {
-        if (!session()->has('stage_id'))
-            session(['stage_id' => 1]);
-        $stage_id = session('stage_id');
-        $users = $this->getUsers();
-        $customer_options = $this->customerService->getCustomerWithParent($stage_id);
-        $statuses = $this->getStatuses($request, 1);
-        $model = $this->getModel($request, $statuses, 'leads');
-        $customersGroup = $this->customerService->countFilterCustomers($request, $statuses, $stage_id);
-        $pending_actions = $this->getPendingActions();
-        $sources = $this->getSources();
-        $products = Product::all();
-        $scoring_interest = $this->getInterestOptions($request);
-        $scoring_profile = $this->getProfileOptions($request);
-        $country = Customer::where('status_id', 8)
-            ->select(DB::raw("DISTINCT(country)"))
-            ->get();
-        $customer = null;
-        $id = 0;
-        if ($model && isset($model[0])) {
-            //dd($model);
-            $customer = $model[0];
-            $id = $customer->id;
-        }
-        if (isset($request->customer_id)) {
-            $customer = Customer::find($request->customer_id);
-            $id = $request->customer_id;
-        }
-        //dd($model->scoring_profile);
-        $actions = Action::where('customer_id', '=', $id)->orderby("created_at", "DESC")->get();
-        $action_options = ActionType::orderby('weigth')->get();
-        $histories = CustomerHistory::where('customer_id', '=', $id)->get();
-        $email_options = Email::where('type_id', '=', 1)->where('active', '=', '1')->get();
-        $statuses_options = CustomerStatus::where('stage_id', $stage_id)->orderBy("weight", "ASC")->get();
-        $actual = true;
-        $today = Carbon\Carbon::now();
-        $audiences = Audience::all();
-        //$campaigns = Campaign::all();
-        $messages = CampaignMessage::where('campaign_id', 8)->get();
-        $metas = CustomerMetaData::find($request->customer_id);
-        $references = null;
-        if ($customer != null) {
-            $references = Reference::where('customer_id', '=', $customer->id)->orderby("created_at", "DESC")->get();
-        }
-        return view('customers.index', compact('model', 'metas', 'request', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'country', 'messages'));
-    }
+    
 
 
     // Función para normalizar números de teléfono

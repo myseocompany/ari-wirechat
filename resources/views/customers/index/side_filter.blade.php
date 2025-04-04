@@ -1,6 +1,6 @@
 <div>
  
-    <form action="/{{$model->action}}/"  actione="/customers/phase/1" method="GET" id="mini_filter_form">
+    <form action="/customers/"   method="GET" id="mini_filter_form">
 
       <div id="quicksearch" class="form-group">
   
@@ -32,7 +32,7 @@
     <div id="collapseFilter" class="collapse" aria-labelledby="headingFilter" data-parent="#accordionExample">
       <!--<div class="card-body row">-->
       <div>
-        <form action="/{{$model->action}}/" actione="/customers/phase/1" method="GET" id="filter_form">
+        <form action="/{{$model->action}}/" actione="/customers" method="GET" id="filter_form">
 
       <div class="col-md-12">
           <select name="filter" class="form-control col-12" id="filter" onchange="update()">
@@ -220,7 +220,7 @@
     <div class="col-6">
         <select name="status_id" id="status_id" class="form-control" onchange="submit();">
           <option value="">Estado...</option>
-          @foreach($customer_options->all() as $item)
+          @foreach($statuses->all() as $item)
             <option value="{{$item->id}}" @if ($request->status_id == $item->id) selected="selected" @endif>
                {{ $item->name }}
               
@@ -256,7 +256,9 @@
 </div>
 
   <div class="col-md-12">
+
     <div class="row">
+      <!--
       <div class="col-6">
         <select name="product_id" class="form-control" id="product_id" onchange="submit();">
           <option value="">Producto...</option>
@@ -268,6 +270,7 @@
           @endforeach
         </select>
       </div>
+    -->
      <div class="col-6">
         <select name="user_id" class="form-control" id="user_id" onchange="submit();">
           <option value="">Usuario...</option>
@@ -295,33 +298,8 @@
             @endforeach
           </select>
         </div>
-        <!-- 
-        <div class="col-6">
-          <select name="audience_id" class="form-control" id="audience_id" onchange="submit();">
-            <option value="">Audiencia...</option>
-            @foreach($audiences as $item)
-              <option value="{{$item->id}}" @if ($request->audience_id == $item->id) selected="selected" @endif>
-                 <?php echo substr($item->name, 0, 50); ?>@if(isset($item->customeres))
-                 - {{$item->customeres->count()}} @endif
-                
-              </option>
-            @endforeach
-          </select>
-        </div>
--->
-    @if(isset($inquiry_products))
-      <div class="col-6">
-          <select name="inquiry_product_id" class="form-control" id="inquiry_product_id" onchange="submit();">
-            <option value="">Producto buscado...</option>
-            @foreach($inquiry_products as $item)
-              <option value="{{$item->id}}" @if ($request->inquiry_product_id == $item->id) selected="selected" @endif>
-                 <?php echo substr($item->name, 0, 50); ?>
-                
-              </option>
-            @endforeach
-          </select>
-        </div>
-        @endif
+
+   
       </div>
   </div>
 <div class="col-md-12">
@@ -379,7 +357,7 @@
         <select name="modal_status_id"  id="modal_status_id" class="form-control">
          
           <option value="">Estado...</option>
-          @foreach($customer_options->all() as $item)
+          @foreach($statuses->all() as $item)
             <option value="{{$item->id}}" @if ($request->status_id == $item->id) selected="selected" @endif>
                {{ $item->name }}
               

@@ -1685,624 +1685,7 @@ class APIController extends Controller
         return view('customers.excel', compact('model', 'request', 'customer_options', 'customersGroup', 'query', 'users', 'sources'));
     }
 
-    /*******
-    Desarrollador: Nicolas Navarro
-    Objeto: recibir datos de dialogflow
-
-     ******/
-    public function opendialog(Request $request)
-    {
-        $data = $request->json()->all();
-
-        if (array_key_exists("queryResult", $data) && array_key_exists("action", $data["queryResult"])) {
-            $action =  $data["queryResult"]['action'];
-            $return = "";
-            switch ($action) {
-                case 'saveCustomer':
-                    $return = $this->saveCustomerDialog($request);
-                    break;
-                case 'saveQuote':
-                    $return = $this->saveQuote($request);
-                    break;
-                case 'validatorCustomer':
-                    $return = $this->validatorCustomer($request);
-                    break;
-                case 'validatorCustomerWpp':
-                    $return = $this->validatorCustomerWpp($request);
-                    break;
-                default:
-                    $return = $this->getDefault();
-                    break;
-            }
-        } else {
-            $return = $this->getJSON('no existe el objeto ["queryResult"]["action"]');
-            //$return = $this->getDefault();
-        }
-        return $return;
-    }
-    public function getDefault()
-    {
-        return response()->json(array(
-            "fulfillmentText" => 'Error: accion desconocida',
-        ));
-    }
-    public function getJSON($str)
-    {
-        return response()->json(array(
-            "fulfillmentText" => $str,
-        ));
-    }
-
-    public function validatorCustomer(Request $request)
-    {
-
-        $data = $request->json()->all();
-        $params = $data["queryResult"]['parameters'];
-        $action =  $data["queryResult"]['action'];
-
-        $session_id = $this->getSession($request);
-        $session = Session::where('session_id', $session_id)->first();
-        //dd($session);
-
-        if ($params["product_id"] == 6) { //Maiz
-            $image = "https://maquiempanadas.com/wp-content/uploads/2020/07/cm06.gif";
-            $texto0 = 'La Máquina CM06, armado de empanadas de maíz y arepas con dos módulos (laminación y armado) en acero inoxidable referencia 304 que le permitirá elaborar más de 300 empanadas por hora con 1 operario y 500 empanadas por hora con 2 operarios, de manera eficiente.';
-            $texto1 = 'Elaboración de Láminas de Maíz de 1,5mm en adelante. Diseño de moldes ajustados. Materiales que cumplen las exigencias nacionales e internacionales.';
-            $texto2 = '$10.539.500 COP - Colombia (Envío Incluido)
-$3.844 USD - América
-$4.112 USD - Europa';
-        } else if ($params["product_id"] == 7) { //Multifuncional
-            $image = 'https://maquiempanadas.com/wp-content/uploads/2020/07/cm06B.gif';
-            $texto0 = 'La Multifuncional CM06B le permitirá elaborar empanadas, arepas, patacones, pupusas, tostones, pasteles. Con materias primas de maíz, yuca o plátano, con una producción de 300 unidades por hora con un operario y 500 con 2 operarios por hora, en el tamaño que requiera.';
-            $texto1 = 'Fabricada en acero inoxidable referencia 304 fácil de limpiar y lavar neumática con controladores electrónicos.';
-            $texto2 = '$14.200.000 COP - Colombia (Envío Incluido)
-$4.953 USD - América
-$5.253 USD - Europa';
-        } else if ($params["product_id"] == 8) { //Trigo
-            $image = 'https://maquiempanadas.com/wp-content/uploads/2020/07/cm07.gif';
-            $texto0 = 'La Máquina CM07, armado de empanadas de harina de trigo con dos módulos (laminación y armado) en acero inoxidable referencia 304 que te permitirá elaborar más de 400 empanadas por hora con 1 operario, de manera eficiente.';
-            $texto1 = 'Diseño de moldes ajustados. Materiales que cumplen las exigencias nacionales e internacionales.';
-            $texto2 = '$12.500.000 COP - Colombia (Envío Incluido)
-$4.438 USD - América
-$4.738 USD - Europa';
-        } else if ($params["product_id"] == 10) { //Mixta
-            $image = 'https://maquiempanadas.com/wp-content/uploads/2019/02/cm08.jpg';
-            $texto0 = 'La Máquina CM08 para elaborar empanadas harina de maíz, harina de trigo, verde, arepas rellenas, tostones, patacones, pupusas, aborrajado, pasteles. ';
-            $texto1 = 'Con una producción de 300 a 500 unidad hora operada por una o dos persona. Espacio de trabajo de 70x70x70cm.';
-            $texto2 = '$15.729.000 COP - Colombia (Envío Incluido)
-$5.416 USD - América
-$5.716 USD - Europa';
-        } else if ($params["product_id"] == 11) { //Semiautomatica
-            $image = 'https://maquiempanadas.com/wp-content/uploads/2019/02/cm05s-2-600x600.jpg';
-            $texto0 = 'La Máquina CM05S, permite armado de empanadas, arepas, pasteles de maíz, morocho, verde y trigo con dos módulos (laminación y armado) en acero inoxidable referencia 304 que le permitirá elaborar 1600 empanadas por hora, de manera eficiente.';
-            $texto1 = 'Elaboración de laminas de maíz, morocho y verde de 1,5mm en adelante. Armado de empanadas de acuerdo a las necesidades del cliente. Diseño de moldes ajustados. Materiales acero inoxidable, polipropileno.';
-            $texto2 = '$28.279.030 COP - Colombia (Envío Incluido)
-$9.669 USD - América
-$10.169 USD - Europa';
-        } else if ($params["product_id"] == 2) { //Escuela
-            $image = "https://maquiempanadas.com/wp-content/uploads/2020/05/mqe-escuela-mai%CC%81z_2020_05_26.jpg";
-            $texto0 = "Aportar conocimientos que permitan a personas que planean tener una empresa de empanadas o para las que la tienen, fortalecer su emprendimiento y productos de empanadas.";
-            $texto1 = "Maíz
-• Qué es maíz
-• Cómo se maneja y buenas prácticas de manufactura
-• Mejoradores de maíz
-
-Masas para empanadas de maíz
-• Masas de maíz fresco
-• Masas de harina de maíz
-• Congelación
-• Prefritura
-• Fritura en aceite y en air fryer
-• Empanadas vegetarianas (Queso – Pipián)
-
-Masas para arepas de maíz
-• Masas de maíz fresco
-• Masas de harina de maíz
-• Rellenar con huevo, queso, pollo y fríjoles
-• Arepas tradicionales tipo tela y aliñadas
-
-Marketing digital
-
-Costos y plan de negocios";
-            $texto2 = "Valor: $650.000 COP
-Requisito: Ninguno
-Modalidad: Virtual con instructor en vivo
-Duración: 10 horas
-Intensidad: 2 horas diarias
-Horario: 9:00 a.m. – 11:00 a.m. (-5 GMT)
-del 10 al 14 de mayo de 2021
-Cupo máximo: 30 Personas
-
-¡RESERVE SU CUPO!
-https://checkout.payulatam.com/ppp-web-gateway-payu/app/v2?k=a545474501c096800b4910c0a59414b8#/co/buyer";
-        } else if ($params["product_id"] == 3) { //Desmechadora
-            $image = "https://maquiempanadas.com/wp-content/uploads/2019/02/desmechadora01-600x600.jpg";
-            $texto0 = "Desmechadora, deshiladora, deshebradora manual";
-            $texto1 = "Máquina manual desmechadora, deshebradora y deshiladora de carne, pollo y queso, con capacidad de 1 kilo por minuto, 60 kilos por hora, fácil de limpiar y de armar. Fabricada en acero inoxidable referencia 304. *Protegido por ley de patentes.";
-        }
-
-
-
-
-
-
-        if ($session) {
-            $customer = Customer::find($session->customer_id);
-            //dd($session->customer_id);
-            if ($customer) {
-                if ($params["product_id"] == 3) {
-                    return response()->json(
-                        array(
-                            "fulfillmentMessages" => array(
-                                $this->getImage($image),
-                                $this->getFulfillmentText($texto0),
-                                $this->getFulfillmentText($texto1),
-                                $this->getQuickReplies('¿Desea agendar una cita?', array("Si", "No")),
-                            ),
-                            "outputContexts" => array(
-                                $this->getOutputContexts("maquibot-xvamxx", $customer->session_id, "quoteValidation", $customer),
-                            )
-                        )
-                    );
-                } else {
-                    return response()->json(
-                        array(
-                            "fulfillmentMessages" => array(
-                                $this->getImage($image),
-                                $this->getFulfillmentText($texto0),
-                                $this->getFulfillmentText($texto1),
-                                $this->getFulfillmentText($texto2),
-                                $this->getQuickReplies('¿Desea agendar una cita?', array("Si", "No")),
-                            ),
-                            "outputContexts" => array(
-                                $this->getOutputContexts("maquibot-xvamxx", $customer->session_id, "quoteValidation", $customer),
-                            )
-                        )
-                    );
-                }
-            }
-        } else {
-            if ($params["product_id"] == 3) {
-                return response()->json(
-                    array(
-                        "fulfillmentMessages" => array(
-                            $this->getImage($image),
-                            $this->getFulfillmentText($texto0),
-                            $this->getFulfillmentText($texto1),
-                            $this->getQuickReplies("¿Estas interesado en adquirir este producto?", array("Si", "No")),
-                        ),
-                        "outputContexts" => array(
-                            $this->getOutputContexts("maquibot-xvamxx", $session_id, "enquire", null),
-                        )
-                    )
-                );
-            } else {
-                return response()->json(
-                    array(
-                        "fulfillmentMessages" => array(
-                            $this->getImage($image),
-                            $this->getFulfillmentText($texto0),
-                            $this->getFulfillmentText($texto1),
-                            $this->getFulfillmentText($texto2),
-                            $this->getQuickReplies("¿Estas interesado en adquirir este producto?", array("Si", "No")),
-                        ),
-                        "outputContexts" => array(
-                            $this->getOutputContexts("maquibot-xvamxx", $session_id, "enquire", null),
-                        )
-                    )
-                );
-            }
-        }
-    }
-
-
-    public function validatorCustomerWpp(Request $request)
-    {
-
-        $data = $request->json()->all();
-        $params = $data["queryResult"]['parameters'];
-        $action =  $data["queryResult"]['action'];
-
-        $session_id = $this->getSession($request);
-        $session = Session::where('session_id', $session_id)->first();
-        //dd($session);
-
-        if ($params["product_id"] == 6) { //Maiz
-            $texto0 = 'La Máquina CM06, armado de empanadas de maíz y arepas con dos módulos (laminación y armado) en acero inoxidable referencia 304 que le permitirá elaborar más de 300 empanadas por hora con 1 operario y 500 empanadas por hora con 2 operarios, de manera eficiente.';
-            $texto1 = 'Elaboración de Láminas de Maíz de 1,5mm en adelante. Diseño de moldes ajustados. Materiales que cumplen las exigencias nacionales e internacionales.';
-            $texto2 = '$10.539.500 COP - Colombia (Envío Incluido)
-$3.844 USD - América
-$4.112 USD - Europa';
-        } else if ($params["product_id"] == 7) { //Multifuncional
-            $texto0 = 'La Multifuncional CM06B le permitirá elaborar empanadas, arepas, patacones, pupusas, tostones, pasteles. Con materias primas de maíz, yuca o plátano, con una producción de 300 unidades por hora con un operario y 500 con 2 operarios por hora, en el tamaño que requiera.';
-            $texto1 = 'Fabricada en acero inoxidable referencia 304 fácil de limpiar y lavar neumática con controladores electrónicos.';
-            $texto2 = '$14.200.000 COP - Colombia (Envío Incluido)
-$4.953 USD - América
-$5.253 USD - Europa';
-        } else if ($params["product_id"] == 8) { //Trigo
-            $texto0 = 'La Máquina CM07, armado de empanadas de harina de trigo con dos módulos (laminación y armado) en acero inoxidable referencia 304 que te permitirá elaborar más de 400 empanadas por hora con 1 operario, de manera eficiente.';
-            $texto1 = 'Diseño de moldes ajustados. Materiales que cumplen las exigencias nacionales e internacionales.';
-            $texto2 = '$12.500.000 COP - Colombia (Envío Incluido)
-$4.438 USD - América
-$4.738 USD - Europa';
-        } else if ($params["product_id"] == 10) { //Mixta
-            $texto0 = 'La Máquina CM08 para elaborar empanadas harina de maíz, harina de trigo, verde, arepas rellenas, tostones, patacones, pupusas, aborrajado, pasteles. ';
-            $texto1 = 'Con una producción de 300 a 500 unidad hora operada por una o dos persona. Espacio de trabajo de 70x70x70cm.';
-            $texto2 = '$15.729.000 COP - Colombia (Envío Incluido)
-$5.416 USD - América
-$5.716 USD - Europa';
-        } else if ($params["product_id"] == 11) { //Semiautomatica
-            $texto0 = 'La Máquina CM05S, permite armado de empanadas, arepas, pasteles de maíz, morocho, verde y trigo con dos módulos (laminación y armado) en acero inoxidable referencia 304 que le permitirá elaborar 1600 empanadas por hora, de manera eficiente.';
-            $texto1 = 'Elaboración de laminas de maíz, morocho y verde de 1,5mm en adelante. Armado de empanadas de acuerdo a las necesidades del cliente. Diseño de moldes ajustados. Materiales acero inoxidable, polipropileno.';
-            $texto2 = '$28.279.030 COP - Colombia (Envío Incluido)
-$9.669 USD - América
-$10.169 USD - Europa';
-        } else if ($params["product_id"] == 2) { //Escuela
-            $texto0 = "Aportar conocimientos que permitan a personas que planean tener una empresa de empanadas o para las que la tienen, fortalecer su emprendimiento y productos de empanadas.";
-            $texto1 = "Maíz
-• Qué es maíz
-• Cómo se maneja y buenas prácticas de manufactura
-• Mejoradores de maíz
-
-Masas para empanadas de maíz
-• Masas de maíz fresco
-• Masas de harina de maíz
-• Congelación
-• Prefritura
-• Fritura en aceite y en air fryer
-• Empanadas vegetarianas (Queso – Pipián)
-
-Masas para arepas de maíz
-• Masas de maíz fresco
-• Masas de harina de maíz
-• Rellenar con huevo, queso, pollo y fríjoles
-• Arepas tradicionales tipo tela y aliñadas
-
-Marketing digital
-
-Costos y plan de negocios";
-            $texto2 = "Valor: $650.000 COP
-Requisito: Ninguno
-Modalidad: Virtual con instructor en vivo
-Duración: 10 horas
-Intensidad: 2 horas diarias
-Horario: 9:00 a.m. – 11:00 a.m. (-5 GMT)
-del 10 al 14 de mayo de 2021
-Cupo máximo: 30 Personas
-
-¡RESERVE SU CUPO!
-https://checkout.payulatam.com/ppp-web-gateway-payu/app/v2?k=a545474501c096800b4910c0a59414b8#/co/buyer";
-        } else if ($params["product_id"] == 3) { //Desmechadora
-            $texto0 = "Desmechadora, deshiladora, deshebradora manual";
-            $texto1 = "Máquina manual desmechadora, deshebradora y deshiladora de carne, pollo y queso, con capacidad de 1 kilo por minuto, 60 kilos por hora, fácil de limpiar y de armar. Fabricada en acero inoxidable referencia 304. *Protegido por ley de patentes.";
-        }
-
-
-
-
-
-
-        if ($session) {
-            $customer = Customer::find($session->customer_id);
-            //dd($session->customer_id);
-            if ($customer) {
-                if ($params["product_id"] == 3) {
-                    return response()->json(
-                        array(
-                            "fulfillmentMessages" => array(
-                                $this->getFulfillmentText($texto0),
-                                $this->getFulfillmentText($texto1),
-                                $this->getFulfillmentText('¿Desea agendar una cita? 
-*1* Si
-*2* No'),
-                            ),
-                            "outputContexts" => array(
-                                $this->getOutputContexts("maquibot2-crwlur", $customer->session_id, "quoteValidation", $customer),
-                            )
-                        )
-                    );
-                } else {
-                    return response()->json(
-                        array(
-                            "fulfillmentMessages" => array(
-                                $this->getFulfillmentText($texto0),
-                                $this->getFulfillmentText($texto1),
-                                $this->getFulfillmentText($texto2),
-                                $this->getFulfillmentText('¿Desea agendar una cita? 
-*1* Si
-*2* No'),
-                            ),
-                            "outputContexts" => array(
-                                $this->getOutputContexts("maquibot2-crwlur", $customer->session_id, "quoteValidation", $customer),
-                            )
-                        )
-                    );
-                }
-            }
-        } else {
-            if ($params["product_id"] == 3) {
-                return response()->json(
-                    array(
-                        "fulfillmentMessages" => array(
-                            $this->getFulfillmentText($texto0),
-                            $this->getFulfillmentText($texto1),
-                            $this->getFulfillmentText("¿Estas interesado en adquirir este producto?
-*1* Si
-*2* No"),
-                        ),
-                        "outputContexts" => array(
-                            $this->getOutputContexts("maquibot2-crwlur", $session_id, "enquire", null),
-                        )
-                    )
-                );
-            } else {
-                return response()->json(
-                    array(
-                        "fulfillmentMessages" => array(
-                            $this->getFulfillmentText($texto0),
-                            $this->getFulfillmentText($texto1),
-                            $this->getFulfillmentText($texto2),
-                            $this->getFulfillmentText("¿Estas interesado en adquirir este producto?
-*1* Si
-*2* No"),
-                        ),
-                        "outputContexts" => array(
-                            $this->getOutputContexts("maquibot2-crwlur", $session_id, "enquire", null),
-                        )
-                    )
-                );
-            }
-        }
-    }
-
-
-    public function getQuickReplies($title, $messages)
-    {
-        return array(
-            "quickReplies" => array(
-                "title" => $title,
-                "quickReplies" => $messages
-            )
-        );
-    }
-
-    public function getImage($url)
-    {
-        return array(
-            "image" => array(
-                "imageUri" => $url
-            )
-        );
-    }
-
-
-    public function getOutputContexts($projects, $sessions, $contexts, $model)
-    {
-        //dd($sessions);
-        $phone = "";
-        $email = "";
-        $country = "";
-        $customer_name = "";
-        if ($model != null) {
-            $phone = $model->phone;
-            $email = $model->email;
-            $country = $model->country;
-            $customer_name = $model->name;
-        }
-
-        $name = "projects/" . $projects . "/agent/sessions/" . $sessions . "/contexts/" . $contexts;
-        return array(
-            "name" => $name,
-            'lifespanCount' => 5,
-            'parameters' => array(
-                'phone' => $phone,
-                'email' => $email,
-                'country' => $country,
-                'name' => $customer_name,
-
-            )
-        );
-    }
-
-
-
-
-
-
-
-
-    public function saveQuote(Request $request)
-    {
-        $data = $request->json()->all();
-        $params = $data["queryResult"]['parameters'];
-        $action =  $data["queryResult"]['action'];
-        $hour = "";
-        if (isset($params["hour"]))
-            $hour = $params["hour"];
-
-        $date = "";
-        if (isset($params["date"]))
-            $date = $params["date"];
-
-        $newDate = date('Y-m-d', strtotime($date));
-        $newHour = date('H:i:s', strtotime($hour));
-        $customer_id = "";
-
-        $session_id = $this->getSession($request);
-        $session = Session::where('session_id', $session_id)->first();
-        if ($session) {
-            $customer = Customer::find($session->customer_id);
-            if ($customer) {
-                $customer_id = $customer->id;
-            }
-        }
-
-        $model = new Quote;
-        $model->date = $newDate;
-        $model->time = $newHour;
-        $model->customer_id = $customer_id;
-        $model->save();
-
-
-        if ($model) {
-            $texto0 = 'Hemos agendado su cita satisfactoriamente!';
-            $texto1 = '¿Le puedo ayudar en algo más?
-            *1.* Volver al menú
-            *2.* Hablar con un asesor
-            *3.* Agendar una cita
-            *4.* Salir';
-        } else {
-            $texto0 = 'Error';
-            $texto1 = '¿Le puedo ayudar en algo más?
-            *1.* Volver al menú
-            *2.* Hablar con un asesor
-            *3.* Agendar una cita
-            *4.* Salir';
-        }
-        return response()->json(array(
-            "fulfillmentMessages" => array(
-                $this->getFulfillmentText($texto0),
-                $this->getFulfillmentText($texto1),
-            )
-        ));
-    }
-
-
-    public function saveCustomerDialog(Request $request)
-    {
-
-        $data = $request->json()->all();
-        $params = $data["queryResult"]['parameters'];
-        $action =  $data["queryResult"]['action'];
-        $name = "";
-        if (isset($params["name"]))
-            $name = $params["name"];
-
-        $phone = "";
-        if (isset($params["phone"]))
-            $phone = $params["phone"];
-
-        $email = "";
-        if (isset($params["email"]))
-            $email = $params["email"];
-
-        $request->name        = $name;
-        $request->phone       = $phone;
-        $request->email       = $email;
-        $request->product_id       = $params["product_id"];
-        if (isset($params["country"]))
-            $request->country       = $params["country"];
-        if (isset($params["city"]))
-            $request->city       = $params["city"];
-        $request->source_id = $params["source_id"];; // FB Messenger
-
-        if (isset($params["session"])) {
-            $request->session_id = $params["session"];
-            //dd($request->session_id);
-        } else {
-            $request->session_id = $this->getSession($request);
-            //dd($request->session_id);
-        }
-
-        $this->saveAPI($request);
-
-
-        if ($request->product_id == 6) {
-            $texto0 = 'A continuación le voy a enviar unos videos donde se ven todas las funcionalidades de una sola máquina';
-            $texto1 = '*Máquina para hacer arepas pequeñas:*
-https://maquiempanadas.com/maquina-para-hacer-arepas-pequenas/
-
-*Máquina para hacer arepas:*
-https://maquiempanadas.com/maquina-para-hacer-arepas/';
-            $texto2 = "*Máquina para hacer arepas de huevo:*
-https://maquiempanadas.com/maquina-para-hacer-arepas-de-huevo/
-
-*Máquina para hacer pasteles:*
-https://maquiempanadas.com/maquina-para-hacer-pasteles/";
-            $texto3 = '*Máquina para hacer patacones y tostones:*
-https://maquiempanadas.com/maquina-para-hacer-patacones-y-tostones/
-
-*Máquina para hacer empanadas cocteleras:*
-https://maquiempanadas.com/maquina-para-hacer-empanadas-cocteleras/';
-            $texto4 = '*Máquina para hacer empanadas semiautomática para dos personas:*
-https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-personas/
-
-*Máquina para hacer empanadas semiautomatica para una persona:*
-https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-una-persona/
-
-*Máquina para hacer empanadas semiautomática para dos personas:*
-https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-personas/';
-            $texto5 = '¿Desea agendar una cita? 
-*1* Si
-*2* No';
-
-            //$array = array($texto0, $texto1, $texto2, $texto3, $texto4, $texto5);
-            return response()->json(array(
-                "fulfillmentMessages" => array(
-                    $this->getFulfillmentText($texto0),
-                    $this->getFulfillmentText($texto1),
-                    $this->getFulfillmentText($texto2),
-                    $this->getFulfillmentText($texto3),
-                    $this->getFulfillmentText($texto4),
-                    $this->getFulfillmentText($texto5),
-                )
-            ));
-        } else {
-            //$texto0 = 'Gracias por contactarnos 🥳. \nUn representante se comunicará con usted';
-            $texto0 = '¿Desea agendar una cita? 
-*1* Si
-*2* No';
-            //$array = array($texto0);
-            return response()->json(array(
-                "fulfillmentMessages" => array(
-                    $this->getFulfillmentText($texto0),
-                )
-            ));
-        }
-    }
-
-    public function getFulfillmentText($str)
-    {
-        return array(
-            "text" => array(
-                "text" => array($str),
-            ),
-        );
-    }
-
-    public function saveSession($customer_id, $session_id)
-    {
-        $model = Session::where('session_id', $session_id)->first();
-        if (!$model) {
-            $model = new Session;
-        }
-        $model->session_id = $session_id;
-        $model->customer_id = $customer_id;
-        $model->save();
-        return $model;
-    }
-
-
-    public function getSession(Request $request)
-    {
-        $data = $request->json()->all();
-        $name = $data["queryResult"]["outputContexts"][0]['name'];
-        $start = strpos($name, "sessions/") + 9;
-        $end = strpos($name, "/contexts");
-        $str = substr($name, $start, ($end - $start));
-        return $str;
-    }
-
-    /****Fin de Dialog flow****/
-
-
-
-
-
-
-
-
-
+    
 
 
     public function trackWPAction($cid,  $aid, $tid, $msg,  Request $request)
@@ -2427,6 +1810,34 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
     }
 
 
+    private function mapDataToCustomer(Customer $model, array $data): void
+    {
+        $map = [
+            'name'            => 'name',
+            'email'           => 'email',
+            'public_url'      => 'rd_public_url',
+            'personal_phone'  => 'phone',
+            'mobile_phone'    => 'phone2',
+            'state'           => 'department',
+            'city'            => 'city',
+            'company'         => 'business',
+            'job_title'       => 'position',
+            'fit_score'       => 'scoring_profile',
+            'interest'        => 'scoring_interest',
+        ];
+
+        foreach ($map as $key => $attribute) {
+            if (isset($data[$key])) {
+                $model->{$attribute} = $data[$key];
+            }
+        }
+
+        if (isset($data['bio'])) {
+            $model->notes .= $data['bio'];
+        }
+    }
+
+
     public function updateFromRD(Request $request)
     {
 
@@ -2487,16 +1898,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         if (isset($data["opportunity"])) {
             $opportunity = $data["opportunity"];
         }
-        if (isset($data["name"])) {
-            $model->name = $data["name"];
-        }
-        if (isset($data["email"])) {
-            $model->email = $data["email"];
-        }
-
-        if (isset($data["public_url"])) {
-            $model->rd_public_url = $data["public_url"];
-        }
+        
 
         if (isset($request->campaign) && ($request->campaign != ""))
             if (($request->campaign == "Maquiempanadas - MQE_Form leads desmechadora")) {
@@ -2528,22 +1930,10 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         }
 
 
+        $this->mapDataToCustomer($model, $data);
 
-        if (isset($data["bio"])) {
-            $model->notes .= $data["bio"];
-        }
-        if (isset($data["personal_phone"])) {
-            $model->phone = $data["personal_phone"];
-        }
-        if (isset($data["mobile_phone"])) {
-            $model->phone2 = $data["mobile_phone"];
-        }
-        if (isset($data["state"])) {
-            $model->department = $data["state"];
-        }
-        if (isset($data["city"])) {
-            $model->city = $data["city"];
-        }
+
+
 
         if ($this->getCountry($data) != "") {
             $model->country = $this->getCountry($data);
@@ -2572,9 +1962,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         }
 
 
-        if (isset($data["city"])) {
-            $model->city = $data["city"];
-        }
+
 
         if (isset($data["custom_fields"]["Número de Puntos de venta"])) {
             $model->number_venues = $data["custom_fields"]["Número de Puntos de venta"];
@@ -2584,24 +1972,6 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         }
 
 
-        if (isset($data["company"])) {
-            $model->business = $data["company"];
-        }
-        if (isset($data["job_title"])) {
-            $model->position = $data["job_title"];
-        }
-
-        if (isset($data["fit_score"])) {
-            $model->scoring_profile = $data["fit_score"];
-        }
-
-        if (isset($data["interest"])) {
-            $model->scoring_interest = $data["interest"];
-        }
-
-        if (isset($data["public_url"])) {
-            $model->rd_public_url = $data["public_url"];
-        }
 
 
         if (isset($data["custom_fields"]["Tamaño de las empanadas que fabrican"])) {
@@ -2617,31 +1987,8 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         }
 
         $model->status_id = -1;
-        if (isset($data["lead_stage"])) {
-            $status = $data["lead_stage"];
-            if (isset($opportunity) && ($opportunity == 'true')) {
-                $model->status_id = 19; //Oportunidad
-            }
-            if (isset($status) && (($status == 'Lead'))) {
-
-                $model->status_id = 1; //Calificado
-            }
-            if (isset($status) && (($status == 'Desmechadora'))) {
-
-                $model->status_id = 41; //Desmechadora
-            }
-            if (isset($status) && (($status == 'Lead Qualificado'))) {
-               // $model->status_id = 36; //Calificado
-            }
-            if (isset($status) && (($status == 'Cliente'))) {
-                $model->status_id = 19; //Demo
-            }
-            if ($status_id) {
-                $model->status_id = 29; //PQR
-
-
-            }
-        }
+        //dd($this->getStatusRD($data));
+        $model->status_id = $this->getStatusRD($data);
         if ($request->campaign == "Maquiempanadas - MQE_Form leads desmechadora") {
             $model->status_id = 41; //Desmechadora
         }
@@ -2684,6 +2031,37 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
 
         // devolver el ID del usuario
         return $nextUser->id;
+    }
+
+    function getStatusRD($data){
+        $status = 1;
+        if (isset($data["lead_stage"])) {
+            /*
+            $status = $data["lead_stage"];
+            
+            if (isset($opportunity) && ($opportunity == 'true')) {
+                $model->status_id = 19; //Oportunidad
+            }
+            if (isset($status) && (($status == 'Lead'))) {
+
+                $status_id = 1; //Calificado
+            }
+            if (isset($status) && (($status == 'Desmechadora'))) {
+
+                $status_id = 41; //Desmechadora
+            }
+            if (isset($status) && (($status == 'Lead Qualificado'))) {
+               // $status_id = 36; //Calificado
+            }
+            
+            if (isset($status) && (($status == 'Cliente'))) {
+                $status_id = 19; //Demo
+            }
+            if ($status_id) {
+                $status_id = 29; //PQR
+            }*/
+        }
+        return $status;
     }
 
     function getRandomNextUserID()
@@ -2866,18 +2244,20 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         $model->status_id = -1;
         if (isset($data["lead_stage"])) {
             $status = $data["lead_stage"];
+            /*
             if (isset($opportunity) && ($opportunity == 'true')) {
                 $model->status_id = 19; //Oportunidad
             }
+            if (isset($status) && (($status == 'Cliente'))) {
+                $model->status_id = 19; //Demo
+            }*/
             if (isset($status) && (($status == 'Lead'))) {
                 $model->status_id = 1; //Calificado
             }
             if (isset($status) && (($status == 'Lead Qualificado'))) {
                 $model->status_id = 36; //Calificado
             }
-            if (isset($status) && (($status == 'Cliente'))) {
-                $model->status_id = 19; //Demo
-            }
+            
         }
         $tags = $data["tags"];
         if ($tags) {
@@ -2998,21 +2378,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         }
 
         $model->status_id = 1;
-        if (isset($data["lead_stage"])) {
-            $status = $data["lead_stage"];
-            if (isset($opportunity) && ($opportunity == 'true')) {
-                $model->status_id = 19; //Oportunidad
-            }
-            if (isset($status) && (($status == 'Lead'))) {
-                $model->status_id = 1; //Calificado
-            }
-            if (isset($status) && (($status == 'Lead Qualificado'))) {
-                $model->status_id = 36; //Calificado
-            }
-            if (isset($status) && (($status == 'Cliente'))) {
-                $model->status_id = 19; //Demo
-            }
-        }
+        $model->status_id = $this->getStatusRD($data);
         $model->source_id = $this->getSourceRD($request);
 
         $model = $this->saveAPIRD($model, $opportunity);
@@ -3025,7 +2391,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
 
     public function updateCustomerHistory($opportunity, $model, $rd_model)
     {
-        // actuliza el existente
+        // actualiza el existente
         if (($opportunity == "false") && ($model->status_id == 18 || $model->status_id == 36)) {
             //nuevo - no contesta - calificado
             $model->status_id = 36;
@@ -3415,8 +2781,6 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         }
 
 
-
-
         if (isset($request->name))
             $model->setName($request->name);
         if (isset($request->phone))
@@ -3459,108 +2823,14 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         ));
     }
 
-    public function callBack()
-    {
-        return "exit!";
-    }
-
-
-
-
-    public function storeTaskFromCalendar(Request $request)
-    {
-        $model = new Task;
-        $model->name = $request->name;
-        $model->status_id = $request->status_id;
-        $model->project_id = $request->project_id;
-        $model->user_id = $request->user_id;
-        $model->priority = $request->priority;
-        $model->due_date = $request->due_date;
-        $model->not_billing = $request->not_billing;
-        $model->points = $request->points;
-        if (isset($request->not_billing)) {
-            $model->not_billing = true;
-        } else {
-            $model->not_billing = false;
-        }
-        if ($request->hasFile('file')) {
-            $request->file('file')->store('public/files');
-            // ensure every image has a different name
-            $path = $request->file('file')->hashName();
-            $model->file_url = $path;
-        }
-
-
-        $model->url_finished = $request->url_finished;
-        $model->description = $request->description;
-        $model->save();
-        return response()->json($model->id);
-    }
-
-    public function destroyTaskFromCalendar(Request $request, $id)
-    {
-        $model = Task::find($id);
-        $model->delete();
-        return response()->json($id);
-    }
-
-    public function updateTaskFromCalendar(Request $request, $id)
-    {
-        $model = Task::find($id);
-        $model->name = $request->name;
-        $model->status_id = $request->status_id;
-        $model->project_id = $request->project_id;
-        $model->user_id = $request->user_id;
-        $model->priority = $request->priority;
-        $model->due_date = $request->due_date;
-        $model->not_billing = $request->not_billing;
-        $model->points = $request->points;
-
-        if ($request->hasFile('file')) {
-            $request->file('file')->store('public/files');
-            $path = $request->file('file')->hashName();
-            $model->file_url = $path;
-        }
-
-        $model->url_finished = $request->url_finished;
-        $model->description = $request->description;
-        $model->save();
-        return response()->json($id);
-    }
 
 
 
 
 
-    public function sendToTeacheable()
-    {
-        $url = 'https://hooks.zapier.com/hooks/catch/2377806/bmc45z0/'; //add your Zapier webhook url 
-        //Form data
-        $data = [
-            "name" => "Leonardo Ortiz",
-            "email" => "lortizr@uniremingtonmanizales.edu.co",
-            "password" => "3232089460",
-        ];
-        // Crear opciones de la petición HTTP
-        $request = array(
-            "http" => array(
-                "header" => "Content-type: application/x-www-form-urlencoded\r\n",
-                "method" => "POST",
-                "content" => http_build_query($data), # Agregar el contenido definido antes
-            ),
-        );
-        # Preparar petición
-        $context = stream_context_create($request);
-        # Hacerla
-        $result = file_get_contents($url, false, $context);
-        if ($result === false) {
-            echo "Error haciendo petición";
-            exit;
-        }
 
-        # si no salimos allá arriba, todo va bien
-        var_dump($result);
-    }
+
+    
 
 
     private function cleanPhoneCharters($phone)
@@ -3591,30 +2861,5 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
 
 
 
-    public function getContacts()
-    {
-        $url = 'https://api.clientify.net/v1/contacts/';
-        $options = [
-            'http' => [
-                'method' => 'GET',
-                'header' => "Authorization: token fa90099ee13cf6ebc389e8444628089037c8c754 \r\n" .
-                    "Content-Type: application/json\r\n"
-            ]
-        ];
-
-        $context = stream_context_create($options);
-        $response = file_get_contents($url, false, $context);
-
-        if ($response !== false) {
-            $data = json_decode($response);
-            $this->saveAPICustomer($data->results);
-
-
-            return view('customers.contacts_clientify', ['contacts' => $data->results]);
-        } else {
-            return view('customers.contacts_clientify', ['error' => 'Failed to fetch data']);
-        }
-        
-
-    }
+    
 }

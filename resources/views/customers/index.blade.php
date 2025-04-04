@@ -31,7 +31,7 @@
                   {{$item->getInitials()}}
               </div>
           </div>
-          <div class="customer_name col-sm-8 col-10" onmouseover="showEditIcon({{$item->id}});" onmouseout="hideEditIcon({{$item->id}});">
+          <div class="customer_name col-sm-8 col-10">
               <div>
                   <?php 
                   $request->customer_id = $item->id;
@@ -66,6 +66,7 @@
                   @if(isset($item->scoring_interest) && ($item->scoring_interest>0))
                       <span style="background-color: #ccc; border-radius: 50%; width: 25px; height: 25px; text-align: center; color: white; align-items: left; font-size: 12px; padding: 2px;">{{$item->scoring_interest}}</span>
                   @endif
+                  {{$item->getScoringToNumber()}}
                   <div class="stars-outer">
                       <div class="stars-inner" id="star{{$cont++}}"></div>
                       <script type="text/javascript">
@@ -77,9 +78,7 @@
                   <img src="/img/editar.png" id="edit_icon_{{$item->id}}" style="display: none; width: 17px;">
               </a> 
               @if(isset($item->phone) || isset($item->phone2))
-                  <a>
-                      <img onmouseover="showEditIcon({{$item->id}});" onmouseout="hideEditIcon({{$item->id}});" src="/img/message.png" data-toggle="modal" data-target="#modalCampañas_{{$item->id}}" id="edit_icon_campaings_{{$item->id}}" style="display: none; width: 20px;">
-                  </a> 
+                 
               @endif
               <div class="customer_description">
                   

@@ -29,7 +29,9 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\WhatsAppAPIController;
 use App\Models\User;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -81,7 +83,8 @@ Route::middleware('auth')->prefix('customers')->group(function () {
 
 // Customer Routes
 Route::middleware('auth')->prefix('customers')->group(function () {
-    Route::get('/', [CustomerController::class, 'leads'])->name('customers');
+    Route::get('/', [CustomerController::class, 'index'])->name('customers.index');
+    
     Route::get('/create', [CustomerController::class, 'create']);
     Route::post('/', [CustomerController::class, 'store']);
     // Chat
@@ -115,7 +118,9 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     // Esta debe ir al final para no interceptar las anteriores
     Route::get('/{pid}', [CustomerController::class, 'dragleads'])->whereNumber('pid');
 
-    
+    Route::get('/{customer}/email/1', [CustomerController::class, 'mail']);
+    Route::get('/{customer}/actions/createMail/{email}', [ActionController::class, 'trackEmail']);
+    Route::get('/{customer}/actions/trackEmail/{email}', [ActionController::class, 'trackEmail']);
 });
 
 // Optimizer Routes
@@ -170,9 +175,8 @@ Route::middleware('auth')->prefix('customer_statuses')->group(function () {
     Route::get('/{customer_status}/destroy', [CustomerStatusController::class, 'destroy']);
 });
 
-Route::get('/customers/{customer}/email/1', [CustomerController::class, 'mail']);
-Route::get('/customers/{customer}/actions/createMail/{email}', [ActionController::class, 'trackEmail']);
-Route::get('/customers/{customer}/actions/trackEmail/{email}', [ActionController::class, 'trackEmail']);
+
+
 
 // File Routes
 Route::middleware('auth')->prefix('customer_files')->group(function () {
@@ -432,3 +436,15 @@ Route::get('/reset_password', function(){
 Route::get('/rdtest', [RDTestController::class, 'test']);
 Route::post('/rdtest', [RDTestController::class, 'handleRequest'])->name('rdtest.post');
 
+Route::get('/test-rd', function () {
+    $payload = json_decode(file_get_contents(base_path('lead.json')), true);
+
+    //dd(file_get_contents(base_path('lead.json')));
+
+    $request = Request::create('/api/customers/update', 'POST', [], [], [], [], json_encode($payload));
+    $request->headers->set('Content-Type', 'application/json');
+
+    // Llama directamente al controlador
+    $controller = app(APIController::class);
+    return $controller->updateFromRD($request);
+});

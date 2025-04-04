@@ -107,25 +107,18 @@
             <div class="row">
               <div class="col-md-6 lavel"><span class="lavel"><strong>Perfil:</strong></span></div>
               <div class="col-md-6 scoring">
-                <div class="stars-outer">
-                  <div class="stars-inner"></div>
-                  <script type="text/javascript">
-                  @if(intval($model->scoring_profile))
-                    ratings = {
-                      scoring: {{$model->scoring_profile}}
-                    };
-                    starTotal = 3;
-                    for (rating in ratings) {
-                      starPercentage = (ratings[rating] / starTotal) * 100;
-                      starPercentageRounded = (Math.round(starPercentage / 10) * 10) + '%';
-                      console.log(starPercentageRounded);
-                      $('.stars-inner').width(starPercentageRounded);
-                    }
-                  @else
-                  // No es un entero $model->scoring_profile
-                  @endif
-                  
-                  </script>
+                <div class="scoring-stars">
+                  @php
+                    $stars = $model->getScoringToNumber();
+                  @endphp
+                
+                  @for ($i = 1; $i <= 4; $i++)
+                    @if ($i <= $stars)
+                      <span style="color: gold; font-size: 18px;">★</span>
+                    @else
+                      <span style="color: lightgray; font-size: 18px;">☆</span>
+                    @endif
+                  @endfor
                 </div>
               </div>
             </div>

@@ -70,13 +70,18 @@
         <div class="col-md-6 col-sm-6"><a href="{{$customer->linkedin_url}}"><img src="{{$customer->image_url}}" width="200" style="border-radius: 49.9%; width: 20%;"></a></div>
         @endif
         <div class="col-md-12 scoring">
-          <div class="stars-outer">
-            <div class="stars-inner"></div>
-            <script type="text/javascript">
-              starTotal = 4;
-              starPercentage = ({{$customer -> getScoringToNumber()}} / starTotal) * 100;
-                  starPercentageRounded = (Math.round(starPercentage / 10) * 10) + '%'; console.log(starPercentageRounded); $('.stars-inner').width(starPercentageRounded);
-            </script>
+          <div class="scoring-stars">
+            @php
+              $stars = $customer->getScoringToNumber();
+            @endphp
+          
+            @for ($i = 1; $i <= 4; $i++)
+              @if ($i <= $stars)
+                <span style="color: gold; font-size: 18px;">★</span>
+              @else
+                <span style="color: lightgray; font-size: 18px;">☆</span>
+              @endif
+            @endfor
           </div>
         </div>
       </div>
@@ -154,9 +159,7 @@
       @include('customers.alerts')
       @include('customers.contact')
       <br>
-      @if($actual)
 
-      @endif
     </div>
   </div>
 

@@ -102,7 +102,7 @@
 
     <br>
 
-    @if($actual)
+   
     <a href="/customers/{{$customer->id}}/edit">
       <span class="btn btn-primary btn-sm" aria-hidden="true">Editar</span>
     </a>
@@ -136,7 +136,6 @@
       @endif
 
 
-    @endif
     </form>
     
   
