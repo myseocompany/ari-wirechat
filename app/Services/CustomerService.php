@@ -770,7 +770,7 @@ class CustomerService {
         if (empty($request->from_date) && empty($request->search)) {
             // Sin filtros → mostrar últimos 90 días
             $from_date = Carbon\Carbon::today()->subDays(89)->format('Y-m-d'); // Incluye hoy
-            $to_date = Carbon\Carbon::today()->format('Y-m-d') . " 23:59:59";
+            $to_date = Carbon\Carbon::today()->endOfDay();
         }    else {
             // Filtros personalizados
             $from_date = Carbon\Carbon::createFromFormat('Y-m-d', $request->from_date ?? Carbon\Carbon::today()->subDays(5000)->format('Y-m-d'));
