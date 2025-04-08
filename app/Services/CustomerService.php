@@ -35,6 +35,9 @@ class CustomerService {
             if (!empty($request->from_date)) {
                 $column = ($request->created_updated === "created") ? 'created_at' : 'updated_at';
                 $query->whereBetween("customers.$column", $dates);
+            }else{
+                
+                $query->whereBetween("customers.created_at", $dates);
             }
 
             if (!empty($request->user_id)) {
@@ -765,10 +768,10 @@ class CustomerService {
     public function getDates($request)
     {
         if (empty($request->from_date) && empty($request->search)) {
-            // Sin filtros → mostrar solo leads de hoy
-            $from_date = Carbon\Carbon::today()->format('Y-m-d');
+            // Sin filtros → mostrar últimos 90 días
+            $from_date = Carbon\Carbon::today()->subDays(89)->format('Y-m-d'); // Incluye hoy
             $to_date = Carbon\Carbon::today()->format('Y-m-d') . " 23:59:59";
-        } else {
+        }    else {
             // Filtros personalizados
             $from_date = Carbon\Carbon::createFromFormat('Y-m-d', $request->from_date ?? Carbon\Carbon::today()->subDays(5000)->format('Y-m-d'));
             $to_date = Carbon\Carbon::createFromFormat('Y-m-d', $request->to_date ?? Carbon\Carbon::today()->subDays(2)->format('Y-m-d'));
