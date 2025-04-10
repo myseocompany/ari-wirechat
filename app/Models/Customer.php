@@ -337,26 +337,26 @@ class Customer extends Authenticatable
 
     public function getInitials()
     {
-
-        $str = $this->getName();
-
-
+        $str = trim($this->getName());
+    
         if (empty($str)) {
-            return '??'; // Sin nombre o estado
+            return '??';
         }
-
-        $words = preg_split('/\s+/', $str); // Separar por cualquier espacio
+    
+        $words = preg_split('/\s+/u', $str); // separa por espacios, soporta unicode
         $initials = '';
-        if (count($words) > 0 && strlen($words[0]) > 0) {
-            $initials .= $words[0][0]; // Asegura que la primera palabra no esté vacía
+    
+        if (isset($words[0]) && mb_strlen($words[0], 'UTF-8') > 0) {
+            $initials .= mb_substr($words[0], 0, 1, 'UTF-8');
         }
-
-        if (count($words) > 1 && strlen($words[1]) > 0) {
-            $initials .= $words[1][0]; // Asegura que la segunda palabra no esté vacía
+    
+        if (isset($words[1]) && mb_strlen($words[1], 'UTF-8') > 0) {
+            $initials .= mb_substr($words[1], 0, 1, 'UTF-8');
         }
-
-        return strtoupper($initials); // Devuelve las iniciales en mayúsculas
+    
+        return mb_strtoupper($initials ?: '??', 'UTF-8');
     }
+    
 
 
 
