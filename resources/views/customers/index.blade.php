@@ -27,9 +27,10 @@
   <div class="col-12">
       <div class="customers customer_row row">
           <div class="initials col-sm-1 col-2">
-              <div class="customer-circle" style_id="{{$item->status_id}}" style="background-color: <?= $item->getStatusColor(); ?>">
-                  {{$item->getInitials()}}
-              </div>
+
+              <div class="customer-circle" style_id="{{ $item->status_id }}" style="background-color: {{ $item->getStatusColor() }}">
+                {{ $item->getInitials() }}
+            </div>
           </div>
           <div class="customer_name col-sm-8 col-10">
               <div>

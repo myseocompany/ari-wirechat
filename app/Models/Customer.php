@@ -340,9 +340,13 @@ class Customer extends Authenticatable
 
         $str = $this->getName();
 
-        $words = explode(' ', $str);
-        $initials = '';
 
+        if (empty($str)) {
+            return '??'; // Sin nombre o estado
+        }
+
+        $words = preg_split('/\s+/', $str); // Separar por cualquier espacio
+        $initials = '';
         if (count($words) > 0 && strlen($words[0]) > 0) {
             $initials .= $words[0][0]; // Asegura que la primera palabra no esté vacía
         }
@@ -358,12 +362,11 @@ class Customer extends Authenticatable
 
     public function getStatusColor()
     {
-        $str = "'#000000'";
-        if(isset($this->status))
-            $str = $this->status->color;
-        // Suponiendo que el color está almacenado en una propiedad `color` del estado relacionado
-        return $str; // Devuelve un color predeterminado si no hay estado
+        if ($this->status && $this->status->color) {
+            return $this->status->color;
+        }
+    
+        return '#000000'; // Negro por defecto si no tiene estado
     }
-
-
+    
 }
