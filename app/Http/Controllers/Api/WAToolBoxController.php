@@ -77,6 +77,10 @@ class WAToolBoxController extends Controller{
         $sender = $api->getSimilarModel($apiRequest);
         if (!$sender) {
             $sender = $api->saveAPICustomer($apiRequest);
+                // Asignar el user_id con el algoritmo de turnos
+            $sender->user_id = $api->getRandomNextUserID();
+            $sender->save();
+            
             $api->storeActionAPI($apiRequest, $sender->id);
         }
         
