@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Validator as FacadesValidator;
 use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Events\MessageCreated;
 use Namu\WireChat\Jobs\NotifyParticipants;
+use App\Http\Controllers\Api\APIController;
 use Namu\WireChat\Models\Message as ModelsMessage;
 use App\Enums\WAMessageType;
 
@@ -59,16 +60,26 @@ class WAToolBoxController extends Controller{
         }
         $reciver_phone = $messageSource->settings['phone_number']; // 57300...
 
-        // Buscar o crear el Lead
-        $sender = Customer::firstOrCreate(
-            ['phone' => $validatedData['phone']],
-            [
-                'name' => $validatedData['name'] ?? $validatedData['name2'],
-                'image_url' => $validatedData['image'],
-                'status_id' => 1,
-                'source_id' => 76,
-            ]
-        );
+        $api = new APIController();
+
+        // Armamos un objeto tipo request para que funcione con la lógica ya existente
+        $apiRequest = new \Illuminate\Http\Request();
+        $apiRequest->replace([
+            'name' => $validatedData['name'] ?? $validatedData['name2'],
+            'phone' => $validatedData['phone'],
+            'email' => null,
+            'source_id' => 76,
+            'status_id' => 1,
+            'image_url' => $validatedData['image'],
+            'content' => $validatedData['content'],
+        ]);
+        
+        $sender = $api->getSimilarModel($apiRequest);
+        if (!$sender) {
+            $sender = $api->saveAPICustomer($apiRequest);
+            $api->storeActionAPI($apiRequest, $sender->id);
+        }
+        
         logger(["image"=>$validatedData['image']]);
 
         logger(["customer"=>$sender->name]);
