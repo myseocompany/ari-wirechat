@@ -30,7 +30,7 @@ use App\Models\Quote;
 use App\Models\Session;
 use App\Models\Reference;
 use App\Models\RdStation;
-//use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Http;
 use App\Models\RequestLog;
 use App\Services\WAToolboxService;
 
@@ -801,12 +801,7 @@ class APIController extends Controller
 
 
         $model->save();
-        if ($model && isset($request->session_id))
-            $this->saveSession($model->id, $request->session_id);
-       
-        //$this->sendToRDStation($model);
-        //$this->sendWelcomeMail($model);
-
+        
         return $model;
     }
 
@@ -1208,6 +1203,7 @@ class APIController extends Controller
 
     public function saveAPI(Request $request)
     {
+        $model = null;
         $this->saveLogFromRequest($request);
         // vericamos que no se inserte 2 veces
        
@@ -1215,7 +1211,7 @@ class APIController extends Controller
         
         $similar = $this->getSimilar($request);
 
-        dd($similar);
+        //dd($similar);
 
         if (is_null($count) || ($count == 0)) {
             // verificamos uno similar
@@ -1251,14 +1247,11 @@ class APIController extends Controller
 
                 $model = $similar[0];
 
-                if (isset($request->session_id)) {
-                    $this->saveSession($model->id, $request->session_id);
-                }
+         
 
                 $this->storeActionAPI($request, $model->id);
                 $this->updateCreateDate($request, $model->id);
-                //return redirect('https://maquiempanadas.com/es/gracias-web');
-                return redirect('https://maquiempanadas.com/es/gracias-web/');
+                
             }
             // este cliente ya existe. Se agrega una nueva nota
             //else{
@@ -1296,7 +1289,7 @@ class APIController extends Controller
             if (isset($request->session_id)) {
 
                 $model = Customer::where("email", $request->email)->first();
-                $this->saveSession($model->id, $request->session_id);
+                
             }
             return redirect('https://maquiempanadas.com/es/gracias-web/');
         }
@@ -2004,6 +1997,9 @@ class APIController extends Controller
 
 
         $modelRD = $this->saveAPIRD($model, $opportunity);
+
+        $this->sendToN8n($modelRD->id);
+        
         return $modelRD->id;
     }
 
@@ -2035,6 +2031,7 @@ class APIController extends Controller
         $nextUser->last_assigned = 1;
         $nextUser->save();
 
+        
         // devolver el ID del usuario
         return $nextUser->id;
     }
@@ -2924,5 +2921,26 @@ class APIController extends Controller
             }
         }
     }
-    
+
+    public function sendToN8n($cid){
+        // Define tu URL de producción del Webhook en n8n
+        $webhookUrl = 'https://n8n-1-85-1.onrender.com/webhook/5977d7f0-ace7-4daf-9ead-cd6f1856fbb5'; // <-- reemplaza con tu URL real
+
+    // Estructura el payload que deseas enviar (puedes modificarlo según lo que esperas en n8n)
+    $payload = [
+        'customer_id' => $cid ?? null
+    ];
+
+    // Enviar el POST al webhook de n8n
+    $response = Http::post($webhookUrl, $payload);
+
+    // Opcional: verificar respuesta
+    if ($response->failed()) {
+        Log::error('Error al enviar lead a n8n', [
+            'status' => $response->status(),
+            'body' => $response->body(),
+        ]);
+    }
+    }
+
 }
