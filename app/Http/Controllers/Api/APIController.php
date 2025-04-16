@@ -2876,7 +2876,7 @@ class APIController extends Controller
 
         \Log::info('campaign=>' , [$campaign] );
 
-        $this->defaultMessageSource = MessageSource::getGlobalDefault();
+        $this->defaultMessageSource = MessageSource::getDefaultMessageSource();
 
 
 
