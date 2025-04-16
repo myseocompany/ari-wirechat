@@ -2880,7 +2880,6 @@ class APIController extends Controller
 
 
 
-        dd($this->defaultMessageSource);
         if ($this->defaultMessageSource) {
             //logger('reacched');
             $this->waToolboxService = new WAToolboxService($this->defaultMessageSource);
