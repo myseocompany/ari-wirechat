@@ -32,4 +32,10 @@ class MessageSource extends Model
         return $this->belongsToMany(User::class, 'user_message_sources')
                     ->withPivot('is_active', 'is_default');
     }
+
+    public function getDefaultMessageSource()
+    {
+        return MessageSource::where('is_default', true)->first() ?? $this->getFirstMessageSource();
+    }
+
 }
