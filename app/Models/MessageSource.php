@@ -33,9 +33,12 @@ class MessageSource extends Model
                     ->withPivot('is_active', 'is_default');
     }
 
-    public function getDefaultMessageSource()
-    {
-        return MessageSource::where('is_default', true)->first() ?? $this->getFirstMessageSource();
+
+    public static function getDefaultMessageSource()    {
+        return self::where('is_default', true)->first()
+            ?? self::orderBy('id')->first(); // fallback por si no hay default explícito
     }
+    
+
 
 }
