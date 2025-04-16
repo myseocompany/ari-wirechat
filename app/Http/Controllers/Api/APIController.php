@@ -25,6 +25,7 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Models\Country;
 use App\Models\AudienceCustomer;
+use App\Models\MessageSource;
 use App\Models\Quote;
 use App\Models\Session;
 use App\Models\Reference;
@@ -2875,8 +2876,10 @@ class APIController extends Controller
 
         \Log::info('campaign=>' , [$campaign] );
 
-        $user = User::find(Auth::id());
-        $this->defaultMessageSource = $user?->getDefaultMessageSource();
+        $this->defaultMessageSource = MessageSource::getGlobalDefault();
+
+
+
         dd($this->defaultMessageSource);
         if ($this->defaultMessageSource) {
             //logger('reacched');
