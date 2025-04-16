@@ -1,6 +1,7 @@
 <?php
 //MQE
 namespace App\Http\Controllers\Api;
+use Illuminate\Support\Facades\Log;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -30,6 +31,7 @@ use App\Models\Reference;
 use App\Models\RdStation;
 //use Illuminate\Support\Facades\Http;
 use App\Models\RequestLog;
+use App\Services\WAToolboxService;
 
 class APIController extends Controller
 {
@@ -37,6 +39,8 @@ class APIController extends Controller
     protected $attributes = ['status_name'];
     protected $appends = ['status_name'];
     protected $status_name;
+
+    protected $waToolboxService;
 
     public function __construct()
     {
@@ -2860,6 +2864,62 @@ class APIController extends Controller
     }
 
 
+    public function sendCampaign($campaign_id, $customer_id)
+    {
 
+        $campaign = Campaign::find($campaign_id);
+        if (!$campaign) {
+            return;
+        }
+
+        \Log::info('campaign=>' , [$campaign] );
+
+        $user = User::find(Auth::id());
+        $this->defaultMessageSource = $user?->getDefaultMessageSource();
+        
+        if ($this->defaultMessageSource) {
+            //logger('reacched');
+            $this->waToolboxService = new WAToolboxService($this->defaultMessageSource);
+            
+        
+        }
+
+
+        $customer = Customer::find($customer_id);
+        if (!$customer) {
+            return;
+        }
+
+        $phone = $customer->getPhone();
+        if (empty($phone)) {
+            return;
+        }
+
+        // 🔍 Evitar mensajes duplicados
+        $sent_texts = [];
+        
+        \Log::info("campaign->messages: " ,[ $campaign->messages ]);
+
+        foreach ($campaign->messages as $message) {
+            if (empty($message->text) || in_array($message->text, $sent_texts)) {
+                continue;
+            }
+
+            $sent_texts[] = $message->text; // Guardar texto para evitar repetidos
+
+            $payload = [
+                'phone_number' => $phone,
+                'message' => $message->text,
+                'action' => 'send-message',
+                'type' => 'text',
+            ];
+
+            try {
+                $this->waToolboxService->sendMessageToWhatsApp($payload);
+            } catch (\Exception $e) {
+                \Log::error("Error enviando mensaje en sendCampaign: " . $e->getMessage());
+            }
+        }
+    }
     
 }
