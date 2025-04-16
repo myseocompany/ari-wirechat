@@ -2903,8 +2903,6 @@ class APIController extends Controller
         
         \Log::info("campaign->messages: " ,[ $campaign->messages ]);
 
-
-        dd($campaign->messages);
         foreach ($campaign->messages as $message) {
             if (empty($message->text) || in_array($message->text, $sent_texts)) {
                 continue;
