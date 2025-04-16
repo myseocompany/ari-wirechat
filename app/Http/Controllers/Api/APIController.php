@@ -41,6 +41,7 @@ class APIController extends Controller
     protected $status_name;
 
     protected $waToolboxService;
+    protected $defaultMessageSource;
 
     public function __construct()
     {
@@ -2876,7 +2877,7 @@ class APIController extends Controller
 
         $user = User::find(Auth::id());
         $this->defaultMessageSource = $user?->getDefaultMessageSource();
-        
+        dd($this->defaultMessageSource);
         if ($this->defaultMessageSource) {
             //logger('reacched');
             $this->waToolboxService = new WAToolboxService($this->defaultMessageSource);
