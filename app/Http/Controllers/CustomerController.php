@@ -86,7 +86,7 @@ class CustomerController extends Controller
             'customer'          => $customer,
             'action_options'    => ActionType::orderBy('weigth')->get(),
             'email_options'     => Email::where('type_id', 1)->where('active', 1)->get(),
-            'statuses_options'  => CustomerStatus::orderBy('weight')->get(),
+            'statuses_options'  => $statuses,
             'country_options'   => Country::all(),
         ]);
     }
