@@ -56,7 +56,10 @@ class CustomerController extends Controller
     {
         $menu = $this->customerService->getUserMenu(Auth::user());
 
-        $statuses = CustomerStatus::where('status_id', '1')->get();
+        $statuses = CustomerStatus::where('status_id', 1)
+            ->orderBy('weight', 'asc')
+            ->get();
+
         $model = $this->customerService->filterCustomers($request, $statuses, null, false, 5);
         $customersGroup = $this->customerService->filterCustomers($request, $statuses, null, true);
         
