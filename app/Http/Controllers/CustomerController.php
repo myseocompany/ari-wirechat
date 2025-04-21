@@ -59,6 +59,8 @@ class CustomerController extends Controller
         $statuses = CustomerStatus::where('status_id', 1)
             ->orderBy('weight', 'asc')
             ->get();
+        
+        //dd($statuses);
 
         $model = $this->customerService->filterCustomers($request, $statuses, null, false, 5);
         $customersGroup = $this->customerService->filterCustomers($request, $statuses, null, true);
@@ -1317,11 +1319,11 @@ $message->to("mateogiraldo420@gmail.com");
 
         /* obtiene una lista de clientes a partir del request */
         //$model = $this->customerService->filterModelFull($request, $statuses);
-        $model = $this->customerService->filterCustomers($request, $statuses, 1);
-        // dd($statuses, $model)
+        $model = $this->customerService->filterCustomers($request, $statuses, null, false, 50000000);
+        $customersGroup = $this->customerService->filterCustomers($request, $statuses, null, true);
 
-
-        $customersGroup = $this->customerService->countFilterCustomers($request, $statuses, 1);
+        //$model = $this->customerService->filterCustomers($request, $statuses, 1);
+        //$customersGroup = $this->customerService->countFilterCustomers($request, $statuses, 1);
         $sources = CustomerSource::all();
 
         return view('customers.excel', compact('model', 'request', 'customer_options', 'customersGroup', 'users', 'sources'));

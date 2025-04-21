@@ -221,7 +221,7 @@
     
     <div class="col-6">
         <select name="status_id" id="status_id" class="form-control" onchange="submit();">
-          <option value="">Estado...</option>
+          <option value="">Estado....</option>
           @foreach($statuses as $item)
             <option value="{{$item->id}}" @if ($request->status_id == $item->id) selected="selected" @endif>
                {{ $item->name }}
