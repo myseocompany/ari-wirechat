@@ -211,7 +211,7 @@
        @if(isset($country_options))
        @foreach($country_options as $item)
           <option value="{{$item->iso2}}" @if ($request->iso2 == $item->iso2 && $item->iso2 != "") selected="selected" @endif>
-             {{ $item->iso2 }}
+             {{ $item->name }}
             
           </option>
         @endforeach
