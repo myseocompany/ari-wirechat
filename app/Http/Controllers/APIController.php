@@ -2444,6 +2444,19 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         return $modelRD->id;
     }
 
+    private function mergeNotes($existingNotes, $newNotes)
+    {
+        if (!$existingNotes) return trim($newNotes);
+        if (!$newNotes) return trim($existingNotes);
+
+        $existingArray = explode(' ', $existingNotes);
+        $newArray = explode(' ', $newNotes);
+
+        $merged = array_unique(array_merge($existingArray, $newArray));
+        return implode(' ', array_filter($merged));
+    }
+
+/*
     public function updateFromRDOld(Request $request)
     {
 
@@ -2695,6 +2708,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         // devolver el ID del usuario
         return $nextUser->id;
     }
+        */
 
     function getRandomNextUserID()
     {
@@ -2974,7 +2988,8 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         }
 
         $existing->contact_email = $existing->email;
-        $existing->notes = trim($incoming->notes) . ' actualizado';
+        $existing->notes = $this->mergeNotes($existing->notes, $incoming->notes);
+
 
         if ($existing->product_id != 15) {
             $existing->status_id = $incoming->status_id;
