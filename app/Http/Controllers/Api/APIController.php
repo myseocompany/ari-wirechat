@@ -1858,23 +1858,31 @@ class APIController extends Controller
 
 
         $status_id = 0;
-        if ($tags) {
-            foreach ($tags as $key  => $value) {
-                if ($value == "desmechadora") {
-                    $model->status_id = 41; //Desmechadora
+        if (!empty($tags)) {
+            foreach ($tags as $tag) {
+                if (!str_contains($model->notes, "#$tag")) {
+                    $model->notes .= " #$tag";
                 }
-                if (!str_contains($model->notes, $value))
-                    $model->notes .=   " " . $value; //alimentec
-                if ($value == "pqr") {
-                    $model->status_id = 29; //PQR
-                    $status_id = 29;
+
+                switch ($tag) {
+                    case 'Tour_Bogota':
+                        if (!str_contains($model->notes, '#BogotaTour2025')) {
+                            $model->notes .= ' #BogotaTour2025';
+                        }
+                        break;
+
+                    case 'pqr':
+                        $model->status_id = 29;
+                        $status_id = 29;
+                        break;
+
+                    case 'desmechadora':
+                        $model->status_id = 41;
+                        break;
                 }
-                if (!str_contains($model->notes, $value))
-                    $model->notes .= "#" . $value;
-                else
-                    $model->notes .= " update2 " . $value;
             }
         }
+
         
         $lead = $json["leads"][0]; // Toma el primer lead
 
@@ -2464,9 +2472,12 @@ class APIController extends Controller
                     $model->campaign_name = $request_model->campaign_name;
                 }
 
+                if (!str_contains($request_model->notes, 'actualizado')) {
+                    $model->notes = trim($request_model->notes . ' actualizado');
+                } else {
+                    $model->notes = $request_model->notes;
+                }
 
-                $model->notes = $request_model->notes;
-                $model->notes .= " actualizado ";
 
                 if ($model->product_id != 15)
                     $model->status_id = $request_model->status_id;
