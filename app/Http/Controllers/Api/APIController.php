@@ -2472,11 +2472,21 @@ class APIController extends Controller
                     $model->campaign_name = $request_model->campaign_name;
                 }
 
-                if (!str_contains($request_model->notes, 'actualizado')) {
-                    $model->notes = trim($request_model->notes . ' actualizado');
+                $oldNotes = $model->notes ?? '';
+                $newNotes = $request_model->notes ?? '';
+
+                // Solo añade si las nuevas notas no están incluidas aún
+                if (!str_contains($oldNotes, $newNotes)) {
+                    $model->notes = trim($oldNotes . ' ' . $newNotes);
                 } else {
-                    $model->notes = $request_model->notes;
+                    $model->notes = $oldNotes;
                 }
+
+                // Añadir "actualizado" solo si no está ya
+                if (!str_contains($model->notes, 'actualizado')) {
+                    $model->notes .= ' actualizado';
+                }
+
 
 
                 if ($model->product_id != 15)
