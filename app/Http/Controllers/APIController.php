@@ -2424,17 +2424,33 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
     }
 
 
+
     public function updateFromRD(Request $request)
+    {   
+        $this->saveLogFromRequest($request);
+        $json = $request->json()->all();
+        $data = $json['leads'][0] ?? [];
+
+        $model = $this->mapLeadToCustomer($data);
+        $tags = $data['tags'] ?? [];
+        $opportunity = $data['opportunity'] ?? '';
+
+        $model->status_id = $this->resolveStatus($data, $tags, $data['lead_stage'] ?? null, $opportunity, $request);
+        $model->source_id = $this->getSourceRD($request);
+        $model->request = json_encode($json);
+
+        $modelRD = $this->saveAPIRD($model, $opportunity);
+
+        return $modelRD->id;
+    }
+
+    public function updateFromRDOld(Request $request)
     {
 
 
         $this->saveLogFromRequest($request);
-
         $json = $request->json()->all();
-        //dd($json);
-        $data = "";
-        if (isset($json["leads"]))
-            $data = $json["leads"][0];
+        $data = $json['leads'][0] ?? [];
 
         $tags = "";
 
@@ -2896,126 +2912,7 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         return $model;
     }
 
-    public function audienceFromRD(Request $request)
-    {
-        //dd($request);
-        $json = $request->json()->all();
 
-        $data = $json["leads"][0];
-
-        $model = new Customer;
-        if (isset($data["opportunity"])) {
-            $opportunity = $data["opportunity"];
-        }
-        if (isset($data["name"])) {
-            $model->name = $data["name"];
-        }
-        if (isset($data["email"])) {
-            $model->email = $data["email"];
-        }
-
-        if (isset($data["public_url"])) {
-            $model->rd_public_url = $data["public_url"];
-        }
-
-        if (isset($data["bio"])) {
-            $model->notes .= $data["bio"];
-        }
-        if (isset($data["personal_phone"])) {
-            $model->phone = $data["personal_phone"];
-        }
-        if (isset($data["mobile_phone"])) {
-            $model->phone2 = $data["mobile_phone"];
-        }
-        if (isset($data["state"])) {
-            $model->department = $data["state"];
-        }
-        if (isset($data["city"])) {
-            $model->city = $data["city"];
-        }
-
-        if (isset($data["first_conversion"]["content"]["País"])) {
-            $model->country = $data["first_conversion"]["content"]["País"];
-        }
-
-
-        if (isset($data["custom_fields"]["Producción diaria de empanadas"])) {
-            $model->count_empanadas = $data["custom_fields"]["Producción diaria de empanadas"];
-            if ($data["custom_fields"]["Producción diaria de empanadas"] == "No produzco. Tengo un proyecto")
-                $model->maker = 0;
-            else
-                $model->maker = 1;
-        }
-
-        if (isset($data["city"])) {
-            $model->city = $data["city"];
-        }
-
-        if (isset($data["custom_fields"]["Número de Puntos de venta"])) {
-            $model->number_venues = $data["custom_fields"]["Número de Puntos de venta"];
-        }
-        if (isset($data["custom_fields"]["Tipo de empresa"])) {
-            $model->company_type = $data["custom_fields"]["Tipo de empresa"];
-        }
-
-
-        if (isset($data["company"])) {
-            $model->business = $data["company"];
-        }
-        if (isset($data["job_title"])) {
-            $model->position = $data["job_title"];
-        }
-
-        if (isset($data["fit_score"])) {
-            $model->scoring_profile = $data["fit_score"];
-        }
-
-        if (isset($data["interest"])) {
-            $model->scoring_interest = $data["interest"];
-        }
-
-        if (isset($data["public_url"])) {
-            $model->rd_public_url = $data["public_url"];
-        }
-
-
-        if (isset($data["custom_fields"]["Tamaño de las empanadas que fabrican"])) {
-            $model->empanadas_size = $data["custom_fields"]["Tamaño de las empanadas que fabrican"];
-        }
-
-        if (isset($data["custom_fields"]["Número de sedes de la empresa"])) {
-            $model->number_venues = $data["custom_fields"]["Número de sedes de la empresa"];
-        }
-
-        if (isset($data["custom_fields"]["Cargo que ocupas dentro de la empresa"])) {
-            $model->position = $data["custom_fields"]["Cargo que ocupas dentro de la empresa"];
-        }
-
-        $model->status_id = 1;
-        if (isset($data["lead_stage"])) {
-            $status = $data["lead_stage"];
-            if (isset($opportunity) && ($opportunity == 'true')) {
-                $model->status_id = 19; //Oportunidad
-            }
-            if (isset($status) && (($status == 'Lead'))) {
-                $model->status_id = 1; //Calificado
-            }
-            if (isset($status) && (($status == 'Lead Qualificado'))) {
-                $model->status_id = 36; //Calificado
-            }
-            if (isset($status) && (($status == 'Cliente'))) {
-                $model->status_id = 19; //Demo
-            }
-        }
-        $model->source_id = $this->getSourceRD($request);
-
-        $model = $this->saveAPIRD($model, $opportunity);
-        //CREAR AUDIENCIA 7
-        $audienceCustomer = new AudienceCustomer;
-        $audienceCustomer->audience_id = 7; //Agendados
-        $audienceCustomer->customer_id = $model->id;
-        $audienceCustomer->save();
-    }
 
     public function updateCustomerHistory($opportunity, $model, $rd_model)
     {
@@ -3035,7 +2932,187 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         $this->updateAPICustomerRD($model);
     }
 
+
     public function saveAPIRD($request_model, $opportunity)
+    {
+        $equal = $this->isEqualModel($request_model);
+
+        if ($equal) {
+            $model = $equal;
+        } else {
+            $similar = $this->getSimilarModel($request_model);
+
+            if ($similar) {
+                $model = $this->updateSimilarCustomer($similar, $request_model);
+                $this->updateCustomerHistory($opportunity, $model, $request_model);
+            } else {
+                $model = $this->createNewCustomer($request_model);
+            }
+        }
+
+        $this->storeActionAPIRD($request_model, $model->id);
+        return $model;
+    }
+
+    private function updateSimilarCustomer($existing, $incoming)
+    {
+        $fields = [
+            'rd_public_url',
+            'scoring_profile',
+            'scoring_interest',
+            'email',
+            'count_empanadas',
+            'maker',
+            'inquiry_product_id',
+            'campaign_name',
+        ];
+
+        foreach ($fields as $field) {
+            if (isset($incoming->$field)) {
+                $existing->$field = $incoming->$field;
+            }
+        }
+
+        $existing->contact_email = $existing->email;
+        $existing->notes = trim($incoming->notes) . ' actualizado';
+
+        if ($existing->product_id != 15) {
+            $existing->status_id = $incoming->status_id;
+        }
+
+        $existing->save();
+
+        return $existing;
+    }
+
+
+    private function createNewCustomer($model)
+    {
+        $model->user_id = $this->getRandomNextUserID();
+        $model->save();
+        return $model;
+    }
+    private function resolveStatus($data, $tags, $lead_stage, $opportunity, $request)
+    {
+        // PQR tiene prioridad
+        if (in_array('pqr', $tags)) {
+            return 29;
+        }
+
+        // Tag de desmechadora
+        if (in_array('desmechadora', $tags)) {
+            return 41;
+        }
+
+        // Campaña
+        if (
+            isset($request->campaign) &&
+            $request->campaign === 'Maquiempanadas - MQE_Form leads desmechadora'
+        ) {
+            return 41;
+        }
+
+        // Identificador de conversión
+        $firstIdentifier = $data["first_conversion"]["content"]["identificador"] ?? '';
+        $lastIdentifier = $data["last_conversion"]["content"]["identificador"] ?? '';
+
+        if (
+            str_contains($firstIdentifier, 'desmechadora') ||
+            str_contains($lastIdentifier, 'desmechadora')
+        ) {
+            return 41;
+        }
+
+        // Stage
+        switch ($lead_stage) {
+            case 'Lead':
+                return 1;
+            case 'Desmechadora':
+                return 41;
+            case 'Lead Qualificado':
+                return 36;
+            case 'Cliente':
+                return 19;
+        }
+
+        // Oportunidad
+        if ($opportunity === 'true') {
+            return 19;
+        }
+
+        // Default
+        return -1;
+    }
+
+    private function mapLeadToCustomer(array $data): Customer
+    {
+        $model = new Customer;
+
+        $model->name = $data['name'] ?? null;
+        $model->email = $data['email'] ?? null;
+        $model->rd_public_url = $data['public_url'] ?? null;
+        $model->notes = '';
+
+        if (isset($data['first_conversion']['content']['note'])) {
+            $note = $data['first_conversion']['content']['note'];
+            $model->notes .= $note;
+
+            if (in_array($note, ['22_de_noviembre', '23_de_noviembre'])) {
+                $model->notes .= " #madrid2023";
+            }
+        }
+
+        $model->phone = $data['personal_phone'] ?? null;
+        $model->phone2 = $data['mobile_phone'] ?? null;
+        $model->department = $data['state'] ?? null;
+        $model->city = $data['city'] ?? null;
+        $model->country = $this->getCountry($data);
+
+        if (isset($data['custom_fields'])) {
+            $this->fillCustomFields($model, $data['custom_fields']);
+        }
+
+        $model->business = $data['company'] ?? null;
+        $model->position = $data['job_title'] ?? null;
+        $model->scoring_profile = $data['fit_score'] ?? null;
+        $model->scoring_interest = $data['interest'] ?? null;
+
+        // Conversión origen campaña
+        $model->campaign_name =
+            $data['first_conversion']['conversion_origin']['campaign']
+            ?? $data['last_conversion']['conversion_origin']['campaign']
+            ?? null;
+
+        return $model;
+    }
+
+    private function fillCustomFields(Customer $model, array $custom_fields)
+    {
+        if (isset($custom_fields['Producción diaria de empanadas'])) {
+            $produccion = $custom_fields['Producción diaria de empanadas'];
+            $model->count_empanadas = $produccion;
+            $model->maker = ($produccion === "No produzco. Tengo un proyecto") ? 0 : 1;
+        }
+
+        $model->custom_fields = json_encode($custom_fields);
+
+        $model->notes .= $custom_fields['Número de empleados'] ?? '';
+        $model->address = $custom_fields['Dirección'] ?? null;
+        $model->number_venues = $custom_fields['Número de Puntos de venta']
+            ?? $custom_fields['Número de sedes de la empresa']
+            ?? null;
+
+        $model->company_type = $custom_fields['Tipo de empresa'] ?? null;
+        $model->position = $custom_fields['Cargo que ocupas dentro de la empresa']
+            ?? $model->position;
+        $model->empanadas_size = $custom_fields['Tamaño de las empanadas que fabrican'] ?? null;
+    }
+
+
+
+
+
+    public function saveAPIRDOld($request_model, $opportunity)
     {
 
 
@@ -3610,5 +3687,126 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         }
         
 
+    }
+
+        public function audienceFromRD(Request $request)
+    {
+        //dd($request);
+        $json = $request->json()->all();
+
+        $data = $json["leads"][0];
+
+        $model = new Customer;
+        if (isset($data["opportunity"])) {
+            $opportunity = $data["opportunity"];
+        }
+        if (isset($data["name"])) {
+            $model->name = $data["name"];
+        }
+        if (isset($data["email"])) {
+            $model->email = $data["email"];
+        }
+
+        if (isset($data["public_url"])) {
+            $model->rd_public_url = $data["public_url"];
+        }
+
+        if (isset($data["bio"])) {
+            $model->notes .= $data["bio"];
+        }
+        if (isset($data["personal_phone"])) {
+            $model->phone = $data["personal_phone"];
+        }
+        if (isset($data["mobile_phone"])) {
+            $model->phone2 = $data["mobile_phone"];
+        }
+        if (isset($data["state"])) {
+            $model->department = $data["state"];
+        }
+        if (isset($data["city"])) {
+            $model->city = $data["city"];
+        }
+
+        if (isset($data["first_conversion"]["content"]["País"])) {
+            $model->country = $data["first_conversion"]["content"]["País"];
+        }
+
+
+        if (isset($data["custom_fields"]["Producción diaria de empanadas"])) {
+            $model->count_empanadas = $data["custom_fields"]["Producción diaria de empanadas"];
+            if ($data["custom_fields"]["Producción diaria de empanadas"] == "No produzco. Tengo un proyecto")
+                $model->maker = 0;
+            else
+                $model->maker = 1;
+        }
+
+        if (isset($data["city"])) {
+            $model->city = $data["city"];
+        }
+
+        if (isset($data["custom_fields"]["Número de Puntos de venta"])) {
+            $model->number_venues = $data["custom_fields"]["Número de Puntos de venta"];
+        }
+        if (isset($data["custom_fields"]["Tipo de empresa"])) {
+            $model->company_type = $data["custom_fields"]["Tipo de empresa"];
+        }
+
+
+        if (isset($data["company"])) {
+            $model->business = $data["company"];
+        }
+        if (isset($data["job_title"])) {
+            $model->position = $data["job_title"];
+        }
+
+        if (isset($data["fit_score"])) {
+            $model->scoring_profile = $data["fit_score"];
+        }
+
+        if (isset($data["interest"])) {
+            $model->scoring_interest = $data["interest"];
+        }
+
+        if (isset($data["public_url"])) {
+            $model->rd_public_url = $data["public_url"];
+        }
+
+
+        if (isset($data["custom_fields"]["Tamaño de las empanadas que fabrican"])) {
+            $model->empanadas_size = $data["custom_fields"]["Tamaño de las empanadas que fabrican"];
+        }
+
+        if (isset($data["custom_fields"]["Número de sedes de la empresa"])) {
+            $model->number_venues = $data["custom_fields"]["Número de sedes de la empresa"];
+        }
+
+        if (isset($data["custom_fields"]["Cargo que ocupas dentro de la empresa"])) {
+            $model->position = $data["custom_fields"]["Cargo que ocupas dentro de la empresa"];
+        }
+
+        $model->status_id = 1;
+        if (isset($data["lead_stage"])) {
+            $status = $data["lead_stage"];
+            if (isset($opportunity) && ($opportunity == 'true')) {
+                $model->status_id = 19; //Oportunidad
+            }
+            if (isset($status) && (($status == 'Lead'))) {
+                $model->status_id = 1; //Calificado
+            }
+            if (isset($status) && (($status == 'Lead Qualificado'))) {
+                $model->status_id = 36; //Calificado
+            }
+            if (isset($status) && (($status == 'Cliente'))) {
+                $model->status_id = 19; //Demo
+            }
+        }
+        $model->source_id = $this->getSourceRD($request);
+
+        $model = $this->saveAPIRD($model, $opportunity);
+        //CREAR AUDIENCIA 7
+        $audienceCustomer = new AudienceCustomer;
+        $audienceCustomer->audience_id = 7; //Agendados
+        $audienceCustomer->customer_id = $model->id;
+        $audienceCustomer->save();
     }
 }
