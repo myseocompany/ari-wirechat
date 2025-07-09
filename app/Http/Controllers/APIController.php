@@ -2450,6 +2450,9 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
                 if ($value == "desmechadora") {
                     $model->status_id = 41; //Desmechadora
                 }
+                if ($value == "Tour_Bogota") {
+                    $model->notes = trim($model->notes . ' #BogotaTour2025');
+                }
                 if (!str_contains($model->notes, $value))
                     $model->notes .=   " " . $value; //alimentec
                 if ($value == "pqr") {
