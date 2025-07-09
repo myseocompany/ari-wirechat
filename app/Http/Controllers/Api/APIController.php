@@ -1865,12 +1865,6 @@ class APIController extends Controller
                 }
 
                 switch ($tag) {
-                    case 'Tour_Bogota':
-                        if (!str_contains($model->notes, '#BogotaTour2025')) {
-                            $model->notes .= ' #BogotaTour2025';
-                        }
-                        break;
-
                     case 'pqr':
                         $model->status_id = 29;
                         $status_id = 29;
