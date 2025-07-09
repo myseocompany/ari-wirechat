@@ -130,12 +130,6 @@ class APIController extends Controller
         return $statuses;
     }
 
-
-
-
-
-
-
     public function filterModel(Request $request, $statuses)
     {
 
@@ -3063,11 +3057,18 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
     {
         $model = new Customer;
 
+        // Campos simples
         $model->name = $data['name'] ?? null;
         $model->email = $data['email'] ?? null;
         $model->rd_public_url = $data['public_url'] ?? null;
         $model->notes = '';
+        $model->phone = $data['personal_phone'] ?? null;
+        $model->phone2 = $data['mobile_phone'] ?? null;
+        $model->department = $data['state'] ?? null;
+        $model->city = $data['city'] ?? null;
+        $model->country = $this->getCountry($data);
 
+        // Nota de conversión
         if (isset($data['first_conversion']['content']['note'])) {
             $note = $data['first_conversion']['content']['note'];
             $model->notes .= $note;
@@ -3077,29 +3078,28 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
             }
         }
 
-        $model->phone = $data['personal_phone'] ?? null;
-        $model->phone2 = $data['mobile_phone'] ?? null;
-        $model->department = $data['state'] ?? null;
-        $model->city = $data['city'] ?? null;
-        $model->country = $this->getCountry($data);
-
-        if (isset($data['custom_fields'])) {
+        // Custom fields
+        if (isset($data['custom_fields']) && is_array($data['custom_fields'])) {
             $this->fillCustomFields($model, $data['custom_fields']);
         }
 
+        // Información adicional
         $model->business = $data['company'] ?? null;
         $model->position = $data['job_title'] ?? null;
         $model->scoring_profile = $data['fit_score'] ?? null;
         $model->scoring_interest = $data['interest'] ?? null;
 
-        // Conversión origen campaña
-        $model->campaign_name =
-            $data['first_conversion']['conversion_origin']['campaign']
-            ?? $data['last_conversion']['conversion_origin']['campaign']
-            ?? null;
+        // Campaña (protegido con isset)
+        $model->campaign_name = null;
+        if (isset($data['first_conversion']['conversion_origin']['campaign'])) {
+            $model->campaign_name = $data['first_conversion']['conversion_origin']['campaign'];
+        } elseif (isset($data['last_conversion']['conversion_origin']['campaign'])) {
+            $model->campaign_name = $data['last_conversion']['conversion_origin']['campaign'];
+        }
 
         return $model;
     }
+
 
     private function fillCustomFields(Customer $model, array $custom_fields)
     {
@@ -3122,10 +3122,6 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
             ?? $model->position;
         $model->empanadas_size = $custom_fields['Tamaño de las empanadas que fabrican'] ?? null;
     }
-
-
-
-
 
     public function saveAPIRDOld($request_model, $opportunity)
     {
@@ -3219,12 +3215,6 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
         $model->save();
         return $model;
     }
-
-
-
-
-
-
 
     public function updateAPICustomerRD($model)
     {
