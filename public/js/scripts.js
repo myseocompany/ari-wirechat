@@ -126,6 +126,8 @@ function update(){
       case "thisweek":getThisWeek(); break;
       case "-7":$('#from_date').val(getDate(-6)); $('#to_date').val(getDate(0)); break;
       case "-30":$('#from_date').val(getDate(-30)); $('#to_date').val(getDate(-1)); break;
+      case "-90":$('#from_date').val(getDate(-930)); $('#to_date').val(getDate(-1)); break;
+      
       case "lastweek":getLastWeek(); break;
       case "lastmonth":getLastMonth();break;
       case "currentmonth":getCurrentMonth();break;
