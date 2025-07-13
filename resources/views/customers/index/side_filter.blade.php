@@ -48,6 +48,8 @@
             <option value="currentyear" @if ($request->filter == "currentyear") selected="selected" @endif>este año</option>
             <option value="-7" @if ($request->filter == "-7") selected="selected" @endif>ultimos 7 dias</option>
             <option value="-30" @if ($request->filter == "-30") selected="selected" @endif>ultimos 30 dias</option>
+            <option value="-90" @if ($request->filter == "-90") selected="selected" @endif>ultimos 90 dias</option>
+        
           </select>
         </div>
         <div class="col-md-12">

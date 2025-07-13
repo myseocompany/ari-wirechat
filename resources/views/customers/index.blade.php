@@ -5,7 +5,7 @@
 @if(isset($phase))
   @section('title', $phase->name)
 @else
-  @section('title', 'Clientes') 
+  @section('title', 'Leads') 
 @endif
 
 
