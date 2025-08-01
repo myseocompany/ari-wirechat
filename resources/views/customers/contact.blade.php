@@ -1,4 +1,85 @@
+
 <div id="divmsg"></div>
+
+<div class="card-block">
+  <form action="customers/{{$customer->id}}/edit">
+    {{ csrf_field() }}
+
+    {{-- SECCIÓN 1: INFORMACIÓN DEL EVENTO Y ASIGNACIÓN --}}
+    <div class="mb-4 border-bottom pb-2">
+      <h5 class="text-primary">Información del Evento</h5>
+      <p><strong>País:</strong> {{$customer->country}}</p>
+      <p><strong>Campaña:</strong> {{$customer->campaign_name}}</p>
+      <p><strong>Grupo de anuncios:</strong> {{$customer->adset_name}}</p>
+      <p><strong>Anuncio:</strong> {{$customer->ad_name}}</p>
+      <p><strong>Asignado a:</strong> @if(isset($customer->user)) {{$customer->user->name}} @else Sin asignar @endif</p>
+      <p><strong>Fuente:</strong> {{ optional($customer->source)->name }}</p>
+      <p><strong>Fecha de creación:</strong> {{$customer->created_at}}</p>
+      <p><strong>Fecha de actualización:</strong> {{$customer->updated_at}}</p>
+      <p><strong>Usuario actualizador:</strong> {{ optional($customer->updated_user)->name }}</p>
+    </div>
+
+    {{-- SECCIÓN 2: INFORMACIÓN DE CONTACTO --}}
+    <div class="mb-4 border-bottom pb-2">
+      <h5 class="text-primary">Contacto</h5>
+      <p><strong>Nombre:</strong> {{$customer->contact_name}}</p>
+      <p><strong>Email:</strong> {{$customer->contact_email}}</p>
+      <p><strong>Teléfono:</strong> {{$customer->contact_phone2}}</p>
+      <p><strong>Cargo:</strong> {{$customer->contact_position}}</p>
+      <p><strong>Documento:</strong> {{$customer->document}}</p>
+    </div>
+
+    {{-- SECCIÓN 3: INFORMACIÓN DE EMPRESA --}}
+    <div class="mb-4 border-bottom pb-2">
+      <h5 class="text-primary">Empresa</h5>
+      <p><strong>Nombre:</strong> {{$customer->business}}</p>
+      <p><strong>Cargo del contacto:</strong> {{$customer->position}}</p>
+      <p><strong>Número de sedes:</strong> {{$customer->number_venues}}</p>
+    </div>
+
+    {{-- SECCIÓN 4: INTERÉS COMERCIAL --}}
+    <div class="mb-4 border-bottom pb-2">
+      <h5 class="text-primary">Interés Comercial</h5>
+      <p><strong>Producto consultado:</strong> {{ optional($customer->product)->name }}</p>
+      <p><strong>Producto adquirido:</strong> {{$customer->bought_products}}</p>
+      <p><strong>Fecha de compra:</strong> {{$customer->date_bought}}</p>
+      <p><strong>Tamaño de empanadas:</strong> {{$customer->empanadas_size}}</p>
+      <p><strong>No. empanadas al día:</strong> {{$customer->count_empanadas}}</p>
+    </div>
+
+    {{-- SECCIÓN 5: OBSERVACIONES Y NOTAS --}}
+    <div class="mb-4 border-bottom pb-2">
+      <h5 class="text-primary">Notas</h5>
+      <p><strong>Observaciones:</strong> {{$customer->notes}}</p>
+      <p><strong>Visitas Técnicas:</strong> {{$customer->technical_visit}}</p>
+    </div>
+
+    {{-- BOTONES DE ACCIÓN --}}
+    <div class="mb-4">
+      <a href="/customers/{{$customer->id}}/edit" class="btn btn-sm btn-primary">Editar</a>
+
+      @if(is_null($customer->user_id) || $customer->user_id==0)
+        <a href="/customers/{{$customer->id}}/assignMe" class="btn btn-sm btn-primary">Asignarme</a>
+      @endif
+
+      @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 10)
+        <a href="/customers/{{ $customer->id }}/destroy" class="btn btn-sm btn-danger" title="Eliminar">Eliminar</a>
+
+        <input type="hidden" name="name" id="name" value="{{$customer->name}}">
+        <input type="hidden" name="phone" id="phone" value="{{$customer->phone}}">
+        <input type="hidden" name="email" id="email" value="{{$customer->email}}">
+        <input type="hidden" name="country" id="country" value="{{$customer->country}}">
+
+        <a class="btn btn-sm btn-primary mt-2" onclick="sendToRDStation();">Enviar a RD</a>
+
+        <a href="/optimize/customers/consolidateDuplicates/?query={{ $customer->phone ?? $customer->email }}"
+           class="btn btn-sm btn-primary mt-2">
+           Buscar duplicados
+        </a>
+      @endif
+    </div>
+  </form>
+</div>
 
 
 <div class="card-block">
