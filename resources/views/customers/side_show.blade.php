@@ -6,7 +6,7 @@
 } ?>
 
 @if($customer != null)
-@include('customers.patials.customer_header')
+@include('customers.partials.customer_header')
 
 <div class="row">
   <div class="col-md-4">
