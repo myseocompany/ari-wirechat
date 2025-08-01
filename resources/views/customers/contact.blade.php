@@ -1,4 +1,31 @@
 <div id="divmsg"></div>
+<div class="card mb-4 p-4 border rounded shadow-sm" style="background-color: #fdfdfd;">
+  <h5 class="mb-3 text-uppercase"><strong>Relación de Clientes</strong></h5>
+
+  <div class="row mb-2">
+    <div class="col-md-6"><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($customer->created_at)->format('d/m') }}</div>
+    <div class="col-md-6"><strong>Evento:</strong> {{ $customer->campaign_name ?? 'No especificado' }}</div>
+  </div>
+
+  <div class="mb-2"><strong>Nombre completo del contacto:</strong> {{ $customer->contact_name }}</div>
+  <div class="mb-2"><strong>Nombre de la empresa:</strong> {{ $customer->business }}</div>
+  <div class="mb-2"><strong>Celular:</strong> {{ $customer->contact_phone2 }}</div>
+  <div class="mb-2"><strong>Correo:</strong> {{ $customer->contact_email }}</div>
+
+  <div class="mb-2">
+    <strong>Tipo de producto:</strong>
+    {{ $customer->product_mix ?? 'No definido' }} {{-- Aquí puedes concatenar por ejemplo "80% trigo / 20% maíz" si lo capturas como texto --}}
+  </div>
+
+  <div class="mb-2"><strong>Máquina de interés:</strong> {{ optional($customer->product)->name }}</div>
+  <div class="mb-2"><strong>Perfil del cliente:</strong> {{ $customer->position }}</div>
+
+  <div class="mb-2"><strong>Pago realizado:</strong> {{ $customer->payment_status ?? 'No' }}</div>
+  <div class="mb-2"><strong>Fecha aproximada de compra:</strong> {{ $customer->date_bought }}</div>
+  <div class="mb-2"><strong>Observaciones:</strong> {{ $customer->count_empanadas ? $customer->count_empanadas . ' diarias' : $customer->notes }}</div>
+</div>
+
+
 <div class="card-block">
   <form action="customers/{{$customer->id}}/edit">
     {{ csrf_field() }}

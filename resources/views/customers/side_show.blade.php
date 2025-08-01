@@ -156,7 +156,6 @@
         <a href="{{$customer->rd_public_url}}" target="_blank">Buscar en RD Station</a>
         @endif
       </div>
-      @include('customers.alerts')
       @include('customers.contact')
       <br>
 
@@ -170,23 +169,7 @@
     <div id="customer_fallowup">
       @include('customers.actions')
       @include('customers.actions_form')
-
       @include('customers.accordion')
-
-
-
-
-
-
-
-
-
-
-
-      
-
-
-
       @include('customers.historial')
     </div>
 
