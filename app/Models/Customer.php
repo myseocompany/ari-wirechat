@@ -83,9 +83,8 @@ class Customer extends Authenticatable
 
  
 
-
-    function actions(){
-        return $this->hasMany('App\Models\Action');
+    function actions() {
+        return $this->hasMany('App\Models\Action')->orderBy('created_at', 'desc');
     }
 
     function customer_files(){
