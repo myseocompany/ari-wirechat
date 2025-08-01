@@ -6,11 +6,7 @@
 
     {{-- SECCIÓN: INFORMACIÓN DEL EVENTO --}}
     <div class="mb-4 border-bottom pb-2">
-      <h5 class="text-dark">Información del Evento</h5>
-
-      @if(!empty($customer->country))
-        <p><strong>País:</strong> <span class="text-dark">{{ $customer->country }}</span></p>
-      @endif
+      <h5 class="text-dark">Mercadeo</h5>
 
       @if(!empty($customer->campaign_name))
         <p><strong>Campaña:</strong> <span class="text-dark">{{ $customer->campaign_name }}</span></p>
