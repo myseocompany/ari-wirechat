@@ -782,7 +782,9 @@ class CustomerController extends Controller
             ->orderBy("weight", "ASC")
             ->get();
         $customer_sources = CustomerSource::all();
-        $users = User::all();
+        $users = User::where('status_id', 1)
+            ->orderBy("name", "ASC")
+            ->get();
         $scoring_profile = $this->getProfileOptionsOrder();
         $products = Product::all();
         return view('customers.edit', compact('products', 'model', 'customer_statuses', 'users', 'customer_sources', 'scoring_profile'));
