@@ -47,7 +47,12 @@
         {{-- Fecha con enlace a detalle --}}
         <p class="mb-0">
           <a href="/actions/{{ $action->id }}/show" class="text-decoration-none text-muted">
-            {{ $action->created_at->format('d M Y H:i') }}
+            @if($action->created_at)
+              {{ $action->created_at->format('d M Y H:i') }}
+            @else
+              <em class="text-muted">Fecha no disponible</em>
+            @endif
+
           </a>
         </p>
 
