@@ -1,56 +1,65 @@
-@if($customer->actions->count()>0)
-<h2>Acciones</h2>
+@if($customer->actions->count() > 0)
+  <h2>Acciones</h2>
 
-  <table class="table table-striped">
-  <tbody>
-    @foreach($customer->actions as $action)
-    <tr>
-      <td>
-        <div>
-      @if(isset($action->type)&& !is_null($action->type)&& $action->type!='')
-      @if($action->type->id == 27)
-        <i class="fa fa-money"></i>
-      @elseif($action->type->id == 28)
-         <i class="fa fa-bell"></i>
-      @elseif($action->type->id == 29)
-        <i class="fa fa-exclamation-triangle"></i>
-      @endif {{$action->type->name}}@endif
-    </div>
-    @if(isset($action->type)&& !is_null($action->type)&& $action->type!='')
-      @if($action->type->id == 27)
-        <div>
-          Valor: ${{$action->sale_amount}}
-        </div>
-      @endif
-    @endif
-    
-    <div>
-      
-        <a href="/actions/{{$action->id}}/show">
-        {{$action->created_at}}
-        </a>
-      
-    </div>
-    <div>  
-      @if(isset($action->creator)&& !is_null($action->creator)&& $action->creator!=''){{$action->creator->name}}@else Automático @endif
-    </div>
-    <div>  
-      @if($action->type_id==2 || $action->type_id==4) {{$action->getEmailSubject()}} <br> {{$action->note}} @else {{$action->note}}@endif
-      
+  @foreach($customer->actions as $action)
+    <div class="card mb-3 shadow-sm rounded">
+      <div class="card-body">
+        {{-- Título de la acción --}}
+        <h5 class="card-title mb-2">
+          {{ $action->note }}
+          @if($action->type_id == 29)
+            <span class="badge bg-danger">Venta perdida</span>
+          @endif
+        </h5>
 
-       @if((Auth::check()) && (Auth::user()->role_id == 1))
-       <a href="/actions/{{$action->id}}/destroy">
-        <span class="btn btn-sm btn-danger fa fa-trash-o" aria-hidden="true" title="Eliminar"></span>
-      </a>
-      @endif
-    
+        {{-- Tipo de acción e icono --}}
+        <p class="mb-1 text-muted">
+          @if($action->type)
+            @if($action->type->id == 27)
+              <i class="fa fa-money"></i>
+            @elseif($action->type->id == 28)
+              <i class="fa fa-bell"></i>
+            @elseif($action->type->id == 29)
+              <i class="fa fa-exclamation-triangle"></i>
+            @endif
+            {{ $action->type->name }}
+          @endif
+          • Creado por {{ $action->creator->name ?? 'Automático' }}
+        </p>
 
-  </div>
-      </td>
-    </tr>
+        {{-- Datos del cliente --}}
+        <p class="mb-1">
+          <a href="#" class="fw-bold text-primary">
+            {{ $customer->name }}
+          </a>
+          @if($customer->phone)
+            <span class="badge bg-success">
+              <i class="fa fa-phone"></i> {{ $customer->phone }}
+            </span>
+          @endif
+          @if($customer->email)
+            <span class="ms-2">
+              <i class="fa fa-envelope"></i> {{ $customer->email }}
+            </span>
+          @endif
+        </p>
+
+        {{-- Fecha con enlace a detalle --}}
+        <p class="mb-0">
+          <a href="/actions/{{ $action->id }}/show" class="text-decoration-none text-muted">
+            {{ $action->created_at->format('d M Y H:i') }}
+          </a>
+        </p>
+
+        {{-- Admin: opción de eliminar --}}
+        @if(Auth::check() && Auth::user()->role_id == 1)
+          <div class="mt-2">
+            <a href="/actions/{{ $action->id }}/destroy" class="btn btn-sm btn-outline-danger">
+              <i class="fa fa-trash-o"></i> Eliminar
+            </a>
+          </div>
+        @endif
+      </div>
+    </div>
   @endforeach
-
-</tbody>
-</table>
-
 @endif
