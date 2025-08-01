@@ -1,8 +1,6 @@
 @if($customer->actions->count() > 0)
-  <h2>Acciones</h2>
-
+  
   @foreach($customer->actions as $action)
-    <div class="card mb-3 shadow-sm rounded">
       <div class="card-body">
         {{-- Título de la acción --}}
         <h5 class="card-title mb-2">
@@ -60,6 +58,5 @@
           </div>
         @endif
       </div>
-    </div>
   @endforeach
 @endif
