@@ -15,10 +15,10 @@
         ?>
         @if($customer->isBanned())
         <h2 class="mb-2 pb-0" style="border-bottom: 1px solid #fff !important; color:red; "> <i class="fa fa-exclamation-circle" style="color:gray; "></i> 
-          
-          
-
           {{$customer->name}} </h2>
+          @if(!empty($customer->business))
+          <h3>{{$customer->business}}</h3>
+          @endif
 
         @else
 
@@ -45,12 +45,7 @@
         </div>
         @endif
 
-        @include('customers.action_poorly_rated')
-        @include('customers.action_opportunity')
-        @include('customers.action_sale_form')
-        @include('customers.action_spare')
-        @include('customers.action_PQR')
-        @include('customers.action_order')
+
 
         
 
@@ -111,9 +106,16 @@
 
 
       </div>
-      <div class="customer_description">creado el: 
-        {{$customer->created_at}} / 
+      <div class="customer_description">creado / actualizado el: 
+        {{$customer->created_at}} / {{$customer->updated_at}} 
       </div>
+
+              @include('customers.action_poorly_rated')
+        @include('customers.action_opportunity')
+        @include('customers.action_sale_form')
+        @include('customers.action_spare')
+        @include('customers.action_PQR')
+        @include('customers.action_order')
       <!--
       <div>
         <form method="POST" action="/customers/start-chat" id="wire_chat">

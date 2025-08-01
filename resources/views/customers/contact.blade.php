@@ -6,7 +6,7 @@
 
     {{-- SECCIÓN: INFORMACIÓN DEL EVENTO --}}
     <div class="mb-4 border-bottom pb-2">
-      <h5 class="text-primary">Información del Evento</h5>
+      <h5 class="text-dark">Información del Evento</h5>
 
       @if(!empty($customer->country))
         <p><strong>País:</strong> <span class="text-dark">{{ $customer->country }}</span></p>
@@ -24,20 +24,8 @@
         <p><strong>Anuncio:</strong> <span class="text-dark">{{ $customer->ad_name }}</span></p>
       @endif
 
-      @if(!empty($customer->user))
-        <p><strong>Asignado a:</strong> <span class="text-dark">{{ $customer->user->name }}</span></p>
-      @endif
-
       @if(!empty($customer->source))
         <p><strong>Fuente:</strong> <span class="text-dark">{{ $customer->source->name }}</span></p>
-      @endif
-
-      @if(!empty($customer->created_at))
-        <p><strong>Fecha de creación:</strong> <span class="text-dark">{{ $customer->created_at }}</span></p>
-      @endif
-
-      @if(!empty($customer->updated_at))
-        <p><strong>Fecha de actualización:</strong> <span class="text-dark">{{ $customer->updated_at }}</span></p>
       @endif
 
       @if(!empty($customer->updated_user))
@@ -47,7 +35,7 @@
 
     {{-- SECCIÓN: CONTACTO --}}
     <div class="mb-4 border-bottom pb-2">
-      <h5 class="text-primary">Contacto</h5>
+      <h5 class="text-dark">Contacto</h5>
 
       @if(!empty($customer->contact_name))
         <p><strong>Nombre:</strong> <span class="text-dark">{{ $customer->contact_name }}</span></p>
@@ -72,7 +60,7 @@
 
     {{-- SECCIÓN: EMPRESA --}}
     <div class="mb-4 border-bottom pb-2">
-      <h5 class="text-primary">Empresa</h5>
+      <h5 class="text-dark">Empresa</h5>
 
       @if(!empty($customer->business))
         <p><strong>Nombre:</strong> <span class="text-dark">{{ $customer->business }}</span></p>
@@ -89,7 +77,7 @@
 
     {{-- SECCIÓN: INTERÉS COMERCIAL --}}
     <div class="mb-4 border-bottom pb-2">
-      <h5 class="text-primary">Interés Comercial</h5>
+      <h5 class="text-dark">Interés Comercial</h5>
 
       @if(!empty($customer->product))
         <p><strong>Producto consultado:</strong> <span class="text-dark">{{ $customer->product->name }}</span></p>
@@ -114,7 +102,7 @@
 
     {{-- SECCIÓN: NOTAS Y VISITAS --}}
     <div class="mb-4 border-bottom pb-2">
-      <h5 class="text-primary">Notas</h5>
+      <h5 class="text-dark">Notas</h5>
 
       @if(!empty($customer->notes))
         <p><strong>Observaciones:</strong> <span class="text-dark">{{ $customer->notes }}</span></p>
