@@ -1,5 +1,5 @@
 <div class="row mb-4">
-  <div class="col-md-12">
+  <div class="col-md-8">
     <div id="customer_title" class="p-3 bg-white rounded shadow-sm border">
 
       {{-- Nombre con ícono y estado --}}
@@ -48,36 +48,16 @@
         </p>
       @endif
 
-      {{-- Tipo de cliente --}}
-      <p class="mb-2">
-        <strong class="text-secondary">
-          @if($customer->maker == 1) Hace empanadas @endif
-          @if($customer->maker == 0) Proyecto @endif
-          @if($customer->maker == 2) Desmechadora @endif
-        </strong>
-      </p>
+
 
       {{-- Asignado a usuario --}}
       @if($customer->user)
         <p class="text-muted mb-2"><i class="fa fa-user"></i> {{ $customer->user->name }}</p>
       @endif
 
-      {{-- Scoring numérico y estrellas --}}
-      @php $stars = $customer->getScoringToNumber(); @endphp
-      <div class="mb-2">
-        @for ($i = 1; $i <= 4; $i++)
-          <span style="color: {{ $i <= $stars ? 'gold' : 'lightgray' }}; font-size: 18px;">{{ $i <= $stars ? '★' : '☆' }}</span>
-        @endfor
 
-        @if($customer->scoring_interest)
-          <span class="badge bg-secondary ms-2">{{ $customer->scoring_interest }}</span>
-        @endif
-      </div>
 
-      {{-- Estado del cliente --}}
-      @if($customer->status)
-        <span class="badge" style="background-color: {{ $customer->status->color }}">{{ $customer->status->name }}</span>
-      @endif
+
 
       {{-- Cotización --}}
       @if($customer->total_sold)
@@ -103,14 +83,46 @@
         creado: {{ $customer->created_at ?? 'N/A' }} / actualizado: {{ $customer->updated_at ?? 'N/A' }}
       </p>
 
-      {{-- Acciones rápidas --}}
+
+
+    </div>
+  </div>
+  <div class="col-md-4">
+          {{-- Estado del cliente --}}
+      @if($customer->status)
+        <span class="badge" style="background-color: {{ $customer->status->color }}">{{ $customer->status->name }}</span>
+      @endif
+          {{-- Tipo de cliente --}}
+      <p class="mb-2">
+        <strong class="text-secondary">
+          @if($customer->maker == 1) Hace empanadas @endif
+          @if($customer->maker == 0) Proyecto @endif
+          @if($customer->maker == 2) Desmechadora @endif
+        </strong>
+      </p>
+            {{-- Scoring numérico y estrellas --}}
+      @php $stars = $customer->getScoringToNumber(); @endphp
+      <div class="mb-2">
+        @for ($i = 1; $i <= 4; $i++)
+          <span style="color: {{ $i <= $stars ? 'gold' : 'lightgray' }}; font-size: 18px;">{{ $i <= $stars ? '★' : '☆' }}</span>
+        @endfor
+
+        @if($customer->scoring_interest)
+          <span class="badge bg-secondary ms-2">{{ $customer->scoring_interest }}</span>
+        @endif
+      </div>
+  </div>
+
+</div>
+
+<div class="row mb-4">
+  <div class="col-mb-12">
+          {{-- Acciones rápidas --}}
       @include('customers.action_poorly_rated')
       @include('customers.action_opportunity')
       @include('customers.action_sale_form')
       @include('customers.action_spare')
       @include('customers.action_PQR')
       @include('customers.action_order')
-
-    </div>
   </div>
 </div>
