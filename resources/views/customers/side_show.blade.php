@@ -16,9 +16,7 @@
         @if($customer->isBanned())
         <h2 class="mb-2 pb-0" style="border-bottom: 1px solid #fff !important; color:red; "> <i class="fa fa-exclamation-circle" style="color:gray; "></i> 
           {{$customer->name}} </h2>
-          @if(!empty($customer->business))
-          <h3>{{$customer->business}}</h3>
-          @endif
+
 
         @else
 
@@ -30,6 +28,9 @@
           {{$customer->name}}
 
         </h1>
+        @if(!empty($customer->business))
+          <h3>{{$customer->business}}</h3>
+        @endif
         <script>
           function searchInGoogle(search) {
             var url = "https://www.google.com/search?q=" + encodeURIComponent(search);
