@@ -19,7 +19,7 @@
           {{ $action->created_at ? $action->created_at->format('d M Y H:i') : 'Fecha no disponible' }}<br>
           {{ $action->creator->name ?? 'Automático' }}
 
-          @if(Auth::check() && Auth::user()->role_id == 1)
+          @if(Auth::check() && (Auth::user()->role_id == 1 || Auth::user()->role_id == 14))
             <br>
             <a href="/actions/{{ $action->id }}/destroy" class="text-danger" style="font-size: 0.9rem;" title="Eliminar">
               <i class="fa fa-trash-o"></i>
