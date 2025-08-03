@@ -326,5 +326,5 @@
        }
   }
 </script>
-  @include('customers.partials_index.side_show')
+  @include('customers.index_partials.side_show')
 @endsection
