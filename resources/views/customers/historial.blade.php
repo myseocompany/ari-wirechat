@@ -1,73 +1,70 @@
-<h2 class="mt-4">Línea de tiempo del cliente</h2>
+<h2 class="mt-4">Historial de asignación</h2>
 
 @php
-  $timeline = collect();
+  $histories = $customer->histories->sortBy('updated_at'); // orden cronológico ascendente
+  $lastUserId = null;
+  $historiesToShow = collect();
 
-  // Agregamos acciones
-  foreach ($customer->actions as $action) {
-      $timeline->push([
-          'type' => 'action',
-          'date' => $action->created_at,
-          'note' => $action->note,
-          'creator' => $action->creator->name ?? 'Automático',
-          'icon' => $action->type->icon ?? 'fa-sticky-note',
-          'color' => $action->type->color ?? '#0d6efd',
-          'subject' => method_exists($action, 'getEmailSubject') ? $action->getEmailSubject() : null,
-      ]);
+  foreach ($histories as $history) {
+      if ($lastUserId !== $history->user_id) {
+          $historiesToShow->push($history);
+          $lastUserId = $history->user_id;
+      }
   }
 
-  // Agregamos historial
-  foreach ($customer->histories as $history) {
-      $timeline->push([
-          'type' => 'history',
-          'date' => $history->updated_at,
-          'status' => $history->status->name ?? $history->status_id,
-          'assigned_to' => $history->user->name ?? 'Sin asignar',
-          'editor' => $history->updated_user->name ?? 'Desconocido',
-          'color' => $history->status->color ?? 'gray',
-      ]);
-  }
-
-  // Ordenamos por fecha descendente
-  $timeline = $timeline->sortByDesc('date');
+  // Agregamos el estado actual como el más reciente
+  $historiesToShow = $historiesToShow->sortByDesc('updated_at');
 @endphp
 
-<div class="timeline">
-  @foreach($timeline as $item)
-    <div class="mb-3 p-3 rounded shadow-sm" style="border-left: 5px solid {{ $item['color'] }}; background: #f8f9fa;">
-      @if($item['type'] === 'action')
-        <div class="d-flex justify-content-between">
-          <div>
-            <strong>
-              @if($item['icon'])
-                <i class="fa {{ $item['icon'] }}"></i>
-              @endif
-              {{ $item['note'] }}
-            </strong><br>
-            @if($item['subject'])
-              <small class="text-muted">{{ $item['subject'] }}</small>
-            @endif
-          </div>
-          <div class="text-end small text-muted">
-            {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}<br>
-            {{ $item['creator'] }}
-          </div>
+<ul class="list-group">
+  @foreach($historiesToShow as $history)
+    @php
+      $status = $history->status->name ?? $history->status_id;
+      $statusColor = $history->status->color ?? 'gray';
+      $assignedTo = $history->user->name ?? 'Sin asignar';
+      $editor = $history->updated_user->name ?? 'Desconocido';
+    @endphp
+
+    <li class="list-group-item border-start border-4" style="border-left-color: {{ $statusColor }}">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <a href="/customers/history/{{$history->id}}/show" class="fw-bold text-decoration-none">
+            {{ \Carbon\Carbon::parse($history->updated_at)->format('d M Y H:i') }}
+          </a><br>
+          <span class="text-muted small">
+            Asignado a <strong>{{ $assignedTo }}</strong><br>
+            Modificado por <strong>{{ $editor }}</strong><br>
+            Estado: {{ $status }}
+          </span>
         </div>
-      @elseif($item['type'] === 'history')
-        <div class="d-flex justify-content-between">
-          <div>
-            <strong>Actualización de estado</strong><br>
-            <small class="text-muted">
-              Estado <strong>{{ $item['status'] }}</strong>,
-              asignado a <strong>{{ $item['assigned_to'] }}</strong><br>
-              Modificado por <strong>{{ $item['editor'] }}</strong>
-            </small>
-          </div>
-          <div class="text-end small text-muted">
-            {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}
-          </div>
-        </div>
-      @endif
-    </div>
+        <span class="badge" style="background-color: {{ $statusColor }}">
+          {{ \Carbon\Carbon::parse($history->updated_at)->diffForHumans() }}
+        </span>
+      </div>
+    </li>
   @endforeach
-</div>
+
+  {{-- Estado actual --}}
+  @php
+    $currentUser = $customer->user->name ?? 'Sin asignar';
+    $currentStatus = $customer->status->name ?? '';
+    $statusColor = $customer->status->color ?? 'gray';
+    $editor = $customer->updated_user->name ?? 'Desconocido';
+  @endphp
+
+  <li class="list-group-item list-group-item-light border-start border-4" style="border-left-color: {{ $statusColor }}">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <strong>Ahora</strong><br>
+        <span class="text-muted small">
+          Asignado a <strong>{{ $currentUser }}</strong><br>
+          Modificado por <strong>{{ $editor }}</strong><br>
+          Estado: {{ $currentStatus }}
+        </span>
+      </div>
+      <span class="badge" style="background-color: {{ $statusColor }}">
+        {{ \Carbon\Carbon::parse($customer->updated_at)->diffForHumans() }}
+      </span>
+    </div>
+  </li>
+</ul>

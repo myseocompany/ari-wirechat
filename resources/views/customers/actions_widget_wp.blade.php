@@ -1,3 +1,4 @@
+<!--
 <style>
     #actions_display {
         max-height: 300px;
@@ -69,3 +70,4 @@
         </div>
     @endforeach
 </div>
+-->
