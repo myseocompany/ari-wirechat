@@ -116,12 +116,12 @@
     {{-- Acciones rápidas --}}
     <div class="row">
       <div class="col-md-12">
-        @include('customers.action_poorly_rated')
-        @include('customers.action_opportunity')
-        @include('customers.action_sale_form')
-        @include('customers.action_spare')
-        @include('customers.action_PQR')
-        @include('customers.action_order')
+        @include('customers.partials.action_poorly_rated')
+        @include('customers.partials.action_opportunity')
+        @include('customers.partials.action_sale_form')
+        @include('customers.partials.action_spare')
+        @include('customers.partials.action_PQR')
+        @include('customers.partials.action_order')
       </div>
     </div>
 

@@ -40,7 +40,7 @@
       
       </button>
       <div class="navbar-collapse collapse" id="navbarsExampleDefault" style="">
-        @include('customers.index.side_nav')
+        @include('customers.partials.side_nav')
       </div>
 
         

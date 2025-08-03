@@ -247,10 +247,10 @@
 
         @include('customers.show_partials.actions_widget')
 
-        @include('customers.show_partials.action_opportunity')
-        @include('customers.show_partials.action_sale_form')
-        @include('customers.show_partials.action_PQR')
-        @include('customers.show_partials.action_spare')
+        @include('customers.partials.action_opportunity')
+        @include('customers.partials.action_sale_form')
+        @include('customers.partials.action_PQR')
+        @include('customers.partials.action_spare')
         <div class="card">
           <div class="card-body">
 
