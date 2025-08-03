@@ -43,7 +43,7 @@
                     <span class="meta">
                         {{ $action->creator->name ?? 'Automático' }}
                     </span><br>
-                    @if(Auth::check() && Auth::user()->role_id == 1)
+                    @if(Auth::check() && (Auth::user()->role_id == 1 || Auth::user()->role_id == 14 ) )
                         <a href="/actions/{{$action->id}}/destroy" class="text-danger small">
                             <i class="fa fa-trash-o"></i> Eliminar
                         </a>
