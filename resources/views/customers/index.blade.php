@@ -191,7 +191,7 @@
 @endsection
 
 @section('filter')
- @include('customers.index.side_filter')
+ @include('customers.index_partials.side_filter')
 @endsection
 
 
@@ -326,5 +326,5 @@
        }
   }
 </script>
-  @include('customers.side_show')
+  @include('customers.partials_index.side_show')
 @endsection

@@ -6,7 +6,7 @@
 } ?>
 
 @if($customer != null)
-@include('customers.partials.customer_header')
+@include('customers.index_partials.customer_header')
 
 <div class="row">
   <div class="col-md-4">
@@ -19,7 +19,7 @@
         <a href="{{$customer->rd_public_url}}" target="_blank">Buscar en RD Station</a>
         @endif
       </div>
-      @include('customers.contact')
+      @include('customers.index_partials.contact')
       <br>
 
     </div>
@@ -30,10 +30,10 @@
   <!-- segunda columna -->
   <div class="col-md-8">
     <div id="customer_fallowup">
-      @include('customers.actions')
-      @include('customers.actions_form')
-      @include('customers.accordion')
-      @include('customers.historial')
+      @include('customers.index_partials.actions')
+      @include('customers.index_partials.actions_form')
+      @include('customers.index_partials.accordion')
+      @include('customers.index_partials.historial')
     </div>
 
   </div>

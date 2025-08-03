@@ -243,14 +243,14 @@
       <!-- Segunda columna -->
 
       <div class="col-md-8">
-        @include('customers.actions_widget_wp')
+        @include('customers.show_partials.actions_widget_wp')
 
-        @include('customers.actions_widget')
+        @include('customers.show_partials.actions_widget')
 
-        @include('customers.action_opportunity')
-        @include('customers.action_sale_form')
-        @include('customers.action_PQR')
-        @include('customers.action_spare')
+        @include('customers.show_partials.action_opportunity')
+        @include('customers.show_partials.action_sale_form')
+        @include('customers.show_partials.action_PQR')
+        @include('customers.show_partials.action_spare')
         <div class="card">
           <div class="card-body">
 
