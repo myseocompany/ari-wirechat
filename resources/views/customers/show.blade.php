@@ -168,7 +168,7 @@
               @endif
               @endif
               <button class="btn btn-primary btn-sm" id="btnCopiar" size="5"> POA</button>
-              <a href="/customers/{{ $model->id }}/quotes/create">
+              <a href="/orders/create/{{ $model->id }}">
                 <span class="btn btn-primary btn-sm" aria-hidden="true" title="Eliminar">Cotizar</span>
               </a>
             </div>
