@@ -517,7 +517,7 @@ class OrderController extends Controller{
         $customer_id = $order->customer_id;
         $customer = Customer::find($customer_id);
 
-       return view('quotes.show', compact('order', 'orderProduct','user','customer','count'));
+       return view('orders.quote', compact('order', 'orderProduct','user','customer','count'));
     }
 
 
@@ -824,7 +824,7 @@ public function storeProduct(Request $request){
     {
         $model = Order::find($oid);
 
-        return view('quotes.show', compact('model'));
+        return view('orders.quote', compact('model'));
 
     }
     
@@ -832,7 +832,7 @@ public function storeProduct(Request $request){
     {
     $model = Order::find($oid);
 
-    return view('quotes.show_co', compact('model'));
+    return view('orders.quote_co', compact('model'));
 
    
     }

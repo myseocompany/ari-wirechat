@@ -16,10 +16,12 @@
 		</a>
 		|
 		<a href="/orders/{{ $model->id }}/delete"> Eliminar</a>
+		<!--
 		|
 		<a href="/orders/{{ $model->id }}/proforma"> Proforma Internacional</a>
 		|
 		<a href="/orders/{{ $model->id }}/proforma_co"> Proforma Nacional</a>
+-->
 
 	</div>
 <form action="/orders/{{$model->id}}/update" method="POST" class="form-group">
