@@ -260,7 +260,7 @@
         @include('customers.partials.action_spare')
 
 
-        <!-- inicio acordeon
+        <!-- inicio acordeon -->
 
 
       <div class="card">
@@ -846,7 +846,7 @@
         </div>
 
       </div>
-        fin acorden-->
+       <!-- fin acordeon -->
       </div>
 
 
