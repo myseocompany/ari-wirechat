@@ -6,37 +6,54 @@
 
 
       @if($customer->orders->count() > 0)
-      <div class="mb-4 border-bottom pb-2">
-        <h5 class="text-dark">Cotizaciones del cliente</h5>
+  <div class="mb-4 border-bottom pb-2">
+    <h5 class="text-dark">Cotizaciones del cliente</h5>
 
-        <div class="row">
-          @foreach($customer->orders as $order)
-            <div class="col-md-12">
-              <div class="card mb-3 shadow-sm border">
-                <div class="card-body p-3">
-                  <h6 class="card-title text-warning">
-                    Cotización #{{ $order->id }}
-                  </h6>
-                  <p class="mb-1"><strong>Fecha:</strong> {{ $order->created_at->format('d/m/Y') }}</p>
-                  <p class="mb-1"><strong>Total:</strong> ${{ number_format($order->getTotal() ?? 0, 0, ',', '.') }}</p>
-                  <p class="mb-1">
-                    <strong>Estado:</strong> 
-                    @if($order->status)
-                      <span class="badge" style="background-color: {{ $order->status->color }}">{{ $order->status->name }}</span>
-                    @else
-                      <span class="badge bg-secondary">Sin estado</span>
-                    @endif
-                  </p>
-                  <a href="/orders/{{ $order->id }}/show" class="btn btn-sm btn-outline-primary mt-2 w-100">
-                    Ver cotización
-                  </a>
-                </div>
-              </div>
+    <div class="row">
+      @foreach($customer->orders as $order)
+        <div class="col-md-12">
+          <div class="card mb-3 shadow-sm border">
+            <div class="card-body p-3">
+              <h6 class="card-title text-warning">
+                Cotización #{{ $order->id }}
+              </h6>
+              <p class="mb-1"><strong>Fecha:</strong> {{ $order->created_at->format('d/m/Y') }}</p>
+              
+              {{-- Productos cotizados --}}
+              @if($order->productList->count() > 0)
+                <p class="mb-1"><strong>Productos:</strong></p>
+                <ul class="mb-2">
+                  @foreach($order->productList as $product)
+                    <li>
+                      {{ $product->quantity }} × {{ $product->product->name ?? 'Producto eliminado' }}
+                      @if($product->price)
+                        - ${{ number_format($product->price, 0, ',', '.') }}
+                      @endif
+                    </li>
+                  @endforeach
+                </ul>
+              @endif
+
+              <p class="mb-1"><strong>Total:</strong> ${{ number_format($order->getTotal() ?? 0, 0, ',', '.') }}</p>
+              <p class="mb-1">
+                <strong>Estado:</strong> 
+                @if($order->status)
+                  <span class="badge" style="background-color: {{ $order->status->color }}">{{ $order->status->name }}</span>
+                @else
+                  <span class="badge bg-secondary">Sin estado</span>
+                @endif
+              </p>
+              <a href="/orders/{{ $order->id }}/show" class="btn btn-sm btn-outline-primary mt-2 w-100">
+                Ver cotización
+              </a>
             </div>
-          @endforeach
+          </div>
         </div>
-      </div>
-    @endif
+      @endforeach
+    </div>
+  </div>
+@endif
+
 
     {{-- SECCIÓN: INFORMACIÓN DEL EVENTO --}}
     <div class="mb-4 border-bottom pb-2">
