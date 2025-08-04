@@ -93,7 +93,7 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     // Rutas con parámetros específicos
     Route::get('/{customer}/edit', [CustomerController::class, 'edit'])->whereNumber('customer');
     Route::post('/{customer}/update', [CustomerController::class, 'update'])->whereNumber('customer');
-    Route::get('/{customer}/show', [CustomerController::class, 'show'])->whereNumber('customer');
+    Route::get('/{customer}/show', [CustomerController::class, 'show'])->whereNumber('customer')->name('customers.show');
     Route::get('/{customer}/show/{action}', [CustomerController::class, 'showAction'])->whereNumber('customer');
     Route::get('/{customer}/destroy', [CustomerController::class, 'destroy'])->whereNumber('customer');
     Route::post('/{customer}/action/store', [CustomerController::class, 'storeAction'])->whereNumber('customer');
