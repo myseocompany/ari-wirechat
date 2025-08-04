@@ -243,9 +243,9 @@
       <!-- Segunda columna -->
 
       <div class="col-md-8">
+        @include('customers.show_partials.actions_form')
         @include('customers.show_partials.actions_widget_wp')
 
-        @include('customers.show_partials.actions_widget')
 
         @include('customers.partials.action_opportunity')
         @include('customers.partials.action_sale_form')

@@ -11,7 +11,7 @@ use App\CustomerSource;
 use App\Product;
 use App\User;
 use App\CustomerFile;
-use App\Order;
+use App\Models\Order;
 
 
 class OptimizerController extends Controller{

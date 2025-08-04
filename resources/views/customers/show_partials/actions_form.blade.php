@@ -67,5 +67,5 @@ function toggleDateInput() {
     dateContainer.style.display = checkbox.checked ? 'block' : 'none';
 }
 </script>
- @include('customers.status_table', ["statuses_options"=>$statuses_options])
-  @include('customers.actions_table', ["action_options"=>$action_options])
+@include('customers.status_table', ["statuses_options"=>$statuses_options])
+@include('customers.actions_table', ["action_options"=>$action_options])

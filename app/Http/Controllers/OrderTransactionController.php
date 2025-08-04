@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
-use App\Order;
+use App\Models\Order;
 use App\OrderStatus;
 use App\User;
 use App\Category;

@@ -1,54 +1,84 @@
+<h2 class="mt-4">Acciones</h2>
 
-<h2>Acciones</h2>
-<div>
-  <form action="/customers/{{$customer->id}}/action/store" method="POST">
-    {{ csrf_field() }}
-    <div>
-      @if(isset($actionProgramed))
-      <input type="hidden" name="ActionProgrameId" value="{{$actionProgramed->id}}">
-      <h3>Acción pendiente: <strong>{{$actionProgramed->note}}</strong></h3>
-      @endif
-      <textarea name="note" id="note" cols="30" rows="5" required="required"></textarea>
-    </div>
-    <div>
-     <select name="type_id" id="type_id" required>
-      @foreach($action_options as $action_option)
-      <option value="{{$action_option->id}}">{{$action_option->name}}</option>
-      @endforeach
-    </select>
-    @include('customers.actions_table', ["action_options"=>$action_options])
-    
-    <button class="btn btn-link" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
-      <span id="helpButtonAction" style="cursor:pointer; color:blue;">  
-        <i class="fa fa-question-circle question"></i>
-      </span>
-    </button>
+<div class="card shadow-sm p-3 mb-4">
+    <form action="/customers/{{$customer->id}}/action/store" method="POST" enctype="multipart/form-data">
+        @csrf
 
-    <select name="status_id" id="status_id">
-      <option value="">Seleccione un estado</option>
-      @foreach($statuses_options as $status_option)
-      <option value="{{$status_option->id}}">{{$status_option->name}}</option>
-      @endforeach
-    </select>
+        {{-- Acción programada previa --}}
+        @if(isset($actionProgramed))
+            <div class="alert alert-info">
+                <strong>Acción pendiente:</strong> {{$actionProgramed->note}}
+                <input type="hidden" name="ActionProgrameId" value="{{$actionProgramed->id}}">
+            </div>
+        @endif
 
-    @include('customers.status_table', ["statuses_options"=>$statuses_options])
-    
-    <button class="btn btn-link" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
-      <span id="helpButtonStatus" style="cursor:pointer; color:blue;">  
-        <i class="fa fa-question-circle question"></i>
-      </span>
-    </button>
+        {{-- Nota --}}
+        <div class="form-group mb-3">
+            <textarea name="note" id="note" rows="4" class="form-control" placeholder="Escribe la nota..." required></textarea>
+        </div>
 
-      </div>
-      <div style="margin-bottom:1rem;">
-        <label for="example-datetime-local-input" class="col-form-label">Fecha y hora</label>
-        <div>
-         <input class="form-control" name="date_programed" type="datetime-local"  id="example-datetime-local-input">
-       </div>
-     </div>
-     <div>
-      <input class="btn btn-primary btn-sm" type="submit" value="Enviar acción">
-      <input type="hidden" id="customer_id" name="customer_id" value="{{$customer->id}}">
-    </div>
-  </form>
+        {{-- Estado y Tipo de Acción --}}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="status_id" class="form-label">Estado</label>
+                <select name="status_id" id="status_id" class="form-control">
+                    <option value="">Seleccione un estado</option>
+                    @foreach($statuses_options as $status_option)
+                        <option value="{{$status_option->id}}">{{$status_option->name}}</option>
+                    @endforeach
+                </select>
+                @include('customers.status_table', ["statuses_options"=>$statuses_options])
+                <button class="btn btn-link p-0" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
+                    <i class="fa fa-question-circle text-primary" id="helpButtonStatus"></i>
+                </button>
+            </div>
+
+            <div class="col-md-6">
+                <label for="type_id" class="form-label">Tipo de acción</label>
+                <select name="type_id" id="type_id" class="form-control" required>
+                    @foreach($action_options as $action_option)
+                        <option value="{{$action_option->id}}">{{$action_option->name}}</option>
+                    @endforeach
+                </select>
+                @include('customers.actions_table', ["action_options"=>$action_options])
+                <button class="btn btn-link p-0" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
+                    <i class="fa fa-question-circle text-primary" id="helpButtonAction"></i>
+                </button>
+            </div>
+        </div>
+
+        {{-- Archivo (opcional) --}}
+        <div class="form-group mb-3">
+            <input type="file" class="form-control" id="file" name="file">
+        </div>
+
+        {{-- Toggle programación --}}
+        <div class="form-group mb-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="toggleDate" onclick="toggleDateInput()">
+                <label class="form-check-label" for="toggleDate">Programar acción</label>
+            </div>
+        </div>
+
+        {{-- Campo fecha (inicialmente oculto) --}}
+        <div class="form-group mb-4" id="dateInputContainer" style="display: none;">
+            <label for="example-datetime-local-input" class="form-label">Fecha y hora</label>
+            <input class="form-control" name="date_programed" type="datetime-local" id="example-datetime-local-input">
+        </div>
+
+        {{-- Botón submit --}}
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary w-100">Guardar acción</button>
+        </div>
+
+        <input type="hidden" id="customer_id" name="customer_id" value="{{$customer->id}}">
+    </form>
 </div>
+
+<script>
+    function toggleDateInput() {
+        const checkbox = document.getElementById('toggleDate');
+        const dateContainer = document.getElementById('dateInputContainer');
+        dateContainer.style.display = checkbox.checked ? 'block' : 'none';
+    }
+</script>

@@ -84,7 +84,7 @@
 
 
 </table>
-{ $model->appends(request()->input())->links() }}
+{{ $model->appends(request()->input())->links() }}
 
 
 @endsection
