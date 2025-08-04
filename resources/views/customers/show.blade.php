@@ -258,14 +258,10 @@
         @include('customers.partials.action_sale_form')
         @include('customers.partials.action_PQR')
         @include('customers.partials.action_spare')
-        <div class="card">
-          <div class="card-body">
 
 
-          </div>
-        </div>
-      </div>
-      <br>
+        <!-- inicio acordeon
+
 
       <div class="card">
         <div class="card-body">
@@ -831,50 +827,7 @@
 
               <br>
 
-              <h2>Historial</h2>
-              <div class="table-responsive">
-                  <ul class="list-group">
-                      <?php $now = Carbon\Carbon::now(); ?>
-                      @foreach($histories as $history)
-                      <li class="list-group-item">
-                          <a href="/customers/history/{{$history->id}}/show">{{$history->updated_at}} </a>
-                          @if(isset($history->updated_user)) Modificado por <strong>{{$history->updated_user->name}}. </strong>@endif
-                          Estado<strong>
-                              @if (isset($history->status) && ($history->status != ''))
-                              {{$history->status->name}}
-                              @else
-                              {{$history->status_id}}
-                              @endif
-                          </strong>,
-                          @if(isset($history->user) && ($history->user_id != '') && !is_null($history->user))asignado a <strong>{{$history->user->name}}</strong> @else sin asignar @endif
-                          <span class="badge" style="background-color: @if(isset($history->status) && ($history->status != '')) {{$history->status->color}};@else gray @endif">
-                              <?php
-                              $end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $history->updated_at);
-                              ?>
-                              {{ $end->diffForHumans($now) }}
-                          </span>
-                      </li>
-                      @endforeach
-                      <li class="list-group-item">
-                          {{$model->updated_at}}
-                          @if((isset($model->updated_user) and $model->updated_user_id!= Null)) Modificado por <strong>{{$model->updated_user->name}} </strong>.@endif
-                          <strong>@if(isset($model->status)&& !is_null($model->status)&&$model->status!='')Estado {{$model->status->name}}@endif</strong>
-                          @if(isset($model->user) && ($model->user_id != '') && !is_null($model->user)) asignado a <strong>{{$model->user->name}}</strong> @else sin asignar @endif
-                          <span class="badge" style="background-color: @if(isset($model->status)&& !is_null($model->status)&&$model->status!=''){{$model->status->color}}@else gray @endif;">
-                              <?php
-                              if ($model->updated_at == null && ($model->created_at != null))
-                                  $model->updated_at = $model->created_at;
-              
-                              if ($model->updated_at == null && ($model->created_at == null))
-                                  $model->updated_at = \Carbon\Carbon::now();
-              
-                              $end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $model->updated_at);
-                              ?>
-                              {{ $end->diffForHumans($now) }}
-                          </span>
-                      </li>
-                  </ul>
-              </div>
+              @include('customers.show_partials.history')
 
               @endif
 
@@ -893,65 +846,12 @@
         </div>
 
       </div>
-      <div class="row">
-
-
-
-
-
-
-
-        <div class="col-md-6">
-
-
-
-
-          <!-- <div class="row"><div class="col-md-6"><span class="lavel"><strong>Notas:</strong></span></div> <div class="col-md-6"></div></div> -->
-        </div>
-
+        fin acorden-->
       </div>
-
-
-
-
-      <br>
 
 
   </form>
-  <div>
-    <input type="submit" value="Asignar una audiencia" data-toggle="modal" data-target="#customer" class="btn btn-primary btn-sm" style="margin-top:5px;" size="3">
-    <form action="/customers/{{$model->id}}/audience" method="POST">
-      {{ csrf_field() }}
-      <div class="modal" id="customer">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">¿A que audiencia desea asignar al lead?</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-              <br>
-              <label for="">Audiencias:</label>
-              <input type="text" id="customer_id" name="customer_id" value="{{$model->id}}" hidden>
-              <select name="audience_id" id="audience_id" class="form-control">
-                @foreach($audiences as $item)
-                <option value="{{$item->id}}">{{$item->name}}</option>
-                @endforeach
-              </select>
-
-              <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-
-              <input type="submit" value="Asignar" class="btn btn-primary " size="7">
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-    </form>
-
-
-  </div>
+  
   <script>
     document.getElementById("btnCopiar").addEventListener("click", function() {
       var textoCopiar = "https://arichat.co/metadata/{{$model->id}}/create/poe/40";
@@ -968,15 +868,4 @@
     });
   </script>
 </div>
-
-
-
-<br>
-<br>
-
-
-<br>
-<br>
-
-
 @endsection

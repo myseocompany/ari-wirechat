@@ -720,8 +720,13 @@ class CustomerController extends Controller
     {
         $model = Customer::find($id);
         $action_options = ActionType::orderby('weigth')->get();
-        $actions = Action::where('customer_id', '=', $id)->orderby("created_at", "DESC")->get();
-        $histories = CustomerHistory::where('customer_id', '=', $id)->get();
+        $actions = Action::where('customer_id', '=', $id)
+            ->orderby("created_at", "DESC")
+            ->get();
+        $histories = CustomerHistory::where('customer_id', '=', $id)
+            ->orderby("updated_at", "DESC")
+            ->get();
+
         $email_options = Email::where('type_id', '=', 1)->where('active', '=', '1')->get();
         $statuses_options = CustomerStatus::
             where('status_id', 1)
