@@ -675,7 +675,7 @@ class CustomerController extends Controller
         $this->sendToRDStationFromCRM($model);
         if ($model->save()) {
             $this->storeActionHandbook($model);
-            $this->sendWelcomeMail($model);
+            //$this->sendWelcomeMail($model);
             return redirect('leads?customer_id=' . $model->id)->with('status', 'El Cliente <strong>' . $model->name . '</strong> fué añadido con éxito!');
         }
     }
@@ -687,6 +687,7 @@ class CustomerController extends Controller
         $this->storeEmailAction($email, $customer, "Correo automático de notificación");
         return back();
     }
+
     public function storeEmailAction($mail, $customer, $note)
     {
         $today = Carbon\Carbon::now();
