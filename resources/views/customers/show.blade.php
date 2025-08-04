@@ -51,6 +51,9 @@
     <div class="row">
       <!-- Primera columna -->
       <div class="col-md-4">
+
+      
+
         <div class="card">
           <h5 class="card-title card-header">Detalles</h5>
           <div class="card-body">
@@ -180,6 +183,7 @@
           </div>
         </div>
         <br>
+        @include('customers.show_partials.orders')
         <div class="card">
           <h5 class="card-title card-header">Dirección</h5>
           <div class="card-body">
