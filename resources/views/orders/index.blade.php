@@ -45,7 +45,7 @@
         </div>
         <div>
           <strong>{{ $item->customer->name ?? 'Desconocido' }}</strong><br>
-          <small>{{ $item->customer->email ?? '' }}</small>
+          <small>{{ $item->customer->getPhone() ?? '' }}</small>
         </div>
       </td>
 
@@ -62,7 +62,7 @@
       </div>
       <div>
         <strong>{{ $item->user->name ?? 'Sin asignar' }}</strong><br>
-        <small>{{ $item->user->email ?? '' }}</small>
+        
       </div>
     </td>
 
