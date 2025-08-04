@@ -26,9 +26,9 @@
     <tr>
       
       <td>
-        @if($item->status)
-          <span class="badge" style="background-color: {{ $item->status->color }}">
-            {{ $item->status->name }}
+        @if($item->customer->status)
+          <span class="badge" style="background-color: {{ $item->customer->status->color }}">
+            {{ $item->customer->status->name }}
           </span>
         @else
           <span class="badge bg-secondary">Sin estado</span>
