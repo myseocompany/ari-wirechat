@@ -25,7 +25,7 @@
       <!-- segunda columna -->
       <div class="col-md-8">
         <div id="customer_fallowup">
-          @include('customers.index_partials.actions_form')
+          @include('customers.index.actions_form')
           @include('customers.index_partials.time_line')
           @include('customers.index_partials.accordion')
         </div>
