@@ -41,10 +41,12 @@ class Order extends Model
 	function customer(){
         return $this->belongsTo('App\Models\Customer');
     }
-    function User(){
-        return $this->belongsTo('App\Models\User')->where('status_id', 1);
-        
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
+
 
     function updatedUser(){
         return $this->belongsTo('App\Models\User', 'updated_user_id');
@@ -74,6 +76,12 @@ class Order extends Model
 
     function products(){
     	return $this->belongsToMany('App\Models\Product', 'order_products');	
+    }
+
+
+    public function firstProductName()
+    {
+        return optional($this->products->first())->name ?? '—';
     }
 
     function productList(){

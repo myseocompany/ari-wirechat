@@ -1,90 +1,113 @@
 @extends('layout')
 
 @section('content')
-<h1>Ordenes</h1>
+<h2 class="mb-4">Órdenes</h2>
 
 @include('orders.dashboard')
 @include('orders.filter')
 
-@php
-    $total_payments = Array();
-    if(isset($payments))
-      foreach($payments as $item){
-        $total_payments[$item->id] = 0;
-      }
-    
-@endphp
-
-<table class="table">
-<tr>
-
-	<th>Cliente</th>
-  <th>Fecha entrega</th>
-  <th>Estado</th>
-  <th>Valor</th>
-
-</tr>
-<?php $i=1;?> 
-
-@foreach($model as $item)
-<tr class="order_row">
-  
-  <td>
-    <div><strong>OrderID:</strong> {{$item->id}} @if(isset($item->user))<strong>Atendido por</strong> {{$item->user->name}}@endif</div>
-    <div>{{$item->delivery_address}}</div>
-    <div><a href="/products/{{$item->product_id}}/show">{{$item->name}}</a></div>
-    <div>@if(isset($item->customer))
-      <a href="/orders/{{$item->id}}/show">{{$item->customer->name}}</a>
-    @endif</div>
-    <div>
-      @if(isset($item->payment))
-      {{$item->payment->name}}
-      @endif
-    </div>
-    <div>
-      <i>{{$item->created_at}}</i>
-    </div>
-
-    @if($item->notes != null or $item->notes != "")
-    <div class="order_notes">
-      {{$item->notes}}
-    </div>
-
-    @endif
-  </td>
-  
-  
-
-  <td>{{$item->delivery_date}}</td>
-  @if(isset($item->status))
-  <td>{{$item->status->name}}</td>
-  @else
-  <td></td>
-  @endif
-  <td class="text-right">$ {{number_format($item->getTotal(), 0)}}</td>
-
-</tr>
-
-
-@php
-  if(isset($item->payment_id) && ($item->payment_id != ""))
-  $total_payments[$item->payment_id] += $item->getTotal();
-@endphp
-@endforeach
-@if(isset($payments))
-  @foreach($payments as $item)
-    
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+  <thead class="table-light">
     <tr>
-      <td colspan="3" class="text-right"><strong>{{$item->name}}:</strong></td>  
-      <td class="text-right">$ {{number_format($total_payments[$item->id])}}</td>
+      <th>Factura</th>
+      <th>Estado</th>
+      <th>Cliente</th>
+      <th>Producto</th>
+      <th>Asesor</th> {{-- ← NUEVA COLUMNA --}}
+      <th>Método</th>
+      <th>Entrega</th>
+      <th>Total</th>
+      <th></th>
     </tr>
-  @endforeach
+  </thead>
+  <tbody>
+    @foreach($model as $item)
+    <tr>
+      <td><span class="badge bg-primary">{{ $item->id }}</span></td>
+
+      <td>
+        @if($item->status)
+          <span class="badge" style="background-color: {{ $item->status->color }}">
+            {{ $item->status->name }}
+          </span>
+        @else
+          <span class="badge bg-secondary">Sin estado</span>
+        @endif
+      </td>
+
+      <td class="d-flex align-items-center">
+        @php
+          $initials = strtoupper(Str::substr($item->customer->name ?? '??', 0, 2));
+        @endphp
+        <div class="rounded-circle bg-success text-white me-2 d-flex justify-content-center align-items-center" style="width: 36px; height: 36px;">
+          {{ $initials }}
+        </div>
+        <div>
+          <strong>{{ $item->customer->name ?? 'Desconocido' }}</strong><br>
+          <small>{{ $item->customer->email ?? '' }}</small>
+        </div>
+      </td>
+
+      <td>{{ $item->firstProductName() }}</td>
+
+    <td class="d-flex align-items-center">
+      @php
+        $userName = $item->user->name ?? '??';
+        $initials = collect(explode(' ', $userName))->map(fn($s) => strtoupper(substr($s, 0, 1)))->implode('');
+      @endphp
+
+      <div class="rounded-circle bg-primary text-white me-2 d-flex justify-content-center align-items-center" style="width: 36px; height: 36px;">
+        {{ $initials }}
+      </div>
+      <div>
+        <strong>{{ $item->user->name ?? 'Sin asignar' }}</strong><br>
+        <small>{{ $item->user->email ?? '' }}</small>
+      </div>
+    </td>
+
+
+      <td>{{ $item->payment->name ?? '-' }}</td>
+
+      <td>
+        <span class="badge bg-light text-danger">
+          {{ optional($item->delivery_date)->format('h:i A') }}<br>
+          {{ optional($item->delivery_date)->format('d M, Y') }}
+        </span>
+      </td>
+
+      <td class="text-end">
+        <strong>$ {{ number_format($item->getTotal(), 0, ',', '.') }}</strong>
+      </td>
+
+      <td class="text-end">
+        <a href="/orders/{{ $item->id }}/show" class="text-primary me-2" title="Ver"><i class="fa fa-eye"></i></a>
+        <a href="/orders/{{ $item->id }}/edit" class="text-warning" title="Editar"><i class="fa fa-edit"></i></a>
+      </td>
+    </tr>
+    @endforeach
+  </tbody>
+</table>
+
+</div>
+
+{{-- Totales por método de pago --}}
+@if(isset($payments))
+  <div class="mt-4">
+    <h5>Totales por forma de pago</h5>
+    <ul class="list-group">
+      @foreach($payments as $item)
+        <li class="list-group-item d-flex justify-content-between">
+          <strong>{{ $item->name }}</strong>
+          <span>$ {{ number_format($total_payments[$item->id] ?? 0, 0, ',', '.') }}</span>
+        </li>
+      @endforeach
+    </ul>
+  </div>
 @endif
 
-
-
-</table>
-{{ $model->appends(request()->input())->links() }}
-
+<div class="mt-4">
+  {{ $model->appends(request()->input())->links() }}
+</div>
 
 @endsection
