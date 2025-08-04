@@ -150,7 +150,7 @@
         <a href="/customers/{{$customer->id}}/assignMe" class="btn btn-sm btn-primary">Asignarme</a>
       @endif
 
-      @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 10)
+      @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 10 || Auth::user()->role_id == 14 || Auth::user()->role_id == 12)
         <a href="/customers/{{ $customer->id }}/destroy" class="btn btn-sm btn-danger" title="Eliminar">Eliminar</a>
 
         {{-- Datos para RD --}}
