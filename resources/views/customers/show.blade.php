@@ -250,7 +250,7 @@
       <!-- Segunda columna -->
 
       <div class="col-md-8">
-        @include('customers.show_partials.actions_form')
+        @include('customers.partials.actions_form')
         @include('customers.show_partials.actions_widget_wp')
 
 
