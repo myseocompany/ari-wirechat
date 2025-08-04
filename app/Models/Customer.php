@@ -367,5 +367,11 @@ class Customer extends Authenticatable
     
         return '#000000'; // Negro por defecto si no tiene estado
     }
+
     
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
 }

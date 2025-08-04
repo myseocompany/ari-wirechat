@@ -18,10 +18,8 @@
      por @if(isset($history->updatedUser) && ($history->updatedUser != '') && !is_null($history->updatedUser)) <strong>{{$history->updatedUser->name}}</strong>  @else <strong>Desconocido</strong> @endif
     {{$history->user_ip}} - {{$history->unique_machine}}
      <span class="badge" style="background-color: @if(isset($history->status) && ($history->status_id != '')) {{$history->status->color}};@else gray @endif">
-	 @php
-          $end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $history->updated_at);
-          echo $end->diffForHumans($now);
-        @endphp
+{{ $history->updated_at->diffForHumans() }}
+
       </span>
 	</li>
     @endforeach
