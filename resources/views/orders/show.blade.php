@@ -287,6 +287,34 @@
 						</div>
 					</div>
 				</div>
+				<div class="col-md-12 col-sm-12">
+					<div class="row">
+						<label class="col-6">Estado de la orden:</label>
+						<div readonly id="" name="" class="col-6" >
+							
+							<select disabled name="status_id" id="status_id"  class="form-control">
+								@foreach($statuses as $item)
+								<option value="{{$item->id}}" @if($model->status_id == $item->id) selected @endif>{{$item->name}}</option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+				</div>
+									
+				<div class="col-md-12 col-sm-12">
+					<div class="row">
+						<label class="col-6">Atendido por:</label>
+						<div  id="" name="" class="col-6">
+							
+							<select readonly disabled name="user_id" id="user_id"  class="form-control">
+								@foreach($users as $item)
+								<option value="{{$item->id}}"  @if ($model->user_id  == $item->id) selected="selected" @endif>{{$item->name}}</option>
+								@endforeach
+							</select>
+						
+						</div>
+					</div>
+				</div>				
 				
 				
 				
