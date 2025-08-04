@@ -12,20 +12,37 @@
           'creator' => $action->creator->name ?? 'Automático',
           'icon' => $action->type->icon ?? 'fa-sticky-note',
           'color' => $action->type->color ?? '#0d6efd',
-          'subject' => method_exists($action, 'getEmailSubject') ? $action->getEmailSubject() : null,
+          
       ]);
   }
 
-  // Agregamos historial
-  foreach ($customer->histories as $history) {
+  // Detectamos cambios de asignación o estado en historial
+  $prevUserId = null;
+  foreach ($customer->histories->sortBy('updated_at') as $history) {
+      $currentUserId = $history->user_id;
+      $asignadoA = $history->user->name ?? 'Sin asignar';
+      $editor = $history->updated_user->name ?? 'Desconocido';
+
+      if ($prevUserId !== null && $currentUserId != $prevUserId) {
+          $timeline->push([
+              'type' => 'asignacion',
+              'date' => $history->updated_at,
+              'assigned_to' => $asignadoA,
+              'editor' => $editor,
+              'color' => '#003366',
+          ]);
+      }
+
       $timeline->push([
-          'type' => 'history',
+          'type' => 'estado',
           'date' => $history->updated_at,
           'status' => $history->status->name ?? $history->status_id,
-          'assigned_to' => $history->user->name ?? 'Sin asignar',
-          'editor' => $history->updated_user->name ?? 'Desconocido',
+          'assigned_to' => $asignadoA,
+          'editor' => $editor,
           'color' => $history->status->color ?? 'gray',
       ]);
+
+      $prevUserId = $currentUserId;
   }
 
   // Ordenamos por fecha descendente
@@ -44,22 +61,35 @@
               @endif
               {{ $item['note'] }}
             </strong><br>
-            @if($item['subject'])
-              <small class="text-muted">{{ $item['subject'] }}</small>
-            @endif
+            
           </div>
           <div class="text-end small text-muted">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}<br>
             {{ $item['creator'] }}
           </div>
         </div>
-      @elseif($item['type'] === 'history')
+
+      @elseif($item['type'] === 'asignacion')
         <div class="d-flex justify-content-between">
           <div>
-            <strong>Actualización de estado</strong><br>
+            <strong class="text-primary">🔁 Reasignación</strong><br>
             <small class="text-muted">
-              Estado <strong>{{ $item['status'] }}</strong>,
-              asignado a <strong>{{ $item['assigned_to'] }}</strong><br>
+              Cliente reasignado a <strong>{{ $item['assigned_to'] }}</strong><br>
+              Modificado por <strong>{{ $item['editor'] }}</strong>
+            </small>
+          </div>
+          <div class="text-end small text-muted">
+            {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}
+          </div>
+        </div>
+
+      @elseif($item['type'] === 'estado')
+        <div class="d-flex justify-content-between">
+          <div>
+            <strong>📝 Cambio de estado</strong><br>
+            <small class="text-muted">
+              Nuevo estado: <strong>{{ $item['status'] }}</strong><br>
+              Asignado a <strong>{{ $item['assigned_to'] }}</strong><br>
               Modificado por <strong>{{ $item['editor'] }}</strong>
             </small>
           </div>

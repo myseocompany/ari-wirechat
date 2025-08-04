@@ -12,7 +12,7 @@
           'creator' => $action->creator->name ?? 'Automático',
           'icon' => $action->type->icon ?? 'fa-sticky-note',
           'color' => $action->type->color ?? '#0d6efd',
-          'subject' => method_exists($action, 'getEmailSubject') ? $action->getEmailSubject() : null,
+          
       ]);
   }
 
@@ -61,9 +61,6 @@
               @endif
               {{ $item['note'] }}
             </strong><br>
-            @if($item['subject'])
-              <small class="text-muted">{{ $item['subject'] }}</small>
-            @endif
           </div>
           <div class="text-end small text-muted">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}<br>
