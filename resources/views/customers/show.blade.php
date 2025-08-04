@@ -94,7 +94,7 @@
               </div>
             <div><span class="lavel"><strong>Nombre:</strong></span> {{$model->name}}</div>
              @if(!empty($model->business))
-            <div><span class="lavel"><strong>Empresa:</strong></span>{{$model->business}}</div>
+            <div><span class="lavel"><strong>Empresa:</strong></span> {{$model->business}}</div>
             @endif
             <div><span class="lavel"><strong>Teléfono:</strong></span> {{$model->phone}} 
               <a href="https://wa.me/{{ clearWP($model->phone) }}" target="_empty">WP</a></div>
