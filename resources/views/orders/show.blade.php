@@ -27,6 +27,83 @@
 <form action="/orders/{{$model->id}}/update" method="POST" class="form-group">
 	<div class="row">
 		<div class="col-md-4 col-sm-12 group-container">
+    <h3 class="title">Datos de facturación</h3>
+    <div class="row">
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Nombre:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_name }}" class="form-control borderless readonly" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Documento:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_document }}" class="form-control borderless readonly" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Teléfono:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_phone }}" class="form-control borderless readonly" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Celular:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_phone2 }}" class="form-control borderless readonly" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Email:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_email }}" class="form-control borderless readonly" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Dirección:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_address }}" class="form-control borderless readonly" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Ciudad:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_city }}" class="form-control borderless readonly" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">País:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_country }}" class="form-control borderless readonly" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+		<div class="col-md-4 col-sm-12 group-container">
 			<h3 class="title">Datos personales</h3>
 			<div class="row">
 

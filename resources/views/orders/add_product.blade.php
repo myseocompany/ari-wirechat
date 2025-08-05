@@ -134,96 +134,92 @@
 			</div>
 	
 			<div class="col-md-4 col-sm-12 group-container">
-				<h3 class="title">Datos empresariales</h3>
-				<div class="row">
-	
-					
-			
-					<div class="col-md-12 col-sm-12">
-						<div class="row">
-							<label class="col-6">Nombre:</label>
-							<div readonly id="" name="" class="col-6" value="{{$model->business}}">
-								<input type="text" value="{{$model->customer->business}}" id="business" name="business" class="form-control borderless readonly" readonly>
-							
-						</div>
-						</div>
-					</div>
-					
-					<div class="col-md-12 col-sm-12">
-						<div class="row">
-							<label class="col-6">NIT:</label>
-							<div readonly id="" name="" class="col-6" value="{{$model->business_document}}">
-								{{$model->business_document}}
-								<input type="text" value="{{$model->customer->business_document}}" id="business_document" name="business_document"  class="form-control borderless readonly" readonly>
-								
-							</div>
-						</div>
-					</div>
-	
-	
-					<div class="col-md-12 col-sm-12 d-none">
-						<div class="row">
-							<label class="col-6">Indicativo:</label>
-							<div readonly id="" name="" class="col-6" value="{{$model->business_area_code}}">
-								{{$model->business_area_code}}
-								<input type="text" value="{{$model->customer->business_area_code}}" id="business_area_code" name="business_area_code"  class="form-control borderless readonly" readonly>
-								
-							</div>
-						</div>
-					</div>
-	
-					<div class="col-md-12 col-sm-12">
-						<div class="row">
-							<label class="col-6">Teléfono:</label>
-							<div readonly id="" name="" class="col-6" value="{{$model->business_phone}}">
-								{{$model->business_phone}}
-								<input type="text" value="{{$model->customer->business_phone}}" id="business_phone" name="business_phone"  class="form-control borderless readonly" readonly>
-								
-							</div>
-						</div>
-					</div>
-	
-					<div class="col-md-12 col-sm-12">
-						<div class="row">
-							<label class="col-6">Email:</label>
-							<div readonly id="" name="" class="col-6" value="{{$model->business_email}}">
-								<input type="text" value="{{$model->customer->business_email}}" id="business_email" name="business_email"  class="form-control borderless readonly" readonly>
-								
-							</div>
-						</div>
-					</div>
-	
-					<div class="col-md-12 col-sm-12">
-						<div class="row">
-							<label class="col-6">Dirección:</label>
-							<div readonly id="" name="" class="col-6" value="{{$model->business_address}}">
-								<input type="text" value="{{$model->customer->business_address}}" id="business_address" name="business_address"  class="form-control borderless readonly" readonly>
-								
-							</div>
-						</div>
-					</div>
-	
-	
-	
-					<div class="col-md-12 col-sm-12 d-none">
-						<div class="row">
-							<label class="col-6">Ciudad:</label>
-							<div readonly id="" name="" class="col-6" value="{{$model->city}}">
-								<input type="text" value="{{$model->customer->business_city}}" id="business_city" name="business_city"  class="form-control borderless readonly" readonly>
-								
-							</div>
-						</div>
-					</div>
-	
-	
-	
-					
-	
-					
-	
-					
-				</div>
-			</div>
+    <h3 class="title">Datos de facturación</h3>
+    <div class="row">
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Nombre:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_name ?? $model->customer->business ?? $model->customer->name }}" id="billing_name" name="billing_name" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">NIT / Documento:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_document ?? $model->customer->business_document ?? $model->customer->document }}" id="billing_document" name="billing_document" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Teléfono:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_phone ?? $model->customer->business_phone ?? $model->customer->phone }}" id="billing_phone" name="billing_phone" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Celular:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_phone2 ?? $model->customer->phone2 }}" id="billing_phone2" name="billing_phone2" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Email:</label>
+                <div class="col-6">
+                    <input type="email" value="{{ $model->billing_email ?? $model->customer->business_email ?? $model->customer->email }}" id="billing_email" name="billing_email" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Dirección:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_address ?? $model->customer->business_address ?? $model->customer->address }}" id="billing_address" name="billing_address" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Ciudad:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->billing_city ?? $model->customer->business_city ?? $model->customer->city }}" id="billing_city" name="billing_city" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">País:</label>
+                <div class="col-6">
+                    <select class="form-control" id="billing_country" name="billing_country">
+                        <option value="">Seleccione el país</option>
+                        @foreach ($countries as $item)
+                            <option value="{{ $item->iso2 }}" 
+                                @if(($model->billing_country ?? $model->customer->country ?? '') == $item->iso2) selected @endif>
+                                {{ $item->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
 			<div class="col-md-4 col-sm-12 group-container">
 				<h3 class="title">Envío / Destino</h3>
 				<div class="row">

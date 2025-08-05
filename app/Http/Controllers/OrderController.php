@@ -563,7 +563,7 @@ class OrderController extends Controller{
     public function store(Request $request){
         
         //$this->updateCustomer($request);
-        
+       // dd($request);
         $model = new Order;
         
         $model->customer_id = $request->customer_id;
@@ -816,8 +816,9 @@ public function storeProduct(Request $request){
         $statuses = OrderStatus::all();
         $users = User::where('role_id', 1)->get();
         $referal= User::where('role_id', 3)->get();
+        $countries = Country::all();
 
-    return view('orders.add_product', compact(  'model', 'users', 'referal', 'products', 'statuses'));
+    return view('orders.add_product', compact(  'model', 'users', 'referal', 'products', 'statuses', 'countries'));
     }
 
     public function destroy($id)

@@ -11,6 +11,7 @@
 
 {{ csrf_field() }}
 	<div class="row">
+
 		<div class="col-md-4 col-sm-12 group-container">
 			<h3 class="title">Datos personales</h3>
 			<div class="row">
@@ -146,6 +147,93 @@
 				
 			</div>
 		</div>
+		<div class="col-md-4 col-sm-12 group-container">
+    <h3 class="title">Datos de facturación</h3>
+    <div class="row">
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Nombre:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->customer->business ?? $model->customer->name }}" id="billing_name" name="billing_name" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">NIT / Documento:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->customer->business_document ?? $model->customer->document }}" id="billing_document" name="billing_document" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Teléfono:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->customer->business_phone ?? $model->customer->phone }}" id="billing_phone" name="billing_phone" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Celular:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->customer->phone2 }}" id="billing_phone2" name="billing_phone2" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Email:</label>
+                <div class="col-6">
+                    <input type="email" value="{{ $model->customer->business_email ?? $model->customer->email }}" id="billing_email" name="billing_email" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Dirección:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->customer->business_address ?? $model->customer->address }}" id="billing_address" name="billing_address" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">Ciudad:</label>
+                <div class="col-6">
+                    <input type="text" value="{{ $model->customer->business_city ?? $model->customer->city }}" id="billing_city" name="billing_city" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-sm-12">
+            <div class="row">
+                <label class="col-6">País:</label>
+                <div class="col-6">
+                    <select class="form-control" id="billing_country" name="billing_country">
+                        <option value="">Seleccione el país</option>
+                        @foreach ($countries as $item)
+                            <option value="{{ $item->iso2 }}" 
+                                @if(($model->customer->country ?? '') == $item->iso2) selected @endif>
+                                {{ $item->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--
 
 		<div class="col-md-4 col-sm-12 group-container">
 			<h3 class="title">Datos empresariales</h3>
@@ -238,6 +326,8 @@
 				
 			</div>
 		</div>
+
+-->
 		<div class="col-md-4 col-sm-12 group-container">
 			<h3 class="title">Envío / Destino</h3>
 			<div class="row">

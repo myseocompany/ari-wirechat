@@ -304,6 +304,7 @@ Route::middleware('auth')->prefix('orders')->group(function () {
     Route::get('/{oid}/proforma_co', [OrderController::class, 'showProformaCO'])->name('orders.showProformaCO');
     Route::get('/sid/{sid}/report', [OrderController::class, 'indexReport']);
     Route::get('/{id}/show', [OrderController::class, 'show']);
+    
     Route::get('/{id}/quote', [OrderController::class, 'quote']);
     Route::get('/{id}/edit', [OrderController::class, 'edit']);
     Route::get('/{id}/destroy', [OrderController::class, 'destroy']);

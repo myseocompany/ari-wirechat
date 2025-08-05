@@ -13,12 +13,16 @@ class Order extends Model
         'price', 'shippingCharges', 'shipperCode', 'IVA', 'IVAReturn', 
         'status_id', 'user_id', 'referal_user_id', 
         'authorizationResult', 'authorizationCode', 'errorCode', 
-        'errorMessage', 'phone', 'added_at', 'notes', 'delivery_date', 
+        'errorMessage', 'phone', 'phone2', 'contact_phone2',
+        'billing_name', 'billing_document', 'billing_email', 'billing_address',
+        'billing_city', 'billing_country',
+        'added_at', 'notes', 'delivery_date', 
         'delivery_name', 'delivery_email', 'delivery_address', 
         'delivery_phone', 'delivery_to', 'delivery_from', 'delivery_message', 
         'payment_form', 'payment_id', 'session_id', 'created_at', 'updated_at', 'user_ip', 'user_agent',
-        'request_url', 'request_data', 'unique_machine', 'contact_phone2', 'phone2'
+        'request_url', 'request_data', 'unique_machine'
     ];
+
     
 
     public static function boot()
