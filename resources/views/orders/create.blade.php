@@ -69,6 +69,16 @@
 						</div>
 					</div>
 				</div>
+				<div class="col-md-12 col-sm-12">
+					<div class="row">
+						<label class="col-6">Celular:</label>
+						<div readonly id="" name="" class="col-6" value="{{$model->phone2}}">
+							{{$model->phone2}}
+							<input type="text" value="{{$model->customer->phone2}}" id="phone2" name="phone2"  class="form-control">
+							
+						</div>
+					</div>
+				</div>
 
 				<div class="col-md-12 col-sm-12">
 					<div class="row">

@@ -562,13 +562,23 @@ class OrderController extends Controller{
 
     public function store(Request $request){
         
-        $this->updateCustomer($request);
+        //$this->updateCustomer($request);
         
         $model = new Order;
         
-        $model->delivery_phone = $request->delivery_phone;
+        $model->customer_id = $request->customer_id;
         
+        // Datos de facturación (puede ser otro cliente)
+        $model->billing_name = $request->billing_name;
+        $model->billing_document = $request->billing_document;
+        $model->billing_phone = $request->billing_phone;
+        $model->billing_phone2 = $request->billing_phone2;
+        $model->billing_email = $request->billing_email;
+        $model->billing_address = $request->billing_address;
+        $model->billing_city = $request->billing_city;
+        $model->billing_country = $request->billing_country;
 
+        $model->delivery_phone = $request->delivery_phone;
         $model->delivery_address = $request->delivery_address;
         $model->delivery_city = $request->delivery_city;
         $model->delivery_country = $request->delivery_country;
@@ -576,7 +586,6 @@ class OrderController extends Controller{
         $model->notes = $request->notes;
         $model->updated_user_id = Auth::id();
 
-        $model->customer_id = $request->customer_id;
         $model->status_id = $request->status_id;
 
         $model->user_id = $request->user_id;
