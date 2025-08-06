@@ -75,4 +75,16 @@ class Action extends Model
     public function user(){
         return $this->belongsTo('App\Models\User');
     }
+
+    public function isPending() {
+        return !is_null($this->due_date) && is_null($this->delivery_date);
+    }
+
+    public function wasNeverPending() {
+        return is_null($this->due_date) && is_null($this->delivery_date);
+    }
+
+    public function shouldShow() {
+        return $this->wasNeverPending() || $this->isPending();
+    }
 }

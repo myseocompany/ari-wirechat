@@ -50,7 +50,7 @@
 
         {{-- Campo de fecha programada (oculto por defecto) --}}
         <div class="form-group mb-4" id="dateInputContainer" style="display:none;">
-            <input class="form-control" name="date_programed" type="datetime-local" id="example-datetime-local-input" value="{{$today}}">
+            <input class="form-control" name="date_programed" type="datetime-local" id="date_programed" value="{{$today}}">
         </div>
 
         {{-- Botón enviar --}}

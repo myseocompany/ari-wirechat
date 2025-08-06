@@ -76,9 +76,18 @@
 </div>
 
 <script>
-    function toggleDateInput() {
-        const checkbox = document.getElementById('toggleDate');
-        const dateContainer = document.getElementById('dateInputContainer');
-        dateContainer.style.display = checkbox.checked ? 'block' : 'none';
+function toggleDateInput() {
+    const checkbox = document.getElementById('toggleDate');
+    const dateInput = document.getElementById('date_programed');
+    const dateContainer = document.getElementById('dateInputContainer');
+    
+    if (checkbox.checked) {
+        dateContainer.style.display = 'block';
+        dateInput.disabled = false;
+    } else {
+        dateContainer.style.display = 'none';
+        dateInput.disabled = true;
     }
+}
+
 </script>

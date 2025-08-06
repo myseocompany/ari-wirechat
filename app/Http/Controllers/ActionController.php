@@ -16,8 +16,20 @@ use Mail;
 use App\Models\DateTime;
 use App\Models\ActionType;
 
+use App\Services\ActionService;
+
+use App\Models\CustomerHistory;
+
+
+
 class ActionController extends Controller
 {
+
+    public function __construct(ActionService $actionService)
+    {
+        $this->actionService = $actionService;
+
+    } 
     
    public function show($id)
     {
@@ -75,16 +87,36 @@ class ActionController extends Controller
 
 	    });
 	}
-	public function index( Request $request){
+    public function index( Request $request){
 
-		$model = $this->filterModel($request);
-		$users = User::where('status_id' , '=' , 1)
-			->get();
-		$action_options = ActionType::orderBy('weigth')->get();
+            
+        $blankRequest = new Request(); // 👈 nuevo Request sin parámetros del usuario
+
+        $overdueRequest = $this->actionService->createFilteredRequest($blankRequest, 'overdue');
+        $todayRequest = $this->actionService->createFilteredRequest($blankRequest, 'today');
+        $upcomingRequest = $this->actionService->createFilteredRequest($blankRequest, 'upcoming');
+        
 
 
-		return view('actions.index', compact('model','users', 'action_options','request'));
-	}
+
+        // calculo los recordSet de las acciones filtradas 
+        $overdueActions = $this->actionService->filterModel($overdueRequest, true);
+        $todayActions = $this->actionService->filterModel($todayRequest, true);
+        $upcomingActions = $this->actionService->filterModel($upcomingRequest, true);
+
+        $useDueDate = $request->input('pending') === 'true';
+        $model = $this->actionService->filterModel($request, $useDueDate);
+
+        
+        $users = User::where('status_id' , '=' , 1)->get();
+        $action_options = ActionType::orderby("weigth", "DESC")->get();
+        $statuses_options = CustomerStatus::orderBy("stage_id", "ASC")->orderBy("weight", "ASC")->get();
+        
+
+        return view('actions.index', compact('model','users', 'action_options','request',
+                'overdueActions', 'todayActions', 'upcomingActions', 
+            'statuses_options'));
+    }   
 
     public function indexPending( Request $request){
         /*BUSCAR LOS QUE TIENEN ACCIONES*/
@@ -229,16 +261,6 @@ class ActionController extends Controller
         return view('actions.pending_actions.whith_out_actions', compact('customers_whith_out_actions', 'total_pending_action'));
     }
 
-
-
-
-
-
-
-
-
-
-
     public function getPendingActions(){
         $customers_id = Action::
                         rightJoin('customers', 'actions.customer_id', 'customers.id')
@@ -368,5 +390,37 @@ class ActionController extends Controller
             return view('actions.calendar.schedule', compact('model'));
         }
         return redirect("/");
+    }
+    
+    public function completePendingAction(Request $request)
+    {
+        $request->validate([
+            'action_id' => 'required|exists:actions,id',
+            'note' => 'required|string',
+            'type_id' => 'required|exists:action_types,id',
+            'status_id' => 'required|exists:customer_statuses,id',
+        ]);
+
+        $pendingAction = Action::findOrFail($request->action_id);
+        $customer = $pendingAction->customer;
+
+        $pendingAction->delivery_date = Carbon\Carbon::now();
+        $pendingAction->save();
+
+        $newAction = new Action();
+        $newAction->note = $request->note;
+        $newAction->type_id = $request->type_id;
+        $newAction->creator_user_id = Auth::id();
+        $newAction->customer_id = $pendingAction->customer_id;
+        $newAction->save();
+
+        if ($customer) {
+            $history = new CustomerHistory();
+            $history->saveFromModel($customer);
+            $customer->status_id = $request->status_id;
+            $customer->save();
+        }
+
+        return redirect()->back()->with('statusone', 'Acción completada con éxito');
     }
 }

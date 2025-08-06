@@ -1158,9 +1158,10 @@ class CustomerController extends Controller
         $model->customer_createad_at = $customer->created_at;
         $model->customer_updated_at = $customer->updated_at;
         $model->customer_id = $request->customer_id;
-        if ($date_programed->gt($today)) {
-            $model->due_date = $date_programed;
-        }
+    if ($request->filled('date_programed')) {
+        $model->due_date = $date_programed;
+    }
+
         $model->save();
         if (!is_null($request->status_id)) {
             $cHistory = new CustomerHistory;
