@@ -17,7 +17,7 @@ Route::middleware('api')->group(
 
         Route::post('/campaigns/{campaign_id}/send-to/{customer_id}', [APIController::class, 'sendCampaign']);
 
-        
+        Route::post('/actions/save', [APIController::class, 'saveQuickAction']);
 });
 
 

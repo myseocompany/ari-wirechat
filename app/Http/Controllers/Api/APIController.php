@@ -2958,4 +2958,21 @@ class APIController extends Controller
     }
     }
 
+    /**
+     * Función simplificada para guardar acciones rápidas
+     */
+    public function saveQuickAction(Request $request)
+    {
+        $action = new Action;
+        $action->customer_id = $request->customer_id;
+        $action->type_id = $request->type_id ?? 16; // Tipo por defecto: actualización
+        $action->note = $request->note ?? 'Acción automática';
+        $action->creator_user_id = Auth::id() ?? 0;
+        $action->delivery_date = Carbon\Carbon::now();
+        
+        $action->save();
+        
+        return $action;
+    }
+
 }
