@@ -15,3 +15,4 @@ class MadridLead extends Model
     public function scopeAsistieron($q) { return $q->whereNotNull('last_attended_at'); }
     public function scopeNoShow($q)     { return $q->whereNotNull('last_noshow_at'); }
 }
+    

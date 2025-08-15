@@ -19,6 +19,8 @@
 
   {{-- Tarjetas KPI --}}
   <div class="row mb-4">
+
+  
     <div class="col-md-2">
       <div class="card"><div class="card-body">
         <h6>Alcanzados (LEAD)</h6>
@@ -77,63 +79,65 @@
   </div></div>
 </div>
   </div>
+<div class="row row-cols-1 row-cols-md-4 g-3 mb-4">
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>Leads España</h6><h2>{{ number_format($kpi_es) }}</h2>
+    <small>+34 / ES / #España</small>
+  </div></div></div>
 
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>ES con fuente pauta</h6><h2>{{ number_format($es_pauta) }}</h2>
+    <small>source_id=76</small>
+  </div></div></div>
 
-  {{-- LISTA: España (+34 / Spain) --}}
-<div class="card mb-4">
-  <div class="card-header"><strong>Leads España (+34 / España)</strong></div>
-  <div class="table-responsive">
-    <table class="table table-sm mb-0">
-      <thead><tr>
-        <th>Cliente</th><th>País</th><th>Teléfono</th><th>Email</th>
-        <th>RSVP</th><th>Asistió</th><th>No show</th>
-      </tr></thead>
-      <tbody>
-      @forelse($list_es as $r)
-        <tr>
-          <td>{{ $r->name }}</td>
-          <td>{{ $r->country }}</td>
-          <td>{{ $r->phone }}</td>
-          <td>{{ $r->email }}</td>
-          <td>{{ $r->last_rsvp_at ? \Carbon\Carbon::parse($r->last_rsvp_at)->format('d/m H:i') : '—' }}</td>
-          <td>{{ $r->last_attended_at ? \Carbon\Carbon::parse($r->last_attended_at)->format('d/m H:i') : '—' }}</td>
-          <td>{{ $r->last_noshow_at ? \Carbon\Carbon::parse($r->last_noshow_at)->format('d/m H:i') : '—' }}</td>
-        </tr>
-      @empty
-        <tr><td colspan="7" class="text-center p-3">Sin datos</td></tr>
-      @endforelse
-      </tbody>
-    </table>
-  </div>
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>ES entraron por WhatsApp</h6><h2>{{ number_format($es_whatsapp_src) }}</h2>
+    <small>source_id=8</small>
+  </div></div></div>
+
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>Fabricantes</h6><h2>{{ number_format($fabricantes) }}</h2>
+    <small>maker=1</small>
+  </div></div></div>
 </div>
 
-{{-- LISTA: Pauta #Tour_Madrid_Pauta --}}
-<div class="card mb-4">
-  <div class="card-header"><strong>Leads por pauta (#Tour_Madrid_Pauta)</strong></div>
-  <div class="table-responsive">
-    <table class="table table-sm mb-0">
-      <thead><tr>
-        <th>Cliente</th><th>País</th><th>Teléfono</th><th>Email</th>
-        <th>RSVP</th><th>Asistió</th><th>No show</th>
-      </tr></thead>
-      <tbody>
-      @forelse($list_pauta as $r)
-        <tr>
-          <td>{{ $r->name }}</td>
-          <td>{{ $r->country }}</td>
-          <td>{{ $r->phone }}</td>
-          <td>{{ $r->email }}</td>
-          <td>{{ $r->last_rsvp_at ? \Carbon\Carbon::parse($r->last_rsvp_at)->format('d/m H:i') : '—' }}</td>
-          <td>{{ $r->last_attended_at ? \Carbon\Carbon::parse($r->last_attended_at)->format('d/m H:i') : '—' }}</td>
-          <td>{{ $r->last_noshow_at ? \Carbon\Carbon::parse($r->last_noshow_at)->format('d/m H:i') : '—' }}</td>
-        </tr>
-      @empty
-        <tr><td colspan="7" class="text-center p-3">Sin datos</td></tr>
-      @endforelse
-      </tbody>
-    </table>
-  </div>
+<div class="row row-cols-1 row-cols-md-4 g-3 mb-4">
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>Mensajes automáticos</h6><h2>{{ number_format($auto_msgs_105) }}</h2>
+    <small>type_id=105</small>
+  </div></div></div>
+
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>Llamadas automáticas</h6><h2>{{ number_format($auto_calls_104) }}</h2>
+    <small>type_id=104</small>
+  </div></div></div>
+
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>Emails automáticos</h6><h2>{{ number_format($auto_emails_2) }}</h2>
+    <small>type_id=2</small>
+  </div></div></div>
+
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>Mensajes manuales</h6><h2>{{ number_format($manual_msgs_14) }}</h2>
+    <small>type_id=14</small>
+  </div></div></div>
+
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>Llamadas manuales</h6><h2>{{ number_format($manual_calls) }}</h2>
+    <small>1,20,21,106</small>
+  </div></div></div>
+
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>Agendados (RSVP)</h6><h2>{{ number_format($agendados_101) }}</h2>
+    <small>type_id=101</small>
+  </div></div></div>
+
+  <div class="col"><div class="card h-100"><div class="card-body">
+    <h6>Perfilación SQL</h6><h2>{{ number_format($perfilacion_sql_106) }}</h2>
+    <small>type_id=106</small>
+  </div></div></div>
 </div>
+
 
   {{-- LISTADO PRINCIPAL: España + #Tour_Madrid_Pauta (de la vista) --}}
   <div class="card">
