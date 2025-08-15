@@ -78,6 +78,9 @@ class CustomerService {
                         $innerQuery->orWhere('customers.name', 'like', "%{$searchTerm}%")
                             ->orWhere('customers.document', 'like', "%{$searchTerm}%")
                             ->orWhere('customers.position', 'like', "%{$searchTerm}%")
+                            ->orWhere('customers.ad_name', 'like', "%{$searchTerm}%")
+                            ->orWhere('customers.adset_name', 'like', "%{$searchTerm}%")
+                            ->orWhere('customers.campaign_name', 'like', "%{$searchTerm}%")
                             ->orWhere('customers.business', 'like', "%{$searchTerm}%")
                             ->orWhere('customers.notes', 'like', "%{$searchTerm}%");
                     }
