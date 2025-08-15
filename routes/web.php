@@ -465,3 +465,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/madrid2025',        [Madrid2025Controller::class, 'dashboard'])->name('madrid2025.dashboard');
     Route::get('/madrid2025/export', [Madrid2025Controller::class, 'export'])->name('madrid2025.export');
 });
+
+
+// routes/web.php
+Route::get('/reportes/madrid', [\App\Http\Controllers\MadridDashboardController::class, 'index'])
+    ->name('madrid.dashboard');
