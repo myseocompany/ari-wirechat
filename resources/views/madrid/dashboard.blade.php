@@ -61,7 +61,79 @@
         <small>Asistieron / RSVPs</small>
       </div></div>
     </div>
+
+    <div class="col-md-2">
+  <div class="card"><div class="card-body">
+    <h6>Leads España</h6>
+    <h2 class="mb-0">{{ number_format($kpi_es ?? 0) }}</h2>
+    <small>Tel +34 / País España</small>
+  </div></div>
+</div>
+<div class="col-md-2">
+  <div class="card"><div class="card-body">
+    <h6>Leads por pauta</h6>
+    <h2 class="mb-0">{{ number_format($kpi_pauta ?? 0) }}</h2>
+    <small>#Tour_Madrid_Pauta</small>
+  </div></div>
+</div>
   </div>
+
+
+  {{-- LISTA: España (+34 / Spain) --}}
+<div class="card mb-4">
+  <div class="card-header"><strong>Leads España (+34 / España)</strong></div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead><tr>
+        <th>Cliente</th><th>País</th><th>Teléfono</th><th>Email</th>
+        <th>RSVP</th><th>Asistió</th><th>No show</th>
+      </tr></thead>
+      <tbody>
+      @forelse($list_es as $r)
+        <tr>
+          <td>{{ $r->name }}</td>
+          <td>{{ $r->country }}</td>
+          <td>{{ $r->phone }}</td>
+          <td>{{ $r->email }}</td>
+          <td>{{ $r->last_rsvp_at ? \Carbon\Carbon::parse($r->last_rsvp_at)->format('d/m H:i') : '—' }}</td>
+          <td>{{ $r->last_attended_at ? \Carbon\Carbon::parse($r->last_attended_at)->format('d/m H:i') : '—' }}</td>
+          <td>{{ $r->last_noshow_at ? \Carbon\Carbon::parse($r->last_noshow_at)->format('d/m H:i') : '—' }}</td>
+        </tr>
+      @empty
+        <tr><td colspan="7" class="text-center p-3">Sin datos</td></tr>
+      @endforelse
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{{-- LISTA: Pauta #Tour_Madrid_Pauta --}}
+<div class="card mb-4">
+  <div class="card-header"><strong>Leads por pauta (#Tour_Madrid_Pauta)</strong></div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead><tr>
+        <th>Cliente</th><th>País</th><th>Teléfono</th><th>Email</th>
+        <th>RSVP</th><th>Asistió</th><th>No show</th>
+      </tr></thead>
+      <tbody>
+      @forelse($list_pauta as $r)
+        <tr>
+          <td>{{ $r->name }}</td>
+          <td>{{ $r->country }}</td>
+          <td>{{ $r->phone }}</td>
+          <td>{{ $r->email }}</td>
+          <td>{{ $r->last_rsvp_at ? \Carbon\Carbon::parse($r->last_rsvp_at)->format('d/m H:i') : '—' }}</td>
+          <td>{{ $r->last_attended_at ? \Carbon\Carbon::parse($r->last_attended_at)->format('d/m H:i') : '—' }}</td>
+          <td>{{ $r->last_noshow_at ? \Carbon\Carbon::parse($r->last_noshow_at)->format('d/m H:i') : '—' }}</td>
+        </tr>
+      @empty
+        <tr><td colspan="7" class="text-center p-3">Sin datos</td></tr>
+      @endforelse
+      </tbody>
+    </table>
+  </div>
+</div>
 
   {{-- LISTADO PRINCIPAL: España + #Tour_Madrid_Pauta (de la vista) --}}
   <div class="card">

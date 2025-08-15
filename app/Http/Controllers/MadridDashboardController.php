@@ -73,8 +73,47 @@ class MadridDashboardController extends Controller
 
         $tasa_show = $rsvps > 0 ? round(($asistieron / $rsvps) * 100, 1) : 0.0;
 
+
+        $kpi_es = DB::table('v_es_customers')->count();
+
+        // Leads por pauta #Tour_Madrid_Pauta (distintos)
+        $kpi_pauta = DB::table('v_pauta_customers')->count();
+
+        // ==== LISTAS (top 100) ====
+        // España
+        $list_es = DB::table('customers as c')
+            ->join('v_es_customers as es', 'es.customer_id','=','c.id')
+            ->leftJoin('v_event_status as st','st.customer_id','=','c.id')
+            ->selectRaw('c.id, COALESCE(c.business,c.name) as name, c.country, COALESCE(c.phone_wp,c.phone,c.phone2) as phone, c.email, st.last_rsvp_at, st.last_attended_at, st.last_noshow_at')
+            ->when($from && $to, function($q) use ($from,$to){
+                $q->where(function($qq) use ($from,$to){
+                    $qq->whereBetween('st.last_rsvp_at', [$from,$to])
+                       ->orWhereBetween('st.last_attended_at', [$from,$to])
+                       ->orWhereBetween('st.last_noshow_at', [$from,$to])
+                       ->orWhereBetween('c.updated_at', [$from,$to]);
+                });
+            })
+            ->orderByDesc('st.last_rsvp_at')
+            ->limit(100)->get();
+
+        // Pauta
+        $list_pauta = DB::table('customers as c')
+            ->join('v_pauta_customers as pa', 'pa.customer_id','=','c.id')
+            ->leftJoin('v_event_status as st','st.customer_id','=','c.id')
+            ->selectRaw('c.id, COALESCE(c.business,c.name) as name, c.country, COALESCE(c.phone_wp,c.phone,c.phone2) as phone, c.email, st.last_rsvp_at, st.last_attended_at, st.last_noshow_at')
+            ->when($from && $to, function($q) use ($from,$to){
+                $q->where(function($qq) use ($from,$to){
+                    $qq->whereBetween('st.last_rsvp_at', [$from,$to])
+                       ->orWhereBetween('st.last_attended_at', [$from,$to])
+                       ->orWhereBetween('st.last_noshow_at', [$from,$to])
+                       ->orWhereBetween('c.updated_at', [$from,$to]);
+                });
+            })
+            ->orderByDesc('st.last_rsvp_at')
+            ->limit(100)->get();
+
         return view('madrid.dashboard', compact(
-            'leads','alcanzados','engaged','calificados','rsvps','asistieron','noshow','tasa_show','from','to'
+            'leads','alcanzados','engaged','calificados','rsvps','asistieron','noshow','tasa_show', 'kpi_es','kpi_pauta','list_es','list_pauta','from','to'
         ));
     }
 }
