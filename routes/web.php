@@ -34,6 +34,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
+
+use App\Http\Controllers\Madrid2025Controller;
+
+
 Route::get('/', function () {
     return view('home');
 });
@@ -452,4 +456,12 @@ Route::get('/test-rd', function () {
     // Llama directamente al controlador
     $controller = app(APIController::class);
     return $controller->updateFromRD($request);
+});
+
+
+// routes/web.php
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/madrid2025',        [Madrid2025Controller::class, 'dashboard'])->name('madrid2025.dashboard');
+    Route::get('/madrid2025/export', [Madrid2025Controller::class, 'export'])->name('madrid2025.export');
 });
