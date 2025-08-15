@@ -20,27 +20,32 @@ public function index(Request $request)
 
     // ========== BASE: clientes ES (tel +34/34, país ES/España/Spain, o tag #España) ==========
     // La armamos como subconsulta para reusarla en todos los KPIs
-    $esBase = MadridUnified::select('id');
+    $esBase = MadridUnified::select('customer_id');
 
     // ========= LISTA principal (primeros 100 de la base ES) =========
-    $leads = DB::table('customers as c')
-        ->joinSub($esBase, 'es', function($j){ $j->on('es.id','=','c.id'); })
-        ->leftJoin('actions as a', 'a.customer_id','=','c.id')
-        ->selectRaw("
-            c.id, COALESCE(c.business,c.name) as name, c.country,
-            COALESCE(c.phone_wp,c.phone,c.phone2) as phone, c.email,
-            MAX(CASE WHEN a.type_id=101 THEN a.created_at END) as last_rsvp_at,
-            MAX(CASE WHEN a.type_id=102 THEN a.created_at END) as last_attended_at,
-            MAX(CASE WHEN a.type_id=103 THEN a.created_at END) as last_noshow_at,
-            MAX(a.created_at) as last_action_at
-        ")
-        ->when($from && $to, function($q) use ($from,$to){
-            $q->whereBetween('a.created_at', [$from, $to]);
-        })
-        ->groupBy('c.id','c.business','c.name','c.country','c.phone_wp','c.phone','c.phone2','c.email')
-        ->orderByDesc('last_action_at')
-        ->limit(100)
-        ->get();
+        $leads = DB::table('customers as c')
+            ->joinSub($esBase, 'es', fn($j) => $j->on('es.customer_id', '=', 'c.id'))
+            ->leftJoin('actions as a', 'a.customer_id', '=', 'c.id')
+            ->selectRaw("
+                c.id,
+                COALESCE(c.business,c.name)  as name,
+                c.country,
+                COALESCE(c.phone_wp,c.phone,c.phone2) as phone,
+                c.email,
+                MAX(CASE WHEN a.type_id=101 THEN a.created_at END) as last_rsvp_at,
+                MAX(CASE WHEN a.type_id=102 THEN a.created_at END) as last_attended_at,
+                MAX(CASE WHEN a.type_id=103 THEN a.created_at END) as last_noshow_at,
+                MAX(a.created_at)                                     as last_action_at
+            ")
+            ->when($from && $to, fn($q) => $q->whereBetween('a.created_at', [$from, $to]))
+            ->groupBy('c.id','c.business','c.name','c.country','c.phone_wp','c.phone','c.phone2','c.email')
+            ->orderByDesc('last_action_at')
+            ->limit(100)
+            ->get()
+            ->map(function($row){
+                $row->link = "https://arichat.co/customers/{$row->id}/show";
+                return $row;
+            });
 
     // ========= KPIs existentes (mantén si los usas) =========
     // Alcanzados (salientes) sobre base ES
