@@ -20,7 +20,7 @@ public function index(Request $request)
 
     // ========== BASE: clientes ES (tel +34/34, país ES/España/Spain, o tag #España) ==========
     // La armamos como subconsulta para reusarla en todos los KPIs
-    $esBase = MadridUnified::select('c.id');
+    $esBase = MadridUnified::select('id');
 
     // ========= LISTA principal (primeros 100 de la base ES) =========
     $leads = DB::table('customers as c')
