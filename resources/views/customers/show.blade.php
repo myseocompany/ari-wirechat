@@ -96,9 +96,28 @@
              @if(!empty($model->business))
             <div><span class="lavel"><strong>Empresa:</strong></span> {{$model->business}}</div>
             @endif
-            <div><span class="lavel"><strong>Teléfono:</strong></span> {{$model->phone}} 
-              <a href="https://wa.me/{{ clearWP($model->phone) }}" target="_empty">WP</a></div>
-            <div><span class="lavel"><strong>Celular:</strong></span> {{$model->phone2}}</div>
+            
+            <!-- teléfono -->
+            @php
+                $phone1 = $model->phone ? $model->getInternationalPhone($model->phone) : null;
+                $phone2 = $model->phone2 ? $model->getInternationalPhone($model->phone2) : null;
+            @endphp
+
+            @if($phone1)
+              <div>
+                <span class="label"><strong>Teléfono:</strong></span>
+                <a href="https://wa.me/{{ clearWP($phone1) }}" target="_blank">{{ $phone1 }}</a>
+              </div>
+            @endif
+
+            @if($phone2 && $phone2 !== $phone1)
+              <div>
+                <span class="label"><strong>Celular:</strong></span>
+                <a href="https://wa.me/{{ clearWP($phone2) }}" target="_blank">{{ $phone2 }}</a>
+              </div>
+            @endif
+            <!-- fin teléfono -->
+
             <div><span class="lavel"><strong>Email:</strong></span> {{$model->email}}</div>
             <div><span class="lavel"><strong>País:</strong></span> {{$model->country}}</div>
             <div><span class="lavel"><strong>Estado:</strong></span> @if(isset($model->status)&& !is_null($model->status)&&$model->status!='')
