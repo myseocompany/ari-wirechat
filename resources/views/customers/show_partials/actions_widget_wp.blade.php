@@ -1,3 +1,5 @@
+@php use Illuminate\Support\Str; @endphp
+
 <h2 class="mt-4">Línea de tiempo del cliente</h2>
 
 @php
@@ -12,7 +14,10 @@
           'creator' => $action->creator->name ?? 'Automático',
           'icon' => $action->type->icon ?? 'fa-sticky-note',
           'color' => $action->type->color ?? '#0d6efd',
-          
+          'url' => $action->url,
+          'type_name' => $action->getTypeName() ?? 'Acción',
+          'is_pending' => $action->isPending(),
+          'due_date' => $action->due_date,
       ]);
   }
 
@@ -45,7 +50,6 @@
       $prevUserId = $currentUserId;
   }
 
-  // Ordenamos por fecha descendente
   $timeline = $timeline->sortByDesc('date');
 @endphp
 
@@ -55,13 +59,33 @@
       @if($item['type'] === 'action')
         <div class="d-flex justify-content-between">
           <div>
+            {{-- ⏰ Pendiente programado --}}
+            @if($item['is_pending'] && $item['due_date'])
+              <span class="text-danger fw-bold small">
+                ⏰ Programado para: {{ \Carbon\Carbon::parse($item['due_date'])->format('d M Y H:i') }}
+              </span><br>
+            @endif
+
+            {{-- Nota de acción --}}
             <strong>
               @if($item['icon'])
                 <i class="fa {{ $item['icon'] }}"></i>
               @endif
               {{ $item['note'] }}
             </strong><br>
-            
+
+            {{-- 🎧 Reproductor si es llamada --}}
+            @if(!empty($item['url']) && Str::contains(Str::lower($item['note']), 'llamada'))
+              <audio controls class="mt-2">
+                <source src="{{ $item['url'] }}" type="audio/ogg">
+                Tu navegador no soporta el audio.
+              </audio><br>
+            @endif
+
+            {{-- Tipo de acción --}}
+            <span class="text-muted small">
+              {{ $item['type_name'] }}
+            </span>
           </div>
           <div class="text-end small text-muted">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}<br>
