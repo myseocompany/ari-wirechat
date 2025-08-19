@@ -104,6 +104,14 @@
                           {{\Carbon\Carbon::parse($item->created_at)->format('d-m-Y')}}
                       @endif
                   </div>
+                  @php $lastAction = $item->getLastUserAction(); @endphp
+                  @if($lastAction)
+                    <div>
+                      Último contacto: {{ \Carbon\Carbon::parse($lastAction->created_at)->format('d-m-Y H:i') }}
+                      <br>
+                      Nota: "{{ \Illuminate\Support\Str::limit($lastAction->note, 40) }}"
+                    </div>
+                  @endif
               </div>
           </div>
           <div class="customer_created_at col-sm-3 d-none d-sm-block">
