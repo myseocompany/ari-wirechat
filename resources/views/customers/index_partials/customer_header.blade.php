@@ -31,8 +31,8 @@
   <p class="mb-2">
     @if($customer->getBestPhoneCandidate())
       📞<a href="/customers/{{ $customer->id }}/show" class="text-decoration-none me-2">
-        {{ $item->getBestPhoneCandidate() 
-                                ? $item->getInternationalPhone($item->getBestPhoneCandidate()) 
+        {{ $customer->getBestPhoneCandidate() 
+                                ? $customer->getInternationalPhone($customer->getBestPhoneCandidate()) 
                                 : 'Sin teléfono válido' 
                             }}
       </a>
