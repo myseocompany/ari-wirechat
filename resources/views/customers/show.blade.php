@@ -99,24 +99,26 @@
             
             <!-- teléfono -->
             @php
-                $phone1 = $model->phone ? $model->getInternationalPhone($model->phone) : null;
-                $phone2 = $model->phone2 ? $model->getInternationalPhone($model->phone2) : null;
+                $phone1 = $model->phone ? '+' . ltrim($model->getInternationalPhone($model->phone), '+') : null;
+                $phone2 = $model->phone2 ? '+' . ltrim($model->getInternationalPhone($model->phone2), '+') : null;
             @endphp
 
             @if($phone1)
               <div>
                 <span class="label"><strong>Teléfono:</strong></span>
-                <a href="https://wa.me/{{ clearWP($phone1) }}" target="_blank">{{ $phone1 }}</a>
+                <span>{{ $phone1 }}</span>
               </div>
             @endif
 
             @if($phone2 && $phone2 !== $phone1)
               <div>
                 <span class="label"><strong>Celular:</strong></span>
-                <a href="https://wa.me/{{ clearWP($phone2) }}" target="_blank">{{ $phone2 }}</a>
+                <span>{{ $phone2 }}</span>
               </div>
             @endif
             <!-- fin teléfono -->
+
+
 
             <div><span class="lavel"><strong>Email:</strong></span> {{$model->email}}</div>
             <div><span class="lavel"><strong>País:</strong></span> {{$model->country}}</div>
