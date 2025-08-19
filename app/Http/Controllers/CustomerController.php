@@ -62,7 +62,7 @@ class CustomerController extends Controller
         
         //dd($statuses);
 
-        $model = $this->customerService->filterCustomers($request, $statuses, null, false, 5);
+        $model = $this->customerService->filterCustomers($request, $statuses, null, false, 10);
         $customersGroup = $this->customerService->filterCustomers($request, $statuses, null, true);
         
         $customer = $model[0] ?? null;
