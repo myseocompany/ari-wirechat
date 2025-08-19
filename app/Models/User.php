@@ -18,6 +18,21 @@ class User extends Authenticatable
     
     use Chatable;
 
+    use HasFactory, Notifiable;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role_id',
+        'channels_id',
+    ];
+
     // Custom logic for allowing chat creation
     public function canCreateChats(): bool
     {
@@ -94,19 +109,7 @@ class User extends Authenticatable
     }
 
 
-    use HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role_id',
-    ];
+    
 
     /**
      * The attributes that should be hidden for serialization.
@@ -238,4 +241,10 @@ class User extends Authenticatable
             Array($from_date->format('Y-m-d'), $to_date->addHours(23)->addMinutes(59)->addSeconds(59)->format('Y-m-d H:i:s'));
         return $date_array;
     }
+
+    public static function getIdFromChannelsId($channelsId): ?int
+    {
+        return self::where('channels_id', $channelsId)->value('id');
+    }
+
 }

@@ -2975,4 +2975,60 @@ class APIController extends Controller
         return $action;
     }
 
+    public function saveChannelsAction(Request $request)
+    {
+        $data = json_decode($request->getContent(), true)[0] ?? [];
+
+        if (!isset($data['phoneNumber'])) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'phoneNumber es requerido'
+            ], 400);
+        }
+
+        $customer = Customer::findByPhoneInternational($data['phoneNumber']);
+
+        if (!$customer) {
+            return response()->json([
+                'status' => 'not_found',
+                'message' => 'Cliente no encontrado con ese número.'
+            ], 404);
+        }
+
+        $action = new Action;
+        $action->customer_id = $customer->id;
+        $action->type_id = $this->getActionTypeFromChannels($data['lastEventType'] ?? null);
+        $action->note = $data['note'] ?? 'Llamada de channels';
+        $action->creator_user_id = User::getIdFromChannelsId($data['agentId'] ?? null);
+        $action->url = $data['recordingUrl'] ?? null;
+        $action->save();
+
+        return response()->json([
+            'status' => 'ok',
+            'action_id' => $action->id,
+            'customer_id' => $customer->id,
+            'created_at' => $action->created_at,
+        ]);
+    }  
+
+
+    public function getActionTypeFromChannels($lastEventType){
+        $id = 1;
+        switch ($lastEventType) {
+            case 'REFUSE':
+                $id = 1; 
+                break;
+            case 'FAILED_CONTACT':
+                $id = 1; 
+                break;
+            case 'INCOMING_CALL_ANSWERED':
+                $id = 21; 
+                break;
+            case 'VOICE_MAIL_DROP':
+                $id = 1; 
+                break;
+        }
+        return $id;
+    }
+
 }

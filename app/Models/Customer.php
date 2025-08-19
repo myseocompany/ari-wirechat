@@ -452,4 +452,21 @@ class Customer extends Authenticatable
 }
 
 
+    public static function normalizePhone(string $phone): string
+    {
+        // Quitar cualquier carácter que no sea dígito
+        return preg_replace('/[^0-9]/', '', $phone);
+    }
+    public static function findByPhoneInternational(string $incomingPhone): ?Customer
+    {
+        $normalized = self::normalizePhone($incomingPhone);
+
+        return self::whereRaw("REPLACE(REPLACE(REPLACE(phone, '+', ''), ' ', ''), '-', '') = ?", [$normalized])
+            ->orWhereRaw("REPLACE(REPLACE(REPLACE(phone2, '+', ''), ' ', ''), '-', '') = ?", [$normalized])
+            ->orWhereRaw("REPLACE(REPLACE(REPLACE(contact_phone2, '+', ''), ' ', ''), '-', '') = ?", [$normalized])
+            ->first();
+    }
+
+
+
 }
