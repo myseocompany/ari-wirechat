@@ -1,5 +1,9 @@
 <h2 class="mt-4">Acciones</h2>
 
+@php
+    $record = isset($customer) ? $customer : $model;
+@endphp
+
 <div class="card shadow-sm p-3 mb-4">
     <form action="/customers/{{$customer->id}}/action/store" method="POST" enctype="multipart/form-data">
         @csrf
@@ -24,9 +28,13 @@
                 <select name="status_id" id="status_id" class="form-control">
                     <option value="">Seleccione un estado</option>
                     @foreach($statuses_options as $status_option)
-                        <option value="{{$status_option->id}}">{{$status_option->name}}</option>
+                        <option value="{{ $status_option->id }}" 
+                            {{ $record->status_id == $status_option->id ? 'selected' : '' }}>
+                            {{ $status_option->name }}
+                        </option>
                     @endforeach
                 </select>
+
                 @include('customers.status_table', ["statuses_options"=>$statuses_options])
                 <button class="btn btn-link p-0" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
                     <i class="fa fa-question-circle text-primary" id="helpButtonStatus"></i>
