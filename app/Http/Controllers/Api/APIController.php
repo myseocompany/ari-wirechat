@@ -2975,7 +2975,50 @@ class APIController extends Controller
         return $action;
     }
 
+
     public function saveChannelsAction(Request $request)
+{
+    $raw = json_decode($request->getContent(), true);
+    $data = $raw[0]['body'] ?? [];
+
+    // Buscar teléfono
+    $phone = $data['msisdn'] ?? ($data['contact']['msisdns'][0] ?? null);
+
+    if ($phone) {
+        $customer = Customer::findByPhoneInternational($phone);
+
+        if ($customer) {
+            $action = new Action;
+            $action->customer_id = $customer->id;
+            $action->type_id = $this->getActionTypeFromChannels($data['lastEventType']);
+            $action->note = 'Llamada de channels (vía webhook)';
+            $action->creator_user_id = User::getIdFromChannelsId($data['agentId']);
+            $action->url = $data['recordingLink'] ?? null;
+
+            $action->save();
+
+            return response()->json([
+                'status' => 'ok',
+                'customer_id' => $customer->id,
+                'action_id' => $action->id,
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'not_found',
+                'message' => 'Cliente no encontrado con ese número.',
+                'phone_received' => $phone
+            ], 404);
+        }
+    }
+
+    return response()->json([
+        'status' => 'error',
+        'message' => 'Número de teléfono no encontrado en el payload.',
+    ], 400);
+}
+
+
+    public function saveChannelsAction2(Request $request)
     {
         $data = json_decode($request->getContent(), true)[0] ?? [];
 
