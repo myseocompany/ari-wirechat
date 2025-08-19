@@ -2978,44 +2978,36 @@ class APIController extends Controller
 
     public function saveChannelsAction(Request $request)
 {
-    $raw = json_decode($request->getContent(), true);
-    $data = $raw[0]['body'] ?? [];
-
-    // Buscar teléfono
-    $phone = $data['msisdn'] ?? ($data['contact']['msisdns'][0] ?? null);
-
-    if ($phone) {
-        $customer = Customer::findByPhoneInternational($phone);
-
-        if ($customer) {
-            $action = new Action;
-            $action->customer_id = $customer->id;
-            $action->type_id = $this->getActionTypeFromChannels($data['lastEventType']);
-            $action->note = 'Llamada de channels (vía webhook)';
-            $action->creator_user_id = User::getIdFromChannelsId($data['agentId']);
-            $action->url = $data['recordingLink'] ?? null;
-
-            $action->save();
-
-            return response()->json([
-                'status' => 'ok',
-                'customer_id' => $customer->id,
-                'action_id' => $action->id,
-            ]);
-        } else {
-            return response()->json([
-                'status' => 'not_found',
-                'message' => 'Cliente no encontrado con ese número.',
-                'phone_received' => $phone
-            ], 404);
-        }
+    // ✅ Respuesta inmediata (no espera al procesamiento)
+    response()->json(['status' => 'accepted'], 200)->send();
+    if (function_exists('fastcgi_finish_request')) {
+        fastcgi_finish_request(); // <-- Aquí se cierra la conexión HTTP
     }
 
-    return response()->json([
-        'status' => 'error',
-        'message' => 'Número de teléfono no encontrado en el payload.',
-    ], 400);
+    // 🔄 Procesamiento asíncrono "manual" (puedes pasar esto a Job más adelante)
+    try {
+        $raw = json_decode($request->getContent(), true);
+        $data = $raw[0]['body'] ?? [];
+
+        $phone = $data['msisdn'] ?? ($data['contact']['msisdns'][0] ?? null);
+
+        if ($phone) {
+            $customer = Customer::findByPhoneInternational($phone);
+            if ($customer) {
+                $action = new Action;
+                $action->customer_id = $customer->id;
+                $action->type_id = $this->getActionTypeFromChannels($data['lastEventType']);
+                $action->note = 'Llamada de channels (vía webhook)';
+                $action->creator_user_id = User::getIdFromChannelsId($data['agentId']);
+                $action->url = $data['recordingLink'] ?? null;
+                $action->save();
+            }
+        }
+    } catch (\Throwable $e) {
+        \Log::error('Webhook Channels Error: ' . $e->getMessage());
+    }
 }
+
 
 
     public function saveChannelsAction2(Request $request)
