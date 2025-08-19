@@ -374,29 +374,28 @@ class Customer extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
-    public function getInternationalPhone($defaultCountryCode = '57')
+    public function getInternationalPhone($phone = null, $defaultCountryCode = '57')
     {
-        $rawPhone = $this->getPhoneStr();              // Usa el método base
-        $cleaned = $this->cleanPhone($rawPhone);       // Limpia espacios y símbolos
+        $rawPhone = $phone ?? $this->getPhoneStr();
+        $cleaned = $this->cleanPhone($rawPhone);
 
-        // Si ya tiene un '+' al inicio, asumimos que es internacional válido
+        if (empty($cleaned)) return null;
+
         if (strpos($rawPhone, '+') === 0) {
             return $rawPhone;
         }
 
-        // Si tiene exactamente 10 dígitos, agregamos +57
         if (strlen($cleaned) === 10) {
             return '+' . $defaultCountryCode . $cleaned;
         }
 
-        // Si tiene entre 11 y 13 dígitos, asumimos que es código internacional mal formateado (sin +)
         if (strlen($cleaned) >= 11 && strlen($cleaned) <= 13) {
             return '+' . $cleaned;
         }
 
-        // Si no entra en ningún caso, se retorna tal cual
         return $cleaned;
     }
+
 
 
     public function getBestPhoneCandidate(): ?string
