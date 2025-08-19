@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Str; @endphp
 <h2 class="mt-4">Línea de tiempo del cliente</h2>
 
 @php
@@ -12,6 +13,10 @@
           'creator' => $action->creator->name ?? 'Automático',
           'icon' => $action->type->icon ?? 'fa-sticky-note',
           'color' => $action->type->color ?? '#0d6efd',
+          'url' => $action->url,
+          'type_name' => $action->getTypeName(), // nombre del tipo
+          'is_pending' => $action->isPending(),  // estado pendiente
+          'due_date' => $action->due_date,       // fecha de vencimiento
           
       ]);
   }
@@ -55,18 +60,43 @@
       @if($item['type'] === 'action')
         <div class="d-flex justify-content-between">
           <div>
+            {{-- ⏰ Mostrar si está pendiente y tiene fecha --}}
+            @if($item['is_pending'] && $item['due_date'])
+              <span class="text-danger fw-bold small">
+                ⏰ Programado para: {{ \Carbon\Carbon::parse($item['due_date'])->format('d M Y H:i') }}
+              </span><br>
+            @endif
+
+            {{-- Nota --}}
             <strong>
               @if($item['icon'])
                 <i class="fa {{ $item['icon'] }}"></i>
               @endif
               {{ $item['note'] }}
             </strong><br>
+
+            {{-- 🎧 Reproductor de audio --}}
+            @if(!empty($item['url']) && Str::contains(Str::lower($item['note']), 'llamada'))
+              <audio controls class="mt-2">
+                <source src="{{ $item['url'] }}" type="audio/ogg">
+                Tu navegador no soporta el audio.
+              </audio><br>
+            @endif
+
+            {{-- Tipo de acción --}}
+            <span class="text-muted small">
+              {{ $item['type_name'] ?? 'Tipo no definido' }}
+            </span>
+
           </div>
+
+          {{-- Lado derecho: fecha y creador --}}
           <div class="text-end small text-muted">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}<br>
             {{ $item['creator'] }}
           </div>
         </div>
+
 
       @elseif($item['type'] === 'asignacion')
         <div class="d-flex justify-content-between">
