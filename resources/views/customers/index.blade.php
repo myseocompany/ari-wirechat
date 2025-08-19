@@ -78,7 +78,7 @@
               <a href="/customers/{{$item->id}}/edit">
                   <img src="/img/editar.png" id="edit_icon_{{$item->id}}" style="display: none; width: 17px;">
               </a> 
-              @if(isset($item->phone) || isset($item->phone2))
+              @if(isset($item->phone) || isset($item->phone2) )
                  
               @endif
               <div class="customer_description">
@@ -90,7 +90,12 @@
                   <div>
                       @if(isset($item->phone)|| isset($item->phone2))
                       <a href="/customers/{{$item->id}}/show">
-                          <span>{{ isset($item->phone) ? $item->phone : $item->phone2 }}</span>
+                         <span>
+                            {{ $item->getBestPhoneCandidate() 
+                                ? $item->getInternationalPhone($item->getBestPhoneCandidate()) 
+                                : 'Sin teléfono válido' 
+                            }}
+                        </span>
                       </a>
                       @endif
                   </div>

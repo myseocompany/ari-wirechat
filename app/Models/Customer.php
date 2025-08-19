@@ -374,4 +374,52 @@ class Customer extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function getInternationalPhone($defaultCountryCode = '57')
+    {
+        $rawPhone = $this->getPhoneStr();                  // usa el método existente
+        $cleaned = $this->cleanPhone($rawPhone);           // limpia el número
+        
+        // Si ya empieza con el código de país, solo agregamos "+"
+        if (strpos($cleaned, $defaultCountryCode) === 0) {
+            return '+' . $cleaned;
+        }
+
+        // Si tiene 10 dígitos, asumimos que es un número nacional sin indicativo
+        if (strlen($cleaned) === 10) {
+            return '+' . $defaultCountryCode . $cleaned;
+        }
+
+        // Si tiene más de 10 pero sin "+" (posiblemente mal ingresado)
+        if (strlen($cleaned) > 10 && $rawPhone[0] !== '+') {
+            return '+' . $cleaned;
+        }
+
+        return $cleaned; // fallback (dejar como está si no entra en ningún caso)
+    }
+
+    public function getBestPhoneCandidate(): ?string
+    {
+        $candidates = [
+            $this->phone,
+            $this->phone2,
+            $this->contact_phone2
+        ];
+
+        $validPhones = collect($candidates)
+            ->filter() // elimina nulos o vacíos
+            ->map(function ($p) {
+                return $this->cleanPhone($p);
+            })
+            ->filter(function ($p) {
+                $len = strlen($p);
+                return $len >= 10 && $len <= 13;
+            })
+            ->sortByDesc(function ($p) {
+                return strlen($p); // preferir el más largo dentro del rango
+            })
+            ->values();
+
+        return $validPhones->first();
+    }
+
 }
