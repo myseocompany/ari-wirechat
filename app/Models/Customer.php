@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Action;
-use Carbon;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Namu\WireChat\Traits\Chatable;
@@ -422,5 +422,34 @@ class Customer extends Authenticatable
 
         return $validPhones->first();
     }
+
+
+
+    public function getLastContactLabel(): ?string
+{
+    $lastAction = $this->getLastUserAction();
+
+    if (!$lastAction) {
+        return null;
+    }
+
+    $diffDays = \Carbon\Carbon::parse($lastAction->created_at)->diffInDays(now());
+    $color = 'secondary';
+    $textColor = 'text-white'; // predeterminado blanco
+
+    if ($diffDays < 2) {
+        $color = 'success';
+        $textColor = 'text-white';
+    } elseif ($diffDays < 90) {
+        $color = 'warning';
+        $textColor = 'text-dark';
+    } else {
+        $color = 'danger';
+        $textColor = 'text-white';
+    }
+
+    return '<span class="badge bg-' . $color . ' ' . $textColor . '">Último contacto: ' . $lastAction->created_at->diffForHumans() . '</span><br><small>Nota: "' . \Illuminate\Support\Str::limit($lastAction->note, 40) . '"</small>';
+}
+
 
 }

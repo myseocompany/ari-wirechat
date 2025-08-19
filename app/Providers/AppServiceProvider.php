@@ -6,6 +6,8 @@ use App\Listeners\WAToolboxListener;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\App;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        
+         Carbon::setLocale(App::getLocale());
         Event::listen(
             \Namu\WireChat\Events\MessageCreated::class,
             WAToolboxListener::class,
