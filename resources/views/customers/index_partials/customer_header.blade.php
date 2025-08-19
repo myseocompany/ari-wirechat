@@ -27,19 +27,23 @@
           @endif
 
           {{-- Teléfonos y correo --}}
-          @if($customer->phone || $customer->phone2 || $customer->email)
-            <p class="mb-2">
-              @if($customer->phone)
-                <a href="/customers/{{ $customer->id }}/show" class="text-decoration-none me-2">📞 {{ $customer->phone }}</a>
-              @endif
-              @if($customer->phone2)
-                <a href="/customers/{{ $customer->id }}/show" class="text-decoration-none me-2">📞 {{ $customer->phone2 }}</a>
-              @endif
-              @if($customer->email)
-                <span class="text-muted">✉️ {{ $customer->email }}</span>
-              @endif
-            </p>
-          @endif
+@if($customer->getBestPhoneCandidate() || $customer->email)
+  <p class="mb-2">
+    @if($customer->getBestPhoneCandidate())
+      📞<a href="/customers/{{ $customer->id }}/show" class="text-decoration-none me-2">
+        {{ $item->getBestPhoneCandidate() 
+                                ? $item->getInternationalPhone($item->getBestPhoneCandidate()) 
+                                : 'Sin teléfono válido' 
+                            }}
+      </a>
+    @endif
+
+    @if($customer->email)
+      <span class="text-muted">✉️ {{ $customer->email }}</span>
+    @endif
+  </p>
+@endif
+
 
           {{-- Ubicación --}}
           @if($customer->country || $customer->department || $customer->city || $customer->address)
