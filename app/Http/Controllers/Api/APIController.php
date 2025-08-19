@@ -2978,6 +2978,15 @@ class APIController extends Controller
 
     public function saveChannelsAction(Request $request)
 {
+
+        Log::info('✅ Webhook Channels recibido');
+
+    // Opcional: log completo del body para debug
+    Log::info('📦 Payload recibido:', [
+        'raw' => $request->getContent(),
+        'parsed' => json_decode($request->getContent(), true),
+    ]);
+    
     // ✅ Respuesta inmediata (no espera al procesamiento)
     response()->json(['status' => 'accepted'], 200)->send();
     if (function_exists('fastcgi_finish_request')) {
