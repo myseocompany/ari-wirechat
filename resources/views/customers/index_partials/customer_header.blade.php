@@ -35,6 +35,8 @@
                                 ? $customer->getInternationalPhone($customer->getBestPhoneCandidate()) 
                                 : 'Sin teléfono válido' 
                             }}
+-
+                            {{$customer->getBestPhoneCandidate()}}
       </a>
     @endif
 
