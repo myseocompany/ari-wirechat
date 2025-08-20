@@ -16,7 +16,8 @@ use App\Models\ActionType;
 use App\Models\Action;
 use App\Models\Customer;
 use App\Models\ViewCustomerHasActions;
-
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class ReportController extends Controller
 {
@@ -1023,5 +1024,55 @@ class ReportController extends Controller
             'customersByProject7', 'customersByProject30', 'customersByProject3', 
             'countShowUp1', 'countShowUp2', 'countShowUp3'));
     }
+
+
+
+
+
+public function missingCustomerFiles(Request $request)
+{
+    $wonStatusId = 8;
+
+    $availableYears = \App\Models\Customer::whereNotNull('updated_at')
+        ->where('status_id', $wonStatusId)
+        ->selectRaw('YEAR(updated_at) as year')
+        ->groupBy('year')
+        ->orderByDesc('year')
+        ->pluck('year');
+
+    $selectedYear = $request->input('year') ?? $availableYears->first();
+
+    $customers = \App\Models\Customer::where('status_id', $wonStatusId)
+        ->whereYear('updated_at', $selectedYear)
+        ->with('files')
+        ->orderByDesc('updated_at')
+        ->get();
+
+    $groupedByMonth = [];
+
+    foreach ($customers as $customer) {
+        $customer->total_files = count($customer->files);
+        $customer->missing_count = 0;
+
+        foreach ($customer->files as $file) {
+            $fullPath = "/home/forge/arichat.co/public/public/files/{$customer->id}/{$file->url}";
+            $file->status = File::exists($fullPath) ? 'OK' : 'MISSING';
+
+            if ($file->status === 'MISSING') {
+                $customer->missing_count++;
+            }
+        }
+
+        $month = optional($customer->updated_at)->format('F') ?? 'Unknown';
+        $groupedByMonth[$month][] = $customer;
+    }
+
+    // Ordenar meses cronológicamente (1=Jan, 12=Dec)
+    uksort($groupedByMonth, function($a, $b) {
+        return date('n', strtotime($a)) - date('n', strtotime($b));
+    });
+
+    return view('reports.missing_customer_files.index', compact('groupedByMonth', 'availableYears', 'selectedYear'));
+}
 
 }

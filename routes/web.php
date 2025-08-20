@@ -413,6 +413,11 @@ Route::get('/auth/callback', [APIController::class, 'callBack']);
 // Reports
 Route::get('/reports/fm', [ReportController::class, 'RFM']);
 
+Route::get('/reports/missing-customer-files', [ReportController::class, 'missingCustomerFiles'])
+    ->name('reports.missing_customer_files');
+
+
+
 Route::get('/watoolbox/test', function(){
 
     return view('test');
