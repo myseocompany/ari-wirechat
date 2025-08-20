@@ -1033,6 +1033,7 @@ public function missingCustomerFiles(Request $request)
 {
     $wonStatusId = 8;
 
+    // Obtener los años disponibles de clientes ganados
     $availableYears = \App\Models\Customer::whereNotNull('updated_at')
         ->where('status_id', $wonStatusId)
         ->selectRaw('YEAR(updated_at) as year')
@@ -1051,28 +1052,35 @@ public function missingCustomerFiles(Request $request)
     $groupedByMonth = [];
 
     foreach ($customers as $customer) {
+        $monthNumber = optional($customer->updated_at)->format('n'); // 1–12
+        $monthName = optional($customer->updated_at)->format('F');   // January, February...
+
         $customer->total_files = count($customer->files);
         $customer->missing_count = 0;
 
         foreach ($customer->files as $file) {
             $fullPath = "/home/forge/arichat.co/public/public/files/{$customer->id}/{$file->url}";
-            $file->status = File::exists($fullPath) ? 'OK' : 'MISSING';
+            $file->status = \File::exists($fullPath) ? 'OK' : 'MISSING';
 
             if ($file->status === 'MISSING') {
                 $customer->missing_count++;
             }
         }
 
-        $month = optional($customer->updated_at)->format('F') ?? 'Unknown';
-        $groupedByMonth[$month][] = $customer;
+        if (!isset($groupedByMonth[$monthNumber])) {
+            $groupedByMonth[$monthNumber] = [
+                'name' => $monthName,
+                'customers' => []
+            ];
+        }
+
+        $groupedByMonth[$monthNumber]['customers'][] = $customer;
     }
 
-    // Ordenar meses cronológicamente (1=Jan, 12=Dec)
-    uksort($groupedByMonth, function($a, $b) {
-        return date('n', strtotime($a)) - date('n', strtotime($b));
-    });
+    ksort($groupedByMonth);
 
     return view('reports.missing_customer_files.index', compact('groupedByMonth', 'availableYears', 'selectedYear'));
 }
+
 
 }
