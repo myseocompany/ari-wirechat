@@ -464,7 +464,7 @@
 		];
 
 	productPrices = [
-		@foreach($products as $item) '{{$item->price}}', @endforeach
+		@foreach($products as $item) '{{$item->total}}', @endforeach
 	];
 
 	productDescriptions = [

@@ -8,19 +8,31 @@ use File;
 
 class CustomerFileController extends Controller
 {
-    public function delete($id){
-    	$model = CustomerFile::find($id);
+	public function delete($id)
+	{
+		$model = CustomerFile::find($id);
 
-    	//$path = public_path('/storage/files/'.$model->url);
-    	$path = 'public/files/'.$model->customer_id."/".$model->url;
-        	
-    	
-    	$error = File::delete($path);
-    
+		$originalPath = 'public/files/'.$model->customer_id.'/'.$model->url;
+		$trashPath = 'public/files_deleted/'.$model->customer_id;
 
-    	$model->delete();
-    	return back();
-    }
+		// Asegura que la carpeta destino exista
+		if (!File::exists($trashPath)) {
+			File::makeDirectory($trashPath, 0755, true, true);
+		}
+
+		// Mover el archivo a la papelera si existe
+		if (File::exists($originalPath)) {
+			File::move($originalPath, $trashPath.'/'.$model->url);
+		} else {
+			\Log::warning("Archivo no encontrado para mover a papelera: ".$originalPath);
+		}
+
+		// Elimina el registro de base de datos
+		$model->delete();
+
+		return back()->with('success', 'Archivo movido a papelera.');
+	}
+
 
     public function store(Request $request){
     	$path = "";
