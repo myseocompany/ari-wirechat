@@ -2978,44 +2978,79 @@ class APIController extends Controller
 
     public function saveChannelsAction(Request $request)
 {
-
-        Log::info('✅ Webhook Channels recibido');
-
-    // Opcional: log completo del body para debug
-    Log::info('📦 Payload recibido:', [
-        'raw' => $request->getContent(),
-        'parsed' => json_decode($request->getContent(), true),
-    ]);
-    
-    // ✅ Respuesta inmediata (no espera al procesamiento)
+    // --- 1) ACK inmediato (TTFB bajito) -------------------------------
+    // Enviar la respuesta al cliente YA y cerrar la conexión HTTP.
     response()->json(['status' => 'accepted'], 200)->send();
     if (function_exists('fastcgi_finish_request')) {
-        fastcgi_finish_request(); // <-- Aquí se cierra la conexión HTTP
+        fastcgi_finish_request(); // PHP-FPM libera al cliente
     }
 
-    // 🔄 Procesamiento asíncrono "manual" (puedes pasar esto a Job más adelante)
+    // --- 2) (Opcional) Autenticación simple por header ----------------
+    // Usa un secreto propio para evitar ruido; no devuelvas 403 a Channels.
     try {
-        $raw = json_decode($request->getContent(), true);
-        $data = $raw[0]['body'] ?? [];
+        $expected = config('services.channels.secret'); // ponlo en .env
+        $got = $request->header('X-Webhook-Secret');
+        if ($expected && (!is_string($got) || !hash_equals($expected, $got))) {
+            \Log::warning('Channels webhook con secreto inválido');
+            // Nota: no abortamos; solo ignoramos el evento.
+            return;
+        }
+    } catch (\Throwable $e) {
+        \Log::error('Error validando secreto Channels: '.$e->getMessage());
+    }
 
-        $phone = $data['msisdn'] ?? ($data['contact']['msisdns'][0] ?? null);
+    // --- 3) Procesamiento asíncrono / en background -------------------
+    try {
+        $payloadRaw = $request->getContent();
+        $raw = json_decode($payloadRaw, true) ?? [];
 
-        if ($phone) {
-            $customer = Customer::findByPhoneInternational($phone);
+        // Normalizar forma del payload (a veces viene envuelto)
+        $data = is_array($raw) && array_key_exists(0, $raw) ? $raw[0] : $raw;
+        if (isset($data['body']) && is_array($data['body'])) {
+            $data = $data['body'];
+        }
+
+        // Campos tolerantes a distintas variantes de Channels
+        $evtType  = $data['webhookType']    ?? $data['lastEventType'] ?? $data['type'] ?? null;
+        $msisdn   = $data['msisdn']         ?? ($data['contact']['msisdns'][0] ?? null) ?? $data['phoneNumber'] ?? null;
+        $agentId  = $data['agentId']        ?? null;
+        $recUrl   = $data['recordingLink']  ?? $data['recordingUrl'] ?? null;
+
+        \Log::info('✅ Channels ACK enviado; procesando en background', [
+            'evtType' => $evtType,
+            'msisdn'  => $msisdn,
+            'agentId' => $agentId,
+            'hasRec'  => (bool) $recUrl,
+        ]);
+
+        // Si tienes colas, es mejor delegar a un Job
+        // ProcessChannelsWebhook::dispatch($data)->onQueue('webhooks');
+
+        // Fallback sin colas:
+        if ($msisdn) {
+            // Normaliza tu formato interno (ajusta a tus helpers reales)
+            $phone = preg_replace('/\D+/', '', $msisdn);
+
+            $customer = \App\Models\Customer::findByPhoneInternational($phone);
             if ($customer) {
-                $action = new Action;
-                $action->customer_id = $customer->id;
-                $action->type_id = $this->getActionTypeFromChannels($data['lastEventType']);
-                $action->note = 'Llamada de channels (vía webhook)';
-                $action->creator_user_id = User::getIdFromChannelsId($data['agentId']);
-                $action->url = $data['recordingLink'] ?? null;
+                $action = new \App\Models\Action;
+                $action->customer_id     = $customer->id;
+                $action->type_id         = $this->getActionTypeFromChannels($evtType);
+                $action->note            = 'Llamada de Channels (webhook)';
+                $action->creator_user_id = \App\Models\User::getIdFromChannelsId($agentId);
+                $action->url             = $recUrl;
                 $action->save();
+            } else {
+                \Log::info('Cliente no encontrado por msisdn', ['msisdn' => $msisdn]);
             }
         }
     } catch (\Throwable $e) {
-        \Log::error('Webhook Channels Error: ' . $e->getMessage());
+        \Log::error('Webhook Channels Error: '.$e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+        ]);
     }
 }
+
 
 
 
