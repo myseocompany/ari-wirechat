@@ -3015,6 +3015,7 @@ class APIController extends Controller
         $msisdn   = $data['msisdn']         ?? ($data['contact']['msisdns'][0] ?? null) ?? $data['phoneNumber'] ?? null;
         $agentId  = $data['agentId']        ?? null;
         $recUrl   = $data['recordingLink']  ?? $data['recordingUrl'] ?? null;
+        
 
         \Log::info('✅ Channels ACK enviado; procesando en background', [
             'evtType' => $evtType,
@@ -3032,11 +3033,18 @@ class APIController extends Controller
             $phone = preg_replace('/\D+/', '', $msisdn);
 
             $customer = \App\Models\Customer::findByPhoneInternational($phone);
+
+            $digits10 = substr(preg_replace('/\D+/', '', $msisdn), -10);
+            $customer = $customer ?: \App\Models\Customer::whereRaw("REPLACE(REPLACE(REPLACE(phone,' ',''),'-',''),'(',')') LIKE ?", ["%{$digits10}%"])
+                                                        ->orWhereRaw("REPLACE(REPLACE(REPLACE(phone2,' ',''),'-',''),'(',')') LIKE ?", ["%{$digits10}%"])
+                                                        ->first();
+
+            
             if ($customer) {
                 $action = new \App\Models\Action;
                 $action->customer_id     = $customer->id;
                 $action->type_id         = $this->getActionTypeFromChannels($evtType);
-                $action->note            = 'Llamada de Channels (webhook)';
+                $action->note            = 'Llamada de Channels (webhook) '. $evtType;
                 $action->creator_user_id = \App\Models\User::getIdFromChannelsId($agentId);
                 $action->url             = $recUrl;
                 $action->save();
@@ -3092,22 +3100,13 @@ class APIController extends Controller
 
 
     public function getActionTypeFromChannels($lastEventType){
-        $id = 1;
-        switch ($lastEventType) {
-            case 'REFUSE':
-                $id = 1; 
-                break;
-            case 'FAILED_CONTACT':
-                $id = 1; 
-                break;
-            case 'INCOMING_CALL_ANSWERED':
-                $id = 21; 
-                break;
-            case 'VOICE_MAIL_DROP':
-                $id = 1; 
-                break;
-        }
-        return $id;
+        return match($lastEventType) {
+            'INCOMING_CALL_ANSWERED' => 107,    // llamada entrante contestada
+            'CALL_STARTED'           => 21,    // llamada iniciada
+            'CALL_FINISHED'          => 21,    // llamada finalizada
+            'REFUSE', 'FAILED_CONTACT', 'VOICE_MAIL_DROP' => 1, // no contactado
+            default => 1,
+        };
     }
 
 }
