@@ -42,7 +42,8 @@
 
       <div class="customer_description">
         <div>
-          <a href="/customers/{{ $item->id }}/show">
+          <a <!-- href="/customers/{{ $item->id }}/show" -->
+              href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}">
             {{ $item->getBestPhoneCandidate()
               ? $item->getInternationalPhone($item->getBestPhoneCandidate())
               : 'Sin teléfono válido' }}
