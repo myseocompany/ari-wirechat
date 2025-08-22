@@ -14,26 +14,32 @@
         </div>
         <div class="position-relative w-100">
 
-          {{-- Estrellas arriba a la derecha --}}
-          @php $stars = $item->getScoringToNumber(); @endphp
-          <div class="text-right">
-            @for ($i = 1; $i <= 4; $i++)
-              <span style="color: {{ $i <= $stars ? 'gold' : 'lightgray' }}; font-size: 16px;">
-                {{ $i <= $stars ? '★' : '☆' }}
-              </span>
-            @endfor
 
-            @if($item->scoring_interest)
-              <span class="badge bg-secondary ml-1">{{ $item->scoring_interest }}</span>
-            @endif
+          {{-- Nombre del cliente + estrellas en una sola línea --}}
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}" class="font-weight-bold">
+                {!! $item->maker === 1 ? '🥟' : ($item->maker === 0 ? '💡' : ($item->maker === 2 ? '🍗🥩⚙️' : '')) !!}
+                &nbsp;{{ Str::limit($item->name ?? 'Sin nombre', 21) }}
+              </a>
+            </div>
+
+            <div>
+              @php $stars = $item->getScoringToNumber(); @endphp
+              @for ($i = 1; $i <= 4; $i++)
+                <span style="color: {{ $i <= $stars ? 'gold' : 'lightgray' }}; font-size: 16px;">
+                  {{ $i <= $stars ? '★' : '☆' }}
+                </span>
+              @endfor
+
+              @if($item->scoring_interest)
+                <span class="badge bg-secondary ml-1">{{ $item->scoring_interest }}</span>
+              @endif
+            </div>
           </div>
 
 
-          {{-- Nombre del cliente y maker --}}
-          <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}" class="font-weight-bold">
-            {!! $item->maker === 1 ? '🥟' : ($item->maker === 0 ? '💡' : ($item->maker === 2 ? '🍗🥩⚙️' : '')) !!}
-            &nbsp;{{ Str::limit($item->name ?? 'Sin nombre', 21) }}
-          </a>
+
 
           {{-- País + Teléfono + Fecha --}}
           <div class="small text-muted mt-1">
