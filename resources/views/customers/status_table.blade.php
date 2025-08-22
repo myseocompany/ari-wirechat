@@ -55,15 +55,5 @@
 </style>
 
 <script>
-  $(document).ready(function(){
-    $("#helpButtonStatus").click(function(){
-      $("#statusSidebar").addClass("active");
-      $(".box").slideDown();
-    });
 
-    $("#closeStatusSidebar").click(function(){
-      $(".box").slideUp();
-      $("#statusSidebar").removeClass("active");
-    });
-  });
 </script>

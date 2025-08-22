@@ -1,403 +1,158 @@
-<div>
- 
-    <form action="/customers/"   method="GET" id="mini_filter_form">
-
-      <div id="quicksearch" class="form-group">
-  
-      <div class="row">
-        <div class="col-md-9">
-        <input placeholder="Escriba aquí" type="text" name="search" id="search" class="form-control" onkeyup="searchSynchronize();" @if(isset($request->search))value="{{$request->search}}" @endif>
-            
-      </div>
-          
-      <div class="col-md-2">
-        <input type="submit" class="btn btn-primary btn-sm" value="Filtrar">
-      </div> 
-      </div>
-    </div> 
-    </form>    
-  
-
-
-<div class="accordion" id="accordionExample">
-  <div class="card">
-    <div class="card-header" id="headingFilter">
-      <h2 class="mb-0">
-        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseFilter" aria-expanded="true" aria-controls="collapseFilter">
-          Filtro
-        </button>
-      </h2>
-    </div>
-
-    <div id="collapseFilter" class="collapse" aria-labelledby="headingFilter" data-parent="#accordionExample">
-      <!--<div class="card-body row">-->
-      <div>
-        <form action="/{{$model->action}}/" actione="/customers" method="GET" id="filter_form">
-
-      <div class="col-md-12">
-          <select name="filter" class="form-control col-12" id="filter" onchange="update()">
-            <option value="">Seleccione tiempo</option>
-            <option value="0" @if ($request->filter == "0") selected="selected" @endif>hoy</option>
-            <option value="-1" @if ($request->filter == "-1") selected="selected" @endif>ayer</option>
-            <option value="thisweek" @if ($request->filter == "thisweek") selected="selected" @endif>esta semana</option>
-            
-            <option value="lastweek" @if ($request->filter == "lastweek") selected="selected" @endif>semana pasada</option>
-            <option value="lastmonth" @if ($request->filter == "lastmonth") selected="selected" @endif>mes pasado</option>
-            <option value="currentmonth" @if ($request->filter == "currentmonth") selected="selected" @endif>este mes</option>
-            <option value="lastyear" @if ($request->filter == "lastyear") selected="selected" @endif>año pasado</option>
-            <option value="currentyear" @if ($request->filter == "currentyear") selected="selected" @endif>este año</option>
-            <option value="-7" @if ($request->filter == "-7") selected="selected" @endif>ultimos 7 dias</option>
-            <option value="-30" @if ($request->filter == "-30") selected="selected" @endif>ultimos 30 dias</option>
-            <option value="-90" @if ($request->filter == "-90") selected="selected" @endif>ultimos 90 dias</option>
-        
-          </select>
-        </div>
-        <div class="col-md-12">
-          <div class="row">
-            <div class="col-6">
-              <input class="form-control" type="date" id="from_date" name="from_date" onchange="cleanFilter()" value="{{$request->from_date}}">
-            </div>
-            <div class="col-6">
-              <input class="form-control" type="date" id="to_date" name="to_date" onchange="cleanFilter()" value="{{$request->to_date}}">
-            </div>
-          </div>
-        </div>
-        <div class="col-md-12">
-          <div class="row">
-          <div class="col-4">
-            <input type="radio" name="maker" id="created" value="empty" onchange="submit();" @if(isset($request->maker) &&($request->maker=="empty"))  checked="checked"   @endif>
-            <label for="maker"><small>Sin clasificar</small></label>
-              </div>
-            <div class="col-4">
-              <input type="radio" name="maker" id="created" value="0" onchange="submit();" @if(isset($request->maker) &&($request->maker=="0"))  checked="checked"   @endif>
-              <label for="maker"><small>Proyecto</small></label>
-            </div>
-            <!--
-            <div class="col-4">
-              <label for="maker"><small>Desmechadora</small></label>
-              <input type="radio" name="maker" id="updated" value="2" onchange="submit();" @if(isset($request->maker)&&($request->maker=="2")) checked="checked" @endif>
-            </div>
--->
-            <div class="col-4">
-              <input type="radio" name="maker" id="updated" value="1" onchange="submit();" @if(isset($request->maker)&&($request->maker=="1")) checked="checked" @endif>
-              <label for="maker"><small>Hace empanadas</small></label>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="col-md-12">
-          <div class="row">
-            <div class="col-6">
-              <label for="created">Creado</label>
-              <input type="radio" name="created_updated" id="created" value="created" onchange="submit();" @if(!isset($request->created_updated) || (isset($request->created_updated)&&($request->created_updated=="created")) ) checked="checked"   @endif>
-            </div>
-            <div class="col-6">
-              <label for="created">Actualizado</label>
-              <input type="radio" name="created_updated" id="updated" value="updated" onchange="submit();" @if(isset($request->created_updated)&&($request->created_updated=="updated")) checked="checked" @endif>
-            </div>
-          </div>
-        </div>
-
-
-  <div class="col-md-12">
-    <div class="row">
-      <div class="col-6">
-        <div class="row">
-          <div class="col-4">
-            Perfil
-          </div>
-          <div class="col-8">
-            <div class="rating">
-              <label @if($request->scoring_profile=="a") class="selected" @endif>
-              <input type="radio" @if($request->scoring_profile=="a") checked @endif name="scoring_profile" value="a" title="4 stars"> 4
-              </label>
-              <label @if($request->scoring_profile=="b") class="selected" @endif>
-              <input type="radio" @if($request->scoring_profile=="b") checked @endif name="scoring_profile" value="b" title="3 stars"> 3
-              </label>
-              <label @if($request->scoring_profile=="c") class="selected" @endif>
-              <input type="radio" @if($request->scoring_profile=="c") checked @endif name="scoring_profile" value="c" title="2 stars"> 2
-              </label>
-              <label @if($request->scoring_profile=="d") class="selected" @endif>
-              <input type="radio" @if($request->scoring_profile=="d") checked @endif name="scoring_profile" value="d" title="1 star"> 1
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    
-    
-
-<div class="col-6">
-      <select name="scoring_interest" class="form-control" id="scoring_interest" onchange="submit();">
-        <option value="">Interes...</option>
-        @foreach($scoring_interest as $item)
-        <option value="{{ $item->scoring_interest }}" 
-          @if ($request->scoring_interest !== null && $request->scoring_interest == $item->scoring_interest) 
-            selected="selected" 
-          @endif>
-          {{ $item->scoring_interest }}
-        </option>
-        @endforeach
-      </select>
-    </div>
+{{-- Buscador rápido --}}
+<form action="/customers" method="GET" id="mini_filter_form" class="mb-3">
+  <div class="input-group">
+    <input type="text" name="search" id="search" class="form-control" placeholder="Buscar..." value="{{ $request->search ?? '' }}">
+    <div class="input-group-append">
+      <button class="btn btn-primary" type="submit">Buscar</button>
     </div>
   </div>
-  
-
-        
-<style type="text/css">
-.rating {
-    unicode-bidi: bidi-override;
-    direction: rtl;
-    width: 8em;
-}
-
-.rating input {
-    position: absolute;
-    left: -999999px;
-}
-
-.rating label {
-    display: inline-block;
-    font-size: 0;
-}
-
-.rating > label:before {
-    position: relative;
-    font: 24px/1 FontAwesome;
-    display: block;
-    content: "\f005";
-    color: #ccc;
-    background: -webkit-linear-gradient(-45deg, #d9d9d9 0%, #b3b3b3 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.rating > label:hover:before,
-.rating > label:hover ~ label:before,
-.rating > label.selected:before,
-.rating > label.selected ~ label:before {
-    color: #f8ce0b;
-    background: -webkit-linear-gradient(-45deg, #f8ce0b 0%, #f8ce0b 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-</style>
-<script type="text/javascript">
-  $('.rating input').change(function () {
-  var $radio = $(this);
-  $('.rating .selected').removeClass('selected');
-  $radio.closest('label').addClass('selected');
-});
-
-
-
-  function searchSynchronize(){
-    var search = $("#search").val(); 
-    $("#search_2").val(search);
-  }
-
-  function search2Synchronize(){
-    var search = $("#search_2").val(); 
-    $("#search").val(search);
-  }
-</script>
-        {{-- Combo de Interest --}}
-<div class="col-md-12">
-  <div class="row">
-    
-    <div class="col-6">
-      <select name="country" class="form-control" id="country" onchange="submit();">
-        <option value="">País...</option>
-       @if(isset($country_options))
-       @foreach($country_options as $item)
-          <option value="{{$item->iso2}}" @if ($request->iso2 == $item->iso2 && $item->iso2 != "") selected="selected" @endif>
-             {{ $item->name }}
-            
-          </option>
-        @endforeach
-       @endif
-      </select>
-    </div>
-    
-    <div class="col-6">
-        <select name="status_id" id="status_id" class="form-control" onchange="submit();">
-          <option value="">Estado....</option>
-          @foreach($statuses as $item)
-            <option value="{{$item->id}}" @if ($request->status_id == $item->id) selected="selected" @endif>
-               {{ $item->name }}
-              
-            </option>
-          @endforeach
-        </select>
-      </div>
-
-    {{-- Combo de Perfil --}}
-    <!--
-  <select name="scoring_profile" class="slectpicker custom-select" id="scoring_profile" onchange="submit();">
-      <option value="">Perfil...</option>
-      <option value="">0</option>
-      @foreach($scoring_profile as $item)
-        <option value="{{$item->scoring_profile}}" @if ($request->scoring_profile == $item->scoring_profile) selected="selected" @endif>
-          @if ($item->scoring_profile=="a")
-              {{ 4 }}
-          @endif
-          @if ($item->scoring_profile=="b")
-              {{ 3 }}
-          @endif
-          @if ($item->scoring_profile=="c")
-              {{ 2 }}
-          @endif
-          @if ($item->scoring_profile=="d")
-              {{ 1 }}
-          @endif
-        </option>
-      @endforeach
-    </select>
-  -->
-  </div>
-</div>
-
-  <div class="col-md-12">
-
-    <div class="row">
-      <!--
-      <div class="col-6">
-        <select name="product_id" class="form-control" id="product_id" onchange="submit();">
-          <option value="">Producto...</option>
-          @foreach($products as $item)
-            <option value="{{$item->id}}" @if ($request->product_id == $item->id) selected="selected" @endif>
-               {{ $item->name }}
-              
-            </option>
-          @endforeach
-        </select>
-      </div>
-    -->
-     <div class="col-6">
-        <select name="user_id" class="form-control" id="user_id" onchange="submit();">
-          <option value="">Usuario...</option>
-          <option value="null">Sin asignar</option>
-          @foreach($users as $user)
-            <option value="{{$user->id}}" @if ($request->user_id == $user->id) selected="selected" @endif>
-               <?php echo substr($user->name, 0, 10); ?>
-              
-            </option>
-          @endforeach
-        </select>
-      </div>
-    </div>
-  </div>
-    <div class="col-md-12">
-      <div class="row">
-        <div class="col-6">
-          <select name="source_id" class="form-control" id="source_id" onchange="submit();">
-            <option value="">Fuente...</option>
-            @foreach($sources as $item)
-              <option value="{{$item->id}}" @if ($request->source_id == $item->id) selected="selected" @endif>
-                 <?php echo substr($item->name, 0, 15); ?>
-                
-              </option>
-            @endforeach
-          </select>
-        </div>
-
-   
-      </div>
-  </div>
-<div class="col-md-12">
-        <!--  fin del filtro -->
-        <div class="row">
-          <div class="col-md-9">
-              <input placeholder="Escriba aquí" type="text" name="search" id="search_2" class="form-control" onkeyup="search2Synchronize();"  @if(isset($request->search))value="{{$request->search}}"@endif>
-          </div>
-          <div class="col-md-3">
-              <input type="submit" class="btn btn-primary btn-sm "  value="Filtrar" >    
-          </div>
-        </div>
-</div>
-      
-      </form>
-    </div>
-  </div>
-  <div class="card">
-    
-    
-      <div class="card-body row">
-        <div><a style="color: #4178be;" href="/customers/create">Crear
-              <i class="fa fa-plus" aria-hidden="true"></i>
-        </a> | <a href="/leads/excel{{ requestToStr($request) }}">Exportar</a> 
-              | <a href="/import/">Importar</a>
-              | 
-              <a href="#" data-toggle="modal" data-target="#miModal">Cambiar Estado</a>
-        
-            </div>
-      </div>
-    
-  </div>
-  
-</div>
-
-
-<!-- Botón que activa el modal -->
-
-<!-- Modal -->
-<form action="/leads/change_status{{ requestToStr($request) }}" type="GET" id="changeStatusForm">
-<div class="modal fade" id="miModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Cambiar usuarios de estado</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-      @foreach($request->query() as $key => $value)
-    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-  @endforeach
-        
-        <select name="modal_status_id"  id="modal_status_id" class="form-control">
-         
-          <option value="">Estado...</option>
-          @foreach($statuses->all() as $item)
-            <option value="{{$item->id}}" @if ($request->status_id == $item->id) selected="selected" @endif>
-               {{ $item->name }}
-              
-            </option>
-          @endforeach
-        </select>
-    
-       
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" id="saveChanges">Guardar Cambios</button>
-      </div>
-    </div>
-  </div>
-</div>
 </form>
 
-      
+{{-- Botón para mostrar filtros avanzados --}}
+<button class="btn btn-link text-primary mb-2" type="button" data-toggle="collapse" data-target="#filterSection" aria-expanded="false" aria-controls="filterSection">
+  Filtros avanzados
+</button>
 
-<script>
-document.getElementById('saveChanges').addEventListener('click', function() {
-  var statusSelect = document.getElementById('modal_status_id');
-  if (statusSelect.value === '') {
-    alert('Por favor, seleccione un estado.');
-    return false;
-  }else{
-    document.getElementById('changeStatusForm').submit();  
-  }
-  
-});
-</script>
+{{-- Sección de filtros colapsable --}}
+<div class="collapse" id="filterSection">
+  <form action="/customers" method="GET" id="filter_form" class="card card-body border shadow-sm">
 
-       
-    
-   
-    
+
+
+    {{-- INPUTS OCULTOS para que se envíen con el form --}}
+  <input type="hidden" id="from_date" name="from_date" value="{{ $request->from_date }}">
+  <input type="hidden" id="to_date" name="to_date" value="{{ $request->to_date }}">
+
+  {{-- Selector visual --}}
+  <div class="form-group">
+    <label for="reportrange">Rango de fechas</label>
+    <div id="reportrange" class="form-control" style="cursor: pointer; background: #fff;">
+      <i class="fa fa-calendar"></i>&nbsp;
+      <span>{{ $request->from_date && $request->to_date ? $request->from_date . ' - ' . $request->to_date : 'Seleccionar rango' }}</span>
+      <i class="fa fa-caret-down float-right mt-1"></i>
+    </div>
+  </div>
+
+  {{-- Enlaces rápidos --}}
+  <div class="mb-2">
+    <a href="#" class="btn btn-sm btn-light border" onclick="setRange(7)">Últimos 7 días</a>
+    <a href="#" class="btn btn-sm btn-light border" onclick="setRange(10)">Últimos 10 días</a>
+    <a href="#" class="btn btn-sm btn-light border" onclick="setRange(30)">Últimos 30 días</a>
+    <a href="#" class="btn btn-sm btn-outline-secondary" onclick="clearRange()">Limpiar</a>
+  </div>
+
+    {{-- Perfil e interés --}}
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="scoring_profile">Perfil</label>
+        <select name="scoring_profile" class="form-control" id="scoring_profile">
+          <option value="">Todos</option>
+          <option value="a" @selected($request->scoring_profile == 'a')>★★★★</option>
+          <option value="b" @selected($request->scoring_profile == 'b')>★★★</option>
+          <option value="c" @selected($request->scoring_profile == 'c')>★★</option>
+          <option value="d" @selected($request->scoring_profile == 'd')>★</option>
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="scoring_interest">Interés</label>
+        <select name="scoring_interest" class="form-control" id="scoring_interest">
+          <option value="">Todos</option>
+          @foreach($scoring_interest as $item)
+            <option value="{{ $item->scoring_interest }}" @selected($request->scoring_interest == $item->scoring_interest)>
+              {{ $item->scoring_interest }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+    </div>
+
+    {{-- País y estado --}}
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="country">País</label>
+        <select name="country" class="form-control" id="country">
+          <option value="">Todos</option>
+          @foreach($country_options as $item)
+            <option value="{{ $item->iso2 }}" @selected($request->iso2 == $item->iso2)>
+              {{ $item->name }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="status_id">Estado</label>
+        <select name="status_id" class="form-control" id="status_id">
+          <option value="">Todos</option>
+          @foreach($statuses as $item)
+            <option value="{{ $item->id }}" @selected($request->status_id == $item->id)>
+              {{ $item->name }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+    </div>
+
+    {{-- Usuario y fuente --}}
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="user_id">Usuario</label>
+        <select name="user_id" class="form-control" id="user_id">
+          <option value="">Todos</option>
+          <option value="null" @selected($request->user_id === 'null')>Sin asignar</option>
+          @foreach($users as $user)
+            <option value="{{ $user->id }}" @selected($request->user_id == $user->id)>
+              {{ Str::limit($user->name, 15) }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label for="source_id">Fuente</label>
+        <select name="source_id" class="form-control" id="source_id">
+          <option value="">Todas</option>
+          @foreach($sources as $item)
+            <option value="{{ $item->id }}" @selected($request->source_id == $item->id)>
+              {{ Str::limit($item->name, 15) }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+    </div>
+
+    {{-- Maker (tipo de cliente) --}}
+    <div class="form-group">
+      <label class="d-block">Tipo de cliente</label>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="maker" value="empty" id="maker_empty" onchange="submit();" @checked($request->maker === 'empty')>
+        <label class="form-check-label" for="maker_empty">Sin clasificar</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="maker" value="0" id="maker_0" onchange="submit();" @checked($request->maker === '0')>
+        <label class="form-check-label" for="maker_0">Proyecto</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="maker" value="1" id="maker_1" onchange="submit();" @checked($request->maker === '1')>
+        <label class="form-check-label" for="maker_1">Hace empanadas</label>
+      </div>
+    </div>
+
+    {{-- Fecha de creación o actualización --}}
+    <div class="form-group">
+      <label class="d-block">Filtrar por</label>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="created_updated" value="created" id="created" onchange="submit();" @checked(!isset($request->created_updated) || $request->created_updated === 'created')>
+        <label class="form-check-label" for="created">Creado</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="created_updated" value="updated" id="updated" onchange="submit();" @checked($request->created_updated === 'updated')>
+        <label class="form-check-label" for="updated">Actualizado</label>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Aplicar filtros</button>
+
+  </form>
 </div>
+
 

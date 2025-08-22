@@ -164,3 +164,85 @@ function openTab(evt, tabName) {
   document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " active";
 }
+
+
+  $(document).ready(function(){
+    $("#helpButtonStatus").click(function(){
+      $("#statusSidebar").addClass("active");
+      $(".box").slideDown();
+    });
+
+    $("#closeStatusSidebar").click(function(){
+      $(".box").slideUp();
+      $("#statusSidebar").removeClass("active");
+    });
+  });
+
+
+      $(document).ready(function(){
+      starTotal = 4;
+      ratings.forEach(renderStar);
+
+      function renderStar(value, index, array){
+        starPercentage = (array[index] / starTotal) * 100;
+        starPercentageRounded = (Math.round(starPercentage / 10) * 10)+'%';
+        selector = '#star'+index;
+        /*console.log(selector);
+        console.log($(selector));
+        console.log(index+":"+value+":"+starPercentageRounded+selector);
+        */
+        $(selector).width(starPercentageRounded); 
+      }
+    });
+
+
+        $(document).ready(function(){
+        // Mostrar el statusSidebar y la tabla cuando se haga clic en el botón de ayuda
+        $("#helpButtonAction").click(function(){
+            $("#actionsSidebar").addClass("active");
+            $(".box").slideDown();
+        });
+
+        // Cerrar el statusSidebar cuando se haga clic en la 'X'
+        $("#closeSidebarAction").click(function(){
+            $(".box").slideUp();
+            $("#actionsSidebar").removeClass("active");
+        });
+    });
+
+
+    function showEditIcon(id){
+    console.log("show_edit_icon_"+id);
+    $("#edit_icon_"+id).css("display", "inline");
+    $("#edit_icon_campaings_"+id).css("display", "inline");
+  }
+  function hideEditIcon(id){
+    console.log("hide_edit_icon_"+id);
+    $("#edit_icon_"+id).css("display", "none");
+     $("#edit_icon_campaings_"+id).css("display", "none");
+}
+
+  function nav(value,id) {
+    var message = encodeURI(value);
+    if (value != "") { 
+      endpoint = '/campaigns/'+id+'/getPhone/setMessage/'+message;
+        $.ajax({
+            type: 'GET',
+            url: endpoint,
+            dataType: 'json',
+            success: function (data) {
+                var phone = data;
+                /*
+                  if(phone == '' || phone == null){
+                      phone = data;
+                  }
+                  */
+                   url = "https://api.whatsapp.com/send/?phone="+phone+"&text="+encodeURI(value);
+                   window.open(url,'_blank');
+            },
+            error: function(data) { 
+            }
+        });
+
+       }
+  }

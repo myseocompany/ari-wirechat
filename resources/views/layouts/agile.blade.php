@@ -8,8 +8,7 @@
   <meta name="google-site-verification" content="LxHKqj-7LHr4nr1F8SSnd7J2_vI1H0lgTg2s1hb-t7A" />
   <link rel="icon" type="image/png" href="/img/icono-maquiempanadas-2025.png">
   <title>@yield('title') - AriCRM</title>
-  {{--<script src="/js/jquery-3.2.1.slim.min.js"></script>--}}
-  <script  src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+  
   <!-- Placed at the end of the document so the pages load faster -->
   <!-- Popper.js (versión compatible con Bootstrap 4) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
@@ -21,10 +20,7 @@
 
   <link rel="stylesheet" href="/css/dashboard.css?id=<?php echo rand(1,1000);?>">
  
-  {{-- drag and drop --}}
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script> 
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.css" rel="stylesheet">   
+
 
 </head>
 <body id="sidebody">
@@ -65,15 +61,31 @@
   </section>
 </div>
 
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-    <!-- Bootstrap core JavaScript
-  
-      ================================================== -->
-      
 
-      
-      {{--   <script scr="/js/fontawesome.js"></script> --}}
-      @yield('footer_scripts')
+
+<!-- jQuery moderno (debe ir primero) -->
+<script src="//cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+<!-- jQuery UI -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script> 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.css" rel="stylesheet">   
+
+<!-- Moment.js + Daterangepicker -->
+<script src="//cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+<!-- Bootstrap (después de jQuery y Popper.js) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" crossorigin="anonymous"></script>
+
+<!-- Scripts locales -->
+<script src="/js/scripts.js?id={{ rand(1,10000) }}"></script>
+
+
+
       <script src="/js/scripts.js?id=<?php echo rand(1,10000) ?>"></script> 
+@yield('footer_scripts')
+@stack('scripts')
     </body>
     </html>

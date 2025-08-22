@@ -27,25 +27,7 @@
     @include('customers.index_partials.card', ['item' => $item])            
                   
   @endforeach
-  <script type="text/javascript">
-    $(document).ready(function(){
-      starTotal = 4;
-      ratings.forEach(renderStar);
 
-      function renderStar(value, index, array){
-        starPercentage = (array[index] / starTotal) * 100;
-        starPercentageRounded = (Math.round(starPercentage / 10) * 10)+'%';
-        selector = '#star'+index;
-        /*console.log(selector);
-        console.log($(selector));
-        console.log(index+":"+value+":"+starPercentageRounded+selector);
-        */
-        $(selector).width(starPercentageRounded); 
-      }
-    });
-             
-          
-  </script>
   <style>
     ul.pagination {
     flex-wrap: wrap;
@@ -125,42 +107,59 @@
 
 </style>
 
-<script type="text/javascript">
-  function showEditIcon(id){
-    console.log("show_edit_icon_"+id);
-    $("#edit_icon_"+id).css("display", "inline");
-    $("#edit_icon_campaings_"+id).css("display", "inline");
-  }
-  function hideEditIcon(id){
-    console.log("hide_edit_icon_"+id);
-    $("#edit_icon_"+id).css("display", "none");
-     $("#edit_icon_campaings_"+id).css("display", "none");
-}
-
-  function nav(value,id) {
-    var message = encodeURI(value);
-    if (value != "") { 
-      endpoint = '/campaigns/'+id+'/getPhone/setMessage/'+message;
-        $.ajax({
-            type: 'GET',
-            url: endpoint,
-            dataType: 'json',
-            success: function (data) {
-                var phone = data;
-                /*
-                  if(phone == '' || phone == null){
-                      phone = data;
-                  }
-                  */
-                   url = "https://api.whatsapp.com/send/?phone="+phone+"&text="+encodeURI(value);
-                   window.open(url,'_blank');
-            },
-            error: function(data) { 
-            }
-        });
-
-       }
-  }
-</script>
   @include('customers.index_partials.side_show')
 @endsection
+
+@push('scripts')
+<script>
+$(function() {
+  function updateFields(start, end) {
+    $('#from_date').val(start.format('YYYY-MM-DD'));
+    $('#to_date').val(end.format('YYYY-MM-DD'));
+    $('#reportrange span').html(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
+  }
+
+  $('#reportrange').daterangepicker({
+    opens: 'right',
+    locale: {
+      format: 'DD-MM-YYYY',
+      applyLabel: "Aplicar",
+      cancelLabel: "Cancelar",
+      daysOfWeek: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+      monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+        "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+      ],
+      firstDay: 1
+    },
+    ranges: {
+       'Hoy': [moment(), moment()],
+       'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+       'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
+       'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
+       'Este mes': [moment().startOf('month'), moment().endOf('month')],
+       'Mes anterior': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    }
+  }, updateFields);
+
+  // Inicializa con los valores si están definidos
+  @if($request->from_date && $request->to_date)
+    updateFields(moment("{{ $request->from_date }}"), moment("{{ $request->to_date }}"));
+  @endif
+});
+
+// Links rápidos
+function setRange(days) {
+  var end = moment();
+  var start = moment().subtract(days - 1, 'days');
+  $('#from_date').val(start.format('YYYY-MM-DD'));
+  $('#to_date').val(end.format('YYYY-MM-DD'));
+  $('#reportrange span').html(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
+}
+
+function clearRange() {
+  $('#from_date').val('');
+  $('#to_date').val('');
+  $('#reportrange span').html('Seleccionar rango');
+}
+</script>
+@endpush

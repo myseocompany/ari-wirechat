@@ -54,18 +54,3 @@
     }
 </style>
 
-<script>
-    $(document).ready(function(){
-        // Mostrar el statusSidebar y la tabla cuando se haga clic en el botón de ayuda
-        $("#helpButtonAction").click(function(){
-            $("#actionsSidebar").addClass("active");
-            $(".box").slideDown();
-        });
-
-        // Cerrar el statusSidebar cuando se haga clic en la 'X'
-        $("#closeSidebarAction").click(function(){
-            $(".box").slideUp();
-            $("#actionsSidebar").removeClass("active");
-        });
-    });
-</script>
