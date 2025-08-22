@@ -3,7 +3,7 @@
   $diasSinContacto = $lastAction ? \Carbon\Carbon::parse($lastAction->created_at)->diffInDays(now()) : null;
 @endphp
 
-<div class="card mb-3" onmouseover="showEditIcon({{ $item->id }})" onmouseout="hideEditIcon({{ $item->id }})">
+<div class="card mb-3 bg-light" onmouseover="showEditIcon({{ $item->id }})" onmouseout="hideEditIcon({{ $item->id }})">
   <div class="card-body p-2">
     <div class="row no-gutters align-items-center">
 
