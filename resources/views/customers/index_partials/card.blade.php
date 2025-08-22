@@ -83,15 +83,17 @@
         {{-- Asesor --}}
         <div class="d-flex align-items-center">
           @if($item->user)
+          <small>{{ $item->user->name }}</small>
             <div class="customer-circle assessor-circle mr-2" style="background-color: #6c757d;">
               {{ $item->user->getInitials() }}
             </div>
-            <small>{{ $item->user->name }}</small>
+            
           @else
+          <small class="text-muted">Sin asesor</small>
             <div class="customer-circle assessor-circle mr-2" style="background-color: #ccc;">
               ??
             </div>
-            <small class="text-muted">Sin asesor</small>
+            
           @endif
         </div>
 
