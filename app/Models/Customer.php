@@ -330,7 +330,6 @@ class Customer extends Authenticatable
         } else {
             return 'Sin nombre'; 
         }
-
     }
     
 
@@ -425,7 +424,7 @@ class Customer extends Authenticatable
 
 
 
-    public function getLastContactLabel(): ?string
+public function getLastContactLabel(): ?string
 {
     $lastAction = $this->getLastUserAction();
 
@@ -433,32 +432,39 @@ class Customer extends Authenticatable
         return null;
     }
 
-
     try {
         $createdAt = \Carbon\Carbon::parse($lastAction->created_at);
     } catch (\Exception $e) {
-        return null; // o loguear el error si es útil para debugging
+        return null;
     }
 
     $diffDays = $createdAt->diffInDays(now());
     $color = 'secondary';
     $textColor = 'text-white';
+    $icon = 'fa-clock-o'; // por defecto
 
     if ($diffDays < 2) {
         $color = 'success';
-        $textColor = 'text-white';
+        $icon = 'fa-check-circle'; // contacto reciente
     } elseif ($diffDays < 90) {
         $color = 'warning';
         $textColor = 'text-dark';
+        $icon = 'fa-hourglass'; // contacto intermedio (no existe exacto en FA4, este sirve)
     } else {
         $color = 'danger';
-        $textColor = 'text-white';
+        $icon = 'fa-exclamation-circle'; // contacto viejo
     }
 
     $humanDate = method_exists($createdAt, 'diffForHumans') ? $createdAt->diffForHumans() : $createdAt->format('d-m-Y');
 
-    return '<span class="badge bg-' . $color . ' ' . $textColor . '">Último contacto: ' . $humanDate . '</span><br><small>Nota: "' . \Illuminate\Support\Str::limit($lastAction->note, 40) . '"</small>';
+    return '<span class="badge bg-' . $color . ' ' . $textColor . '">
+                <i class="fa ' . $icon . '"></i> ' . $humanDate . '
+            </span>'
+            . ($lastAction->note
+                ? '<br><small>Nota: "' . \Illuminate\Support\Str::limit($lastAction->note, 40) . '"</small>'
+                : '');
 }
+
 
     public static function normalizePhone(string $phone): string
     {

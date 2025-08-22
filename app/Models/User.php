@@ -247,4 +247,27 @@ class User extends Authenticatable
         return self::where('channels_id', $channelsId)->value('id');
     }
 
+
+        public function getInitials()
+    {
+        $str = trim($this->name);
+    
+        if (empty($str)) {
+            return '??';
+        }
+    
+        $words = preg_split('/\s+/u', $str); // separa por espacios, soporta unicode
+        $initials = '';
+    
+        if (isset($words[0]) && mb_strlen($words[0], 'UTF-8') > 0) {
+            $initials .= mb_substr($words[0], 0, 1, 'UTF-8');
+        }
+    
+        if (isset($words[1]) && mb_strlen($words[1], 'UTF-8') > 0) {
+            $initials .= mb_substr($words[1], 0, 1, 'UTF-8');
+        }
+    
+        return mb_strtoupper($initials ?: '??', 'UTF-8');
+    }
+    
 }
