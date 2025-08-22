@@ -81,31 +81,32 @@
         </div>
 
         {{-- Asesor --}}
-        <div class="d-flex align-items-center">
-          @if($item->user)
-          <small>{{ $item->user->name }}</small>
-            <div class="customer-circle assessor-circle mr-2" style="background-color: #6c757d;">
-              {{ $item->user->getInitials() }}
-            </div>
-            
-          @else
-          <small class="text-muted">Sin asesor</small>
-            <div class="customer-circle assessor-circle mr-2" style="background-color: #ccc;">
-              ??
-            </div>
-            
-          @endif
-        </div>
+        <a href="/customers/{{$item->id}}/show">
+          <div class="d-flex align-items-center">
+            @if($item->user)
+            <small class="mr-2">{{ $item->user->name }}</small>
+              <div class="customer-circle assessor-circle" style="background-color: #6c757d;">
+                {{ $item->user->getInitials() }}
+              </div>
+              
+            @else
+            <small class="text-muted mr-2">Sin asesor</small>
+              <div class="customer-circle assessor-circle" style="background-color: #ccc;">
+                <i class="fa fa-user" aria-hidden="true"></i>
+              </div>
+              
+            @endif
+          </div>
+        </a>
 
 
       </div>
-@if($lastAction->note)
-  <div class="row px-3 pb-2">
-    <div class="col-12">
-      <small class="text-muted">"{{ \Illuminate\Support\Str::limit($lastAction->note, 100) }}"</small>
-    </div>
-  </div>
-@endif
+      @if($lastAction->note)
+        <div class="mt-1 text-muted" style="font-size: 0.85rem;">
+          <i class="fa fa-sticky-note-o" aria-hidden="true"></i>
+          "{{ \Illuminate\Support\Str::limit($lastAction->note, 80) }}"
+        </div>
+      @endif
     </div>
   @endif
 </div>
