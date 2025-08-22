@@ -14,15 +14,20 @@
         </div>
         <div class="position-relative w-100">
 
-          {{-- Estrellas y scoring arriba a la derecha --}}
-          <div class="position-absolute" style="top: 0; right: 0; text-align: right;">
-            <div class="stars-outer" style="height: 16px;">
-              <div class="stars-inner" id="star{{ $loop->index }}"></div>
-            </div>
-            @if($item->scoring_interest > 0)
-              <span class="badge badge-secondary mt-1">{{ $item->scoring_interest }}</span>
+          {{-- Estrellas arriba a la derecha --}}
+          @php $stars = $item->getScoringToNumber(); @endphp
+          <div class="text-right">
+            @for ($i = 1; $i <= 4; $i++)
+              <span style="color: {{ $i <= $stars ? 'gold' : 'lightgray' }}; font-size: 16px;">
+                {{ $i <= $stars ? '★' : '☆' }}
+              </span>
+            @endfor
+
+            @if($item->scoring_interest)
+              <span class="badge bg-secondary ml-1">{{ $item->scoring_interest }}</span>
             @endif
           </div>
+
 
           {{-- Nombre del cliente y maker --}}
           <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}" class="font-weight-bold">
