@@ -429,13 +429,20 @@ class Customer extends Authenticatable
 {
     $lastAction = $this->getLastUserAction();
 
-    if (!$lastAction) {
+    if (!$lastAction || empty($lastAction->created_at)) {
         return null;
     }
 
-    $diffDays = \Carbon\Carbon::parse($lastAction->created_at)->diffInDays(now());
+
+    try {
+        $createdAt = \Carbon\Carbon::parse($lastAction->created_at);
+    } catch (\Exception $e) {
+        return null; // o loguear el error si es útil para debugging
+    }
+
+    $diffDays = $createdAt->diffInDays(now());
     $color = 'secondary';
-    $textColor = 'text-white'; // predeterminado blanco
+    $textColor = 'text-white';
 
     if ($diffDays < 2) {
         $color = 'success';
@@ -448,9 +455,10 @@ class Customer extends Authenticatable
         $textColor = 'text-white';
     }
 
-    return '<span class="badge bg-' . $color . ' ' . $textColor . '">Último contacto: ' . $lastAction->created_at->diffForHumans() . '</span><br><small>Nota: "' . \Illuminate\Support\Str::limit($lastAction->note, 40) . '"</small>';
-}
+    $humanDate = method_exists($createdAt, 'diffForHumans') ? $createdAt->diffForHumans() : $createdAt->format('d-m-Y');
 
+    return '<span class="badge bg-' . $color . ' ' . $textColor . '">Último contacto: ' . $humanDate . '</span><br><small>Nota: "' . \Illuminate\Support\Str::limit($lastAction->note, 40) . '"</small>';
+}
 
     public static function normalizePhone(string $phone): string
     {

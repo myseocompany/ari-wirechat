@@ -865,7 +865,8 @@ class CustomerController extends Controller
         if (Auth::id())
             $model->updated_user_id = Auth::id();
         if ($model->save()) {
-            return redirect('customers/' . $model->id . '/show')->with('statusone', 'El Cliente <strong>' . $model->name . '</strong> fué modificado con éxito!');
+            return redirect()->to(url()->previous())
+                ->with('statusone', 'El Cliente <strong>' . $model->name . '</strong> fué modificado con éxito!');
         }
     }
     public function updateAjaxStatus(Request $request)
@@ -1183,7 +1184,9 @@ class CustomerController extends Controller
             $model->save();
             return back();
         }
-        return redirect('/customers/' . $request->customer_id . '/show')->with('statusone', 'El Cliente <strong>' . $customer->name . '</strong> fué modificado con éxito!');
+        
+        return redirect()->to(url()->previous())
+            ->with('statusone', 'El Cliente <strong>' . $customer->name . '</strong> fué modificado con éxito!');
     }
     public function saleAction(Request $request)
     {
