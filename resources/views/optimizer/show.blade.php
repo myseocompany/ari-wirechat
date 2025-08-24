@@ -1,249 +1,221 @@
-
 @extends('layout')
+
 @section('content')
-
-
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <div style="overflow-x:auto;">
+  <form class="form" action="{{ route('optimizer.merge') }}" method="POST">
+    @csrf
 
+    {{-- IDs candidatos --}}
+    @foreach($model as $item)
+      <input type="hidden" name="customer_id_all[]" value="{{ $item->id }}">
+    @endforeach
 
-<form class="form" action="/optimize/customers/mergeDuplicates/" method="GET">
-    {{ csrf_field() }}
+    @php
+      // Campos editables
+      $fields = [
+        'status_id','user_id','source_id','product_id',
+        'name','document','position','business',
+        'phone','phone2','contact_phone2','phone_wp','total_sold',
+        'email','address','city','country','department',
+        'contact_name','contact_email','contact_position',
+        'purchase_date','notes','technical_visit','gender',
+        'scoring_interest','scoring_profile','rd_public_url','src','cid','vas',
+        'rd_source','country2','count_empanadas',
+      ];
+      $first = $model->first(); // registro base para valores iniciales
+    @endphp
 
-    <script>
-      function updateControl(value, target) {
-          var element = document.getElementById(target);
-          if (element) {
-              if (element.tagName === "SELECT") {
-                  element.value = value;
-                  // Disparar el evento 'change' manualmente
-                  var event = new Event("change", { bubbles: true });
-                  element.dispatchEvent(event);
-              } else {
-                  element.value = value;
-              }
-          }
-      }
-  
-      // Asignamos la función al evento change de los selects dinámicamente
-      document.addEventListener("DOMContentLoaded", function() {
-          document.querySelectorAll("select").forEach(select => {
-              select.addEventListener("change", function() {
-                  updateControl(this.value, this.id);
-              });
-          });
-      });
-  </script>
-  
-
-    <table class="table table-striped">   
-
-       <tr>
-            <td>Registros</td>
-            <td>Editar</td>
-            <?php $cont2 = 0; ?>
-            @foreach($model as $item)
-            <input type="hidden" name="customer_id_all[]" value="{{$item->id}}"  class="d-none2">
-                
-            <td>
-                <input type="radio" name="customer_id" value="{{$item->id}}" @if($cont2==0) checked="checked" @endif >
-                <a href="/customers/{{$item->id}}/show">{{$item->id}}</a> 
-            </td>
-            <?php $cont2++; ?>
-            @endforeach
-              
-        </tr>
-
-  
-        @foreach($model[0]->getAttributes() as $key => $value)
-
-            @if( $key!="id" && ($key != "request"))
-            <tr class="row_ms">      
-                <td><strong>{{$key}}:</strong></td>
-               
-                <td>  
-                      @if($key=='status_id')
-                     <select name="status_id" id="status_id" style="width:200px">
-                        <option value="">Seleccione un estado</option>
-                        @foreach($statuses_options as $status_option)
-                        <option value="{{$status_option->id}}" onclick="updateControl('{{$status_option->id}}','{{$key}}')"   >{{$status_option->name}}
-                        </option>
-                        @endforeach
-                    </select>
-                     @endif
-
-                     @if($key=='user_id')
-                      <select name="user_id" id="user_id" style="width:200px">
-                        <option value="" >Seleccione un usuario:</option>
-                        @foreach($user as $subitem)
-                          <option value="{{$subitem->id}}">
-                            {{$subitem->name}}-{{$subitem->id}}
-                          </option>
-                        @endforeach
-                      </select>
-                      <script>
-                        funcion changeUserId(this){
-                          var selected = $(this).val();
-                          $("#user_id").val(selected);
-                        }
-                      </script>
-                     @endif
-
-                       @if($key=='source_id')
-                     <select name="source_id" id="source_id" style="width:200px">
-                      <option value="" >Seleccione una fuente</option>
-                      @foreach($customers_source as $customer_source)
-                      <option value="{{$customer_source->id}}" onclick="updateControl('{{$customer_source->id}}','{{$key}}')"   >
-                        {{$customer_source->name}}
-                      </option>
-                      @endforeach
-                    </select>
-                     @endif
-                   
-
-                     
-
-                     
-
-
-
-                    <input style="width:200px"; 
-                    @if($key=='date_bought') type="text" readonly="" @endif @if($key=='created_at') 
-                    type="text" readonly="" @endif @if($key=='updated_at') -ype="text" readonly @endif @if($key=='status_id') type="hidden" readonly="" @endif 
-                    @if($key=='user_id') type="hidden" readonly=""  @endif 
-                    @if($key=='source_id') type="hidden" readonly="" @endif
-                    @if($key=='scoring_interest') type="number" readonly="" @endif
-                    @if($key=='vas') type="number" readonly="" @endif
-                    @if($key=='product_id') type="hidden" readonly="" @endif
-                    @if($key=='updated_user_id') type="hidden" readonly="" @endif
-                    @if($key=='gender') readonly=""  @endif
-                    @if($key=='scoring_profile') readonly=""  @endif
-                    
-
-                    value="{{$value}}" type="text" name="{{$key}}" id="{{$key}}"></input>
-
-                </td>
-               
-
-                <?php $cont = 0; 
-
-
-                ?>
-            @foreach($model as $item)
-                <?php $data = $item->toArray();?>
-                @if($cont==0)
-                <script type="text/javascript">
-                
-                    $("#{{$key}}").val("{{$data[$key]}}");
-                      
-                </script>
-              @endif
-                <td class="ms_row">
-
-                  <div class="form-check form-check-inline">
-
-                   
-                    <input class="form-check-input" type="radio"  id="{{$key}}_{{$item->id}}" 
-                      value="{{$data[$key]}}" @if($cont==0) checked="checked" @endif  
-                        onclick="updateControl('{{$data[$key]}}','{{$key}}')" name="{{$key}}_1">
-                   
-                    <label class="form-check-label" for="{{$key}}">
-                        {{$controller->getModelText($key, $item)}} {{$data[$key]}}</label>
-
-                    
-
-
-                  </div>
-                </td>
-
-                <?php $cont++; ?>
-            @endforeach
-            
-             </tr>
-            @endif
+    <table class="table table-striped">
+      {{-- Selección de registro ganador --}}
+      <tr>
+        <td>Registros</td>
+        <td>Editar</td>
+        @foreach($model as $i => $item)
+          <td>
+            <label>
+              <input type="radio" name="customer_id" value="{{ $item->id }}" {{ $i===0 ? 'checked' : '' }}>
+              <a href="{{ url("/customers/{$item->id}/show") }}">{{ $item->id }}</a>
+            </label>
+          </td>
         @endforeach
+      </tr>
+
+      {{-- Filas por cada campo --}}
+      @foreach($fields as $field)
+        @php $initial = data_get($first, $field); @endphp
         <tr>
-            <td><strong>Acciones</strong></td>
+          <td><strong>{{ $field }}:</strong></td>
 
-               <td></td>
+          {{-- Editor principal con valor inicial --}}
+          <td>
+            @switch($field)
+              @case('status_id')
+                <select name="status_id" id="status_id" class="form-control" style="width:200px">
+                  <option value="">Seleccione un estado</option>
+                  @foreach($statuses_options as $opt)
+                    <option value="{{ $opt->id }}" {{ (string)$opt->id === (string)$initial ? 'selected' : '' }}>
+                      {{ $opt->name }}
+                    </option>
+                  @endforeach
+                </select>
+                @break
 
-             @foreach($model as $item)
+              @case('user_id')
+                <select name="user_id" id="user_id" class="form-control" style="width:200px">
+                  <option value="">Seleccione un usuario</option>
+                  @foreach($user as $u)
+                    <option value="{{ $u->id }}" {{ (string)$u->id === (string)$initial ? 'selected' : '' }}>
+                      {{ $u->name }}-{{ $u->id }}
+                    </option>
+                  @endforeach
+                </select>
+                @break
 
+              @case('source_id')
+                <select name="source_id" id="source_id" class="form-control" style="width:200px">
+                  <option value="">Seleccione una fuente</option>
+                  @foreach($customers_source as $src)
+                    <option value="{{ $src->id }}" {{ (string)$src->id === (string)$initial ? 'selected' : '' }}>
+                      {{ $src->name }}
+                    </option>
+                  @endforeach
+                </select>
+                @break
+
+              @case('product_id')
+                <select name="product_id" id="product_id" class="form-control" style="width:200px">
+                  <option value="">Seleccione un producto</option>
+                  @foreach($products as $p)
+                    <option value="{{ $p->id }}" {{ (string)$p->id === (string)$initial ? 'selected' : '' }}>
+                      {{ $p->name ?? ('#'.$p->id) }}
+                    </option>
+                  @endforeach
+                </select>
+                @break
+
+              @case('purchase_date')
+                <input name="purchase_date" id="purchase_date" type="date" class="form-control" style="width:200px"
+                       value="{{ $initial ? \Illuminate\Support\Str::of($initial)->substr(0,10) : '' }}">
+                @break
+
+              @case('notes')
+                <textarea name="notes" id="notes" class="form-control" style="width:300px;height:90px">{{ old('notes', $initial) }}</textarea>
+                @break
+
+              @case('technical_visit')
+                <textarea name="technical_visit" id="technical_visit" class="form-control" style="width:300px;height:70px">{{ old('technical_visit', $initial) }}</textarea>
+                @break
+
+              @default
+                <input name="{{ $field }}" id="{{ $field }}" type="text" class="form-control" style="width:200px"
+                       value="{{ old($field, $initial) }}">
+            @endswitch
+          </td>
+
+          {{-- Radios por cada registro para elegir valor --}}
+          @foreach($model as $i => $item)
+            @php $val = data_get($item, $field); @endphp
             <td>
-              
-
-                 
-                <ul>
-                    @foreach($item->actions as $item_action)
-
-                         <li> 
-                             <input type="checkbox" name="action_all[]" checked="checked" value="{{ $item_action->id }}">
-                              {{ $item_action->note }}
-
-                           <div>@if(isset($item_action->type)&& !is_null($item_action->type)&& $item_action->type!=''){{$item_action->type->name}}@endif
-                           </div>
-                          <div>@if(isset($item_action->creator)&& !is_null($item_action->creator)&& $item_action->creator!=''){{$item_action->creator->name}}@else Automático @endif
-                          </div>
-                          <div>@if($item_action->type_id==2 || $item_action->type_id==4) {{$item_action->getEmailSubject()}}
-                            <br> {{$item_action->note}} @else {{$item_action->note}}@endif</div>
-                          <div>
-                         </li>
-                    @endforeach
-                       
-                </ul>
-                   <?php
-                    if(isset($_POST['submit'])){
-                     if(!empty($_POST['action_all'])){
-                 
-                        foreach($_POST['action_all'] as $selected){
-                        
-                         }
-                     }
-                    }
-
-                  
-
-                    ?>
-
+              <label class="form-check-inline" style="cursor:pointer">
+                <input class="form-check-input pick-field"
+                       type="radio"
+                       name="pick_{{ $field }}"
+                       value="{{ $item->id }}"                         {{-- id del registro (no se usa) --}}
+                       data-target="#{{ $field }}"                      {{-- input/select destino --}}
+                       data-val="{{ e((string)($val ?? '')) }}"         {{-- valor real --}}
+                       {{ $i===0 ? 'checked' : '' }}>
+                <span>{{ $controller->getModelText($field, $item) }} {{ $val }}</span>
+              </label>
             </td>
-            @endforeach
+          @endforeach
         </tr>
-    
-        <tr>
-            <td><strong>Archivos</strong></td>
-            <td></td>
-            @foreach($model as $item)    
-               <td>
-                
-                <ul>
-                    @foreach($item->files as $item_file)
+      @endforeach
 
-                         <li> 
-                             <input type="checkbox" name="file_all[]" checked="checked" value="{{ $item_file->id }}">
-                              {{ $item_file->url }}
+      {{-- Acciones --}}
+      <tr>
+        <td><strong>Acciones</strong></td>
+        <td></td>
+        @foreach($model as $item)
+          <td>
+            <ul style="padding-left:18px;">
+              @foreach($item->actions as $act)
+                <li>
+                  <label>
+                    <input type="checkbox" name="action_all[]" value="{{ $act->id }}" checked>
+                    {{ $act->note }}
+                    <div>{{ optional($act->type)->name }}</div>
+                    <div>{{ optional($act->creator)->name ?? 'Automático' }}</div>
+                  </label>
+                </li>
+              @endforeach
+            </ul>
+          </td>
+        @endforeach
+      </tr>
 
-                           
-                         </li>
-                    @endforeach
-                       
-                </ul>
-                
-               </td>
-               @endforeach
-             
-        </tr>
-
-
-
-
-
+      {{-- Archivos --}}
+      <tr>
+        <td><strong>Archivos</strong></td>
+        <td></td>
+        @foreach($model as $item)
+          <td>
+            <ul style="padding-left:18px;">
+              @foreach($item->files as $f)
+                <li>
+                  <label>
+                    <input type="checkbox" name="file_all[]" value="{{ $f->id }}" checked>
+                    {{ $f->url }}
+                  </label>
+                </li>
+              @endforeach
+            </ul>
+          </td>
+        @endforeach
+      </tr>
     </table>
-    <div style="text-align: center;">
-        <input type="submit" name="" value="enviar" class="btn btn-primary my-2 my-sm-0">
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary my-2">Consolidar</button>
     </div>
-</form>
+  </form>
 </div>
 
+{{-- JS: aplica el valor del radio seleccionado al input/select destino --}}
+<script>
+function applyToTarget(radio){
+  const target = document.querySelector(radio.dataset.target);
+  if (!target) return;
+  const val = radio.dataset.val ?? '';
+  if (target.tagName === 'SELECT') {
+    const opt = Array.from(target.options).find(o => o.value == val);
+    target.value = opt ? opt.value : '';
+    target.dispatchEvent(new Event('change', {bubbles:true}));
+  } else if (target.tagName === 'TEXTAREA') {
+    target.value = val;
+    target.dispatchEvent(new Event('input', {bubbles:true}));
+  } else {
+    target.value = val;
+    target.dispatchEvent(new Event('input', {bubbles:true}));
+  }
+}
 
+// Cambios en radios
+document.addEventListener('change', function(e){
+  if (e.target.classList.contains('pick-field')) {
+    applyToTarget(e.target);
+  }
+});
+
+// Inicializa cada grupo al cargar
+document.addEventListener('DOMContentLoaded', function(){
+  const groups = new Map();
+  document.querySelectorAll('input.pick-field').forEach(r => {
+    groups.set(r.name, (groups.get(r.name) || []).concat([r]));
+  });
+  groups.forEach(radios => {
+    const checked = radios.find(r => r.checked) || radios[0];
+    if (checked) applyToTarget(checked);
+  });
+});
+</script>
 @endsection

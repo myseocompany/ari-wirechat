@@ -16,9 +16,7 @@
   <strong>{{ $model->lastItem() }}</strong> de 
   <strong>{{ $model->total() }}</strong>
 </div>
- <small class="text-muted">
-  Tiempo de consulta: {{ number_format($customers->benchmark_ms ?? 0, 2) }} ms
-</small>
+ 
 
  <script type="text/javascript">
    var ratings = [];

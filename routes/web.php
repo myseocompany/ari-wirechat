@@ -127,13 +127,29 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     Route::get('/{customer}/actions/trackEmail/{email}', [ActionController::class, 'trackEmail']);
 });
 
+
 // Optimizer Routes
-Route::middleware('auth')->prefix('optimize/customers')->group(function () {
-    Route::get('/findDuplicates', [OptimizerController::class, 'findDuplicates']);
-    Route::get('/consolidateDuplicates', [OptimizerController::class, 'consolidateDuplicates']);
-    Route::get('/findDuplicates/show', [OptimizerController::class, 'showDuplicates']);
-    Route::get('/mergeDuplicates', [OptimizerController::class, 'mergeDuplicates_']);
-});
+Route::middleware('auth')
+    ->prefix('optimize/customers')
+    ->name('optimizer.')
+    ->group(function () {
+
+        // Buscar duplicados (por email o teléfono)
+        Route::get('/consolidateDuplicates', [OptimizerController::class, 'consolidateDuplicates'])
+            ->name('consolidate');
+
+        // Consolida (POST)
+        Route::post('/merge', [OptimizerController::class, 'mergeDuplicates'])
+            ->name('merge');
+
+        // (Opcional) tus rutas antiguas, si aún las usas
+        Route::get('/findDuplicates', [OptimizerController::class, 'findDuplicates']);
+        Route::get('/findDuplicates/show', [OptimizerController::class, 'showDuplicates']);
+
+        // Legacy (si quieres mantener el viejo flujo GET)
+        Route::get('/mergeDuplicates', [OptimizerController::class, 'mergeDuplicates_'])
+            ->name('merge_legacy');
+    });
 
 // Lead Routes
 Route::middleware('auth')->get('/leads', [CustomerController::class, 'leads'])->name('leads');

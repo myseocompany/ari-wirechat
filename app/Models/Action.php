@@ -7,7 +7,34 @@ use Illuminate\Database\Eloquent\Model;
 
 class Action extends Model
 {
-    
+       /** Campos que se pueden asignar en masa (create / update). */
+    protected $fillable = [
+        'note',
+        'url',
+        'due_date',
+        'delivery_date',
+        'object_id',
+        'customer_id',
+        'customer_owner_id',
+        'customer_createad_at',
+        'customer_updated_at',
+        'type_id',
+        'creator_user_id',
+        'owner_user_id',
+        'sale_date',
+        'sale_amount',
+    ];
+
+    /** Casts para fechas y numéricos. */
+    protected $casts = [
+        'due_date'              => 'datetime',
+        'delivery_date'         => 'datetime',
+        'customer_createad_at'  => 'datetime',
+        'customer_updated_at'   => 'datetime',
+        'sale_date'             => 'date',
+        'sale_amount'           => 'decimal:2',
+    ];
+
 
     public function type(){
         return $this->belongsTo('App\Models\ActionType');

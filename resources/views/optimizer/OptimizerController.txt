@@ -15,10 +15,6 @@ use App\Models\User;
 use App\Models\CustomerFile;
 use App\Models\CustomerHistory;
 
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
-
-
 class OptimizerController extends Controller
 {
     public function consolidateDuplicates(Request $request)
@@ -43,12 +39,7 @@ class OptimizerController extends Controller
                 // Búsqueda por email (o texto)
                 $q->where('email', 'like', "%{$query}%");
             })
-            ->with([
-                // para getModelText():
-                'status','source','user','updated_user','product',
-                // para la vista:
-                'actions.type','actions.creator','files',
-            ])
+            ->with(['actions.type', 'actions.creator', 'files']) // evita N+1 en la vista
             ->orderByDesc('created_at')
             ->limit(100)
             ->get();
@@ -229,25 +220,4 @@ public function mergeDuplicates(Request $request)
         ->route('optimizer.consolidate', ['query' => $request->input('query', $request->input('email', ''))])
         ->with('success', 'Consolidación realizada y registrada.');
 }
-
-// Devuelve una etiqueta corta para los campos relacionales
-public function getModelText(string $key, $model): string
-{
-    // Usa optional() para evitar errores cuando no hay relación cargada
-    switch ($key) {
-        case 'status_id':
-            return optional($model->status)->name ? optional($model->status)->name . ' - ' : '';
-        case 'source_id':
-            return optional($model->source)->name ? optional($model->source)->name . ' - ' : '';
-        case 'user_id':
-            return optional($model->user)->name ? optional($model->user)->name . ' - ' : '';
-        case 'updated_user_id': // si tienes esta relación en Customer
-            return optional($model->updated_user)->name ? optional($model->updated_user)->name . ' - ' : '';
-        case 'product_id':
-            return optional($model->product)->name ? optional($model->product)->name . ' - ' : '';
-        default:
-            return '';
-    }
-}
-
 }
