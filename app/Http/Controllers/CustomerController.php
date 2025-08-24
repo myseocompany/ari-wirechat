@@ -865,7 +865,7 @@ class CustomerController extends Controller
         if (Auth::id())
             $model->updated_user_id = Auth::id();
         if ($model->save()) {
-            return redirect()->to(url()->previous())
+            return redirect('customers/'.$model->id.'/show')
                 ->with('statusone', 'El Cliente <strong>' . $model->name . '</strong> fué modificado con éxito!');
         }
     }
