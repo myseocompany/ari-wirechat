@@ -12,6 +12,13 @@
 <button class="btn btn-link text-primary mb-2" type="button" data-toggle="collapse" data-target="#filterSection" aria-expanded="false" aria-controls="filterSection">
   Filtros avanzados
 </button>
+@include('customers.index_partials.active_filters', [
+  'country_options' => $country_options ?? [],
+  'statuses' => $statuses ?? [],
+  'users' => $users ?? [],
+  'sources' => $sources ?? [],
+])
+
 
 {{-- Sección de filtros colapsable --}}
 <div class="collapse" id="filterSection">
@@ -56,9 +63,10 @@
       <div class="form-group col-md-6">
         <label for="scoring_interest">Interés</label>
         <select name="scoring_interest" class="form-control" id="scoring_interest">
-          <option value="">Todos</option>
+          <option value="" {{ request()->has('scoring_interest') ? '' : 'selected' }}>Todos</option>
           @foreach($scoring_interest as $item)
-            <option value="{{ $item->scoring_interest }}" @selected($request->scoring_interest == $item->scoring_interest)>
+            <option value="{{ $item->scoring_interest }}"
+              {{ (string)request()->query('scoring_interest', '') === (string)$item->scoring_interest ? 'selected' : '' }}>
               {{ $item->scoring_interest }}
             </option>
           @endforeach
