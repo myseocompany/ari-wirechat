@@ -68,9 +68,26 @@ class CustomerService {
                     
 
                     if ($this->looksLikePhoneNumber($searchTerm)) {
-                        $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
-                        $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
-                        $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.contact_phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
+                       // $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
+                       // $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
+                       //  $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.contact_phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
+
+
+                        $digits = $this->normalizePhoneNumber($searchTerm);
+
+                        $innerQuery->orWhere(function ($q) use ($digits) {
+                            if (strlen($digits) >= 9) {
+                                $last9 = substr($digits, -9);
+                                $q->orWhere('customers.phone_last9', $last9)
+                                ->orWhere('customers.phone2_last9', $last9)
+                                ->orWhere('customers.contact_phone2_last9', $last9);
+                            } else {
+                                // prefijo
+                                $q->orWhere('customers.phone', 'like', $digits.'%')
+                                ->orWhere('customers.phone2', 'like', $digits.'%')
+                                ->orWhere('customers.contact_phone2', 'like', $digits.'%');
+                            }
+                        });
                     } elseif ($this->looksLikeEmail($searchTerm)) {
                         $innerQuery->orWhere('customers.email', 'like', "%{$searchTerm}%")
                             ->orWhere('customers.contact_email', 'like', "%{$searchTerm}%");
