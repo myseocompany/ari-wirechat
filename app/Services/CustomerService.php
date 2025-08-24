@@ -13,23 +13,19 @@ use App\Models\Customer;
 use App\Models\RoleProduct;
 
 class CustomerService {
+
+
     public function filterCustomers(Request $request, $statuses, $stage_id, $countOnly = false, $pageSize = 0)
     {
+        $t0 = function_exists('hrtime') ? hrtime(true) : (int) (microtime(true) * 1e9);
+
         $searchTerm = $request->search;
         $dates = $this->getDates($request);
 
-        
         $query = Customer::query()
             ->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
 
-
         $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm) {
-            /*
-            if (!empty($stage_id) && empty($searchTerm)) {
-                $query->where('customer_statuses.stage_id', $stage_id);
-            }
-                */
-
             if (!empty($request->from_date)) {
                 $column = ($request->created_updated === "created") ? 'created_at' : 'updated_at';
                 $query->whereBetween("customers.$column", $dates);
@@ -42,70 +38,62 @@ class CustomerService {
             }
 
             if (isset($request->maker)) {
-                is_numeric($request->maker) ? 
-                    $query->where('customers.maker', $request->maker) : 
-                    $query->whereNull('customers.maker');
+                is_numeric($request->maker)
+                    ? $query->where('customers.maker', $request->maker)
+                    : $query->whereNull('customers.maker');
             }
 
             if (!empty($request->product_id)) {
                 $query->whereIn(
-                    'customers.product_id', 
+                    'customers.product_id',
                     $request->product_id == 1 ? [1, 6, 7, 8, 9, 10, 11] : [$request->product_id]
                 );
             }
 
-            if (!empty($request->source_id)) $query->where('customers.source_id', $request->source_id);
-            if (!empty($request->country)) $query->where('customers.country', $request->country);
-            if (!empty($request->status_id)) $query->where('customers.status_id', $request->status_id);
-            if (!empty($request->scoring_interest)) $query->where('customers.scoring_interest', $request->scoring_interest);
-            if (isset($request->scoring_profile)  && ($request->scoring_profile != null))
-                        $query->where('customers.scoring_profile', $request->scoring_profile);
+            if (!empty($request->source_id))          $query->where('customers.source_id', $request->source_id);
+            if (!empty($request->country))            $query->where('customers.country', $request->country);
+            if (!empty($request->status_id))          $query->where('customers.status_id', $request->status_id);
+            if (!empty($request->scoring_interest))   $query->where('customers.scoring_interest', $request->scoring_interest);
+            if (isset($request->scoring_profile) && $request->scoring_profile !== null)
+                                                    $query->where('customers.scoring_profile', $request->scoring_profile);
             if (!empty($request->inquiry_product_id)) $query->where('customers.inquiry_product_id', $request->inquiry_product_id);
 
             if (!empty($searchTerm)) {
-                $normalizedSearch = $this->normalizePhoneNumber($searchTerm);
-                $query->where(function ($innerQuery) use ($request, $normalizedSearch, $searchTerm) {
-                    
+                $query->where(function ($innerQuery) use ($searchTerm) {
 
-                    if ($this->looksLikePhoneNumber($searchTerm)) {
-                       // $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
-                       // $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
-                       //  $innerQuery->orWhereRaw("REPLACE(REPLACE(REPLACE(customers.contact_phone2, ' ', ''), '-', ''), '(', '') LIKE ?", ["%$normalizedSearch%"]);
+                    $digits = preg_replace('/\D/', '', (string)$searchTerm);
+                    $looksPhone = $digits !== '' && preg_match('/^\d{5,}$/', $digits);
 
-
-                        $digits = $this->normalizePhoneNumber($searchTerm);
-
-                        $innerQuery->orWhere(function ($q) use ($digits) {
-                            if (strlen($digits) >= 9) {
-                                $last9 = substr($digits, -9);
-                                $q->orWhere('customers.phone_last9', $last9)
-                                ->orWhere('customers.phone2_last9', $last9)
-                                ->orWhere('customers.contact_phone2_last9', $last9);
-                            } else {
-                                // prefijo
-                                $q->orWhere('customers.phone', 'like', $digits.'%')
-                                ->orWhere('customers.phone2', 'like', $digits.'%')
-                                ->orWhere('customers.contact_phone2', 'like', $digits.'%');
-                            }
-                        });
-                    } elseif ($this->looksLikeEmail($searchTerm)) {
-                        $innerQuery->orWhere('customers.email', 'like', "%{$searchTerm}%")
-                            ->orWhere('customers.contact_email', 'like', "%{$searchTerm}%");
+                    if ($looksPhone) {
+                        if (strlen($digits) >= 9) {
+                            $last9 = substr($digits, -9);
+                            $innerQuery->orWhere('customers.phone_last9', $last9)
+                                    ->orWhere('customers.phone2_last9', $last9)
+                                    ->orWhere('customers.contact_phone2_last9', $last9);
+                        } else {
+                            $innerQuery->orWhere('customers.phone',          'like', $digits.'%')
+                                    ->orWhere('customers.phone2',         'like', $digits.'%')
+                                    ->orWhere('customers.contact_phone2', 'like', $digits.'%');
+                        }
+                    } elseif (filter_var($searchTerm, FILTER_VALIDATE_EMAIL) !== false) {
+                        $innerQuery->orWhere('customers.email',         'like', "%{$searchTerm}%")
+                                ->orWhere('customers.contact_email', 'like', "%{$searchTerm}%");
                     } else {
-                        $innerQuery->orWhere('customers.name', 'like', "%{$searchTerm}%")
-                            ->orWhere('customers.document', 'like', "%{$searchTerm}%")
-                            ->orWhere('customers.position', 'like', "%{$searchTerm}%")
-                            ->orWhere('customers.ad_name', 'like', "%{$searchTerm}%")
-                            ->orWhere('customers.adset_name', 'like', "%{$searchTerm}%")
-                            ->orWhere('customers.campaign_name', 'like', "%{$searchTerm}%")
-                            ->orWhere('customers.business', 'like', "%{$searchTerm}%")
-                            ->orWhere('customers.notes', 'like', "%{$searchTerm}%");
+                        $like = "%{$searchTerm}%";
+                        $innerQuery->orWhere('customers.name',          'like', $like)
+                                ->orWhere('customers.document',      'like', $like)
+                                ->orWhere('customers.position',      'like', $like)
+                                ->orWhere('customers.ad_name',       'like', $like)
+                                ->orWhere('customers.adset_name',    'like', $like)
+                                ->orWhere('customers.campaign_name', 'like', $like)
+                                ->orWhere('customers.business',      'like', $like)
+                                ->orWhere('customers.notes',         'like', $like);
                     }
                 });
             }
         });
 
-        // RESULTADO
+        // Ejecutar y medir
         if ($countOnly) {
             $result = $query->select(
                     DB::raw('count(distinct(customers.id)) as count'),
@@ -114,24 +102,25 @@ class CustomerService {
                     DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color'),
                 )
                 ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color')
-                ->orderBy(DB::raw('COALESCE(customer_statuses.weight, 999)'), 'ASC') // Ordena y deja los null al final
-            
+                ->orderBy(DB::raw('COALESCE(customer_statuses.weight, 999)'), 'ASC')
                 ->get();
         } else {
             $selectColumns = ['customers.*'];
-            
             $result = $query->select($selectColumns)
                 ->orderBy('customers.created_at', 'DESC')
                 ->when($pageSize > 0, fn($q) => $q->paginate($pageSize), fn($q) => $q->get());
         }
 
+        $t1 = function_exists('hrtime') ? hrtime(true) : (int) (microtime(true) * 1e9);
+        $elapsedMs = ($t1 - $t0) / 1e6; // ns → ms
+
+        // ⚠️ Añadir propiedades dinámicas en objetos paginator puede emitir deprecations en PHP 8.2.
+        // Si ya añadías "action", seguimos igual por compatibilidad:
         $result->action = "customers";
+        $result->benchmark_ms = round($elapsedMs, 2);
+
         return $result;
     }
-
-
-
-    
     
     
  
