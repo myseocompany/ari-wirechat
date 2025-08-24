@@ -1,3 +1,7 @@
+{{-- ========================= --}}
+{{--  FILTRO COMPLETO CLIENTES  --}}
+{{-- ========================= --}}
+
 {{-- Buscador rápido --}}
 <form action="/customers" method="GET" id="mini_filter_form" class="mb-3">
   <div class="input-group">
@@ -12,41 +16,52 @@
 <button class="btn btn-link text-primary mb-2" type="button" data-toggle="collapse" data-target="#filterSection" aria-expanded="false" aria-controls="filterSection">
   Filtros avanzados
 </button>
+
 @include('customers.index_partials.active_filters', [
   'country_options' => $country_options ?? [],
-  'statuses' => $statuses ?? [],
-  'users' => $users ?? [],
-  'sources' => $sources ?? [],
+  'statuses'        => $statuses ?? [],
+  'users'           => $users ?? [],
+  'sources'         => $sources ?? [],
 ])
-
 
 {{-- Sección de filtros colapsable --}}
 <div class="collapse" id="filterSection">
   <form action="/customers" method="GET" id="filter_form" class="card card-body border shadow-sm">
 
+    {{-- HIDDEN para envío real al backend --}}
+    <input type="hidden" id="from_date" name="from_date" value="{{ $request->from_date }}">
+    <input type="hidden" id="to_date"   name="to_date"   value="{{ $request->to_date }}">
 
+    {{-- Selector visual (Date Range Picker) --}}
+    <div class="form-group">
+      <label for="reportrange_input" class="mb-1">Rango de fechas</label>
 
-    {{-- INPUTS OCULTOS para que se envíen con el form --}}
-  <input type="hidden" id="from_date" name="from_date" value="{{ $request->from_date }}">
-  <input type="hidden" id="to_date" name="to_date" value="{{ $request->to_date }}">
+      {{-- Input editable + calendario (editable true) --}}
+      <div class="input-group">
+        <input
+          type="text"
+          id="reportrange_input"
+          class="form-control"
+          placeholder="Seleccionar rango"
+          value="{{ ($request->from_date && $request->to_date) ? $request->from_date.' - '.$request->to_date : '' }}"
+          autocomplete="off">
+        <div class="input-group-append">
+          <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+        </div>
+      </div>
 
-  {{-- Selector visual --}}
-  <div class="form-group">
-    <label for="reportrange">Rango de fechas</label>
-    <div id="reportrange" class="form-control" style="cursor: pointer; background: #fff;">
-      <i class="fa fa-calendar"></i>&nbsp;
-      <span>{{ $request->from_date && $request->to_date ? $request->from_date . ' - ' . $request->to_date : 'Seleccionar rango' }}</span>
-      <i class="fa fa-caret-down float-right mt-1"></i>
+      {{-- Enlaces rápidos --}}
+      <div class="mt-2">
+        <a href="#" class="btn btn-sm btn-light border" onclick="return setRange(7)">Últimos 7 días</a>
+        <a href="#" class="btn btn-sm btn-light border" onclick="return setRange(10)">Últimos 10 días</a>
+        <a href="#" class="btn btn-sm btn-light border" onclick="return setRange(30)">Últimos 30 días</a>
+        <a href="#" class="btn btn-sm btn-light border" onclick="return setThisWeek()">Esta semana</a>
+        <a href="#" class="btn btn-sm btn-light border" onclick="return setLastWeek()">Semana pasada</a>
+        <a href="#" class="btn btn-sm btn-light border" onclick="return setCurrentMonth()">Este mes</a>
+        <a href="#" class="btn btn-sm btn-light border" onclick="return setLastMonth()">Mes pasado</a>
+        <a href="#" class="btn btn-sm btn-outline-secondary" onclick="return clearRange()">Limpiar</a>
+      </div>
     </div>
-  </div>
-
-  {{-- Enlaces rápidos --}}
-  <div class="mb-2">
-    <a href="#" class="btn btn-sm btn-light border" onclick="setRange(7)">Últimos 7 días</a>
-    <a href="#" class="btn btn-sm btn-light border" onclick="setRange(10)">Últimos 10 días</a>
-    <a href="#" class="btn btn-sm btn-light border" onclick="setRange(30)">Últimos 30 días</a>
-    <a href="#" class="btn btn-sm btn-outline-secondary" onclick="clearRange()">Limpiar</a>
-  </div>
 
     {{-- Perfil e interés --}}
     <div class="form-row">
@@ -81,9 +96,7 @@
         <select name="country" class="form-control" id="country">
           <option value="">Todos</option>
           @foreach($country_options as $item)
-            <option value="{{ $item->iso2 }}" @selected($request->iso2 == $item->iso2)>
-              {{ $item->name }}
-            </option>
+            <option value="{{ $item->iso2 }}" @selected($request->country == $item->iso2)>{{ $item->name }}</option>
           @endforeach
         </select>
       </div>
@@ -92,9 +105,7 @@
         <select name="status_id" class="form-control" id="status_id">
           <option value="">Todos</option>
           @foreach($statuses as $item)
-            <option value="{{ $item->id }}" @selected($request->status_id == $item->id)>
-              {{ $item->name }}
-            </option>
+            <option value="{{ $item->id }}" @selected($request->status_id == $item->id)>{{ $item->name }}</option>
           @endforeach
         </select>
       </div>
@@ -108,21 +119,16 @@
           <option value="">Todos</option>
           <option value="null" @selected($request->user_id === 'null')>Sin asignar</option>
           @foreach($users as $user)
-            <option value="{{ $user->id }}" @selected($request->user_id == $user->id)>
-              {{ Str::limit($user->name, 15) }}
-            </option>
+            <option value="{{ $user->id }}" @selected($request->user_id == $user->id)>{{ Str::limit($user->name, 15) }}</option>
           @endforeach
         </select>
       </div>
-
       <div class="form-group col-md-6">
         <label for="source_id">Fuente</label>
         <select name="source_id" class="form-control" id="source_id">
           <option value="">Todas</option>
           @foreach($sources as $item)
-            <option value="{{ $item->id }}" @selected($request->source_id == $item->id)>
-              {{ Str::limit($item->name, 15) }}
-            </option>
+            <option value="{{ $item->id }}" @selected($request->source_id == $item->id)>{{ Str::limit($item->name, 15) }}</option>
           @endforeach
         </select>
       </div>
@@ -132,15 +138,15 @@
     <div class="form-group">
       <label class="d-block">Tipo de cliente</label>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="maker" value="empty" id="maker_empty" onchange="submit();" @checked($request->maker === 'empty')>
+        <input class="form-check-input" type="radio" name="maker" value="empty" id="maker_empty" onchange="this.form.submit();" @checked($request->maker === 'empty')>
         <label class="form-check-label" for="maker_empty">Sin clasificar</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="maker" value="0" id="maker_0" onchange="submit();" @checked($request->maker === '0')>
+        <input class="form-check-input" type="radio" name="maker" value="0" id="maker_0" onchange="this.form.submit();" @checked($request->maker === '0')>
         <label class="form-check-label" for="maker_0">Proyecto</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="maker" value="1" id="maker_1" onchange="submit();" @checked($request->maker === '1')>
+        <input class="form-check-input" type="radio" name="maker" value="1" id="maker_1" onchange="this.form.submit();" @checked($request->maker === '1')>
         <label class="form-check-label" for="maker_1">Hace empanadas</label>
       </div>
     </div>
@@ -149,18 +155,15 @@
     <div class="form-group">
       <label class="d-block">Filtrar por</label>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="created_updated" value="created" id="created" onchange="submit();" @checked(!isset($request->created_updated) || $request->created_updated === 'created')>
+        <input class="form-check-input" type="radio" name="created_updated" value="created" id="created" onchange="this.form.submit();" @checked(!isset($request->created_updated) || $request->created_updated === 'created')>
         <label class="form-check-label" for="created">Creado</label>
       </div>
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="radio" name="created_updated" value="updated" id="updated" onchange="submit();" @checked($request->created_updated === 'updated')>
+        <input class="form-check-input" type="radio" name="created_updated" value="updated" id="updated" onchange="this.form.submit();" @checked($request->created_updated === 'updated')>
         <label class="form-check-label" for="updated">Actualizado</label>
       </div>
     </div>
 
     <button type="submit" class="btn btn-primary mt-2">Aplicar filtros</button>
-
   </form>
 </div>
-
-

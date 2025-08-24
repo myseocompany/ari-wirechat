@@ -139,20 +139,23 @@ class CustomerService {
 
     public function getDates($request)
     {
-        if (empty($request->from_date) && empty($request->search)) {
-            // Sin filtros → mostrar últimos 90 días
-            $from_date = Carbon\Carbon::today()->subDays(89)->format('Y-m-d'); // Incluye hoy
-            $to_date = Carbon\Carbon::today()->endOfDay();
-        }    else {
-            // Filtros personalizados
-            $from_date = Carbon\Carbon::createFromFormat('Y-m-d', $request->from_date ?? Carbon\Carbon::today()->subDays(5000)->format('Y-m-d'));
-            $to_date = Carbon\Carbon::createFromFormat('Y-m-d', $request->to_date ?? Carbon\Carbon::today()->subDays(2)->format('Y-m-d'));
-            $from_date = $from_date->format('Y-m-d');
-            $to_date = $to_date->format('Y-m-d') . " 23:59:59";
+        if (empty($request->from_date) && empty($request->to_date) && empty($request->search)) {
+            $from = Carbon\Carbon::today()->subDays(89)->format('Y-m-d');
+            $to   = Carbon\Carbon::today()->endOfDay();
+            return [$from, $to];
         }
-    
-        return [$from_date, $to_date];
+
+        $from = $request->from_date
+            ? Carbon\Carbon::createFromFormat('Y-m-d', $request->from_date)->startOfDay()
+            : Carbon\Carbon::createFromFormat('Y-m-d', '1900-01-01')->startOfDay();
+
+        $to = $request->to_date
+            ? Carbon\Carbon::createFromFormat('Y-m-d', $request->to_date)->endOfDay()
+            : Carbon\Carbon::today()->endOfDay();
+
+        return [$from->format('Y-m-d'), $to->format('Y-m-d H:i:s')];
     }
+
     
 
     public function getLead($lead)

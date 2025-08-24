@@ -112,54 +112,125 @@
 
 @push('scripts')
 <script>
-$(function() {
-  function updateFields(start, end) {
+(function() {
+  // Origen para el rango "Máximo" (ajústalo si prefieres 1970-01-01 o 1000-01-01)
+  const ORIGEN_MAXIMO = moment('1900-01-01', 'YYYY-MM-DD');
+
+  // --- Helpers ---
+  function setHidden(start, end) {
+    // Backend: YYYY-MM-DD
     $('#from_date').val(start.format('YYYY-MM-DD'));
     $('#to_date').val(end.format('YYYY-MM-DD'));
-    $('#reportrange span').html(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
+    // Visible: DD-MM-YYYY
+    $('#reportrange_input').val(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
+  }
+  function updateFields(start, end){ setHidden(start, end); }
+
+  function getInitialStart(){
+    const fd = $('#from_date').val();
+    // Si no hay filtros → simula tus “últimos 90 días”
+    return fd ? moment(fd, 'YYYY-MM-DD') : moment().subtract(89,'days');
+  }
+  function getInitialEnd(){
+    const td = $('#to_date').val();
+    return td ? moment(td, 'YYYY-MM-DD') : moment();
   }
 
-  $('#reportrange').daterangepicker({
+  // --- Inicializa DateRangePicker sobre el INPUT ---
+  $('#reportrange_input').daterangepicker({
+    startDate: getInitialStart(),
+    endDate:   getInitialEnd(),
+    maxDate: moment(),
+    alwaysShowCalendars: true,
     opens: 'right',
+    autoUpdateInput: false, // nosotros llenamos el input
     locale: {
       format: 'DD-MM-YYYY',
       applyLabel: "Aplicar",
       cancelLabel: "Cancelar",
-      daysOfWeek: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
-      monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
-        "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-      ],
+      daysOfWeek: ["Do","Lu","Ma","Mi","Ju","Vi","Sa"],
+      monthNames: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
       firstDay: 1
     },
     ranges: {
-       'Hoy': [moment(), moment()],
-       'Ayer': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-       'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
-       'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
-       'Este mes': [moment().startOf('month'), moment().endOf('month')],
-       'Mes anterior': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+      'Hoy': [moment(), moment()],
+      'Ayer': [moment().subtract(1,'day'), moment().subtract(1,'day')],
+      'Últimos 7 días': [moment().subtract(6,'days'), moment()],
+      'Últimos 10 días': [moment().subtract(9,'days'), moment()],
+      'Últimos 30 días': [moment().subtract(29,'days'), moment()],
+      'Esta semana': [moment().startOf('isoWeek'), moment().endOf('isoWeek')],
+      'Semana pasada': [moment().subtract(1,'week').startOf('isoWeek'), moment().subtract(1,'week').endOf('isoWeek')],
+      'Este mes': [moment().startOf('month'), moment().endOf('month')],
+      'Mes anterior': [moment().subtract(1,'month').startOf('month'), moment().subtract(1,'month').endOf('month')],
+      'Máximo': [ORIGEN_MAXIMO, moment()]
     }
-  }, updateFields);
+  }, updateFields)
+  .on('apply.daterangepicker', function(ev, picker){
+    updateFields(picker.startDate, picker.endDate);
+    // Si quieres aplicar al instante:
+    // document.getElementById('filter_form').submit();
+  })
+  .on('cancel.daterangepicker', function(){
+    clearRange();
+  });
 
-  // Inicializa con los valores si están definidos
-  @if($request->from_date && $request->to_date)
-    updateFields(moment("{{ $request->from_date }}"), moment("{{ $request->to_date }}"));
-  @endif
-});
+  // Si la vista llegó con valores en request, puebla el input
+  if ($('#from_date').val() && $('#to_date').val()) {
+    setHidden(moment($('#from_date').val(),'YYYY-MM-DD'), moment($('#to_date').val(),'YYYY-MM-DD'));
+  }
 
-// Links rápidos
-function setRange(days) {
-  var end = moment();
-  var start = moment().subtract(days - 1, 'days');
-  $('#from_date').val(start.format('YYYY-MM-DD'));
-  $('#to_date').val(end.format('YYYY-MM-DD'));
-  $('#reportrange span').html(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
-}
+  // --- Edición manual del input (DD-MM-YYYY - DD-MM-YYYY) ---
+  $('#reportrange_input').on('blur keydown', function(e){
+    if (e.type==='blur' || e.key==='Enter') {
+      const raw = $(this).val().trim();
+      const parts = raw.split('-').map(s=>s.trim());
+      // Esperado: "DD-MM-YYYY - DD-MM-YYYY" → tras split simple por "-", reconstruimos
+      // Mejor: dividir por " - "
+      const bySep = raw.split(' - ');
+      if (bySep.length === 2) {
+        const s = moment(bySep[0], 'DD-MM-YYYY', true);
+        const e2 = moment(bySep[1], 'DD-MM-YYYY', true);
+        if (s.isValid() && e2.isValid() && !e2.isBefore(s)) {
+          setHidden(s, e2);
+        }
+      }
+      if (e.key==='Enter') e.preventDefault();
+    }
+  });
 
-function clearRange() {
-  $('#from_date').val('');
-  $('#to_date').val('');
-  $('#reportrange span').html('Seleccionar rango');
-}
+  // --- Enlaces rápidos externos (botones) ---
+  window.setRange = function(days) {
+    const end = moment();
+    const start = moment().subtract(days-1,'days'); // incluye hoy
+    setHidden(start, end);
+    return false;
+  };
+  window.setThisWeek = function(){
+    setHidden(moment().startOf('isoWeek'), moment().endOf('isoWeek'));
+    return false;
+  };
+  window.setLastWeek = function(){
+    setHidden(moment().subtract(1,'week').startOf('isoWeek'), moment().subtract(1,'week').endOf('isoWeek'));
+    return false;
+  };
+  window.setCurrentMonth = function(){
+    setHidden(moment().startOf('month'), moment().endOf('month'));
+    return false;
+  };
+  window.setLastMonth = function(){
+    setHidden(moment().subtract(1,'month').startOf('month'), moment().subtract(1,'month').endOf('month'));
+    return false;
+  };
+  window.setMaximo = function(){
+    setHidden(ORIGEN_MAXIMO, moment());
+    return false;
+  };
+  window.clearRange = function(){
+    $('#from_date').val('');
+    $('#to_date').val('');
+    $('#reportrange_input').val('');
+    return false;
+  };
+})();
 </script>
 @endpush
