@@ -59,7 +59,8 @@ $hasAny =
   ($q['scoring_profile'] ?? null) || ($q['scoring_interest'] ?? null) ||
   ($q['country'] ?? null) || ($q['status_id'] ?? null) ||
   ($q['user_id'] ?? null) || ($q['source_id'] ?? null) ||
-  ($q['maker'] ?? null) || ($q['created_updated'] ?? null);
+  ($q['maker'] ?? null) || ($q['created_updated'] ?? null) ||
+  ($q['has_quote'] ?? null);
 @endphp
 
 @if($hasAny)
@@ -105,6 +106,15 @@ $hasAny =
       Fecha en: {{ $q['created_updated'] === 'created' ? 'Creado' : 'Actualizado' }}
       <a class="ml-1 text-danger"
          href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['created_updated'])) }}">×</a>
+    </span>
+  @endif
+
+  {{-- Cotización --}}
+  @if(array_key_exists('has_quote', $q))
+    <span class="badge badge-pill badge-light border text-danger ml-2">
+      Cotización: {{ $q['has_quote'] === '1' ? 'Sí' : 'No' }}
+      <a class="ml-1 text-danger"
+        href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['has_quote'])) }}">×</a>
     </span>
   @endif
 

@@ -134,6 +134,21 @@
       </div>
     </div>
 
+    {{-- Tiene cotización --}}
+    <div class="form-group">
+      <label class="d-block">Con Cotización</label>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="has_quote" value="1" id="has_quote_1"
+          onchange="this.form.submit();" @checked(request('has_quote') === '1')>
+        <label class="form-check-label" for="has_quote_1">Sí</label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="has_quote" value="0" id="has_quote_0"
+          onchange="this.form.submit();" @checked(request('has_quote') === '0')>
+        <label class="form-check-label" for="has_quote_0">No</label>
+      </div>
+    </div>
+
     {{-- Maker (tipo de cliente) --}}
     <div class="form-group">
       <label class="d-block">Tipo de cliente</label>

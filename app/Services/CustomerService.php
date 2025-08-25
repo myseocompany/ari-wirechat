@@ -93,6 +93,18 @@ class CustomerService {
             }
         });
 
+        if ($request->filled('has_quote')) {
+            if ($request->has_quote === '1') {
+                $query->whereHas('orders', function ($q) {
+                    $q->whereNull('invoice_id');
+                });
+            } elseif ($request->has_quote === '0') {
+                $query->whereDoesntHave('orders', function ($q) {
+                    $q->whereNull('invoice_id');
+                });
+            }
+        }
+
         // Ejecutar y medir
         if ($countOnly) {
             $result = $query->select(
