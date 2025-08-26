@@ -27,7 +27,17 @@
 {{-- Sección de filtros colapsable --}}
 <div class="collapse" id="filterSection">
   <form action="/customers" method="GET" id="filter_form" class="card card-body border shadow-sm">
-
+    <div class="form-group">
+  <label for="search_adv" class="mb-1">Buscar</label>
+  <input
+    type="text"
+    id="search_adv"
+    name="search"
+    class="form-control"
+    placeholder="Nombre, email, teléfono, empresa…"
+    value="{{ $request->search ?? '' }}"
+    autocomplete="off">
+</div>
     {{-- HIDDEN para envío real al backend --}}
     <input type="hidden" id="from_date" name="from_date" value="{{ $request->from_date }}">
     <input type="hidden" id="to_date"   name="to_date"   value="{{ $request->to_date }}">
