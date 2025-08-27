@@ -1,1 +1,1758 @@
-{"webhookType":"CALL_FINISHED","id":19011,"contact":{"id":2,"firstName":"Nicolás Navarro Rincón","lastName":"Navarro","company":"Marketing Digital Manizales Colombia","externalLink":"https://app.clientify.com/contacts/79170064/","createdAt":"2024-07-22T14:57:02.000+00:00","lastModificationDate":"2025-08-21T20:28:15.114+00:00","source":"API","email":"nicolas@myseocompany.co","msisdns":["+573004410097"],"details":{"alternativeMsisdn":null,"plain":"test","tagColumnName":"exampleTag"},"externalServices":{"recordId":2,"pipedrivePersonId":null,"pipedriveDealId":null,"shopifyCustomerId":null,"shoperClientId":null,"shoperOrderClientId":null,"hubspotContactId":null,"zendeskEndUserId":null}},"msisdn":"+573004410097","agentMsisdn":"+576063111613","agentMsisdnId":24,"startDate":"2025-08-21T20:27:50.837+00:00","answeredDate":"2025-08-21T20:28:07.310+00:00","finishDate":"2025-08-21T20:28:14.335+00:00","length":7,"finishType":"FINISHED_BY_CLIENT","agentId":15,"agentName":"Catherine","agentSurname":"Landinez","agentUsername":"maquiempanadas@gmail.com","recordingLink":"https://backend.channels.app/recording-files/rgsjc/cfd563ad-4899-4ff4-8289-3b06579af261","direction":"OUTBOUND","lastEventType":"REFUSE","appType":"WIDGET","callDetails":{}}
+  {
+    "headers": {
+      "host": "n8n-service-l12g.onrender.com",
+      "user-agent": "axios/1.11.0",
+      "content-length": "24804",
+      "accept": "application/json, text/plain, */*",
+      "accept-encoding": "gzip, br",
+      "cdn-loop": "cloudflare; loops=1",
+      "cf-connecting-ip": "100.20.5.228",
+      "cf-ipcountry": "US",
+      "cf-ray": "975c2acb3cb32095-PDX",
+      "cf-visitor": "{\"scheme\":\"https\"}",
+      "content-type": "application/json",
+      "render-proxy-ttl": "4",
+      "rndr-id": "98ebac5c-abd9-403d",
+      "true-client-ip": "100.20.5.228",
+      "x-forwarded-for": "100.20.5.228, 104.23.160.71",
+      "x-forwarded-proto": "https",
+      "x-request-start": "1756303981324974",
+      "x-retell-signature": "v=1756303981302,d=097c90616c7c6051a028acfa99e27f6ab5d5c8bec282473ddaf7e01f40e60309"
+    },
+    "params": {},
+    "query": {},
+    "body": {
+      "event": "call_analyzed",
+      "call": {
+        "call_id": "call_6a5e7565f703a3e550de64502d6",
+        "call_type": "phone_call",
+        "agent_id": "agent_39280bd97ed1486c1bfd875960",
+        "agent_version": 0,
+        "agent_name": "Tour_Madrid_Prompt",
+        "retell_llm_dynamic_variables": {
+          "nombre_cliente": "Juan"
+        },
+        "custom_sip_headers": {},
+        "call_status": "ended",
+        "start_timestamp": 1756303906041,
+        "end_timestamp": 1756303978529,
+        "duration_ms": 72488,
+        "transcript": "Agent: Buenas, mucho gusto. \nUser: Aló.\nAgent: Hola Juan, le habla Camilo de Maquiempanadas, la empresa que hace las máquinas para empanadas. ¿Le suena Maquiempanadas?\nUser: Aló, aló.\nAgent: Hola, ¿Juan? Le habla Camilo de Maquiempanadas, la empresa que hace las máquinas para empanadas. ¿Le suena Maquiempanadas?\nUser: Sí, sí me suena.\nAgent: Perfecto, Juan. Usted nos dejó sus datos hace un tiempito porque quería info sobre máquinas para empanadas.¿Sigue buscando automatizar su proceso?\nUser: Sí.\nAgent: Listo, Juan. Para guiarlo mejor, ¿usted las hace con masa de maíz, de \nUser: De \nAgent: trigo o hace las dos?\nUser: maíz.\nAgent: Perfecto. ¿Y cuántas empanadas más o menos hace en un día?\nUser: Más o menos en promedio unas doscientas.\nAgent: Listo, Juan. Le voy a mandar más info por WhatsApp para que la mire con calma.Si más adelante quiere retomar, aquí estoy. ¡Muchas gracias por su tiempo!\n",
+        "transcript_object": [
+          {
+            "role": "agent",
+            "content": "Buenas, mucho gusto. ",
+            "words": [
+              {
+                "word": "Buenas, ",
+                "start": 0.325774169921875,
+                "end": 0.6910966796875
+              },
+              {
+                "word": "mucho ",
+                "start": 0.6910966796875,
+                "end": 0.915290283203125
+              },
+              {
+                "word": "gusto. ",
+                "start": 0.915290283203125,
+                "end": 1.47738720703125
+              }
+            ],
+            "metadata": {
+              "response_id": 0
+            }
+          },
+          {
+            "role": "user",
+            "content": "Aló.",
+            "words": [
+              {
+                "word": "Aló.",
+                "start": 1.525,
+                "end": 2.025
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Hola Juan, le habla Camilo de Maquiempanadas, la empresa que hace las máquinas para empanadas. ¿Le suena Maquiempanadas?",
+            "words": [
+              {
+                "word": "Hola ",
+                "start": 1.495802490234375,
+                "end": 1.701447509765625
+              },
+              {
+                "word": "Juan, ",
+                "start": 1.701447509765625,
+                "end": 2.310318603515625
+              },
+              {
+                "word": "le ",
+                "start": 2.310318603515625,
+                "end": 2.469189453125
+              },
+              {
+                "word": "habla ",
+                "start": 2.469189453125,
+                "end": 3.218383056640625
+              },
+              {
+                "word": "Camilo ",
+                "start": 3.218383056640625,
+                "end": 3.695802490234375
+              },
+              {
+                "word": "de ",
+                "start": 3.695802490234375,
+                "end": 3.9482216796875
+              },
+              {
+                "word": "Maquiempanadas, ",
+                "start": 3.9482216796875,
+                "end": 5.22160888671875
+              },
+              {
+                "word": "la ",
+                "start": 5.22160888671875,
+                "end": 5.324834716796875
+              },
+              {
+                "word": "empresa ",
+                "start": 5.324834716796875,
+                "end": 5.755479736328125
+              },
+              {
+                "word": "que ",
+                "start": 5.755479736328125,
+                "end": 5.85870556640625
+              },
+              {
+                "word": "hace ",
+                "start": 5.85870556640625,
+                "end": 6.064350830078125
+              },
+              {
+                "word": "las ",
+                "start": 6.064350830078125,
+                "end": 6.307899169921875
+              },
+              {
+                "word": "máquinas ",
+                "start": 6.307899169921875,
+                "end": 6.541770263671875
+              },
+              {
+                "word": "para ",
+                "start": 6.541770263671875,
+                "end": 6.66354443359375
+              },
+              {
+                "word": "empanadas. ",
+                "start": 6.66354443359375,
+                "end": 7.403866943359375
+              },
+              {
+                "word": "¿Le ",
+                "start": 7.4472216796875,
+                "end": 7.615770263671875
+              },
+              {
+                "word": "suena ",
+                "start": 7.615770263671875,
+                "end": 7.80367333984375
+              },
+              {
+                "word": "Maquiempanadas?",
+                "start": 7.80367333984375,
+                "end": 8.68351220703125
+              }
+            ],
+            "metadata": {
+              "response_id": 0
+            }
+          },
+          {
+            "role": "user",
+            "content": "Aló, aló.",
+            "words": [
+              {
+                "word": "Aló, ",
+                "start": 17.805,
+                "end": 18.205
+              },
+              {
+                "word": "aló.",
+                "start": 18.205,
+                "end": 18.515
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Hola, ¿Juan? Le habla Camilo de Maquiempanadas, la empresa que hace las máquinas para empanadas. ¿Le suena Maquiempanadas?",
+            "words": [
+              {
+                "word": "Hola, ",
+                "start": 22.609774169921874,
+                "end": 22.796870849609373
+              },
+              {
+                "word": "¿Juan?",
+                "start": 22.796870849609373,
+                "end": 23.274290283203126
+              },
+              {
+                "word": " Le ",
+                "start": 23.296715087890625,
+                "end": 23.390263427734375
+              },
+              {
+                "word": "habla ",
+                "start": 23.390263427734375,
+                "end": 23.5684892578125
+              },
+              {
+                "word": "Camilo ",
+                "start": 23.5684892578125,
+                "end": 23.858811767578125
+              },
+              {
+                "word": "de ",
+                "start": 23.858811767578125,
+                "end": 23.952360107421875
+              },
+              {
+                "word": "Maquiempanadas, ",
+                "start": 23.952360107421875,
+                "end": 24.9354248046875
+              },
+              {
+                "word": "la ",
+                "start": 24.9354248046875,
+                "end": 25.019295654296876
+              },
+              {
+                "word": "empresa ",
+                "start": 25.019295654296876,
+                "end": 25.5346181640625
+              },
+              {
+                "word": "que ",
+                "start": 25.5346181640625,
+                "end": 25.646715087890627
+              },
+              {
+                "word": "hace ",
+                "start": 25.646715087890627,
+                "end": 25.8346181640625
+              },
+              {
+                "word": "las ",
+                "start": 25.8346181640625,
+                "end": 25.983811767578125
+              },
+              {
+                "word": "máquinas ",
+                "start": 25.983811767578125,
+                "end": 26.3305859375
+              },
+              {
+                "word": "para ",
+                "start": 26.3305859375,
+                "end": 26.4805859375
+              },
+              {
+                "word": "empanadas.",
+                "start": 26.4805859375,
+                "end": 27.248327880859375
+              },
+              {
+                "word": " ¿Le ",
+                "start": 27.290392578125,
+                "end": 27.45894091796875
+              },
+              {
+                "word": "suena ",
+                "start": 27.45894091796875,
+                "end": 27.655715087890623
+              },
+              {
+                "word": "Maquiempanadas?",
+                "start": 27.655715087890623,
+                "end": 28.6855537109375
+              }
+            ],
+            "metadata": {
+              "response_id": 1
+            }
+          },
+          {
+            "role": "user",
+            "content": "Sí, sí me suena.",
+            "words": [
+              {
+                "word": "Sí, ",
+                "start": 30.384999999999998,
+                "end": 30.704998999999997
+              },
+              {
+                "word": "sí ",
+                "start": 30.704998999999997,
+                "end": 30.864998999999997
+              },
+              {
+                "word": "me ",
+                "start": 30.864998999999997,
+                "end": 31.024998999999998
+              },
+              {
+                "word": "suena.",
+                "start": 31.024998999999998,
+                "end": 31.415
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Perfecto, Juan. Usted nos dejó sus datos hace un tiempito porque quería info sobre máquinas para empanadas.¿Sigue buscando automatizar su proceso?",
+            "words": [
+              {
+                "word": "Perfecto, ",
+                "start": 33.25777416992187,
+                "end": 33.75374194335937
+              },
+              {
+                "word": "Juan.",
+                "start": 33.75374194335937,
+                "end": 34.25938720703125
+              },
+              {
+                "word": " Usted ",
+                "start": 34.29393017578125,
+                "end": 34.5753818359375
+              },
+              {
+                "word": "nos ",
+                "start": 34.5753818359375,
+                "end": 34.67780102539062
+              },
+              {
+                "word": "dejó ",
+                "start": 34.67780102539062,
+                "end": 34.85602685546875
+              },
+              {
+                "word": "sus ",
+                "start": 34.85602685546875,
+                "end": 35.04312353515625
+              },
+              {
+                "word": "datos ",
+                "start": 35.04312353515625,
+                "end": 35.31489794921875
+              },
+              {
+                "word": "hace ",
+                "start": 35.31489794921875,
+                "end": 35.42699462890625
+              },
+              {
+                "word": "un ",
+                "start": 35.42699462890625,
+                "end": 35.50199462890625
+              },
+              {
+                "word": "tiempito ",
+                "start": 35.50199462890625,
+                "end": 35.885865478515626
+              },
+              {
+                "word": "porque ",
+                "start": 35.885865478515626,
+                "end": 36.1294140625
+              },
+              {
+                "word": "quería ",
+                "start": 36.1294140625,
+                "end": 36.3915107421875
+              },
+              {
+                "word": "info ",
+                "start": 36.3915107421875,
+                "end": 36.597156005859375
+              },
+              {
+                "word": "sobre ",
+                "start": 36.597156005859375,
+                "end": 36.8503818359375
+              },
+              {
+                "word": "máquinas ",
+                "start": 36.8503818359375,
+                "end": 37.262478515625
+              },
+              {
+                "word": "para ",
+                "start": 37.262478515625,
+                "end": 37.43989794921875
+              },
+              {
+                "word": "empanadas.",
+                "start": 37.43989794921875,
+                "end": 38.18909130859375
+              },
+              {
+                "word": "¿Sigue ",
+                "start": 38.2399716796875,
+                "end": 38.59642333984375
+              },
+              {
+                "word": "buscando ",
+                "start": 38.59642333984375,
+                "end": 38.9238427734375
+              },
+              {
+                "word": "automatizar ",
+                "start": 38.9238427734375,
+                "end": 39.439165283203124
+              },
+              {
+                "word": "su ",
+                "start": 39.439165283203124,
+                "end": 39.55126220703125
+              },
+              {
+                "word": "proceso?",
+                "start": 39.55126220703125,
+                "end": 40.187552490234374
+              }
+            ],
+            "metadata": {
+              "response_id": 2
+            }
+          },
+          {
+            "role": "user",
+            "content": "Sí.",
+            "words": [
+              {
+                "word": "Sí.",
+                "start": 41.535003,
+                "end": 42.035003
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Listo, Juan. Para guiarlo mejor, ¿usted las hace con masa de maíz, de ",
+            "words": [
+              {
+                "word": "Listo, ",
+                "start": 45.1010966796875,
+                "end": 45.49464526367188
+              },
+              {
+                "word": "Juan.",
+                "start": 45.49464526367188,
+                "end": 45.96319360351563
+              },
+              {
+                "word": " Para ",
+                "start": 45.98604833984375,
+                "end": 46.21991943359375
+              },
+              {
+                "word": "guiarlo ",
+                "start": 46.21991943359375,
+                "end": 46.50137084960937
+              },
+              {
+                "word": "mejor, ",
+                "start": 46.50137084960937,
+                "end": 47.025564453125
+              },
+              {
+                "word": "¿usted ",
+                "start": 47.025564453125,
+                "end": 47.45620971679688
+              },
+              {
+                "word": "las ",
+                "start": 47.45620971679688,
+                "end": 47.5965322265625
+              },
+              {
+                "word": "hace ",
+                "start": 47.5965322265625,
+                "end": 47.76508056640625
+              },
+              {
+                "word": "con ",
+                "start": 47.76508056640625,
+                "end": 47.92395166015625
+              },
+              {
+                "word": "masa ",
+                "start": 47.92395166015625,
+                "end": 48.158629150390624
+              },
+              {
+                "word": "de ",
+                "start": 48.158629150390624,
+                "end": 48.252177490234374
+              },
+              {
+                "word": "maíz, ",
+                "start": 48.252177490234374,
+                "end": 48.63604833984375
+              },
+              {
+                "word": "de ",
+                "start": 48.63604833984375,
+                "end": 48.757822509765624
+              }
+            ],
+            "metadata": {
+              "response_id": 4
+            }
+          },
+          {
+            "role": "user",
+            "content": "De ",
+            "words": [
+              {
+                "word": "De ",
+                "start": 49.175000000000004,
+                "end": 49.675000000000004
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "trigo o hace las dos?",
+            "words": [
+              {
+                "word": "trigo ",
+                "start": 48.757822509765624,
+                "end": 49.35701611328125
+              },
+              {
+                "word": "o ",
+                "start": 49.35701611328125,
+                "end": 49.450564453125
+              },
+              {
+                "word": "hace ",
+                "start": 49.450564453125,
+                "end": 49.64733862304688
+              },
+              {
+                "word": "las ",
+                "start": 49.64733862304688,
+                "end": 49.77798388671875
+              },
+              {
+                "word": "dos?",
+                "start": 49.77798388671875,
+                "end": 50.31185473632812
+              }
+            ],
+            "metadata": {
+              "response_id": 4
+            }
+          },
+          {
+            "role": "user",
+            "content": "maíz.",
+            "words": [
+              {
+                "word": "maíz.",
+                "start": 51.075,
+                "end": 51.575
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Perfecto. ¿Y cuántas empanadas más o menos hace en un día?",
+            "words": [
+              {
+                "word": "Perfecto.",
+                "start": 54.561774169921875,
+                "end": 55.30129028320312
+              },
+              {
+                "word": " ¿Y ",
+                "start": 55.32130249023437,
+                "end": 55.48017333984375
+              },
+              {
+                "word": "cuántas ",
+                "start": 55.48017333984375,
+                "end": 55.74227026367188
+              },
+              {
+                "word": "empanadas ",
+                "start": 55.74227026367188,
+                "end": 56.16404443359375
+              },
+              {
+                "word": "más ",
+                "start": 56.16404443359375,
+                "end": 56.304366943359376
+              },
+              {
+                "word": "o ",
+                "start": 56.304366943359376,
+                "end": 56.36001220703125
+              },
+              {
+                "word": "menos ",
+                "start": 56.36001220703125,
+                "end": 56.58501220703125
+              },
+              {
+                "word": "hace ",
+                "start": 56.58501220703125,
+                "end": 56.73501220703125
+              },
+              {
+                "word": "en ",
+                "start": 56.73501220703125,
+                "end": 56.83743139648438
+              },
+              {
+                "word": "un ",
+                "start": 56.83743139648438,
+                "end": 56.93178637695313
+              },
+              {
+                "word": "día?",
+                "start": 56.93178637695313,
+                "end": 57.40920556640625
+              }
+            ],
+            "metadata": {
+              "response_id": 5
+            }
+          },
+          {
+            "role": "user",
+            "content": "Más o menos en promedio unas doscientas.",
+            "words": [
+              {
+                "word": "Más ",
+                "start": 59.115,
+                "end": 59.355000000000004
+              },
+              {
+                "word": "o ",
+                "start": 59.355000000000004,
+                "end": 59.595000000000006
+              },
+              {
+                "word": "menos ",
+                "start": 59.595000000000006,
+                "end": 59.835
+              },
+              {
+                "word": "en ",
+                "start": 59.835,
+                "end": 60.075
+              },
+              {
+                "word": "promedio ",
+                "start": 60.075,
+                "end": 60.395
+              },
+              {
+                "word": "unas ",
+                "start": 60.395,
+                "end": 60.895
+              },
+              {
+                "word": "doscientas.",
+                "start": 60.954997000000006,
+                "end": 61.454997000000006
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Listo, Juan. Le voy a mandar más info por WhatsApp para que la mire con calma.Si más adelante quiere retomar, aquí estoy. ¡Muchas gracias por su tiempo!",
+            "words": [
+              {
+                "word": "Listo, ",
+                "start": 64.0340966796875,
+                "end": 64.3340966796875
+              },
+              {
+                "word": "Juan.",
+                "start": 64.3340966796875,
+                "end": 64.82119360351562
+              },
+              {
+                "word": " Le ",
+                "start": 65.0490966796875,
+                "end": 65.18054833984375
+              },
+              {
+                "word": "voy ",
+                "start": 65.18054833984375,
+                "end": 65.30232250976563
+              },
+              {
+                "word": "a ",
+                "start": 65.30232250976563,
+                "end": 65.36764526367188
+              },
+              {
+                "word": "mandar ",
+                "start": 65.36764526367188,
+                "end": 65.96683862304687
+              },
+              {
+                "word": "más ",
+                "start": 65.96683862304687,
+                "end": 66.228935546875
+              },
+              {
+                "word": "info ",
+                "start": 66.228935546875,
+                "end": 66.42570971679687
+              },
+              {
+                "word": "por ",
+                "start": 66.42570971679687,
+                "end": 66.5660322265625
+              },
+              {
+                "word": "WhatsApp ",
+                "start": 66.5660322265625,
+                "end": 66.92167749023437
+              },
+              {
+                "word": "para ",
+                "start": 66.92167749023437,
+                "end": 67.137
+              },
+              {
+                "word": "que ",
+                "start": 67.137,
+                "end": 67.45554833984374
+              },
+              {
+                "word": "la ",
+                "start": 67.45554833984374,
+                "end": 67.56845166015626
+              },
+              {
+                "word": "mire ",
+                "start": 67.56845166015626,
+                "end": 67.737
+              },
+              {
+                "word": "con ",
+                "start": 67.737,
+                "end": 67.87732250976562
+              },
+              {
+                "word": "calma.",
+                "start": 67.87732250976562,
+                "end": 68.420064453125
+              },
+              {
+                "word": "Si ",
+                "start": 68.46501342773438,
+                "end": 68.63356176757813
+              },
+              {
+                "word": "más ",
+                "start": 68.63356176757813,
+                "end": 68.82146508789063
+              },
+              {
+                "word": "adelante ",
+                "start": 68.82146508789063,
+                "end": 69.21420703125
+              },
+              {
+                "word": "quiere ",
+                "start": 69.21420703125,
+                "end": 69.53275537109376
+              },
+              {
+                "word": "retomar, ",
+                "start": 69.53275537109376,
+                "end": 70.17872314453125
+              },
+              {
+                "word": "aquí ",
+                "start": 70.17872314453125,
+                "end": 70.45049731445313
+              },
+              {
+                "word": "estoy.",
+                "start": 70.45049731445313,
+                "end": 71.08678759765625
+              },
+              {
+                "word": " ¡Muchas ",
+                "start": 71.1280966796875,
+                "end": 71.43777416992188
+              },
+              {
+                "word": "gracias ",
+                "start": 71.43777416992188,
+                "end": 71.67164526367188
+              },
+              {
+                "word": "por ",
+                "start": 71.67164526367188,
+                "end": 71.77487084960937
+              },
+              {
+                "word": "su ",
+                "start": 71.77487084960937,
+                "end": 71.90551611328125
+              },
+              {
+                "word": "tiempo!",
+                "start": 71.90551611328125,
+                "end": 72.43938720703125
+              }
+            ],
+            "metadata": {
+              "response_id": 6
+            }
+          }
+        ],
+        "transcript_with_tool_calls": [
+          {
+            "role": "agent",
+            "content": "Buenas, mucho gusto. ",
+            "words": [
+              {
+                "word": "Buenas, ",
+                "start": 0.325774169921875,
+                "end": 0.6910966796875
+              },
+              {
+                "word": "mucho ",
+                "start": 0.6910966796875,
+                "end": 0.915290283203125
+              },
+              {
+                "word": "gusto. ",
+                "start": 0.915290283203125,
+                "end": 1.47738720703125
+              }
+            ],
+            "metadata": {
+              "response_id": 0
+            }
+          },
+          {
+            "role": "user",
+            "content": "Aló.",
+            "words": [
+              {
+                "word": "Aló.",
+                "start": 1.525,
+                "end": 2.025
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Hola Juan, le habla Camilo de Maquiempanadas, la empresa que hace las máquinas para empanadas. ¿Le suena Maquiempanadas?",
+            "words": [
+              {
+                "word": "Hola ",
+                "start": 1.495802490234375,
+                "end": 1.701447509765625
+              },
+              {
+                "word": "Juan, ",
+                "start": 1.701447509765625,
+                "end": 2.310318603515625
+              },
+              {
+                "word": "le ",
+                "start": 2.310318603515625,
+                "end": 2.469189453125
+              },
+              {
+                "word": "habla ",
+                "start": 2.469189453125,
+                "end": 3.218383056640625
+              },
+              {
+                "word": "Camilo ",
+                "start": 3.218383056640625,
+                "end": 3.695802490234375
+              },
+              {
+                "word": "de ",
+                "start": 3.695802490234375,
+                "end": 3.9482216796875
+              },
+              {
+                "word": "Maquiempanadas, ",
+                "start": 3.9482216796875,
+                "end": 5.22160888671875
+              },
+              {
+                "word": "la ",
+                "start": 5.22160888671875,
+                "end": 5.324834716796875
+              },
+              {
+                "word": "empresa ",
+                "start": 5.324834716796875,
+                "end": 5.755479736328125
+              },
+              {
+                "word": "que ",
+                "start": 5.755479736328125,
+                "end": 5.85870556640625
+              },
+              {
+                "word": "hace ",
+                "start": 5.85870556640625,
+                "end": 6.064350830078125
+              },
+              {
+                "word": "las ",
+                "start": 6.064350830078125,
+                "end": 6.307899169921875
+              },
+              {
+                "word": "máquinas ",
+                "start": 6.307899169921875,
+                "end": 6.541770263671875
+              },
+              {
+                "word": "para ",
+                "start": 6.541770263671875,
+                "end": 6.66354443359375
+              },
+              {
+                "word": "empanadas. ",
+                "start": 6.66354443359375,
+                "end": 7.403866943359375
+              },
+              {
+                "word": "¿Le ",
+                "start": 7.4472216796875,
+                "end": 7.615770263671875
+              },
+              {
+                "word": "suena ",
+                "start": 7.615770263671875,
+                "end": 7.80367333984375
+              },
+              {
+                "word": "Maquiempanadas?",
+                "start": 7.80367333984375,
+                "end": 8.68351220703125
+              }
+            ],
+            "metadata": {
+              "response_id": 0
+            }
+          },
+          {
+            "role": "user",
+            "content": "Aló, aló.",
+            "words": [
+              {
+                "word": "Aló, ",
+                "start": 17.805,
+                "end": 18.205
+              },
+              {
+                "word": "aló.",
+                "start": 18.205,
+                "end": 18.515
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Hola, ¿Juan? Le habla Camilo de Maquiempanadas, la empresa que hace las máquinas para empanadas. ¿Le suena Maquiempanadas?",
+            "words": [
+              {
+                "word": "Hola, ",
+                "start": 22.609774169921874,
+                "end": 22.796870849609373
+              },
+              {
+                "word": "¿Juan?",
+                "start": 22.796870849609373,
+                "end": 23.274290283203126
+              },
+              {
+                "word": " Le ",
+                "start": 23.296715087890625,
+                "end": 23.390263427734375
+              },
+              {
+                "word": "habla ",
+                "start": 23.390263427734375,
+                "end": 23.5684892578125
+              },
+              {
+                "word": "Camilo ",
+                "start": 23.5684892578125,
+                "end": 23.858811767578125
+              },
+              {
+                "word": "de ",
+                "start": 23.858811767578125,
+                "end": 23.952360107421875
+              },
+              {
+                "word": "Maquiempanadas, ",
+                "start": 23.952360107421875,
+                "end": 24.9354248046875
+              },
+              {
+                "word": "la ",
+                "start": 24.9354248046875,
+                "end": 25.019295654296876
+              },
+              {
+                "word": "empresa ",
+                "start": 25.019295654296876,
+                "end": 25.5346181640625
+              },
+              {
+                "word": "que ",
+                "start": 25.5346181640625,
+                "end": 25.646715087890627
+              },
+              {
+                "word": "hace ",
+                "start": 25.646715087890627,
+                "end": 25.8346181640625
+              },
+              {
+                "word": "las ",
+                "start": 25.8346181640625,
+                "end": 25.983811767578125
+              },
+              {
+                "word": "máquinas ",
+                "start": 25.983811767578125,
+                "end": 26.3305859375
+              },
+              {
+                "word": "para ",
+                "start": 26.3305859375,
+                "end": 26.4805859375
+              },
+              {
+                "word": "empanadas.",
+                "start": 26.4805859375,
+                "end": 27.248327880859375
+              },
+              {
+                "word": " ¿Le ",
+                "start": 27.290392578125,
+                "end": 27.45894091796875
+              },
+              {
+                "word": "suena ",
+                "start": 27.45894091796875,
+                "end": 27.655715087890623
+              },
+              {
+                "word": "Maquiempanadas?",
+                "start": 27.655715087890623,
+                "end": 28.6855537109375
+              }
+            ],
+            "metadata": {
+              "response_id": 1
+            }
+          },
+          {
+            "role": "user",
+            "content": "Sí, sí me suena.",
+            "words": [
+              {
+                "word": "Sí, ",
+                "start": 30.384999999999998,
+                "end": 30.704998999999997
+              },
+              {
+                "word": "sí ",
+                "start": 30.704998999999997,
+                "end": 30.864998999999997
+              },
+              {
+                "word": "me ",
+                "start": 30.864998999999997,
+                "end": 31.024998999999998
+              },
+              {
+                "word": "suena.",
+                "start": 31.024998999999998,
+                "end": 31.415
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Perfecto, Juan. Usted nos dejó sus datos hace un tiempito porque quería info sobre máquinas para empanadas.¿Sigue buscando automatizar su proceso?",
+            "words": [
+              {
+                "word": "Perfecto, ",
+                "start": 33.25777416992187,
+                "end": 33.75374194335937
+              },
+              {
+                "word": "Juan.",
+                "start": 33.75374194335937,
+                "end": 34.25938720703125
+              },
+              {
+                "word": " Usted ",
+                "start": 34.29393017578125,
+                "end": 34.5753818359375
+              },
+              {
+                "word": "nos ",
+                "start": 34.5753818359375,
+                "end": 34.67780102539062
+              },
+              {
+                "word": "dejó ",
+                "start": 34.67780102539062,
+                "end": 34.85602685546875
+              },
+              {
+                "word": "sus ",
+                "start": 34.85602685546875,
+                "end": 35.04312353515625
+              },
+              {
+                "word": "datos ",
+                "start": 35.04312353515625,
+                "end": 35.31489794921875
+              },
+              {
+                "word": "hace ",
+                "start": 35.31489794921875,
+                "end": 35.42699462890625
+              },
+              {
+                "word": "un ",
+                "start": 35.42699462890625,
+                "end": 35.50199462890625
+              },
+              {
+                "word": "tiempito ",
+                "start": 35.50199462890625,
+                "end": 35.885865478515626
+              },
+              {
+                "word": "porque ",
+                "start": 35.885865478515626,
+                "end": 36.1294140625
+              },
+              {
+                "word": "quería ",
+                "start": 36.1294140625,
+                "end": 36.3915107421875
+              },
+              {
+                "word": "info ",
+                "start": 36.3915107421875,
+                "end": 36.597156005859375
+              },
+              {
+                "word": "sobre ",
+                "start": 36.597156005859375,
+                "end": 36.8503818359375
+              },
+              {
+                "word": "máquinas ",
+                "start": 36.8503818359375,
+                "end": 37.262478515625
+              },
+              {
+                "word": "para ",
+                "start": 37.262478515625,
+                "end": 37.43989794921875
+              },
+              {
+                "word": "empanadas.",
+                "start": 37.43989794921875,
+                "end": 38.18909130859375
+              },
+              {
+                "word": "¿Sigue ",
+                "start": 38.2399716796875,
+                "end": 38.59642333984375
+              },
+              {
+                "word": "buscando ",
+                "start": 38.59642333984375,
+                "end": 38.9238427734375
+              },
+              {
+                "word": "automatizar ",
+                "start": 38.9238427734375,
+                "end": 39.439165283203124
+              },
+              {
+                "word": "su ",
+                "start": 39.439165283203124,
+                "end": 39.55126220703125
+              },
+              {
+                "word": "proceso?",
+                "start": 39.55126220703125,
+                "end": 40.187552490234374
+              }
+            ],
+            "metadata": {
+              "response_id": 2
+            }
+          },
+          {
+            "role": "user",
+            "content": "Sí.",
+            "words": [
+              {
+                "word": "Sí.",
+                "start": 41.535003,
+                "end": 42.035003
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Listo, Juan. Para guiarlo mejor, ¿usted las hace con masa de maíz, de ",
+            "words": [
+              {
+                "word": "Listo, ",
+                "start": 45.1010966796875,
+                "end": 45.49464526367188
+              },
+              {
+                "word": "Juan.",
+                "start": 45.49464526367188,
+                "end": 45.96319360351563
+              },
+              {
+                "word": " Para ",
+                "start": 45.98604833984375,
+                "end": 46.21991943359375
+              },
+              {
+                "word": "guiarlo ",
+                "start": 46.21991943359375,
+                "end": 46.50137084960937
+              },
+              {
+                "word": "mejor, ",
+                "start": 46.50137084960937,
+                "end": 47.025564453125
+              },
+              {
+                "word": "¿usted ",
+                "start": 47.025564453125,
+                "end": 47.45620971679688
+              },
+              {
+                "word": "las ",
+                "start": 47.45620971679688,
+                "end": 47.5965322265625
+              },
+              {
+                "word": "hace ",
+                "start": 47.5965322265625,
+                "end": 47.76508056640625
+              },
+              {
+                "word": "con ",
+                "start": 47.76508056640625,
+                "end": 47.92395166015625
+              },
+              {
+                "word": "masa ",
+                "start": 47.92395166015625,
+                "end": 48.158629150390624
+              },
+              {
+                "word": "de ",
+                "start": 48.158629150390624,
+                "end": 48.252177490234374
+              },
+              {
+                "word": "maíz, ",
+                "start": 48.252177490234374,
+                "end": 48.63604833984375
+              },
+              {
+                "word": "de ",
+                "start": 48.63604833984375,
+                "end": 48.757822509765624
+              }
+            ],
+            "metadata": {
+              "response_id": 4
+            }
+          },
+          {
+            "role": "user",
+            "content": "De ",
+            "words": [
+              {
+                "word": "De ",
+                "start": 49.175000000000004,
+                "end": 49.675000000000004
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "trigo o hace las dos?",
+            "words": [
+              {
+                "word": "trigo ",
+                "start": 48.757822509765624,
+                "end": 49.35701611328125
+              },
+              {
+                "word": "o ",
+                "start": 49.35701611328125,
+                "end": 49.450564453125
+              },
+              {
+                "word": "hace ",
+                "start": 49.450564453125,
+                "end": 49.64733862304688
+              },
+              {
+                "word": "las ",
+                "start": 49.64733862304688,
+                "end": 49.77798388671875
+              },
+              {
+                "word": "dos?",
+                "start": 49.77798388671875,
+                "end": 50.31185473632812
+              }
+            ],
+            "metadata": {
+              "response_id": 4
+            }
+          },
+          {
+            "role": "user",
+            "content": "maíz.",
+            "words": [
+              {
+                "word": "maíz.",
+                "start": 51.075,
+                "end": 51.575
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Perfecto. ¿Y cuántas empanadas más o menos hace en un día?",
+            "words": [
+              {
+                "word": "Perfecto.",
+                "start": 54.561774169921875,
+                "end": 55.30129028320312
+              },
+              {
+                "word": " ¿Y ",
+                "start": 55.32130249023437,
+                "end": 55.48017333984375
+              },
+              {
+                "word": "cuántas ",
+                "start": 55.48017333984375,
+                "end": 55.74227026367188
+              },
+              {
+                "word": "empanadas ",
+                "start": 55.74227026367188,
+                "end": 56.16404443359375
+              },
+              {
+                "word": "más ",
+                "start": 56.16404443359375,
+                "end": 56.304366943359376
+              },
+              {
+                "word": "o ",
+                "start": 56.304366943359376,
+                "end": 56.36001220703125
+              },
+              {
+                "word": "menos ",
+                "start": 56.36001220703125,
+                "end": 56.58501220703125
+              },
+              {
+                "word": "hace ",
+                "start": 56.58501220703125,
+                "end": 56.73501220703125
+              },
+              {
+                "word": "en ",
+                "start": 56.73501220703125,
+                "end": 56.83743139648438
+              },
+              {
+                "word": "un ",
+                "start": 56.83743139648438,
+                "end": 56.93178637695313
+              },
+              {
+                "word": "día?",
+                "start": 56.93178637695313,
+                "end": 57.40920556640625
+              }
+            ],
+            "metadata": {
+              "response_id": 5
+            }
+          },
+          {
+            "role": "user",
+            "content": "Más o menos en promedio unas doscientas.",
+            "words": [
+              {
+                "word": "Más ",
+                "start": 59.115,
+                "end": 59.355000000000004
+              },
+              {
+                "word": "o ",
+                "start": 59.355000000000004,
+                "end": 59.595000000000006
+              },
+              {
+                "word": "menos ",
+                "start": 59.595000000000006,
+                "end": 59.835
+              },
+              {
+                "word": "en ",
+                "start": 59.835,
+                "end": 60.075
+              },
+              {
+                "word": "promedio ",
+                "start": 60.075,
+                "end": 60.395
+              },
+              {
+                "word": "unas ",
+                "start": 60.395,
+                "end": 60.895
+              },
+              {
+                "word": "doscientas.",
+                "start": 60.954997000000006,
+                "end": 61.454997000000006
+              }
+            ]
+          },
+          {
+            "role": "agent",
+            "content": "Listo, Juan. Le voy a mandar más info por WhatsApp para que la mire con calma.Si más adelante quiere retomar, aquí estoy. ¡Muchas gracias por su tiempo!",
+            "words": [
+              {
+                "word": "Listo, ",
+                "start": 64.0340966796875,
+                "end": 64.3340966796875
+              },
+              {
+                "word": "Juan.",
+                "start": 64.3340966796875,
+                "end": 64.82119360351562
+              },
+              {
+                "word": " Le ",
+                "start": 65.0490966796875,
+                "end": 65.18054833984375
+              },
+              {
+                "word": "voy ",
+                "start": 65.18054833984375,
+                "end": 65.30232250976563
+              },
+              {
+                "word": "a ",
+                "start": 65.30232250976563,
+                "end": 65.36764526367188
+              },
+              {
+                "word": "mandar ",
+                "start": 65.36764526367188,
+                "end": 65.96683862304687
+              },
+              {
+                "word": "más ",
+                "start": 65.96683862304687,
+                "end": 66.228935546875
+              },
+              {
+                "word": "info ",
+                "start": 66.228935546875,
+                "end": 66.42570971679687
+              },
+              {
+                "word": "por ",
+                "start": 66.42570971679687,
+                "end": 66.5660322265625
+              },
+              {
+                "word": "WhatsApp ",
+                "start": 66.5660322265625,
+                "end": 66.92167749023437
+              },
+              {
+                "word": "para ",
+                "start": 66.92167749023437,
+                "end": 67.137
+              },
+              {
+                "word": "que ",
+                "start": 67.137,
+                "end": 67.45554833984374
+              },
+              {
+                "word": "la ",
+                "start": 67.45554833984374,
+                "end": 67.56845166015626
+              },
+              {
+                "word": "mire ",
+                "start": 67.56845166015626,
+                "end": 67.737
+              },
+              {
+                "word": "con ",
+                "start": 67.737,
+                "end": 67.87732250976562
+              },
+              {
+                "word": "calma.",
+                "start": 67.87732250976562,
+                "end": 68.420064453125
+              },
+              {
+                "word": "Si ",
+                "start": 68.46501342773438,
+                "end": 68.63356176757813
+              },
+              {
+                "word": "más ",
+                "start": 68.63356176757813,
+                "end": 68.82146508789063
+              },
+              {
+                "word": "adelante ",
+                "start": 68.82146508789063,
+                "end": 69.21420703125
+              },
+              {
+                "word": "quiere ",
+                "start": 69.21420703125,
+                "end": 69.53275537109376
+              },
+              {
+                "word": "retomar, ",
+                "start": 69.53275537109376,
+                "end": 70.17872314453125
+              },
+              {
+                "word": "aquí ",
+                "start": 70.17872314453125,
+                "end": 70.45049731445313
+              },
+              {
+                "word": "estoy.",
+                "start": 70.45049731445313,
+                "end": 71.08678759765625
+              },
+              {
+                "word": " ¡Muchas ",
+                "start": 71.1280966796875,
+                "end": 71.43777416992188
+              },
+              {
+                "word": "gracias ",
+                "start": 71.43777416992188,
+                "end": 71.67164526367188
+              },
+              {
+                "word": "por ",
+                "start": 71.67164526367188,
+                "end": 71.77487084960937
+              },
+              {
+                "word": "su ",
+                "start": 71.77487084960937,
+                "end": 71.90551611328125
+              },
+              {
+                "word": "tiempo!",
+                "start": 71.90551611328125,
+                "end": 72.43938720703125
+              }
+            ],
+            "metadata": {
+              "response_id": 6
+            }
+          },
+          {
+            "role": "tool_call_invocation",
+            "tool_call_id": "d345b9a388fd86d7",
+            "name": "end_call",
+            "arguments": "{\"execution_message\":\"Le mando la información por WhatsApp para que la revise con calma. Si más adelante quiere retomar, aquí estoy. ¡Que esté muy bien!\"}"
+          }
+        ],
+        "knowledge_base_retrieved_contents_url": "https://dxc03zgurdly9.cloudfront.net/0a985c46ac5068b1990f0dcc705280ed34456d399bab6b4e8569be7507405583/knowledge_base_retrieved_contents.json",
+        "recording_url": "https://dxc03zgurdly9.cloudfront.net/0a985c46ac5068b1990f0dcc705280ed34456d399bab6b4e8569be7507405583/recording.wav",
+        "public_log_url": "https://dxc03zgurdly9.cloudfront.net/0a985c46ac5068b1990f0dcc705280ed34456d399bab6b4e8569be7507405583/public.log",
+        "disconnection_reason": "agent_hangup",
+        "latency": {
+          "llm": {
+            "p50": 1017.5,
+            "p90": 1236.5,
+            "p95": 1279.75,
+            "p99": 1314.35,
+            "min": 2,
+            "max": 1323,
+            "num": 6,
+            "values": [
+              2,
+              1323,
+              1150,
+              772,
+              911,
+              1124
+            ]
+          },
+          "e2e": {
+            "p50": 2542.0029296875,
+            "p90": 3640.3988281249995,
+            "p95": 3844.1994140624997,
+            "p99": 4007.2398828125,
+            "min": 1740,
+            "max": 4048,
+            "num": 5,
+            "values": [
+              4048,
+              1796,
+              3028.9970703125,
+              1740,
+              2542.0029296875
+            ]
+          },
+          "tts": {
+            "p50": 303,
+            "p90": 338.5,
+            "p95": 342.75,
+            "p99": 346.15,
+            "min": 276,
+            "max": 347,
+            "num": 6,
+            "values": [
+              276,
+              301,
+              347,
+              305,
+              301,
+              330
+            ]
+          },
+          "knowledge_base": {
+            "p50": 245,
+            "p90": 272.8,
+            "p95": 295.9,
+            "p99": 314.38,
+            "min": 136,
+            "max": 319,
+            "num": 8,
+            "values": [
+              234,
+              244,
+              246,
+              172,
+              136,
+              253,
+              251,
+              319
+            ]
+          }
+        },
+        "call_cost": {
+          "total_duration_unit_price": 0.2,
+          "product_costs": [
+            {
+              "product": "elevenlabs_tts",
+              "unit_price": 0.1166667,
+              "cost": 8.5166667
+            },
+            {
+              "product": "gpt_4_1",
+              "unit_price": 0.075,
+              "cost": 5.475
+            },
+            {
+              "product": "knowledge_base_usage",
+              "unit_price": 0.0083333,
+              "cost": 0.6083333
+            }
+          ],
+          "combined_cost": 14.6,
+          "total_duration_seconds": 73
+        },
+        "call_analysis": {
+          "call_summary": "The user, Juan, expressed interest in information about empanada machines from Maquiempanadas. The agent confirmed Juan's needs and promised to send more information via WhatsApp for him to review later.",
+          "in_voicemail": false,
+          "user_sentiment": "Positive",
+          "call_successful": true,
+          "custom_analysis_data": {}
+        },
+        "opt_out_sensitive_data_storage": false,
+        "data_storage_setting": "everything",
+        "opt_in_signed_url": false,
+        "llm_token_usage": {
+          "values": [
+            2487,
+            2209,
+            1515,
+            2769,
+            2819,
+            2993
+          ],
+          "average": 2465.3333333333335,
+          "num_requests": 6
+        },
+        "from_number": "+576042044918",
+        "to_number": "+573125407247",
+        "direction": "outbound",
+        "telephony_identifier": {
+          "twilio_call_sid": "CA7f998f86b27314f16fcc074ed26496c3"
+        }
+      }
+    },
+    "webhookUrl": "https://n8n-service-l12g.onrender.com/webhook/15f19400-1493-4098-8d91-de5c0610aa75",
+    "executionMode": "production"
+  }

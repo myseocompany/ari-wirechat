@@ -3057,6 +3057,11 @@ class APIController extends Controller
             'trace' => $e->getTraceAsString(),
         ]);
     }
+
+    
+
+
+
 }
 
 
@@ -3108,5 +3113,167 @@ class APIController extends Controller
             default => 1,
         };
     }
+
+
+    public function handle(Request $request)
+{
+    // --- 1) ACK immediately (keep TTFB tiny) -------------------------
+    response()->json(['status' => 'accepted'], 200)->send();
+    if (function_exists('fastcgi_finish_request')) {
+        fastcgi_finish_request();
+    }
+
+    // --- 2) Optional internal auth (shared secret) -------------------
+    try {
+        $expected = config('services.retell.internal_token'); // from services.php
+        $got = $request->header('X-Internal-Token');
+        if ($expected && (!is_string($got) || !hash_equals($expected, $got))) {
+            \Log::warning('Retell webhook with invalid internal token');
+            return;
+        }
+    } catch (\Throwable $e) {
+        \Log::error('Retell token check error: '.$e->getMessage());
+    }
+
+    // --- 3) Persist raw request for audit/debug ----------------------
+    try {
+        $this->saveLogFromRequest($request);
+    } catch (\Throwable $e) {
+        \Log::error('Retell saveLogFromRequest failed: '.$e->getMessage());
+    }
+
+    // --- 4) Parse + normalize payload --------------------------------
+    try {
+        $raw = json_decode($request->getContent(), true) ?? [];
+
+        // n8n/render often wraps as an array with {headers, body, ...}. Unwrap it.
+        $data = is_array($raw) && array_key_exists(0, $raw) ? $raw[0] : $raw;
+
+        // If it's the n8n shape { headers, body, ... }, drill into body
+        if (isset($data['body']) && is_array($data['body'])) {
+            $data = $data['body'];
+        }
+
+        // Retell native shape: { event, call: {...} }
+        $event = $data['event'] ?? ($data['type'] ?? null);
+        $call  = $data['call']  ?? $data;
+
+        // Extract useful fields safely
+        $callId        = $call['call_id']           ?? null;
+        $agentId       = $call['agent_id']          ?? null;
+        $agentName     = $call['agent_name']        ?? null;
+        $status        = $call['call_status']       ?? null;   // e.g. "ended"
+        $direction     = $call['direction']         ?? null;   // "inbound"|"outbound"
+        $fromNumber    = $call['from_number']       ?? null;
+        $toNumber      = $call['to_number']         ?? null;
+        $durationMs    = $call['duration_ms']       ?? null;
+
+        $recordingUrl  = $call['recording_url']     ?? null;
+        $publicLogUrl  = $call['public_log_url']    ?? null;
+
+        $analysis      = $call['call_analysis']     ?? [];
+        $summary       = $analysis['call_summary']  ?? null;
+        $sentiment     = $analysis['user_sentiment']?? null;
+        $successful    = $analysis['call_successful'] ?? null;
+
+        $transcript    = $call['transcript']        ?? null;
+
+        \Log::info('✅ Retell ACK sent; processing in background', [
+            'event'      => $event,
+            'call_id'    => $callId,
+            'status'     => $status,
+            'direction'  => $direction,
+            'from'       => $fromNumber,
+            'to'         => $toNumber,
+            'agent'      => $agentName,
+        ]);
+
+        // --- 5) Resolve the customer by phone ------------------------
+        $customer = null;
+        $candidates = array_filter([$toNumber, $fromNumber]); // prefer callee (customer) first on outbound
+        foreach ($candidates as $num) {
+            $digits10 = substr(preg_replace('/\D+/', '', $num), -10);
+            if (!$digits10) { continue; }
+
+            $match = \App\Models\Customer::whereRaw("REPLACE(REPLACE(REPLACE(phone,' ',''),'-',''),'(',')') LIKE ?", ["%{$digits10}%"])
+                        ->orWhereRaw("REPLACE(REPLACE(REPLACE(phone2,' ',''),'-',''),'(',')') LIKE ?", ["%{$digits10}%"])
+                        ->orWhereRaw("REPLACE(REPLACE(REPLACE(contact_phone2,' ',''),'-',''),'(',')') LIKE ?", ["%{$digits10}%"])
+                        ->first();
+            if ($match) { $customer = $match; break; }
+        }
+
+        if (!$customer) {
+            \Log::info('Retell: no customer match by phone', ['from' => $fromNumber, 'to' => $toNumber]);
+            return;
+        }
+
+        // --- 6) Create Action in CRM ---------------------------------
+        $action = new \App\Models\Action;
+        $action->customer_id     = $customer->id;
+        $action->type_id         = 104;
+        $action->creator_user_id = 1; // fallback
+
+        // Prefer to store a clickable URL
+        $action->url             = $recordingUrl ?: $publicLogUrl;
+
+        // Build a concise note (avoid blowing the column size)
+        $pieces = [];
+        if ($agentName)   { $pieces[] = "Agente: {$agentName}"; }
+        if ($direction)   { $pieces[] = "Dirección: {$direction}"; }
+        if ($status)      { $pieces[] = "Estado: {$status}"; }
+        if ($durationMs)  { $pieces[] = "Duración: ~".round($durationMs/1000)."s"; }
+        if ($sentiment)   { $pieces[] = "Sentimiento: {$sentiment}"; }
+        if (is_bool($successful)) { $pieces[] = "Exitosa: ".($successful ? 'sí' : 'no'); }
+        if ($summary)     { $pieces[] = "Resumen: {$summary}"; }
+
+        $note = "Llamada (Retell) — ".implode(' | ', $pieces);
+
+        // Add transcript (truncated) for quick view
+        if ($transcript) {
+            $safeTranscript = mb_substr($transcript, 0, 2000); // keep it sane
+            $note .= "\n\nTranscripción:\n".$safeTranscript.(mb_strlen($transcript) > 2000 ? " …[truncated]" : "");
+        }
+
+        
+
+        $action->note = $note;
+        $action->save();
+
+        // Optionally: move status on successful call
+        // if ($successful && in_array($customer->status_id, [1,36,28])) {
+        //     $cHistory = new \App\Models\CustomerHistory;
+        //     $cHistory->saveFromModel($customer);
+        //     $customer->status_id = 28; // e.g., "Seguimiento"
+        //     $customer->save();
+        // }
+
+    } catch (\Throwable $e) {
+        \Log::error('Retell webhook error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+    }
+}
+
+/**
+ * Map Retell event/status/direction to your ActionType IDs.
+ * Reuse your Channels semantics where it makes sense.
+ */
+public function getActionTypeFromRetell($event = null, $status = null, $direction = null)
+{
+    // Your Channels mapping uses:
+    // 107 => incoming answered, 21 => call started/finished, 1 => no contact
+    $event = strtoupper((string) $event);
+    $status = strtoupper((string) $status);
+    $direction = strtolower((string) $direction);
+
+    // If we know it's an analyzed/ended call, treat as completed call
+    if ($event === 'CALL_ANALYZED' || $status === 'ENDED') {
+        // Inbound finished can be tagged as "answered inbound"
+        if ($direction === 'inbound') return 107;
+        return 21;
+    }
+
+    // Fallbacks
+    if ($event === 'CALL_STARTED') return 21;
+    return 21; // safe default for "call event"
+}
 
 }

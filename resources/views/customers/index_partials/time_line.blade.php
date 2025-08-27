@@ -67,21 +67,33 @@
               </span><br>
             @endif
 
-            {{-- Nota --}}
-            <strong>
+            {{-- Título cortito, no todo en bold --}}
+            <div class="fw-semibold">
               @if($item['icon'])
                 <i class="fa {{ $item['icon'] }}"></i>
               @endif
-              {{ $item['note'] }}
-            </strong><br>
+              {{ $item['type_name'] ?? 'Acción' }}
+            </div>
+
+            {{-- Texto de la nota, sin bold y con saltos de línea --}}
+            <div class="mt-1" style="white-space: pre-wrap;">
+              {!! nl2br(e($item['note'])) !!}
+            </div><br>
 
             {{-- 🎧 Reproductor de audio --}}
             @if(!empty($item['url']) && Str::contains(Str::lower($item['note']), 'llamada'))
-              <audio controls class="mt-2">
-                <source src="{{ $item['url'] }}" type="audio/ogg">
+              @php
+                $lower = Str::lower($item['url']);
+                $mime = Str::endsWith($lower, '.mp3') ? 'audio/mpeg' :
+                        (Str::endsWith($lower, '.wav') ? 'audio/wav' :
+                        (Str::endsWith($lower, ['.ogg','.oga']) ? 'audio/ogg' : 'audio/mpeg'));
+              @endphp
+              <audio controls class="mt-2" style="width:100%;">
+                <source src="{{ $item['url'] }}" type="{{ $mime }}">
                 Tu navegador no soporta el audio.
               </audio><br>
             @endif
+
 
             {{-- Tipo de acción --}}
             <span class="text-muted small">

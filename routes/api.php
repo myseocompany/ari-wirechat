@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\WAToolBoxController;
 use App\Http\Controllers\Api\APIController;
+use App\Http\Controllers\Api\RetellWebhookController;
 
 
 Route::middleware('api')->group(
@@ -19,6 +20,8 @@ Route::middleware('api')->group(
 
         Route::post('/actions/save', [APIController::class, 'saveQuickAction']);
         Route::post('/channels-action', [APIController::class, 'saveChannelsAction']);
+        Route::post('/retell-action', [APIController::class, 'handle']);
+
         
 });
 
