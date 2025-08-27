@@ -76,7 +76,7 @@
             </div>
 
             {{-- Texto de la nota, sin bold y con saltos de línea --}}
-            <div class="mt-1" style="white-space: pre-wrap;">
+            <div class="mt-1" style="white-space: normal;">
               {!! nl2br(e($item['note'])) !!}
             </div><br>
 
