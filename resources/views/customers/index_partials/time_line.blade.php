@@ -72,7 +72,7 @@
               @if($item['icon'])
                 <i class="fa {{ $item['icon'] }}"></i>
               @endif
-              {{ $item['type_name'] ?? 'Acción' }}
+              
             </div>
 
             {{-- Texto de la nota, sin bold y con saltos de línea --}}
