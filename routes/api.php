@@ -3,6 +3,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\WAToolBoxController;
 use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\Api\RetellWebhookController;
+use App\Http\Controllers\Api\CustomerApiController;
+use App\Http\Middleware\CheckApiToken;
 
 
 Route::middleware('api')->group(
@@ -25,6 +27,17 @@ Route::middleware('api')->group(
         
 });
 
+
+Route::middleware([CheckApiToken::class, 'throttle:60,1'])->group(function () {
+    Route::get('/customers', [CustomerApiController::class, 'index']);           // filtros
+    Route::get('/customers/{id}', [CustomerApiController::class, 'show']);
+
+    Route::patch('/customers/{id}/status', [CustomerApiController::class, 'updateStatus']);
+    Route::post('/customers/{id}/actions', [CustomerApiController::class, 'addAction']);
+
+    Route::post('/customers/bulk/status', [CustomerApiController::class, 'bulkUpdateStatus']);
+    Route::post('/customers/bulk/actions', [CustomerApiController::class, 'bulkAddAction']);
+});
 
 
 
