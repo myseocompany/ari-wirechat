@@ -14,24 +14,36 @@ class CustomerApiController extends Controller
     public function __construct(private CustomerService $svc) {}
 
     // GET /api/customers
-    public function index(Request $request) {
-        $request->merge([
-            'from_date' => $request->query('from_date'),
-            'to_date'   => $request->query('to_date'),
-        ]);
-        $pageSize = (int) $request->query('per_page', 50);
-        $result = $this->svc->filterCustomers($request, [], null, false, $pageSize);
+    public function index(Request $request)
+{
+    $query = Customer::query();
 
-        return response()->json([
-            'data' => $result->items(),
-            'meta' => [
-                'current_page' => $result->currentPage(),
-                'per_page'     => $result->perPage(),
-                'total'        => $result->total(),
-                'benchmark_ms' => $result->benchmark_ms ?? null,
-            ],
-        ]);
+    // filtros normales (status_id, fechas, etc.)
+    if ($request->has('status_id')) {
+        $query->where('status_id', $request->status_id);
     }
+
+    if ($request->has('from_date') && $request->has('to_date')) {
+        $query->whereBetween('created_at', [$request->from_date, $request->to_date]);
+    }
+
+    // 🔎 FILTRO por acciones
+    if ($request->has('action_note') || $request->has('action_from') || $request->has('action_to')) {
+        $query->whereHas('actions', function ($q) use ($request) {
+            if ($request->filled('action_note')) {
+                $q->where('note', 'like', '%' . $request->action_note . '%');
+            }
+            if ($request->filled('action_from') && $request->filled('action_to')) {
+                $q->whereBetween('created_at', [$request->action_from, $request->action_to]);
+            }
+        });
+    }
+
+    $customers = $query->paginate($request->get('per_page', 50));
+
+    return response()->json($customers);
+}
+
 
     // GET /api/customers/{id}
     public function show($id) {
