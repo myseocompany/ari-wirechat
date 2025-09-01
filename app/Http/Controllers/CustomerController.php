@@ -676,7 +676,7 @@ class CustomerController extends Controller
         if ($model->save()) {
             $this->storeActionHandbook($model);
             //$this->sendWelcomeMail($model);
-            return redirect()->to(url()->previous())
+            return redirect("/customers/{$model->id}/show")
                 ->with('status', '🔥 El Cliente <strong>' . $model->name . '</strong> fué añadido con éxito!');
         }
     }

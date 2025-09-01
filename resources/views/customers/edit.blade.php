@@ -32,13 +32,13 @@
   <div class="col-sm-3">
     <div class="form-group">
       <label for="phone2">Celular:</label>
-      <input type="text" class="form-control" id="phone" name="phone" value="{{$model->phone}}" placeholder="Celular...">
+      <input type="text" class="form-control" id="phone" name="phone" value="{{$model->phone}}" placeholder="Celular..." pattern="[0-9]{6,20}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
     </div>
   </div>
   <div class="col-sm-3">
     <div class="form-group">
       <label for="phone">Teléfono:</label>
-      <input type="text" class="form-control" id="phone2" name="phone2" value="{{$model->phone2}}" placeholder="Telefono...">
+      <input type="text" class="form-control" id="phone2" name="phone2" value="{{$model->phone2}}" placeholder="Telefono..." pattern="[0-9]{6,20}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
     </div>
   </div>
   
@@ -246,7 +246,7 @@ console.log({{$model->getScoringToNumber()}});
         <div class="col-sm-3">
            <div class="form-group">
             <label for="contact_phone2">Celular:</label>
-            <input type="text" class="form-control" id="contact_phone2" name="contact_phone2" value="{{$model->contact_phone2}}" >
+            <input type="text" class="form-control" id="contact_phone2" name="contact_phone2" value="{{$model->contact_phone2}}" pattern="[0-9]{6,20}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
           </div>
         </div>
         

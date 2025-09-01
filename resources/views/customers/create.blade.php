@@ -17,14 +17,14 @@
         <div class="col-sm-3">
            <div class="form-group">
             <label for="phone">Celular:</label>
-            <input type="tel" class="form-control" id="phone" name="phone" placeholder="Celular..." pattern="[0-9]{6,20}">
+            <input type="text" class="form-control" id="phone" name="phone" placeholder="Celular..." pattern="[0-9]{6,20}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
           </div>
         </div>
         
         <div class="col-sm-3">
           <div class="form-group">
             <label for="phone2">Teléfono:</label>
-            <input type="tel" class="form-control" id="phone2" name="phone2" placeholder="Telefono..." pattern="[0-9]{6,20}">
+            <input type="text" class="form-control" id="phone2" name="phone2" placeholder="Telefono..." pattern="[0-9]{6,20}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
           </div>
         </div>
          
@@ -191,7 +191,7 @@
         <div class="col-sm-3">
            <div class="form-group">
             <label for="contact_phone2">Celular:</label>
-            <input type="tel" class="form-control" id="contact_phone2" name="contact_phone2" placeholder="Celular..." pattern="[0-9]{6,20}">
+            <input type="text" class="form-control" id="contact_phone2" name="contact_phone2" placeholder="Celular..." pattern="[0-9]{6,20}" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
           </div>
         </div>
         
