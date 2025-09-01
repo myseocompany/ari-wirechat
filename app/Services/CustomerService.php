@@ -65,6 +65,14 @@ class CustomerService {
                     $looksPhone = $digits !== '' && preg_match('/^\d{5,}$/', $digits);
 
                     if ($looksPhone) {
+                        if ($looksPhone && strlen($digits) >= 4) {
+                            $innerQuery->orWhere('customers.phone_last9', 'like', "%$digits%")
+                                ->orWhere('customers.phone2_last9', 'like', "%$digits%")
+                                ->orWhere('customers.contact_phone2_last9', 'like', "%$digits%")
+                                ->orWhere('customers.phone', 'like', "%$digits%")
+                                ->orWhere('customers.phone2', 'like', "%$digits%")
+                                ->orWhere('customers.contact_phone2', 'like', "%$digits%");
+                        }
                         if (strlen($digits) >= 9) {
                             $last9 = substr($digits, -9);
                             $innerQuery->orWhere('customers.phone_last9', $last9)
