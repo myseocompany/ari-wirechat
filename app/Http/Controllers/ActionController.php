@@ -87,149 +87,8 @@ class ActionController extends Controller
 
 	    });
 	}
-    public function index( Request $request){
-    $forcePending = $request->input('pending') === 'true';
-
-    $overdueRequest  = $this->actionService->createFilteredRequest($request, 'overdue',  $forcePending);
-    $todayRequest    = $this->actionService->createFilteredRequest($request, 'today',    $forcePending);
-    $upcomingRequest = $this->actionService->createFilteredRequest($request, 'upcoming', $forcePending);
-
-    $overdueActions  = $this->actionService->filterModel($overdueRequest);
-    $todayActions    = $this->actionService->filterModel($todayRequest);
-    $upcomingActions = $this->actionService->filterModel($upcomingRequest);
-
-    // Listado principal (respeta from/to del request actual)
-    $model = $this->actionService->filterModel($request);
-
-    // “Todas” debe ser exactamente el mismo set que el listado cuando range_type=all
-    $allRequest = clone $request;
-    $allRequest->merge(['range_type' => 'all']);
-    $totalFilteredActions = $this->actionService->countAllMatching($allRequest);
-
-        $users = User::where('status_id' , '=' , 1)->get();
-        $action_options = ActionType::orderby("weigth", "DESC")->get();
-        $statuses_options = CustomerStatus::orderBy("stage_id", "ASC")->orderBy("weight", "ASC")->get();
-        
-        
-
-    return view('actions.index', compact(
-        'model','users','action_options','request',
-        'overdueActions','todayActions','upcomingActions',
-        'statuses_options','totalFilteredActions'
-    ));
-    }   
-
-    public function indexPending( Request $request){
-        /*BUSCAR LOS QUE TIENEN ACCIONES*/
-         $customers_id = Action::
-                        rightJoin('customers', 'actions.customer_id', 'customers.id')
-                        ->join('action_types', 'action_types.id', 'actions.type_id')
-                        ->where('action_types.outbound', 1)
-                        ->select(DB::raw('DISTINCT(customers.id)')) 
-                        ->groupBy('customers.id')         
-                        ->get();    
-
-        $array_customer_id = array();
-        foreach ($customers_id as $key => $value) {
-            $array_customer_id[] = $value["id"];
-        }
-        $year = date("Y");
-        $month = date("n");
 
 
-
-        $model = Customer::
-                        whereNotIn('id', $array_customer_id)
-                        ->whereYear('created_at' ,$year) 
-                        ->whereMonth('created_at' ,$month) 
-                        ->orderBy('created_at', 'DESC')
-                        ->get();
-        $total_pending_action = $this->getPendingActions();
-
-        $users = User::where('status_id' , '=' , 1)
-            ->get();
-
-            //dd($model);
-        $action_options = ActionType::orderBy('weigth')->get();   
-
-
-
-        //CLientes con acciones de Salida
-        $customers_whith_actions = Customer::
-                        leftjoin('actions', 'actions.customer_id', 'customers.id')
-                        ->join('action_types', 'action_types.id', 'actions.type_id')
-                        ->where('action_types.outbound', 1)
-                        ->whereYear('actions.created_at' ,$year) 
-                        ->whereMonth('actions.created_at' ,$month) 
-                        ->select(DB::raw('DISTINCT(customers.id), customers.name, customers.status_id, customers.created_at as customer_created_at, customers.phone, customers.email, customers.source_id, customers.status_id, actions.created_at as action_created_at')) 
-                        ->groupBy('customers.id','customers.name', 'customers.status_id', 'customers.created_at', 'actions.created_at', 'customers.phone', 'customers.email', 'customers.source_id','customers.status_id')  
-                        ->orderBy('actions.created_at', 'DESC')       
-                        ->get();
-
-
-        $from_date = date("Y-m-d"). " 00:00:00";
-        $to_date = date("Y-m-d"). " 23:59:59";
-
-        /*GRAFICO*/
-        $new_customers = Customer::whereYear('created_at' ,$year) 
-                        ->whereMonth('created_at' ,$month) 
-                        ->count();
-
-        $attended_customers = Customer::
-                            join('actions', 'actions.customer_id','customers.id')
-                            ->join('action_types','action_types.id','actions.type_id')
-                            ->where('action_types.outbound', 1)
-                            //->whereBetween('customers.created_at', array($from_date, $to_date))
-                            ->whereYear('customers.created_at' ,$year) 
-                            ->whereMonth('customers.created_at' ,$month) 
-                            ->select(DB::raw('COUNT(DISTINCT(customers.id)) as count')) 
-                            ->first();
-        /*FIN GRAFICO*/
-
-
-
-        //SELECT count(a.customer_id), c.* FROM `customers` c left join actions a on c.id = a.customer_id inner join action_types aty on aty.id = a.type_id where c.user_id is not null and aty.outbound = 1 and c.status_id in(1,4,28) and c.created_at between "" GROUP by c.id
-
-        $this_date = date('Y-m-j');
-        $last_date = strtotime ( '-3 month' , strtotime ( $this_date ) ) ;
-        $last_date = date ( 'Y-m-j' , $last_date );
-        $active_customers = Customer::
-                            leftJoin('actions', 'actions.customer_id','customers.id')
-                            ->join('action_types','action_types.id','actions.type_id')
-                            ->where('action_types.outbound', 1)
-                            ->whereNotNull('customers.user_id')
-                            ->whereIn('customers.status_id', array(1,4,28))
-                            ->where('actions.created_at', ">=", $last_date)
-                            ->select(DB::raw('customers.id, customers.name, customers.status_id, customers.created_at, customers.phone, customers.email, customers.source_id, customers.status_id, customers.created_at, actions.created_at as action_created_at'))
-                            ->orderBy('actions.created_at', 'DESC') 
-                            ->get();
-
-
-        //SELECT * FROM customers c LEFT JOIN actions a ON a.customer_id = c.id INNER JOIN action_types aty ON aty.id = a.type_id WHERE aty.outbound = 1 AND c.user_id IS NOT NULL AND c.status_id IN(1,4,28) AND a.created_at <= "2021-04-16" AND c.created_at <= "2021-04-16"
-
-
-        $inactive_customers = Customer::
-                            leftJoin('actions', 'actions.customer_id','customers.id')
-                            ->join('action_types','action_types.id','actions.type_id')
-                            ->where('action_types.outbound', 1)
-                            ->whereNotNull('customers.user_id')
-                            ->whereIn('customers.status_id', array(1,4,28))
-                            ->where('actions.created_at', "<=", "2021-04-16")
-                            ->where('customers.created_at', "<=", "2021-04-16")
-                            ->select(DB::raw('DISTINCT(customers.id), customers.name, customers.status_id, customers.created_at, customers.phone, customers.email, customers.source_id, customers.status_id, customers.created_at, actions.created_at as action_created_at'))
-                            ->orderBy('actions.created_at', 'DESC') 
-                            ->get();
-
-
-        $customers_whith_out_actions  = Customer::
-                        whereNotIn('id', $array_customer_id)
-                        ->whereYear('created_at' ,$year) 
-                        ->whereMonth('created_at' ,$month) 
-                        ->whereNotNull('user_id')
-                        ->orderBy('created_at', 'DESC')
-                        ->paginate(5);
-        return view('actions.pending_actions', compact('model','users', 'action_options','request','customers_whith_actions','new_customers','attended_customers','active_customers', 'inactive_customers','total_pending_action', 'customers_whith_out_actions')); 
-    }
 
 
 
@@ -424,4 +283,135 @@ class ActionController extends Controller
 
         return redirect()->back()->with('statusone', 'Acción completada con éxito');
     }
+
+
+    // App/Http/Controllers/ActionController.php
+
+public function calendar(Request $request) {
+    // Renderiza la vista con filtros iniciales (opcional)
+    $users = \App\Models\User::active()->get();
+    $types = \App\Models\ActionType::orderBy('weigth','desc')->get();
+    return view('actions.calendar.index', compact('users','types','request'));
+}
+
+
+// App/Http/Controllers/ActionController.php
+
+public function index(Request $request){
+    $view = $request->get('view', 'list'); // 'list' | 'calendar'
+
+    // Filtros y KPIs (se calculan igual para ambas vistas)
+    $forcePending = $request->input('pending') === 'true';
+    $overdueRequest  = $this->actionService->createFilteredRequest($request, 'overdue',  $forcePending);
+    $todayRequest    = $this->actionService->createFilteredRequest($request, 'today',    $forcePending);
+    $upcomingRequest = $this->actionService->createFilteredRequest($request, 'upcoming', $forcePending);
+
+    $overdueActions  = $this->actionService->filterModel($overdueRequest);
+    $todayActions    = $this->actionService->filterModel($todayRequest);
+    $upcomingActions = $this->actionService->filterModel($upcomingRequest);
+
+    // Si es lista, paginamos; si es calendario, no cargues la lista para ahorrar DB
+    $model = $view === 'list' ? $this->actionService->filterModel($request) : null;
+
+    $allRequest = clone $request; $allRequest->merge(['range_type' => 'all']);
+    $totalFilteredActions = $this->actionService->countAllMatching($allRequest);
+
+    $users = User::where('status_id',1)->get();
+    $action_options = ActionType::orderby("weigth", "DESC")->get();
+    $statuses_options = CustomerStatus::orderBy("stage_id")->orderBy("weight")->get();
+    $types = $action_options;
+
+    return view('actions.index', compact(
+        'view','model','users','action_options','request',
+        'overdueActions','todayActions','upcomingActions',
+        'statuses_options','totalFilteredActions','types'
+    ));
+}
+
+public function calendarFeed(Request $request)
+{
+    try {
+        // 1) Ventana de calendario
+        $startParam = $request->query('start');
+        $endParam   = $request->query('end');
+
+        // FullCalendar siempre manda start/end, pero por si acaso:
+        $start = $startParam ? \Carbon\Carbon::parse($startParam)->startOfDay()
+                             : \Carbon\Carbon::now()->startOfMonth();
+        $end   = $endParam   ? \Carbon\Carbon::parse($endParam)->endOfDay()
+                             : \Carbon\Carbon::now()->endOfMonth();
+
+        // 2) Pendientes
+        $pendingOnly = filter_var($request->query('pending', '1'), FILTER_VALIDATE_BOOLEAN);
+
+        // 3) Query base
+        $q = Action::query()
+            ->when($pendingOnly, fn($q)=>$q->whereNull('delivery_date')->whereNotNull('due_date'))
+            ->whereBetween('due_date', [$start, $end])
+            ->when($request->filled('user_id'), fn($q)=>$q->where('creator_user_id', $request->user_id))
+            ->when($request->filled('type_id'), fn($q)=>$q->where('type_id', $request->type_id))
+            ->when($request->filled('search'),  fn($q)=>$q->where('note', 'like', '%'.$request->search.'%'))
+            ->with('type');
+
+        $nowStart = \Carbon\Carbon::now()->startOfDay();
+        $nowEnd   = \Carbon\Carbon::now()->endOfDay();
+
+        $events = $q->get()->map(function ($a) use ($nowStart, $nowEnd) {
+            $status = 'upcoming';
+            if ($a->due_date && $a->due_date < $nowStart)                        $status = 'overdue';
+            elseif ($a->due_date && $a->due_date->between($nowStart, $nowEnd))   $status = 'today';
+            if ($a->delivery_date)                                               $status = 'done';
+
+            $colors = [
+                'overdue' => ['#B91C1C','#FEE2E2'],
+                'today'   => ['#1D4ED8','#DBEAFE'],
+                'upcoming'=> ['#065F46','#D1FAE5'],
+                'done'    => ['#6B7280','#E5E7EB'],
+            ];
+            [$border, $bg] = $colors[$status];
+
+            // Guardas: no encadenar sobre optional()
+            $start = $a->due_date ? $a->due_date->toIso8601String() : null;
+            $end   = $a->due_date ? $a->due_date->copy()->addMinutes(30)->toIso8601String() : null;
+
+            return [
+                'id'    => $a->id,
+                'title' => (($a->type->name ?? 'Acción').' · '.mb_strimwidth($a->note ?? 'Sin nota', 0, 50, '…')),
+                'start' => $start,
+                'end'   => $end,
+                'url'   => route('actions.show', $a->id),
+                'editable' => !$a->delivery_date,
+                'backgroundColor' => $bg, 'borderColor' => $border, 'textColor' => '#111827',
+            ];
+        });
+
+        return response()->json($events);
+
+    } catch (\Throwable $e) {
+        \Log::error('calendarFeed error', ['msg' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+        return response()->json(['error' => 'Internal'], 500);
+    }
+}
+
+
+/** Reprogramar desde calendar (drag/drop o resize) */
+public function reschedule(Request $request, Action $action)
+{
+    $this->authorize('update', $action); // opcional si usas policies
+    $request->validate([
+        'due_date' => 'required|date',      // ISO8601 desde FullCalendar
+    ]);
+
+    // No permitir mover acciones ya entregadas
+    if ($action->delivery_date) {
+        return response()->json(['message'=>'La acción ya fue completada'], 422);
+    }
+
+    $action->due_date = \Carbon\Carbon::parse($request->input('due_date'));
+    $action->save();
+
+    return response()->json(['ok'=>true]);
+}
+
+
 }

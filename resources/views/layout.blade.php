@@ -42,6 +42,8 @@
     text-align: left !important;
   }
 </style>
+
+@stack('styles')
 </head>
 <body>
   <div class="container">
@@ -111,5 +113,6 @@ $(document).ready(function(){
           }, 4000); // desaparece después de 4 segundos
         });
       </script>
+      @stack('scripts')
     </body>
     </html>

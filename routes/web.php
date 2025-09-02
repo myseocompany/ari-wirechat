@@ -1,6 +1,5 @@
 <?php
 use App\Http\Controllers\RDTestController;
-
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OptimizerController;
@@ -493,5 +492,18 @@ Route::get('/reportes/madrid', [\App\Http\Controllers\MadridDashboardController:
     ->name('madrid.dashboard');
 
 
+Route::get('/actions', [ActionController::class, 'index'])->name('actions.index');    
+
 Route::put('/roles/{role}/permissions', [RoleController::class, 'updatePermissions'])
     ->name('roles.updatePermissions');
+
+// Feed de eventos para FullCalendar
+Route::get('/actions/calendar/feed', [ActionController::class, 'calendarFeed'])
+    ->name('actions.calendar.feed');
+
+// Reprogramar arrastrando en el calendario
+Route::put('/actions/{action}/reschedule', [ActionController::class, 'reschedule'])
+    ->name('actions.reschedule');
+
+Route::get('/actions/{id}/show', [ActionController::class, 'show'])
+     ->name('actions.show');
