@@ -4,18 +4,3 @@
     @include('actions.filter')
 </aside>
 
-<style>
-.input-date {
-    max-width: 100%;
-}
-.custom-select, .form-control {
-    max-width: 100%;
-}
-</style>
-
-<script>
-function submitWithRange(value) {
-    document.getElementById('range_type').value = value;
-    document.getElementById('filter_form').submit();
-}
-</script>

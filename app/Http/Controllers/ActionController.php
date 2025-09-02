@@ -88,34 +88,35 @@ class ActionController extends Controller
 	    });
 	}
     public function index( Request $request){
+    $forcePending = $request->input('pending') === 'true';
 
-            
-        $blankRequest = new Request(); // 👈 nuevo Request sin parámetros del usuario
+    $overdueRequest  = $this->actionService->createFilteredRequest($request, 'overdue',  $forcePending);
+    $todayRequest    = $this->actionService->createFilteredRequest($request, 'today',    $forcePending);
+    $upcomingRequest = $this->actionService->createFilteredRequest($request, 'upcoming', $forcePending);
 
-        $overdueRequest = $this->actionService->createFilteredRequest($blankRequest, 'overdue');
-        $todayRequest = $this->actionService->createFilteredRequest($blankRequest, 'today');
-        $upcomingRequest = $this->actionService->createFilteredRequest($blankRequest, 'upcoming');
-        
+    $overdueActions  = $this->actionService->filterModel($overdueRequest);
+    $todayActions    = $this->actionService->filterModel($todayRequest);
+    $upcomingActions = $this->actionService->filterModel($upcomingRequest);
 
+    // Listado principal (respeta from/to del request actual)
+    $model = $this->actionService->filterModel($request);
 
+    // “Todas” debe ser exactamente el mismo set que el listado cuando range_type=all
+    $allRequest = clone $request;
+    $allRequest->merge(['range_type' => 'all']);
+    $totalFilteredActions = $this->actionService->countAllMatching($allRequest);
 
-        // calculo los recordSet de las acciones filtradas 
-        $overdueActions = $this->actionService->filterModel($overdueRequest, true);
-        $todayActions = $this->actionService->filterModel($todayRequest, true);
-        $upcomingActions = $this->actionService->filterModel($upcomingRequest, true);
-
-        $useDueDate = $request->input('pending') === 'true';
-        $model = $this->actionService->filterModel($request, $useDueDate);
-
-        
         $users = User::where('status_id' , '=' , 1)->get();
         $action_options = ActionType::orderby("weigth", "DESC")->get();
         $statuses_options = CustomerStatus::orderBy("stage_id", "ASC")->orderBy("weight", "ASC")->get();
         
+        
 
-        return view('actions.index', compact('model','users', 'action_options','request',
-                'overdueActions', 'todayActions', 'upcomingActions', 
-            'statuses_options'));
+    return view('actions.index', compact(
+        'model','users','action_options','request',
+        'overdueActions','todayActions','upcomingActions',
+        'statuses_options','totalFilteredActions'
+    ));
     }   
 
     public function indexPending( Request $request){

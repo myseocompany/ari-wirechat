@@ -14,69 +14,79 @@ use DB;
 
 class ActionService{
 
+// App/Services/ActionService.php
+
 public function filterModel(Request $request, $useDueDate = false)
 {
-    Log::info('filterModel called', $request->all());
+    $query = $this->buildBaseQuery($request);
+    $dateColumn = $request->input('pending') === 'true' ? 'due_date' : 'created_at';
 
-    // Determinar si el filtro es por pendientes o por fecha de creación
-    $isPending = $request->input('pending') === 'true';
+    // Orden y paginación
+    return $query->orderBy($dateColumn, 'asc')->paginate(15);
+}
+
+/** NUEVO: una sola fuente de verdad para armar el query */
+private function buildBaseQuery(Request $request)
+{
+    $isPending  = $request->input('pending') === 'true';
     $dateColumn = $isPending ? 'due_date' : 'created_at';
 
-    $model = Action::where(function ($query) use ($request, $isPending, $dateColumn) {
+    $hasDates = $request->filled('from_date') && $request->filled('to_date');
+    $from = $hasDates ? Carbon\Carbon::parse($request->from_date)->startOfDay() : null;
+    $to   = $hasDates ? Carbon\Carbon::parse($request->to_date)->endOfDay()   : null;
+
+    return Action::where(function ($query) use ($request, $isPending, $dateColumn, $hasDates, $from, $to) {
 
         if ($isPending) {
-            // Solo pendientes
             $query->whereNull('delivery_date')
                   ->whereNotNull('due_date');
         }
 
-        if ($request->filled('range_type')) {
+        $rangeType = $request->input('range_type'); // puede venir null
+
+        if ($rangeType) {
             $now = Carbon\Carbon::now();
 
-            if ($request->range_type == 'overdue' && $isPending) {
-                $query->where('due_date', '<', $now->startOfDay());
+            if ($rangeType === 'overdue' && $isPending) {
+                // Vencidas: antes de hoy, y además respeta el rango si viene
+                $query->where($dateColumn, '<', $now->startOfDay());
+                if ($hasDates) $query->whereBetween($dateColumn, [$from, $to]);
 
-            } elseif ($request->range_type == 'today') {
-                $query->where(function ($q) use ($now, $isPending) {
-                    if ($isPending) {
-                        // Pendientes programadas para hoy
-                        $q->whereDate('due_date', $now->toDateString());
-                    } else {
-                        // Acciones creadas hoy
-                        $q->whereDate('created_at', $now->toDateString());
-                    }
-                });
+            } elseif ($rangeType === 'today') {
+                // Hoy: del inicio al fin de hoy, y además respeta el rango si viene
+                $query->whereDate($dateColumn, $now->toDateString());
+                if ($hasDates) $query->whereBetween($dateColumn, [$from, $to]);
 
-            } elseif ($request->range_type == 'upcoming' && $isPending) {
-                $query->where('due_date', '>', $now->endOfDay());
+            } elseif ($rangeType === 'upcoming' && $isPending) {
+                // Próximas: después de hoy, y además respeta el rango si viene
+                $query->where($dateColumn, '>', $now->endOfDay());
+                if ($hasDates) $query->whereBetween($dateColumn, [$from, $to]);
+
+            } elseif ($rangeType === 'all') {
+                // Todas: solo aplica el rango si viene
+                if ($hasDates) $query->whereBetween($dateColumn, [$from, $to]);
             }
 
-        } elseif ($request->filled('from_date') && $request->filled('to_date')) {
-            $fromDate = Carbon\Carbon::parse($request->from_date)->startOfDay();
-            $toDate = Carbon\Carbon::parse($request->to_date)->endOfDay();
-            $query->whereBetween($dateColumn, [$fromDate, $toDate]);
+        } else if ($hasDates) {
+            // Sin range_type: usa únicamente el rango explícito
+            $query->whereBetween($dateColumn, [$from, $to]);
         }
 
-        if ($request->filled('user_id')) {
-            $query->where('creator_user_id', $request->user_id);
-        }
-
-        if ($request->filled('type_id')) {
-            $query->where('type_id', $request->type_id);
-        }
-
+        if ($request->filled('user_id'))   $query->where('creator_user_id', $request->user_id);
+        if ($request->filled('type_id'))   $query->where('type_id', $request->type_id);
         if ($request->filled('action_search')) {
-            $searchTerm = '%' . $request->action_search . '%';
-            $query->where('note', 'like', $searchTerm);
+            $query->where('note', 'like', '%'.$request->action_search.'%');
         }
-    })
-    ->orderBy($dateColumn, 'asc')
-    ->paginate(15);
-
-    $model->getActualRows = $model->currentPage() * $model->perPage();
-
-    return $model;
+    });
 }
+
+
+/** ACTUALIZA: respeta fechas y reusa la query base */
+public function countAllMatching(Request $request)
+{
+    return $this->buildBaseQuery($request)->count();
+}
+
 
     public function getAll(Request $request) {
         // Iniciar el query base para acciones pendientes
@@ -102,35 +112,60 @@ public function filterModel(Request $request, $useDueDate = false)
     }
             
 
-    public function createFilteredRequest($originalRequest, $dateRangeType) {
-        $filteredRequest = clone $originalRequest;
-        $now = Carbon\Carbon::now();
+public function createFilteredRequest($originalRequest, $dateRangeType, $forcePendingOnly = true)
+{
+    $filteredRequest = new Request();
 
-        switch ($dateRangeType) {
-            case 'overdue':
-                $fromDate = Carbon\Carbon::createFromTimestamp(0); // desde el inicio de los tiempos
-                $toDate = $now->copy()->startOfDay()->subSecond(); // hasta ayer
-                break;
-            case 'today':
-                $fromDate = $now->copy()->startOfDay();
-                $toDate = $now->copy()->endOfDay();
-                break;
-            case 'upcoming':
-                $fromDate = $now->copy()->addDay()->startOfDay(); // mañana
-                $toDate = $now->copy()->addWeeks(1)->endOfDay(); // hasta 1 semana
-                break;
-            default:
-                throw new \Exception('Invalid date range type');
+    $filters = ['user_id', 'type_id', 'action_search', 'from_date', 'to_date'];
+    foreach ($filters as $filter) {
+        if ($originalRequest->has($filter)) {
+            $filteredRequest->merge([
+                $filter => $originalRequest->input($filter)
+            ]);
         }
+    }
 
+    $now = Carbon\Carbon::now();
+
+    switch ($dateRangeType) {
+        case 'overdue':
+            $fromDate = Carbon\Carbon::createFromTimestamp(0);
+            $toDate = $now->copy()->startOfDay()->subSecond();
+            break;
+        case 'today':
+            $fromDate = $now->copy()->startOfDay();
+            $toDate = $now->copy()->endOfDay();
+            break;
+        case 'upcoming':
+            $fromDate = $now->copy()->addDay()->startOfDay();
+            $toDate = $now->copy()->addWeeks(1)->endOfDay();
+            break;
+        default:
+            throw new \Exception('Invalid date range type');
+    }
+
+    // Si from_date y to_date vienen del request original, respétalos, si no, aplicar el preset
+    if (!$originalRequest->filled('from_date') || !$originalRequest->filled('to_date')) {
         $filteredRequest->merge([
-            'pending' => true,
             'from_date' => $fromDate->toDateString(),
             'to_date' => $toDate->toDateString(),
-            'range_type' => $dateRangeType // 👈 Nuevo
         ]);
-
-        return $filteredRequest;
     }
+
+    if ($forcePendingOnly) {
+        $filteredRequest->merge([
+            'pending' => 'true'
+        ]);
+    }
+
+    $filteredRequest->merge([
+        'range_type' => $dateRangeType
+    ]);
+
+    return $filteredRequest;
+}
+
+
+
 
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Role;
 use DB;
 use App\Models\UserStatus;
+use App\Models\Menu;
 
 class RoleController extends Controller
 {
@@ -67,11 +68,11 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
-        $model = Role::find($id);
-        return view('roles.show', compact('model'));
+    public function show($id) {
+        $role = Role::with(['menus', 'users'])->findOrFail($id);
+        $menus = Menu::orderBy('name')->get();
+
+        return view('roles.show', compact('role', 'menus'));
     }
 
     /**
@@ -121,4 +122,24 @@ class RoleController extends Controller
             return redirect('/roles')->with('statustwo', 'El Rol <strong>'.$model->name.'</strong> fué eliminado con éxito!'); 
         }
     }
+
+    public function updatePermissions(Request $request, Role $role)
+    {
+        $data = $request->input('permissions', []);
+        $syncData = [];
+
+        foreach ($data as $menuId => $perms) {
+            $syncData[$menuId] = [
+                'create' => isset($perms['create']) ? 1 : 0,
+                'read'   => isset($perms['read']) ? 1 : 0,
+                'update' => isset($perms['update']) ? 1 : 0,
+                'delete' => isset($perms['delete']) ? 1 : 0,
+            ];
+        }
+
+        $role->menus()->sync($syncData);
+
+        return redirect()->back()->with('success', 'Permisos actualizados');
+    }
+
 }

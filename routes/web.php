@@ -491,3 +491,7 @@ Route::middleware(['auth'])->group(function () {
 // routes/web.php
 Route::get('/reportes/madrid', [\App\Http\Controllers\MadridDashboardController::class, 'index'])
     ->name('madrid.dashboard');
+
+
+Route::put('/roles/{role}/permissions', [RoleController::class, 'updatePermissions'])
+    ->name('roles.updatePermissions');

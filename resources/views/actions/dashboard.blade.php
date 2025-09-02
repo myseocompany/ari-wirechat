@@ -1,3 +1,4 @@
+@if($request->input('pending') === 'true')
 <div class="grid grid-cols-2 gap-2 mb-6">
     <button type="button" onclick="submitWithRange('overdue')" class="flex flex-col items-center justify-center p-2 bg-yellow-100 text-yellow-700 rounded hover:bg-yellow-200">
         <span class="text-xs font-medium">Vencidas</span>
@@ -13,6 +14,8 @@
     </button>
     <button type="button" onclick="submitWithRange('all')" class="flex flex-col items-center justify-center p-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">
         <span class="text-xs font-medium">Todas</span>
-        <span class="font-bold text-lg">{{ $overdueActions->total() +  $todayActions->total() + $upcomingActions->total() }}</span>
+        <span class="font-bold text-lg">{{ $totalFilteredActions }}</span>
+
     </button>
 </div>
+@endif

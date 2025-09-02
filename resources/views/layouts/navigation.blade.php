@@ -5,7 +5,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="navbar-collapse collapse" id="navbarsExampleDefault" style="">
+    <div class="navbar-collapse " id="navbarsExampleDefault" style="">
       <ul class="navbar-nav mr-auto">
         
         @if (Auth::guest())

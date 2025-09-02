@@ -34,5 +34,11 @@ class Menu extends Model{
         return $model;
 
     }
+
+    public function roles() {
+        return $this->belongsToMany(Role::class, 'role_menus')
+                    ->withPivot(['create', 'read', 'update', 'delete'])
+                    ->withTimestamps();
+    }
 	
 }
