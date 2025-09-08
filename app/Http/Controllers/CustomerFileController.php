@@ -73,6 +73,8 @@ class CustomerFileController extends Controller
 
         $model->customer_id = $request->customer_id;
         $model->url = $path;
+		$model->creator_user_id = auth()->id();
+		
         $model->save();
 
         return back();
