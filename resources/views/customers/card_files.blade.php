@@ -37,6 +37,7 @@
                 <th>Url</th>
                 <th>Fecha de Creación</th>
                 <th>Usuario</th>
+                <th>Estado</th>
                 <th></th>
               </tr>
             </thead>
@@ -48,6 +49,13 @@
                 <th><a href="/public/files/{{$file->customer_id}}/{{$file->url}}">{{$file->url}}</a></th>
                 <th>{{$file->created_at}}</th>
                 <th>{{ $file->creator?->name ?? 'Sin usuario' }}</th>
+                 <th>
+                                @if($file->status === 'OK')
+                                    <span class="badge badge-success">OK</span>
+                                @else
+                                    <span class="badge badge-danger">MISSING</span>
+                                @endif
+                              </th>
                 <th>
                   <a class="btn btn-danger btn-sm" href="/customer_files/{{$file->id}}/delete" title="Eliminar">Eliminar</a>
                 </th>
