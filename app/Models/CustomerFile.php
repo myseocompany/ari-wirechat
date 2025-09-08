@@ -10,6 +10,17 @@ class CustomerFile extends Model
     // Si prefieres que estos atributos aparezcan al serializar:
     // protected $appends = ['status', 'web_path', 'ext', 'size_human'];
 
+    /** Campos que se pueden asignar en masa (create / update). */
+    protected $fillable = [
+        'customer_id',
+        'url',
+        'creator_user_id',
+        'uuid',
+        'filename',
+        'size',
+        'mime_type',
+    ];
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'creator_user_id')
