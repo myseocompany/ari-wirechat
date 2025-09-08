@@ -767,7 +767,7 @@
   
                               <th><a href="/public/files/{{$file->customer_id}}/{{$file->url}}">{{$file->url}}</a></th>
                               <th>{{$file->created_at}}</th>
-                              <th>{{$file->creator->name}}</th>
+                              <th>{{ $file->creator?->name ?? 'Sin usuario' }}</th>
                               <th>
                                 <a class="btn btn-danger btn-sm" href="/customer_files/{{$file->id}}/delete" title="Eliminar">Eliminar</a>
                               </th>
