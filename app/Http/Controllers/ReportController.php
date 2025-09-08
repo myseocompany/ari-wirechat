@@ -1033,35 +1033,55 @@ public function missingCustomerFiles(Request $request)
 {
     $wonStatusId = 8;
 
-    // Obtener los años disponibles de clientes ganados
-    $availableYears = \App\Models\Customer::whereNotNull('updated_at')
+    // Años disponibles (clientes ganados)
+    $availableYears = Customer::whereNotNull('updated_at')
         ->where('status_id', $wonStatusId)
         ->selectRaw('YEAR(updated_at) as year')
         ->groupBy('year')
         ->orderByDesc('year')
         ->pluck('year');
 
-    $selectedYear = $request->input('year') ?? $availableYears->first();
+    $selectedYear   = $request->input('year') ?? $availableYears->first();
+    $selectedUserId = $request->input('user_id'); // ej: "3", "unassigned" o null
 
-    $customers = \App\Models\Customer::where('status_id', $wonStatusId)
+    // Lista de usuarios que tienen clientes ganados en ese año (más útil que listar a todos)
+    $userIdsThisYear = Customer::where('status_id', $wonStatusId)
         ->whereYear('updated_at', $selectedYear)
-        ->with('files')
-        ->orderByDesc('updated_at')
-        ->get();
+        ->whereNotNull('user_id')
+        ->pluck('user_id')
+        ->unique();
 
+    $users = User::whereIn('id', $userIdsThisYear)->orderBy('name')->get();
+
+    // Query base
+    $customersQuery = Customer::where('status_id', $wonStatusId)
+        ->whereYear('updated_at', $selectedYear)
+        ->with(['files', 'user'])
+        ->orderByDesc('updated_at');
+
+    // Filtro por usuario asignado
+    if ($selectedUserId === 'unassigned') {
+        $customersQuery->where(function ($q) {
+            $q->whereNull('user_id')->orWhere('user_id', 0);
+        });
+    } elseif (!empty($selectedUserId)) {
+        $customersQuery->where('user_id', $selectedUserId);
+    }
+
+    $customers = $customersQuery->get();
+
+    // Agrupar por mes y calcular faltantes
     $groupedByMonth = [];
-
     foreach ($customers as $customer) {
         $monthNumber = optional($customer->updated_at)->format('n'); // 1–12
-        $monthName = optional($customer->updated_at)->format('F');   // January, February...
+        $monthName   = optional($customer->updated_at)->format('F'); // January, ...
 
-        $customer->total_files = count($customer->files);
+        $customer->total_files  = $customer->files->count();
         $customer->missing_count = 0;
 
         foreach ($customer->files as $file) {
-            $fullPath = "/home/forge/arichat.co/public/public/files/{$customer->id}/{$file->url}";
-            $file->status = \File::exists($fullPath) ? 'OK' : 'MISSING';
-
+            $fullPath   = "/home/forge/arichat.co/public/public/files/{$customer->id}/{$file->url}";
+            $file->status = File::exists($fullPath) ? 'OK' : 'MISSING';
             if ($file->status === 'MISSING') {
                 $customer->missing_count++;
             }
@@ -1069,17 +1089,19 @@ public function missingCustomerFiles(Request $request)
 
         if (!isset($groupedByMonth[$monthNumber])) {
             $groupedByMonth[$monthNumber] = [
-                'name' => $monthName,
-                'customers' => []
+                'name'      => $monthName,
+                'customers' => [],
             ];
         }
-
         $groupedByMonth[$monthNumber]['customers'][] = $customer;
     }
 
     ksort($groupedByMonth);
 
-    return view('reports.missing_customer_files.index', compact('groupedByMonth', 'availableYears', 'selectedYear'));
+    return view(
+        'reports.missing_customer_files.index',
+        compact('groupedByMonth', 'availableYears', 'selectedYear', 'users', 'selectedUserId')
+    );
 }
 
 

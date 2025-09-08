@@ -4,19 +4,30 @@
 <div class="container">
     <h1>Customer Files – Year {{ $selectedYear }}</h1>
 
-    {{-- Year selector --}}
-    <form method="GET" action="{{ route('reports.missing_customer_files') }}" class="mb-4">
-        <label for="year">Select year:</label>
-        <select name="year" id="year" onchange="this.form.submit()" class="form-control w-auto d-inline-block ml-2">
+    {{-- Filtros --}}
+    <form method="GET" action="{{ route('reports.missing_customer_files') }}" class="mb-4 form-inline">
+        <label for="year" class="mr-2">Año:</label>
+        <select name="year" id="year" onchange="this.form.submit()" class="form-control mr-4">
             @foreach($availableYears as $year)
                 <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
                     {{ $year }}
                 </option>
             @endforeach
         </select>
+
+        <label for="user_id" class="mr-2">Usuario asignado:</label>
+        <select name="user_id" id="user_id" onchange="this.form.submit()" class="form-control">
+            <option value="" {{ empty($selectedUserId) ? 'selected' : '' }}>Todos</option>
+            <option value="unassigned" {{ $selectedUserId === 'unassigned' ? 'selected' : '' }}>Sin asignar</option>
+            @foreach($users as $u)
+                <option value="{{ $u->id }}" {{ (string)$selectedUserId === (string)$u->id ? 'selected' : '' }}>
+                    {{ $u->name }}
+                </option>
+            @endforeach
+        </select>
     </form>
 
-    {{-- Accordion by month --}}
+    {{-- Acordeón por mes --}}
     <div class="accordion" id="monthsAccordion">
         @foreach($groupedByMonth as $monthData)
             @php
@@ -57,7 +68,7 @@
                                                 {{ $customer->name }}
                                             </a>
                                         </td>
-                                        <td>{{ $customer->updated_at->format('Y-m-d') }}</td>
+                                        <td>{{ optional($customer->updated_at)->format('Y-m-d') }}</td>
                                         <td>{{ $customer->total_files }}</td>
                                         <td>{{ $customer->missing_count }}</td>
                                         <td>
@@ -107,5 +118,4 @@
         @endforeach
     </div>
 </div>
-
 @endsection
