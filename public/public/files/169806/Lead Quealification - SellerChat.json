@@ -1,0 +1,558 @@
+{
+  "agent_id": "",
+  "channel": "voice",
+  "last_modification_timestamp": 1750271336501,
+  "agent_name": "Lead Quealification - SellerChat",
+  "response_engine": {
+    "type": "conversation-flow",
+    "version": 7,
+    "conversation_flow_id": "conversation_flow_f63e00c057ab"
+  },
+  "language": "es-419",
+  "opt_out_sensitive_data_storage": false,
+  "version": 7,
+  "is_published": false,
+  "version_title": "",
+  "voice_id": "11labs-Anna",
+  "max_call_duration_ms": 3600000,
+  "interruption_sensitivity": 0.9,
+  "user_dtmf_options": {},
+  "retellLlmData": null,
+  "conversationFlow": {
+    "conversation_flow_id": "conversation_flow_f63e00c057ab",
+    "version": 7,
+    "global_prompt": "\"global_prompt\": \n\n\"## Descripción de la tarea ##\nEstás llamando para identificar posibles clientes interesados en maquinaria para empanadas, en nombre de la empresa Maquiempanadas SAS.\nEl objetivo principal es calificar si el cliente tiene potencial para adquirir nuestras máquinas y, si cumple los criterios, agendar una videollamada o llamada con un asesor técnico especializado.\n\n## Guía de respuesta ##\nAdáptate e Intuye: Intenta comprender transcripciones que puedan contener errores o palabras incompletas. No menciones la existencia de errores de transcripción al usuario.\nMantente en Personaje: Eres Camila, asesora comercial de Maquiempanadas. Tu tono es amable, profesional y proactivo. Si la conversación se desvía, redirígela de forma natural al propósito de la llamada, sin sonar repetitiva.\nAsegura un Diálogo Fluido: Responde de manera clara y directa, de acuerdo con tu rol. Lidera la conversación con preguntas simples, asegurando que fluya hacia la calificación del cliente y luego a la programación de la cita.\",\n",
+    "nodes": [
+      {
+        "instruction": {
+          "type": "static_text",
+          "text": "Hola {{first_name}}, soy Camila de Maquiempanadas, la empresa especializada en maquinaria para producir empanadas de forma automatizada.  \nHace un tiempo mostraste interés en uno de nuestros anuncios, así que te estoy llamando brevemente para ver si sigue siendo algo de tu interés.  \n¿Te suena Maquiempanadas?"
+        },
+        "name": "Greeting",
+        "edges": [
+          {
+            "condition": "User replies",
+            "id": "edge-1",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "El usuario contesta"
+            },
+            "destination_node_id": "node-1735833439816"
+          }
+        ],
+        "start_speaker": "agent",
+        "id": "start-node-1735833334791",
+        "type": "conversation",
+        "display_position": {
+          "x": 914.438118001263,
+          "y": 213.42671913346177
+        }
+      },
+      {
+        "name": "Confirm",
+        "edges": [
+          {
+            "condition": "user said yes or shows interests",
+            "id": "edge-1735833536291",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "user said yes or shows interests"
+            },
+            "destination_node_id": "node-1735833814191"
+          },
+          {
+            "condition": "user is a bit hesitant or has no interest ",
+            "id": "edge-1736577612042",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "user is a bit hesitant or has no interest "
+            },
+            "destination_node_id": "node-1735833710558"
+          }
+        ],
+        "id": "node-1735833439816",
+        "type": "conversation",
+        "display_position": {
+          "x": 886.4859010458915,
+          "y": 798.6487565673983
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "Vi que mostraste interés en una de nuestras campañas sobre maquinaria para empanadas.\n\nSolo quería confirmar si aún estás buscando una máquina para automatizar la producción de empanadas en tu negocio o emprendimiento.\n\n¿Es algo que todavía te interesa explorar?"
+        }
+      },
+      {
+        "name": "Collect info",
+        "edges": [
+          {
+            "condition": "client said yes or shows interests",
+            "id": "edge-1735833710558",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "client said yes or shows interests"
+            },
+            "destination_node_id": "node-1735833814191"
+          }
+        ],
+        "id": "node-1735833710558",
+        "type": "conversation",
+        "display_position": {
+          "x": 1332.6307600379514,
+          "y": 1213.4919779443355
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "¡Qué bueno que te interese! Para poder darte una mejor orientación, quería hacerte un par de preguntas rápidas:\n\n¿Ya estás produciendo empanadas actualmente, o estás en etapa de planificación?\n\n(espera respuesta)\n\nY en tu caso, ¿cuántas empanadas estás haciendo al día, o cuántas te gustaría producir cuando empieces?\n\n(espera respuesta)\n\nCon eso claro, puedo recomendarte cuál modelo de máquina se ajusta mejor a lo que necesitas.\n"
+        }
+      },
+      {
+        "finetune_conversation_examples": [],
+        "instruction": {
+          "type": "static_text",
+          "text": "Genial. En Maquiempanadas usamos un enfoque muy práctico y probado para ayudarte a automatizar tu producción de empanadas.\n\nTenemos soluciones tanto para quienes están empezando como para negocios que ya producen a gran escala. Además, te orientamos sobre qué máquina se adapta mejor a lo que haces y cómo implementarla paso a paso.\n\nCuéntame algo para entender mejor tu caso:  \n¿Actualmente ya estás produciendo empanadas?  \n¿O apenas estás comenzando a planear tu negocio?   "
+        },
+        "name": "Establish genuine interest",
+        "edges": [
+          {
+            "condition": "user responds",
+            "id": "edge-1735833814191",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "user responds"
+            },
+            "destination_node_id": "node-1735833833607"
+          }
+        ],
+        "id": "node-1735833814191",
+        "type": "conversation",
+        "display_position": {
+          "x": 1370.3728591903891,
+          "y": 571.9098914231498
+        }
+      },
+      {
+        "name": "Budget info",
+        "edges": [
+          {
+            "condition": "get budget information from user",
+            "id": "edge-1735833833607",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "get budget information from user"
+            },
+            "destination_node_id": "node-1735833930066"
+          },
+          {
+            "condition": "user say no",
+            "id": "edge-1735927788190",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "user say no"
+            },
+            "destination_node_id": "node-1735833850790"
+          }
+        ],
+        "id": "node-1735833833607",
+        "type": "conversation",
+        "display_position": {
+          "x": 1940.3395241596468,
+          "y": 295.87470977569234
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "También quería contarte brevemente cómo funcionan las opciones de inversión, ya que tenemos equipos tanto para emprendedores que están empezando como para negocios que ya producen a gran escala.\n\nPor lo general, para arrancar con una solución completa, nuestros clientes destinan entre 3.000 y 9.000 dólares, dependiendo del modelo y del país.\n\n¿Tienes ya un presupuesto en mente para invertir en maquinaria, o te parece razonable ese rango para lo que  \n"
+        }
+      },
+      {
+        "name": "Confirm budget",
+        "edges": [
+          {
+            "condition": "User reply yes",
+            "id": "edge-1735833850790",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "User reply yes"
+            },
+            "destination_node_id": "node-1735833930066"
+          }
+        ],
+        "id": "node-1735833850790",
+        "type": "conversation",
+        "display_position": {
+          "x": 1898.4088527948156,
+          "y": 916.7436143628614
+        },
+        "instruction": {
+          "type": "static_text",
+          "text": "Perfecto, no hay problema.  \n¿Tienes algún presupuesto máximo que te gustaría no superar?\n\nEn general, para que sea viable una automatización real y funcional, los proyectos suelen comenzar desde unos 3.000 dólares en adelante."
+        }
+      },
+      {
+        "name": "Confirm online meeting",
+        "edges": [
+          {
+            "condition": "User reply no",
+            "id": "edge-1735833930066",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "User reply no"
+            },
+            "destination_node_id": "node-1735834579374"
+          },
+          {
+            "condition": "User reply yes",
+            "id": "edge-1735834567855",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "User reply yes"
+            },
+            "destination_node_id": "node-1735833949716"
+          }
+        ],
+        "id": "node-1735833930066",
+        "type": "conversation",
+        "display_position": {
+          "x": 2152.2987995315843,
+          "y": 1414.5732181744966
+        },
+        "instruction": {
+          "type": "static_text",
+          "text": "¿Te gustaría agendar una videollamada con uno de nuestros asesores técnicos para explicarte todo en detalle y ayudarte a identificar qué máquina se adapta mejor a tu caso?\n\nEs una excelente forma de resolver tus dudas y avanzar con una recomendación personalizada, sin compromiso.\n"
+        }
+      },
+      {
+        "name": "Ask for availiability",
+        "edges": [
+          {
+            "condition": "that time works",
+            "id": "edge-1735833949716",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "that time works"
+            },
+            "destination_node_id": "node-1735834052879"
+          },
+          {
+            "condition": "that time does not work",
+            "id": "edge-1736581008978",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "that time does not work"
+            },
+            "destination_node_id": "node-1736581022615"
+          }
+        ],
+        "id": "node-1735833949716",
+        "type": "conversation",
+        "display_position": {
+          "x": 2523.448975686285,
+          "y": 687.444330442757
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "Excelente, creo que realmente te va a ser útil.  \nEn el peor de los casos, saldrás con mucha más claridad sobre cómo funciona la automatización de empanadas y qué opciones existen.  \nY en el mejor, vas a ver que es viable para ti y podremos ayudarte a elegir la máquina ideal.\n\n¿Estarías disponible unos 45 minutos mañana, o el siguiente día hábil, para agendar la videollamada?"
+        }
+      },
+      {
+        "name": "Booking",
+        "edges": [
+          {
+            "condition": "City obtained",
+            "id": "edge-1735834052879",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "Tipo de masa obtenida"
+            },
+            "destination_node_id": "node-1736581119470"
+          }
+        ],
+        "id": "node-1735834052879",
+        "type": "conversation",
+        "display_position": {
+          "x": 3041.266165319431,
+          "y": 231.39668294117837
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "Para poder recomendarte la máquina adecuada cuando nos veamos, ¿trabajas con masa de maíz, de trigo… o estás explorando ambas?\n\nCon eso me aseguro de mostrarte el equipo que más se ajusta a lo que necesitas.\n"
+        }
+      },
+      {
+        "name": "Confirm phone call",
+        "edges": [
+          {
+            "condition": "user agrees to call",
+            "id": "edge-1735834579374",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "user agrees to call"
+            },
+            "destination_node_id": "node-1735833949716"
+          }
+        ],
+        "id": "node-1735834579374",
+        "type": "conversation",
+        "display_position": {
+          "x": 2501.6468041492803,
+          "y": 245.38166484503665
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "Y si prefieres algo más sencillo, ¿te sentirías más cómodo con una llamada normal para explicarte todo por teléfono?\n\nTambién es una buena forma de resolver tus dudas si no puedes conectarte por videollamada."
+        }
+      },
+      {
+        "tool_id": "tool-1735930073314",
+        "name": "Book Meeting",
+        "edges": [
+          {
+            "condition": "book success",
+            "id": "edge-1735929770831",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "Quiere asistir"
+            },
+            "destination_node_id": "node-1750265780902"
+          },
+          {
+            "condition": "book failed",
+            "id": "edge-1735930593664",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "No quiere asistir"
+            },
+            "destination_node_id": "node-1736580464935"
+          }
+        ],
+        "id": "node-1735929762524",
+        "type": "function",
+        "tool_type": "local",
+        "speak_during_execution": false,
+        "display_position": {
+          "x": 3629.6412336590906,
+          "y": 754.932409838709
+        },
+        "wait_for_result": true
+      },
+      {
+        "instruction": {
+          "type": "prompt",
+          "text": "Si el usuario no está interesado, agradécele por su tiempo de forma amable y profesional.  \nHazle saber que puede volver a contactarnos si cambia de opinión en el futuro.  \nFinaliza la llamada de manera cordial, sin presionarlo."
+        },
+        "name": "Handle no interest",
+        "edges": [
+          {
+            "condition": "Describe the transition condition",
+            "id": "edge-1736577809771",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "Describe the transition condition"
+            }
+          }
+        ],
+        "global_node_setting": {
+          "condition": "If user got angry or is not interested at all"
+        },
+        "id": "node-1736577809771",
+        "type": "conversation",
+        "display_position": {
+          "x": 0,
+          "y": 909
+        },
+        "skip_response_edge": {
+          "condition": "Skip response",
+          "id": "edge-1736577869883",
+          "transition_condition": {
+            "type": "prompt",
+            "prompt": "Skip response"
+          },
+          "destination_node_id": "node-1736577860868"
+        }
+      },
+      {
+        "name": "End Call",
+        "id": "node-1736577860868",
+        "type": "end",
+        "display_position": {
+          "x": 500,
+          "y": 1060
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "Politely end the call"
+        }
+      },
+      {
+        "name": "Conversation",
+        "edges": [
+          {
+            "condition": "Slot chosen",
+            "id": "edge-1736579201470",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "Slot chosen"
+            },
+            "destination_node_id": "node-1735929762524"
+          }
+        ],
+        "id": "node-1736579201470",
+        "type": "conversation",
+        "display_position": {
+          "x": 3577.3378599315406,
+          "y": 1259.1290752623322
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "¿Te gustaría ser transferido directamente a uno de nuestros asesores comerciales para recibir más información y atención personalizada sobre nuestros productos?\nSi prefieres que te conectemos con un asesor, solo indícanos y te lo facilitamos sin necesidad de agendar, ¡estaremos encantados de ayudarte!\n\n¿Te gustaría proceder con eso ahora?"
+        }
+      },
+      {
+        "name": "Conversation",
+        "edges": [
+          {
+            "condition": "Got new time",
+            "id": "edge-1736580464935",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "Got new time"
+            }
+          }
+        ],
+        "id": "node-1736580464935",
+        "type": "conversation",
+        "display_position": {
+          "x": 4185.334073999397,
+          "y": 1104.3218330592163
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "Entiendo, lamento que no puedas acompañarnos esta vez.  \nDe todas formas, me alegra haberte contactado y saber un poco más sobre tu proyecto.  \nSi más adelante te interesa retomar la conversación o conocer las máquinas, estaré encantada de ayudarte.\n\nGracias por tu tiempo y que tengas un excelente día. Hasta pronto.\n"
+        }
+      },
+      {
+        "name": "Conversation",
+        "edges": [
+          {
+            "condition": "preferred date and time obtained",
+            "id": "edge-1736581022615",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "preferred date and time obtained"
+            },
+            "destination_node_id": "node-1735834052879"
+          }
+        ],
+        "id": "node-1736581022615",
+        "type": "conversation",
+        "display_position": {
+          "x": 2529.311219607856,
+          "y": 1375.2216522137849
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "Perfecto. ¿Qué día y hora te viene mejor para la llamada o videollamada?  \nPuedo ajustarme a lo que te quede más cómodo dentro de horario laboral.\n"
+        }
+      },
+      {
+        "name": "email",
+        "edges": [
+          {
+            "condition": "email obtained",
+            "id": "edge-1736581119470",
+            "transition_condition": {
+              "type": "prompt",
+              "prompt": "Cantidad de empanadas obtenida"
+            },
+            "destination_node_id": "node-1736579201470"
+          }
+        ],
+        "id": "node-1736581119470",
+        "type": "conversation",
+        "display_position": {
+          "x": 3202.542703491476,
+          "y": 833.2040409044898
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "Para poder orientarte mejor con el equipo ideal, ¿cuántas empanadas estás produciendo al día, o cuántas te gustaría producir cuando arranques?\n\nEso nos ayuda a saber qué modelo te conviene ver en la demostración."
+        }
+      },
+      {
+        "custom_sip_headers": {},
+        "transfer_destination": {
+          "type": "predefined",
+          "number": "+573125407247"
+        },
+        "edge": {
+          "destination_node_id": "node-1750270991355",
+          "id": "edge-1750265780902",
+          "transition_condition": {
+            "type": "prompt",
+            "prompt": "Transfer failed"
+          }
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "Transferring your call now."
+        },
+        "name": "Transfer Call",
+        "id": "node-1750265780902",
+        "transfer_option": {
+          "type": "cold_transfer",
+          "show_transferee_as_caller": true
+        },
+        "type": "transfer_call",
+        "display_position": {
+          "x": 4152.756518153115,
+          "y": 741.8973927387534
+        }
+      },
+      {
+        "name": "End Call",
+        "id": "node-1750270991355",
+        "type": "end",
+        "display_position": {
+          "x": 4660.978793606015,
+          "y": 827.4819127384201
+        },
+        "instruction": {
+          "type": "prompt",
+          "text": "Politely end the call"
+        }
+      }
+    ],
+    "start_node_id": "start-node-1735833334791",
+    "start_speaker": "agent",
+    "tools": [
+      {
+        "tool_id": "tool-1735930052950",
+        "event_type_id": 151000,
+        "cal_api_key": "cal_live_123456",
+        "timezone": "America/Los_Angeles",
+        "name": "check_availability_cal",
+        "description": "When users ask for availability, check the calendar and provide available slots.",
+        "type": "check_availability_cal"
+      },
+      {
+        "tool_id": "tool-1735930073314",
+        "event_type_id": 151000,
+        "cal_api_key": "cal_live_123456",
+        "timezone": "America/Los_Angeles",
+        "name": "book_appointment_cal",
+        "description": "When users ask to book an appointment, book it on the calendar.",
+        "type": "book_appointment_cal"
+      }
+    ],
+    "model_choice": {
+      "type": "cascading",
+      "model": "gpt-4.1"
+    },
+    "knowledge_base_ids": [],
+    "begin_tag_display_position": {
+      "x": 111.5,
+      "y": 762
+    },
+    "is_published": false
+  },
+  "llmURL": null
+}

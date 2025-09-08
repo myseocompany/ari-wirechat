@@ -49,69 +49,68 @@
 
                 <div id="collapse-{{ $monthId }}" class="collapse" data-parent="#monthsAccordion">
                     <div class="card-body">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Cliente</th>
-                                    <th>Última actualización</th>
-                                    <th>Total archivos</th>
-                                    <th>Faltantes</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($customers as $customer)
-                                    @php $rowId = 'customer-' . $monthId . '-' . $customer->id; @endphp
-                                    <tr>
-                                        <td>
-                                            <a href="https://arichat.co/customers/{{ $customer->id }}/show" target="_blank">
-                                                {{ $customer->name }}
-                                            </a>
-                                        </td>
-                                        <td>{{ optional($customer->updated_at)->format('Y-m-d') }}</td>
-                                        <td>{{ $customer->total_files }}</td>
-                                        <td>{{ $customer->missing_count }}</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-secondary" type="button" data-toggle="collapse" data-target="#{{ $rowId }}">
-                                                Ver detalle
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr class="collapse" id="{{ $rowId }}">
-                                        <td colspan="5">
-                                            @if($customer->files->isEmpty())
-                                                <p>No files for this customer.</p>
-                                            @else
-                                                <table class="table table-sm table-bordered mt-2">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>File Name</th>
-                                                            <th>Path</th>
-                                                            <th>Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($customer->files as $file)
-                                                            <tr>
-                                                                <td>{{ $file->url }}</td>
-                                                                <td>/files/{{ $customer->id }}/{{ $file->url }}</td>
-                                                                <td>
-                                                                    @if($file->status === 'OK')
-                                                                        <span class="badge badge-success">OK</span>
-                                                                    @else
-                                                                        <span class="badge badge-danger">MISSING</span>
-                                                                    @endif
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                        @php
+  // Ordena por fecha desc si quieres
+  $files = $model->customer_files->sortByDesc('created_at');
+@endphp
+
+<style>
+  /* evita que nombres largos se corten/rompan el layout */
+  .file-name { overflow-wrap: anywhere; word-break: break-word; }
+</style>
+
+<div class="row">
+  @forelse($files as $file)
+    @php
+      $isMissing = isset($file->status) ? ($file->status === 'MISSING') : false;
+    @endphp
+
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+      <div class="card h-100 {{ $isMissing ? 'border-danger' : 'border-light' }} shadow-sm">
+        <div class="card-body">
+          <div class="file-name mb-2">
+            @if(!$isMissing)
+              <a href="/public/files/{{ $file->customer_id }}/{{ $file->url }}" target="_blank">
+                {{ $file->url }}
+              </a>
+            @else
+              <span class="text-muted">{{ $file->url }}</span>
+            @endif
+          </div>
+
+          <small class="text-muted d-block">
+            {{ optional($file->created_at)->format('Y-m-d H:i') }}
+          </small>
+
+          @if($isMissing)
+            <span class="badge badge-danger mt-2">MISSING</span>
+          @endif
+        </div>
+
+        <div class="card-footer bg-transparent border-0 pt-0">
+          <div class="d-flex">
+            @if(!$isMissing)
+              <a class="btn btn-sm btn-outline-secondary mr-2"
+                 href="/public/files/{{ $file->customer_id }}/{{ $file->url }}"
+                 target="_blank">
+                Abrir
+              </a>
+            @endif
+            <a class="btn btn-sm btn-danger"
+               href="/customer_files/{{ $file->id }}/delete">
+              Eliminar
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  @empty
+    <div class="col-12">
+      <p class="text-muted mb-0">No hay archivos aún.</p>
+    </div>
+  @endforelse
+</div>
+
                     </div>
                 </div>
             </div>

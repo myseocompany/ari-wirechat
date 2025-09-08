@@ -87,9 +87,7 @@ class Customer extends Authenticatable
         return $this->hasMany('App\Models\Action')->orderBy('created_at', 'desc');
     }
 
-    function customer_files(){
-        return $this->hasMany('App\Models\CustomerFile');
-    }
+
 
     function histories(){
         return $this->hasMany('App\Models\CustomerHistory');
@@ -97,6 +95,11 @@ class Customer extends Authenticatable
 
     function files(){
         return $this->hasMany('App\Models\CustomerFile');
+    }
+    // por compatibilidad con tu Blade actual
+    public function customer_files()
+    {
+        return $this->files();
     }
 
     public function status(){
