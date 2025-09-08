@@ -31,17 +31,19 @@
     <div class="accordion" id="monthsAccordion">
         @foreach($groupedByMonth as $monthData)
             @php
-                $monthName = $monthData['name'];
-                $customers = $monthData['customers'];
-                $totalFiles = collect($customers)->sum('total_files');
-                $totalMissing = collect($customers)->sum('missing_count');
-                $monthId = Str::slug($monthName);
+                $monthName   = $monthData['name'];
+                $customers   = $monthData['customers'];
+                $totalFiles  = collect($customers)->sum('total_files');
+                $totalMissing= collect($customers)->sum('missing_count');
+                $monthId     = Str::slug($monthName);
             @endphp
 
             <div class="card">
                 <div class="card-header" id="heading-{{ $monthId }}">
                     <h5 class="mb-0">
-                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapse-{{ $monthId }}" aria-expanded="false" aria-controls="collapse-{{ $monthId }}">
+                        <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                                data-target="#collapse-{{ $monthId }}" aria-expanded="false"
+                                aria-controls="collapse-{{ $monthId }}">
                             {{ $monthName }} — {{ $totalMissing }} archivos faltantes
                         </button>
                     </h5>
@@ -49,67 +51,116 @@
 
                 <div id="collapse-{{ $monthId }}" class="collapse" data-parent="#monthsAccordion">
                     <div class="card-body">
-                        @php
-  // Ordena por fecha desc si quieres
-  $files = $model->customer_files->sortByDesc('created_at');
-@endphp
 
-<style>
-  /* evita que nombres largos se corten/rompan el layout */
-  .file-name { overflow-wrap: anywhere; word-break: break-word; }
-</style>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Última actualización</th>
+                                    <th>Total archivos</th>
+                                    <th>Faltantes</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($customers as $customer)
+                                    @php $rowId = 'customer-' . $monthId . '-' . $customer->id; @endphp
+                                    <tr>
+                                        <td>
+                                            <a href="https://arichat.co/customers/{{ $customer->id }}/show" target="_blank">
+                                                {{ $customer->name }}
+                                            </a>
+                                        </td>
+                                        <td>{{ optional($customer->updated_at)->format('Y-m-d') }}</td>
+                                        <td>{{ $customer->total_files }}</td>
+                                        <td>{{ $customer->missing_count }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary" type="button"
+                                                    data-toggle="collapse" data-target="#{{ $rowId }}">
+                                                Ver detalle
+                                            </button>
+                                        </td>
+                                    </tr>
 
-<div class="row">
-  @forelse($files as $file)
-    @php
-      $isMissing = isset($file->status) ? ($file->status === 'MISSING') : false;
-    @endphp
+                                    {{-- Detalle del cliente (subida y lista de archivos) --}}
+                                    <tr class="collapse" id="{{ $rowId }}">
+                                        <td colspan="5">
+                                            {{-- Subir archivos nuevos al cliente --}}
+                                            <form method="POST" action="{{ route('customer_files.store') }}"
+                                                  enctype="multipart/form-data" class="mb-3">
+                                                @csrf
+                                                <div class="form-row align-items-center">
+                                                    <div class="col-auto">
+                                                        <input type="file" name="files[]" multiple required class="form-control-file">
+                                                        <input type="hidden" name="customer_id" value="{{ $customer->id }}">
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <button type="submit" class="btn btn-sm btn-primary">Subir archivos</button>
+                                                    </div>
+                                                </div>
+                                            </form>
 
-    <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
-      <div class="card h-100 {{ $isMissing ? 'border-danger' : 'border-light' }} shadow-sm">
-        <div class="card-body">
-          <div class="file-name mb-2">
-            @if(!$isMissing)
-              <a href="/public/files/{{ $file->customer_id }}/{{ $file->url }}" target="_blank">
-                {{ $file->url }}
-              </a>
-            @else
-              <span class="text-muted">{{ $file->url }}</span>
-            @endif
-          </div>
+                                            @if($customer->files->isEmpty())
+                                                <p class="text-muted mb-0">No files for this customer.</p>
+                                            @else
+                                                <style>
+                                                    .file-path { font-family: monospace; }
+                                                    .file-name { overflow-wrap:anywhere; word-break:break-word; }
+                                                </style>
 
-          <small class="text-muted d-block">
-            {{ optional($file->created_at)->format('Y-m-d H:i') }}
-          </small>
-
-          @if($isMissing)
-            <span class="badge badge-danger mt-2">MISSING</span>
-          @endif
-        </div>
-
-        <div class="card-footer bg-transparent border-0 pt-0">
-          <div class="d-flex">
-            @if(!$isMissing)
-              <a class="btn btn-sm btn-outline-secondary mr-2"
-                 href="/public/files/{{ $file->customer_id }}/{{ $file->url }}"
-                 target="_blank">
-                Abrir
-              </a>
-            @endif
-            <a class="btn btn-sm btn-danger"
-               href="/customer_files/{{ $file->id }}/delete">
-              Eliminar
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  @empty
-    <div class="col-12">
-      <p class="text-muted mb-0">No hay archivos aún.</p>
-    </div>
-  @endforelse
-</div>
+                                                <table class="table table-sm table-bordered mt-2">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>File Name</th>
+                                                            <th>Path</th>
+                                                            <th>Status</th>
+                                                            <th>Acción</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($customer->files as $file)
+                                                            @php $isMissing = ($file->status === 'MISSING'); @endphp
+                                                            <tr>
+                                                                <td class="file-name">{{ $file->url }}</td>
+                                                                <td class="file-path">/files/{{ $customer->id }}/{{ $file->url }}</td>
+                                                                <td>
+                                                                    @if($isMissing)
+                                                                        <span class="badge badge-danger">MISSING</span>
+                                                                    @else
+                                                                        <span class="badge badge-success">OK</span>
+                                                                    @endif
+                                                                </td>
+                                                                <td>
+                                                                    @if($isMissing)
+                                                                        {{-- Reponer el mismo archivo (misma URL en BD) --}}
+                                                                        <form method="POST"
+                                                                              action="{{ route('customer_files.reupload', $file->id) }}"
+                                                                              enctype="multipart/form-data"
+                                                                              class="form-inline">
+                                                                            @csrf
+                                                                            <input type="file" name="file" required
+                                                                                   class="form-control-file mr-2" style="max-width:220px;">
+                                                                            <button type="submit" class="btn btn-sm btn-warning">
+                                                                                Reponer
+                                                                            </button>
+                                                                        </form>
+                                                                    @else
+                                                                        <a class="btn btn-sm btn-outline-secondary" target="_blank"
+                                                                           href="/public/files/{{ $customer->id }}/{{ $file->url }}">
+                                                                            Abrir
+                                                                        </a>
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
 
                     </div>
                 </div>

@@ -197,11 +197,31 @@ Route::middleware('auth')->prefix('customer_statuses')->group(function () {
 
 
 
-// File Routes
-Route::middleware('auth')->prefix('customer_files')->group(function () {
-    Route::post('/', [CustomerFileController::class, 'store']);
-    Route::get('/{file}/delete', [CustomerFileController::class, 'delete']);
-});
+Route::middleware('auth')
+    ->prefix('customer_files')
+    ->name('customer_files.')
+    ->group(function () {
+
+        Route::get('/', function () {
+            return redirect()->route('reports.missing_customer_files');
+        })->name('index');
+        
+        // Crear (subir uno o varios)
+        Route::post('/', [CustomerFileController::class, 'store'])
+            ->name('store');
+
+        // Reponer un archivo faltante (manteniendo el mismo nombre)
+        Route::post('{file}/reupload', [CustomerFileController::class, 'reupload'])
+            ->name('reupload');
+
+        // Eliminar (mejor DELETE; deja el GET solo si ya lo usas en enlaces antiguos)
+        Route::delete('{file}', [CustomerFileController::class, 'destroy'])
+            ->name('destroy');
+
+        // (Opcional) compatibilidad con enlaces antiguos:
+        Route::get('{file}/delete', [CustomerFileController::class, 'destroy'])
+            ->name('delete.legacy');
+    });
 
 // API Routes
 Route::middleware('auth')->prefix('api')->group(function () {
