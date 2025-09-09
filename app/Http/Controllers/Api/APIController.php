@@ -3287,13 +3287,7 @@ public function handle(Request $request)
         response()->json(['status' => 'accepted'], 202)->send();
         if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
 
-        // 2) Auth interna (opcional)
-        $expected = config('services.retell.internal_token');
-        $got = $request->header('X-Internal-Token');
-        if ($expected && (!is_string($got) || !hash_equals($expected, $got))) {
-            Log::warning('Retell invalid token');
-            return;
-        }
+
 
         // 3) Parse liviano
         $raw  = json_decode($request->getContent(), true) ?? [];
