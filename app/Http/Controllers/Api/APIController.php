@@ -3115,7 +3115,7 @@ class APIController extends Controller
     }
 
 
-    public function handle(Request $request)
+    public function handleOld(Request $request)
 {
     // --- 1) ACK immediately (keep TTFB tiny) -------------------------
     response()->json(['status' => 'accepted'], 200)->send();
@@ -3274,6 +3274,44 @@ public function getActionTypeFromRetell($event = null, $status = null, $directio
     // Fallbacks
     if ($event === 'CALL_STARTED') return 21;
     return 21; // safe default for "call event"
+}
+
+
+public function handle(Request $request)
+{
+    // ACK ultrarrápido
+    response()->json(['status' => 'accepted'], 202)->send();
+    if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
+
+    // Auth opcional
+    $expected = config('services.retell.internal_token');
+    $got = $request->header('X-Internal-Token');
+    if ($expected && (!is_string($got) || !hash_equals($expected, $got))) {
+        \Log::warning('Retell invalid token'); return;
+    }
+
+    // Parse mínimo
+    $raw = json_decode($request->getContent(), true) ?? [];
+    $data = isset($raw[0]) ? $raw[0] : $raw;
+    if (isset($data['body']) && is_array($data['body'])) $data = $data['body'];
+    $call = $data['call'] ?? $data;
+    $callId = $call['call_id'] ?? null;
+    $status = $call['call_status'] ?? null;
+    if (!$callId) { \Log::warning('Retell: missing call_id'); return; }
+
+    // Inserta en inbox (idempotente por unique)
+    try {
+        \DB::table('retell_inbox')->insert([
+            'call_id' => $callId,
+            'status'  => $status,
+            'payload' => json_encode($data),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    } catch (\Illuminate\Database\QueryException $e) {
+        // Duplicado o error: lo ignoramos para no tumbar el request
+        \Log::info('Retell inbox dup or fail: '.$e->getMessage());
+    }
 }
 
 }
