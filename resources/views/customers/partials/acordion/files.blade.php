@@ -16,7 +16,9 @@
           <div class="container">
             <div class="row">
               <div class="col">Seleccione el archivo</div>
-              <div class="col"><input type="file" class="form-control" id="file" name="file" placeholder="email" ></div>
+              <div class="col">
+              <input type="file" class="form-control" id="files" name="files[]" multiple>
+            </div>
               <input type="hidden" id="customer_id" name="customer_id" value="{{$customer->id}}">
               <div class="col"><input type="submit" class="btn btn-sm btn-primary glyphicon glyphicon-pencil" aria-hidden="true"></div>
             </div>
