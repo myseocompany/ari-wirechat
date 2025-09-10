@@ -218,9 +218,10 @@ Route::middleware('auth')
         Route::delete('{file}', [CustomerFileController::class, 'destroy'])
             ->name('destroy');
 
-        // (Opcional) compatibilidad con enlaces antiguos:
+        // Compatibilidad con enlaces antiguos tipo GET
         Route::get('{file}/delete', [CustomerFileController::class, 'destroy'])
             ->name('delete.legacy');
+    
     });
 
 // API Routes

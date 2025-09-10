@@ -6,6 +6,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
   <meta name="google-site-verification" content="LxHKqj-7LHr4nr1F8SSnd7J2_vI1H0lgTg2s1hb-t7A" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <link rel="icon" type="image/png" href="/img/icono-maquiempanadas-2025.png">
   <title>@yield('title') - AriCRM</title>
   

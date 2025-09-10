@@ -10,30 +10,35 @@ use Illuminate\Support\Facades\File as Fs;
 
 class CustomerFileController extends Controller
 {
-	public function delete($id)
-	{
-		$model = CustomerFile::find($id);
+public function destroy(Request $request, CustomerFile $file)
+    {
+        $originalPath = 'public/files/'.$file->customer_id.'/'.$file->url;
+        $trashPath    = 'public/files_deleted/'.$file->customer_id;
 
-		$originalPath = 'public/files/'.$model->customer_id.'/'.$model->url;
-		$trashPath = 'public/files_deleted/'.$model->customer_id;
+        if (!Fs::exists($trashPath)) {
+            Fs::makeDirectory($trashPath, 0755, true, true);
+        }
 
-		// Asegura que la carpeta destino exista
-		if (!File::exists($trashPath)) {
-			File::makeDirectory($trashPath, 0755, true, true);
-		}
+        if (Fs::exists($originalPath)) {
+            Fs::move($originalPath, $trashPath.'/'.$file->url);
+        } else {
+            \Log::warning("Archivo no encontrado para mover a papelera: ".$originalPath);
+        }
 
-		// Mover el archivo a la papelera si existe
-		if (File::exists($originalPath)) {
-			File::move($originalPath, $trashPath.'/'.$model->url);
-		} else {
-			\Log::warning("Archivo no encontrado para mover a papelera: ".$originalPath);
-		}
+        $file->delete();
 
-		// Elimina el registro de base de datos
-		$model->delete();
+        // AJAX → JSON
+        if ($request->ajax()) {
+            return response()->json([
+                'ok'      => true,
+                'message' => 'Archivo movido a papelera.',
+                'id'      => (int) $file->id,
+            ]);
+        }
 
-		return back()->with('success', 'Archivo movido a papelera.');
-	}
+        // Fallback clásico
+        return back()->with('success', 'Archivo movido a papelera.');
+    }
 
 
     public function store(Request $request)
@@ -84,4 +89,7 @@ class CustomerFileController extends Controller
 
         return back()->with('status', "Archivo repuesto: {$file->url}");
     }
+
+
+    
 }
