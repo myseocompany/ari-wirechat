@@ -25,6 +25,7 @@
          </form>
        </div>
     </div>
-    @include('customers.card_files')
+    @include('customers.partials.acordion.files')
+
 
 </div>

@@ -1,12 +1,14 @@
 <!-- ARCHIVOS -->
-<div>
+ @if($customer)
   <div class="card">
-  <div class="card-header" id="headingTwo">
-    <h2>
-      <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-      Archivos</h2>
+    <div class="card-header" id="headingTwo">
+      <h2>
+        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+        Archivos
+        </button>
+      </h2>
     </div>
-    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" >
 
       <form method="POST" action="/customer_files" enctype="multipart/form-data">
         {{ csrf_field() }}
@@ -70,4 +72,4 @@
 
   </div>
 
-</div>
+@endif
