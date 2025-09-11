@@ -55,6 +55,18 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
+        'spaces' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION', 'sfo3'),
+            'bucket' => env('AWS_BUCKET'),
+            'endpoint' => env('AWS_ENDPOINT'), // p.ej. https://sfo3.digitaloceanspaces.com
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'url' => env('AWS_URL'), // CDN o URL del bucket (opcional)
+            'visibility' => 'public', // o 'private' según tu caso
+            'throw' => true,
+        ],
 
     ],
 

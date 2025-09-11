@@ -113,7 +113,12 @@
   @foreach($customer->customer_files as $file)
     <tr id="file-row-{{ $file->id }}">
       <td>
-        <a href="/public/files/{{ $file->customer_id }}/{{ $file->url }}" target="_blank">
+
+
+<a href="{{ route('customer_files.open', $file->id) }}" target="_blank" rel="noopener">
+
+
+
           {{ $file->url }}
           @if($file->status !== 'OK')
             <span class="badge badge-warning ml-2">

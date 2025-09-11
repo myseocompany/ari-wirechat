@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 use DB;
 use App\Models\Task;
@@ -18,6 +19,9 @@ use App\Models\Customer;
 use App\Models\ViewCustomerHasActions;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+
+
+use Illuminate\Support\Facades\Cache;
 
 class ReportController extends Controller
 {
@@ -1029,80 +1033,233 @@ class ReportController extends Controller
 
 
 
+
+/**
+ * AJAX: calcula faltantes para un año/mes (y usuario opcional).
+ * Devuelve: { ok, missing, customers }
+ */
+public function verifyMonth(Request $request)
+{
+    $wonStatusId = 8;
+    $year  = (int) $request->query('year');
+    $month = (int) $request->query('month');
+    $userId = $request->query('user_id'); // "unassigned"|"3"|null
+
+    if (!$year || !$month) {
+        return response()->json(['ok'=>false, 'message'=>'Parámetros inválidos'], 422);
+    }
+
+    // Cache por 10 min (por año/mes/usuario)
+    $cacheKey = 'missing-summary:'.$year.':'.$month.':'.($userId ?: 'all');
+    if ($cached = Cache::get($cacheKey)) {
+        return response()->json(['ok'=>true] + $cached);
+    }
+
+    // Filtro usuario
+    $userFilter = function ($q) use ($userId) {
+        if ($userId === 'unassigned') {
+            $q->where(fn($qq) => $qq->whereNull('user_id')->orWhere('user_id', 0));
+        } elseif (!empty($userId)) {
+            $q->where('user_id', $userId);
+        }
+    };
+
+    // Traemos solo lo necesario
+    $base = Customer::where('status_id', $wonStatusId)
+        ->whereYear('updated_at', $year)
+        ->whereMonth('updated_at', $month)
+        ->where($userFilter)
+        ->with(['files:id,customer_id,url'])
+        ->withCount('files')
+        ->having('files_count','>',0)
+        ->orderByDesc('updated_at');
+
+    // Cliente S3/Spaces
+    $disk   = Storage::disk('spaces');
+    $s3     = $disk->getClient();
+    $bucket = config('filesystems.disks.spaces.bucket');
+
+    $listKeys = function (int $customerId) use ($s3, $bucket) {
+        $prefix   = "files/{$customerId}/";
+        $keyCache = "spaces:list:{$bucket}:{$prefix}";
+        return Cache::remember($keyCache, now()->addMinutes(10), function () use ($s3, $bucket, $prefix) {
+            $set = []; $token = null;
+            try {
+                do {
+                    $params = ['Bucket'=>$bucket,'Prefix'=>$prefix,'MaxKeys'=>1000];
+                    if ($token) $params['ContinuationToken'] = $token;
+                    $res = $s3->listObjectsV2($params);
+                    foreach (($res['Contents'] ?? []) as $obj) $set[$obj['Key']] = true;
+                    $token = !empty($res['IsTruncated']) ? ($res['NextContinuationToken'] ?? null) : null;
+                } while ($token);
+            } catch (\Throwable $e) {
+                \Log::warning("listObjectsV2 error {$prefix}: ".$e->getMessage());
+                return [];
+            }
+            return $set;
+        });
+    };
+
+    // Recorremos en chunks (ligero)
+    $totalCustomers = 0;
+    $totalMissing   = 0;
+
+    $base->chunk(60, function ($chunk) use (&$totalCustomers, &$totalMissing, $listKeys) {
+        foreach ($chunk as $customer) {
+            $existing = $listKeys($customer->id);
+            $missing  = 0;
+            foreach ($customer->files as $f) {
+                $key = "files/{$customer->id}/{$f->url}";
+                if (!isset($existing[$key])) $missing++;
+            }
+            $totalMissing   += $missing;
+            $totalCustomers += 1;
+        }
+    });
+
+    $payload = ['missing'=>$totalMissing, 'customers'=>$totalCustomers];
+    Cache::put($cacheKey, $payload, now()->addMinutes(10));
+
+    return response()->json(['ok'=>true] + $payload);
+}
+
+
+public function verifyCustomer(Request $request, Customer $customer)
+{
+    // Traemos los files de la relación (id, url) y salimos rápido si no hay
+    $files = $customer->files()->select('id', 'url')->get();
+    if ($files->isEmpty()) {
+        return response()->json([
+            'ok'      => true,
+            'missing' => 0,
+            'results' => [],
+        ]);
+    }
+
+    // Cliente S3/Spaces
+    $disk   = Storage::disk('spaces');
+    $s3     = $disk->getClient();
+    $bucket = config('filesystems.disks.spaces.bucket');
+    $prefix = "files/{$customer->id}/";
+
+    // Cacheamos el listado de keys bajo /files/{customer_id}/ para no hacer HeadObject uno por uno
+    $keyCache = "spaces:list:{$bucket}:{$prefix}";
+    $existing = Cache::remember($keyCache, now()->addMinutes(10), function () use ($s3, $bucket, $prefix) {
+        $set = [];
+        try {
+            $token = null;
+            do {
+                $params = ['Bucket' => $bucket, 'Prefix' => $prefix, 'MaxKeys' => 1000];
+                if ($token) $params['ContinuationToken'] = $token;
+                $res = $s3->listObjectsV2($params);
+                foreach (($res['Contents'] ?? []) as $obj) {
+                    $set[$obj['Key']] = true;
+                }
+                $token = !empty($res['IsTruncated']) ? ($res['NextContinuationToken'] ?? null) : null;
+            } while ($token);
+        } catch (\Throwable $e) {
+            \Log::warning("listObjectsV2 error {$prefix}: ".$e->getMessage());
+        }
+        return $set; // array<string,bool>
+    });
+
+    $missing = 0;
+    $results = [];
+
+    foreach ($files as $f) {
+        $key    = "{$prefix}{$f->url}";
+        $exists = isset($existing[$key]);
+
+        if (!$exists) $missing++;
+
+        // Href: si tus files son privados, usa una ruta que genere URL temporal;
+        // si son públicos, puedes usar $disk->url($key).
+        // Como ya tienes una ruta para abrir, úsala:
+        $href = route('customer_files.open', $f->id);
+
+        $results[] = [
+            'id'     => $f->id,
+            'exists' => $exists,
+            'href'   => $exists ? $href : null,
+        ];
+    }
+
+    return response()->json([
+        'ok'      => true,
+        'missing' => $missing,
+        'results' => $results,
+    ]);
+}
+
 public function missingCustomerFiles(Request $request)
 {
     $wonStatusId = 8;
 
     // Años disponibles (clientes ganados)
-    $availableYears = Customer::whereNotNull('updated_at')
-        ->where('status_id', $wonStatusId)
+    $availableYears = Customer::where('status_id', $wonStatusId)
+        ->whereNotNull('updated_at')
         ->selectRaw('YEAR(updated_at) as year')
         ->groupBy('year')
         ->orderByDesc('year')
         ->pluck('year');
 
-    $selectedYear   = $request->input('year') ?? $availableYears->first();
-    $selectedUserId = $request->input('user_id'); // ej: "3", "unassigned" o null
+    // Filtros
+    $selectedYear   = (int) ($request->input('year') ?: ($availableYears->first() ?: 2025));
+    $selectedMonth  = $request->input('month');            // null | "1".."12"
+    $selectedUserId = $request->input('user_id');          // null | "unassigned" | "3"
 
-    // Lista de usuarios que tienen clientes ganados en ese año (más útil que listar a todos)
+    // Usuarios con clientes ese año (para el combo)
     $userIdsThisYear = Customer::where('status_id', $wonStatusId)
         ->whereYear('updated_at', $selectedYear)
         ->whereNotNull('user_id')
-        ->pluck('user_id')
-        ->unique();
-
+        ->pluck('user_id')->unique();
     $users = User::whereIn('id', $userIdsThisYear)->orderBy('name')->get();
 
-    // Query base
+    // Meses que tienen clientes ese año (para el resumen de nivel 1)
+    $months = Customer::where('status_id', $wonStatusId)
+        ->whereYear('updated_at', $selectedYear)
+        ->selectRaw('MONTH(updated_at) as month')
+        ->groupBy('month')->orderBy('month')
+        ->pluck('month')->all(); // e.g. [1,2,3...]
+
+    // Si NO hay mes: solo renderiza el resumen por meses
+    if (empty($selectedMonth)) {
+        return view('reports.missing_customer_files.index', [
+            'availableYears'  => $availableYears,
+            'selectedYear'    => $selectedYear,
+            'selectedMonth'   => null,
+            'selectedUserId'  => $selectedUserId,
+            'users'           => $users,
+            'months'          => $months,
+            // En este nivel NO enviamos $customers
+        ]);
+    }
+
+    // Si hay mes ⇒ armamos la lista de clientes de ese mes (nivel 2)
     $customersQuery = Customer::where('status_id', $wonStatusId)
         ->whereYear('updated_at', $selectedYear)
-        ->with(['files', 'user'])
+        ->whereMonth('updated_at', (int)$selectedMonth)
+        ->with(['files:id,customer_id,url'])        // solo lo necesario
+        ->withCount('files')
         ->orderByDesc('updated_at');
 
-    // Filtro por usuario asignado
     if ($selectedUserId === 'unassigned') {
-        $customersQuery->where(function ($q) {
-            $q->whereNull('user_id')->orWhere('user_id', 0);
-        });
+        $customersQuery->where(fn($q) => $q->whereNull('user_id')->orWhere('user_id', 0));
     } elseif (!empty($selectedUserId)) {
         $customersQuery->where('user_id', $selectedUserId);
     }
 
-    $customers = $customersQuery->get();
+    $customers = $customersQuery->paginate(50); // paginado
 
-    // Agrupar por mes y calcular faltantes
-    $groupedByMonth = [];
-    foreach ($customers as $customer) {
-        $monthNumber = optional($customer->updated_at)->format('n'); // 1–12
-        $monthName   = optional($customer->updated_at)->format('F'); // January, ...
-
-        $customer->total_files  = $customer->files->count();
-        $customer->missing_count = 0;
-
-        foreach ($customer->files as $file) {
-            $fullPath   = "/home/forge/arichat.co/public/public/files/{$customer->id}/{$file->url}";
-            $file->status = File::exists($fullPath) ? 'OK' : 'MISSING';
-            if ($file->status === 'MISSING') {
-                $customer->missing_count++;
-            }
-        }
-
-        if (!isset($groupedByMonth[$monthNumber])) {
-            $groupedByMonth[$monthNumber] = [
-                'name'      => $monthName,
-                'customers' => [],
-            ];
-        }
-        $groupedByMonth[$monthNumber]['customers'][] = $customer;
-    }
-
-    ksort($groupedByMonth);
-
-    return view(
-        'reports.missing_customer_files.index',
-        compact('groupedByMonth', 'availableYears', 'selectedYear', 'users', 'selectedUserId')
-    );
+    return view('reports.missing_customer_files.index', [
+        'availableYears'  => $availableYears,
+        'selectedYear'    => $selectedYear,
+        'selectedMonth'   => (int)$selectedMonth,
+        'selectedUserId'  => $selectedUserId,
+        'users'           => $users,
+        'months'          => $months,
+        'customers'       => $customers, // << clave para mostrar clientes
+    ]);
 }
-
 
 }

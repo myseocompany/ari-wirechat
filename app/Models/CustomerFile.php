@@ -3,14 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 class CustomerFile extends Model
 {
-    // Si prefieres que estos atributos aparezcan al serializar:
-    // protected $appends = ['status', 'web_path', 'ext', 'size_human'];
-
-    /** Campos que se pueden asignar en masa (create / update). */
     protected $fillable = [
         'customer_id',
         'url',
@@ -27,25 +23,61 @@ class CustomerFile extends Model
                     ->withDefault(['name' => 'Sin usuario']);
     }
 
-    // ----- Helpers de ruta -----
+    /* ====== Helpers internos ====== */
+    protected function disk()
+    {
+        return Storage::disk('spaces');
+    }
+
+    protected function isPrivate(): bool
+    {
+        // Si en config/filesystems.php dejaste 'visibility' => 'public' en el disco spaces,
+        // esto devolverá false (público). Cambia la lógica si manejas otro flag.
+        return config('filesystems.disks.spaces.visibility', 'public') !== 'public';
+    }
+
+    /* ====== Clave (prefijo/ruta) en el bucket ====== */
+    public function getStorageKeyAttribute(): string
+    {
+        return "files/{$this->customer_id}/{$this->url}";
+    }
+
+    /* ====== Compatibilidad con tu código previo ====== */
+
+    // Antes era una ruta física en el servidor. Ahora devolvemos la "key" del objeto en el bucket.
     public function getFullPathAttribute(): string
     {
-        // Ajusta si tu carpeta real cambia.
-        // Si tus archivos están en /public/public/files/{customer_id}/...
-        return public_path("public/files/{$this->customer_id}/{$this->url}");
-        // Si usas storage: return storage_path("app/public/files/{$this->customer_id}/{$this->url}");
+        return $this->storage_key; // compat: ya no hay path local
     }
 
+    // Antes era "/public/files/...". Ahora devuelve URL pública o la ruta de descarga firmada.
     public function getWebPathAttribute(): string
     {
-        return "/public/files/{$this->customer_id}/{$this->url}";
-        // Si usas storage + symlink (storage:link): return "/storage/files/{$this->customer_id}/{$this->url}";
+        if ($this->isPrivate()) {
+            // Asume que definiste la route customer_files.download (redirige a temporaryUrl)
+            return route('customer_files.download', $this);
+        }
+        return $this->public_url ?? '#';
     }
 
-    // ----- Atributos calculados -----
+    /* ====== Atributos calculados ====== */
+
+    public function getPublicUrlAttribute(): ?string
+    {
+        try {
+            return $this->disk()->url($this->storage_key); // respeta AWS_URL/CDN
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
     public function getStatusAttribute(): string
     {
-        return File::exists($this->full_path) ? 'OK' : 'MISSING';
+        try {
+            return $this->disk()->exists($this->storage_key) ? 'OK' : 'MISSING';
+        } catch (\Throwable $e) {
+            return 'MISSING';
+        }
     }
 
     public function getExtAttribute(): string
@@ -55,8 +87,13 @@ class CustomerFile extends Model
 
     public function getSizeHumanAttribute(): ?string
     {
-        if (!File::exists($this->full_path)) return null;
-        $bytes = File::size($this->full_path);
+        try {
+            $bytes = $this->disk()->size($this->storage_key); // Flysystem 3
+        } catch (\Throwable $e) {
+            return null;
+        }
+        if ($bytes === null) return null;
+
         $u = ['B','KB','MB','GB','TB']; $i = 0;
         while ($bytes >= 1024 && $i < count($u) - 1) { $bytes /= 1024; $i++; }
         return round($bytes, 2).' '.$u[$i];

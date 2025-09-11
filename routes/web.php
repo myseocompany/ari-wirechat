@@ -449,9 +449,12 @@ Route::get('/auth/callback', [APIController::class, 'callBack']);
 
 // Reports
 Route::get('/reports/fm', [ReportController::class, 'RFM']);
+Route::get('/customer-files/{file}/open', [CustomerFileController::class, 'open'])
+     ->name('customer_files.open'); 
 
-Route::get('/reports/missing-customer-files', [ReportController::class, 'missingCustomerFiles'])
-    ->name('reports.missing_customer_files');
+
+Route::get('{file}/open', [CustomerFileController::class, 'open'])->name('open');
+
 
 
 
@@ -529,3 +532,24 @@ Route::put('/actions/{action}/reschedule', [ActionController::class, 'reschedule
 
 Route::get('/actions/{id}/show', [ActionController::class, 'show'])
      ->name('actions.show');
+
+Route::get('/test-spaces', function () {
+    Storage::disk('spaces')->put('test.txt', 'hola DO Spaces', 'public');
+    return Storage::disk('spaces')->url('test.txt');
+});
+
+
+Route::get('/reports/missing-customer-files/verify-month', [ReportController::class, 'verifyMonth'])
+    ->name('reports.missing_customer_files.verify_month'); // ?year=2025&month=2&user_id=
+
+
+ Route::get('/reports/missing-customer-files', [ReportController::class, 'missingCustomerFiles'])
+    ->name('reports.missing_customer_files');
+
+Route::get('/reports/missing-customer-files/verify/{customer}', [ReportController::class, 'verifyCustomerFiles'])
+    ->name('reports.missing_customer_files.verify'); // AJAX   
+
+Route::get(
+    '/reports/missing-customer-files/{customer}/verify',
+    [ReportController::class, 'verifyCustomer']
+)->name('reports.missing_customer_files.verify');
