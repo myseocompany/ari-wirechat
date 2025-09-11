@@ -111,13 +111,16 @@ $customersSinAgenda = DB::table('customers')
     )
     ->get();
 
+    $totalSinAgenda = $customersSinAgenda->count();
+
     return view('madrid.schedule', [
         'acciones' => $acciones,
         'from' => $from,
         'to' => $to,
         'maker_filter' => $r->maker,
         'orders_filter' => $r->orders,
-        'customersSinAgenda' => $customersSinAgenda
+        'customersSinAgenda' => $customersSinAgenda,
+        'totalSinAgenda' => $totalSinAgenda
     ]);
 }
 

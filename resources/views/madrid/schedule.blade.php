@@ -39,8 +39,8 @@
 @endphp
 
 <div class="alert alert-info" role="alert">
-  <strong>Totales:</strong>
-  {{ $totalAgendados }} agendado(s),
+  <strong>Totales:</strong> {{ $acciones->pluck('customer_id')->unique()->count() }} cliente(s), 
+
   <span class="text-success">{{ $totalYes }} empanadero(s)</span>,
   <span class="text-danger">{{ $totalNo }} proyecto(s)</span>,
   <span class="text-muted">{{ $totalUnk }} ¿?</span>,
@@ -96,7 +96,8 @@ $fechas = [
     {{-- Fila resumen alineada con cabeceras --}}
     <tr class="table-light fw-bold">
       <td>{{ $fecha->format('d/m') }} — {{ $h }}:00 h</td>
-      <td>{{ $accionesSlot->count() }} agendado(s)</td>
+      <td>{{ $accionesSlot->pluck('customer_id')->unique()->count() }} cliente(s)</td>
+
       <td>—</td>
       <td>
         <span class="text-success">{{ $countYes }} empanadero</span>, 
@@ -158,9 +159,12 @@ $fechas = [
 
 
 @if ($customersSinAgenda->isNotEmpty())
-  <tr>
-    <td colspan="7" class="table-danger fw-bold">Sin agenda (sin acción type_id=101)</td>
-  </tr>
+<tr class="table-secondary fw-bold">
+  <td colspan="7">
+    Total de clientes sin agenda (sin acción type_id=101): {{ $totalSinAgenda }}
+  </td>
+</tr>
+
 
   @foreach ($customersSinAgenda as $c)
     <tr>
