@@ -157,6 +157,44 @@ $fechas = [
 
 
 
+@if ($customersSinAgenda->isNotEmpty())
+  <tr>
+    <td colspan="7" class="table-danger fw-bold">Sin agenda (sin acción type_id=101)</td>
+  </tr>
+
+  @foreach ($customersSinAgenda as $c)
+    <tr>
+      <td>
+        <a href="{{ url('/customers/' . $c->customer_id . '/show') }}" target="_blank">
+          {{ $c->name ?? 'ID: ' . $c->customer_id }}
+        </a>
+      </td>
+      <td>{{ $c->phone ?? '—' }}</td>
+      <td>—</td>
+      <td>
+        @if($c->maker === 1)
+          <span class="badge bg-success">Empanadero</span>
+        @elseif($c->maker === 0)
+          <span class="badge bg-danger">Proyecto</span>
+        @else
+          <span class="badge bg-secondary">¿?</span>
+        @endif
+      </td>
+      <td>
+        @if($c->has_orders)
+          <span class="badge bg-success">Sí</span>
+        @else
+          <span class="badge bg-secondary">No</span>
+        @endif
+      </td>
+      <td>—</td>
+      <td>
+        {{-- sin acción, así que no hay botón de acción --}}
+        <span class="text-muted">Sin acción</span>
+      </td>
+    </tr>
+  @endforeach
+@endif
 
 
     </table>

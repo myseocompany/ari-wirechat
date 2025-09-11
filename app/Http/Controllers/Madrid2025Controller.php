@@ -93,12 +93,31 @@ public function schedule(Request $r) {
 
     $acciones = $q->orderBy('actions.due_date')->get();
 
+    // Clientes sin acción type_id=101 en este rango
+$customersSinAgenda = DB::table('customers')
+    ->where('notes', 'like', '%#EspañaAgenda2025%')
+    ->whereNotIn('id', function ($q) use ($from, $to) {
+        $q->select('customer_id')
+          ->from('actions')
+          ->where('type_id', 101)
+          ->whereBetween('due_date', [$from, $to]);
+    })
+    ->select(
+        'id as customer_id',
+        'name',
+        'phone',
+        'maker',
+        DB::raw('(SELECT COUNT(*) FROM orders WHERE orders.customer_id = customers.id) > 0 as has_orders')
+    )
+    ->get();
+
     return view('madrid.schedule', [
         'acciones' => $acciones,
         'from' => $from,
         'to' => $to,
         'maker_filter' => $r->maker,
         'orders_filter' => $r->orders,
+        'customersSinAgenda' => $customersSinAgenda
     ]);
 }
 
