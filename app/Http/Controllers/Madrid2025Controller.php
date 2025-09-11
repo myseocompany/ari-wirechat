@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\EventMadridParticipation as Part;
 use App\Models\EventMadridKpis as Kpis;
 
+use Illuminate\Support\Facades\DB;
+
 class Madrid2025Controller extends Controller
 {
     public function dashboard(Request $r) {
@@ -47,4 +49,57 @@ class Madrid2025Controller extends Controller
             'Content-Disposition' => 'attachment; filename="madrid2025_participation.csv"'
         ]);
     }
+
+
+public function schedule(Request $r) {
+    $from = '2025-09-16 00:00:00';
+    $to   = '2025-09-17 23:59:59';
+
+    $q = DB::table('actions')
+        ->join('customers', 'actions.customer_id', '=', 'customers.id')
+        ->leftJoin('orders', 'customers.id', '=', 'orders.customer_id')
+        ->select(
+            'actions.id as action_id',
+            'actions.due_date',
+            'actions.delivery_date',
+            'actions.note',
+            'customers.id as customer_id',
+            'customers.name',
+            'customers.phone',
+            'customers.maker',
+            DB::raw('COUNT(orders.id) > 0 as has_orders')
+        )
+        ->where('actions.type_id', 101)
+        ->where('customers.notes', 'like', '%#EspañaAgenda2025%')
+        ->whereBetween('actions.due_date', [$from, $to])
+        ->groupBy('customers.id', 'actions.id', 'actions.due_date', 'actions.delivery_date', 'actions.note', 'customers.name', 'customers.phone', 'customers.maker');
+
+    // Filtros opcionales
+    if ($r->filled('maker')) {
+        if ($r->maker === 'null') {
+            $q->whereNull('customers.maker');
+        } else {
+            $q->where('customers.maker', (int) $r->maker);
+        }
+    }
+
+    if ($r->filled('orders')) {
+        if ($r->orders === 'yes') {
+            $q->having('has_orders', '=', 1);
+        } elseif ($r->orders === 'no') {
+            $q->having('has_orders', '=', 0);
+        }
+    }
+
+    $acciones = $q->orderBy('actions.due_date')->get();
+
+    return view('madrid.schedule', [
+        'acciones' => $acciones,
+        'from' => $from,
+        'to' => $to,
+        'maker_filter' => $r->maker,
+        'orders_filter' => $r->orders,
+    ]);
+}
+
 }

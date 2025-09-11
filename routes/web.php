@@ -509,6 +509,8 @@ Route::get('/test-rd', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/madrid2025',        [Madrid2025Controller::class, 'dashboard'])->name('madrid2025.dashboard');
     Route::get('/madrid2025/export', [Madrid2025Controller::class, 'export'])->name('madrid2025.export');
+    Route::get('/madrid2025/schedule', [Madrid2025Controller::class, 'schedule'])->name('madrid2025.schedule');
+
 });
 
 
