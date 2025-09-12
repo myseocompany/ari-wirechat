@@ -13,7 +13,7 @@
     @if(!isset($customer))
       <form action="{{ route('landing.checkin.submit') }}" method="POST" class="flex flex-col gap-4">
         @csrf
-        <input type="text" name="phone" placeholder="Ingrese su teléfono" required
+        <input type="text" name="phone" placeholder="Ingrese su teléfono con indicativo (34)" required
           class="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
         <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Continuar</button>
         @if($errors->any())
