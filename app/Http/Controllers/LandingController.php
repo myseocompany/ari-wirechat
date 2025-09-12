@@ -66,30 +66,63 @@ class LandingController extends Controller
         return view('madrid.checkin', compact('customer','nombre','cita','resumen'));
     }
 
-    public function rebook(Request $request)
+public function rebook(Request $request)
 {
     $request->validate([
         'phone' => 'required|string',
-        'date' => 'required|date|in:2025-09-16,2025-09-17',
-        'hour' => 'required|integer|min:9|max:17',
+        'date'  => 'required|date|in:2025-09-16,2025-09-17',
+        'hour'  => 'required|integer|min:9|max:17',
     ]);
 
-    $customer = DB::table('customers')->where('phone',$request->phone)->first();
+    $customer = DB::table('customers')
+        ->where('phone', $request->phone)
+        ->first();
 
-    if(!$customer){
-        return response()->json(['error'=>'No se encontró el cliente'], 404);
+    if (!$customer) {
+        return response()->json([
+            'error' => 'No se encontró cliente con ese teléfono.'
+        ], 404);
     }
 
-    DB::table('actions')
-      ->where('customer_id', $customer->id)
-      ->where('type_id', 101)
-      ->update([
-          'due_date' => Carbon::parse($request->date.' '.$request->hour.':00:00'),
-          'updated_at' => now()
-      ]);
+    // Obtener acción actual type_id=101
+    $currentAction = DB::table('actions')
+        ->where('customer_id', $customer->id)
+        ->where('type_id', 101)
+        ->first();
 
-    return response()->json(['success' => 'Cita reagendada correctamente']);
+    if (!$currentAction) {
+        return response()->json([
+            'error' => 'No se encontró cita existente para este cliente.'
+        ], 404);
+    }
+
+    $oldDate = $currentAction->due_date;
+    $newDate = Carbon::parse($request->date . ' ' . $request->hour . ':00:00');
+
+    // Actualizar la acción existente
+    DB::table('actions')
+        ->where('id', $currentAction->id)
+        ->update([
+            'due_date' => $newDate,
+            'updated_at' => now(),
+        ]);
+
+    // Crear nueva acción tipo 16 que registre el cambio
+    DB::table('actions')->insert([
+        'customer_id' => $customer->id,
+        'type_id' => 16, // tipo "reagendamiento"
+        'note' => "El cliente reagendó cita. Antes estaba en " . $oldDate . " y quedó en " . $newDate,
+        'creator_user_id' => null,
+        'owner_user_id' => null,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return response()->json([
+        'success' => "Cita reagendada correctamente: de $oldDate a $newDate."
+    ]);
 }
+
 
 public function cancel(Request $request)
 {
