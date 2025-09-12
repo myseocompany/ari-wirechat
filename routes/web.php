@@ -33,6 +33,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\LandingController;
+
+
 
 use App\Http\Controllers\Madrid2025Controller;
 
@@ -514,6 +517,9 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+
+
+
 // routes/web.php
 Route::get('/reportes/madrid', [\App\Http\Controllers\MadridDashboardController::class, 'index'])
     ->name('madrid.dashboard');
@@ -555,3 +561,8 @@ Route::get(
     '/reports/missing-customer-files/{customer}/verify',
     [ReportController::class, 'verifyCustomer']
 )->name('reports.missing_customer_files.verify');
+
+Route::get('/landing/checkin', [LandingController::class,'checkinForm'])->name('landing.checkin');
+Route::post('/landing/checkin', [LandingController::class,'checkinSubmit'])->name('landing.checkin.submit');
+Route::post('/landing/rebook', [LandingController::class,'rebook'])->name('landing.rebook');
+Route::post('/landing/cancel', [LandingController::class,'cancel'])->name('landing.cancel');
