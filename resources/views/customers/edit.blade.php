@@ -209,18 +209,18 @@ console.log({{$model->getScoringToNumber()}});
  
       <div class="col-12">
         <label for="maker">Proyecto</label>
-        <input type="radio" name="maker" id="created" value="0"" @if($model->maker == 0) checked  @endif>
-        
+        <input type="radio" name="maker" id="created" value="0" @checked($model->maker === 0)>
+
       </div>
       <div class="col-12">
         <label for="maker">Hace empanadas</label>
-        <input type="radio" name="maker" id="updated" value="1"" @if($model->maker == 1) checked  @endif>
+        <input type="radio" name="maker" id="updated" value="1" @checked($model->maker === 1)>
       </div>
 
 
       <div class="col-12">
         <label for="maker">Otros</label>
-        <input type="radio" name="maker" id="updated" value="2"" @if($model->maker == 2) checked  @endif>
+        <input type="radio" name="maker" id="updated" value="2" @checked($model->maker === 2)>
       </div>
     
 
