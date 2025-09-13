@@ -24,20 +24,38 @@
   </div>
 </div>
 
-<div class="flex min-h-screen">
-  @include('actions.sidebar')
+<div x-data="{ showFilters: false, isDesktop: window.innerWidth >= 768 }" x-init="window.addEventListener('resize', () => { isDesktop = window.innerWidth >= 768 })" class="flex flex-col md:flex-row min-h-screen">
+  <!-- Filtros para móvil -->
+  <template x-if="!isDesktop">
+    <div class="p-4">
+      <button @click="showFilters = !showFilters" class="w-full rounded-md bg-blue-600 py-2 text-sm font-medium text-white">
+        Filtros
+      </button>
+      <div x-show="showFilters" x-cloak class="mt-4">
+        @include('actions.filter')
+      </div>
+    </div>
+  </template>
 
-  @if(($view ?? 'list') === 'calendar')
-    {{-- Vista calendario --}}
-    @include('actions.calendar_panel', ['types' => $types, 'users' => $users])
-  @else
-    {{-- Vista lista --}}
-    @include('actions.main')
-    @include('actions.modal_pending', [
-      'action_options' => $action_options,
-      'statuses_options' => $statuses_options
-    ])
-  @endif
+  <!-- Barra lateral para escritorio -->
+  <template x-if="isDesktop">
+    @include('actions.sidebar')
+  </template>
+
+  <!-- Contenido principal -->
+  <div class="flex-1">
+    @if(($view ?? 'list') === 'calendar')
+      {{-- Vista calendario --}}
+      @include('actions.calendar_panel', ['types' => $types, 'users' => $users])
+    @else
+      {{-- Vista lista --}}
+      @include('actions.main')
+      @include('actions.modal_pending', [
+        'action_options' => $action_options,
+        'statuses_options' => $statuses_options
+      ])
+    @endif
+  </div>
 </div>
 
 <script>

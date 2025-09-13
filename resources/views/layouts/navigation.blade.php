@@ -1,11 +1,11 @@
-<nav class="navbar navbar-expand-md navbar-white fixed-top bg-white container">
+<nav class="navbar navbar-expand-md navbar-light fixed-top bg-white container">
       
   <a class="navbar-brand" href="/customers"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
-    <button class="navbar-toggler d-lg-none collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="navbar-collapse " id="navbarsExampleDefault" style="">
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
       <ul class="navbar-nav mr-auto">
         
         @if (Auth::guest())
