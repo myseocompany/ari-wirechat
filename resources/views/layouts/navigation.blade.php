@@ -10,7 +10,7 @@
         
         @if (Auth::guest())
                           
-        <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Iniciar sesión</a></li>
+        <li class="nav-item"><a class="nav-link text-dark" href="{{ route('login') }}">Iniciar sesión</a></li>
         @else
         
 
@@ -20,7 +20,7 @@
 
 
                   @if($item->url =="/logout")
-                          <a class="nav-link" href="{{ route('logout') }}"
+                          <a class="nav-link text-dark" href="{{ route('logout') }}"
                               onclick="event.preventDefault();
                                        document.getElementById('logout-form').submit();">
                               Salir
@@ -29,7 +29,7 @@
                               {{ csrf_field() }}
                           </form>
                       @else
-                      <a class="nav-link" href="{{$item->url}}" @if($item->hasChildren()) class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" @endif> 
+                      <a class="nav-link text-dark @if($item->hasChildren()) dropdown-toggle @endif" href="{{$item->url}}" @if($item->hasChildren()) data-toggle="dropdown" role="button" aria-expanded="false" @endif>
                       
                           {{$item->name}} @if($item->hasChildren()) - @endif
                           
@@ -41,7 +41,7 @@
                     <li class="nav-item">
 
                       @if($subitem->url =="/logout")
-                          <a class="nav-link" href="{{ route('logout') }}"
+                          <a class="nav-link text-dark" href="{{ route('logout') }}"
                               onclick="event.preventDefault();
                                        document.getElementById('logout-form').submit();">
                               Salir
@@ -50,7 +50,7 @@
                               {{ csrf_field() }}
                           </form>
                       @else
-                      <a class="nav-link" href="{{$subitem->url}}"> 
+                      <a class="nav-link text-dark" href="{{$subitem->url}}">
                           
                               {{$subitem->name}} 
                           
