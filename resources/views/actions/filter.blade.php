@@ -1,3 +1,30 @@
+@php
+    $fromDateValue = '';
+    $fromTimeValue = '';
+    $toDateValue = '';
+    $toTimeValue = '';
+
+    if ($request->filled('from_date')) {
+        $fromDate = \Carbon\Carbon::parse($request->from_date);
+        $fromDateValue = $fromDate->format('Y-m-d');
+        if ($request->filled('from_time')) {
+            $fromTimeValue = $request->from_time;
+        } elseif (strlen($request->from_date ?? '') > 10) {
+            $fromTimeValue = $fromDate->format('H:i');
+        }
+    }
+
+    if ($request->filled('to_date')) {
+        $toDate = \Carbon\Carbon::parse($request->to_date);
+        $toDateValue = $toDate->format('Y-m-d');
+        if ($request->filled('to_time')) {
+            $toTimeValue = $request->to_time;
+        } elseif (strlen($request->to_date ?? '') > 10) {
+            $toTimeValue = $toDate->format('H:i');
+        }
+    }
+@endphp
+
 <form action="/actions/" method="GET" id="filter_form" class="flex flex-col gap-4">
     @include('actions.dashboard')
 
@@ -5,6 +32,7 @@
 
     <!-- Selector de tiempo -->
     <div>
+        <label for="filter" class="mb-1 text-sm font-medium text-gray-700">Rango rápido</label>
         <select name="filter" id="filter" onchange="update()"
             class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
             <option value="">Seleccione tiempo</option>
@@ -21,13 +49,23 @@
 
     <!-- Fechas -->
     <div>
-        <input type="date" id="from_date" name="from_date" value="{{ $request->from_date }}"
-            class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+        <label for="from_date" class="mb-1 text-sm font-medium text-gray-700">Desde</label>
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <input type="date" id="from_date" name="from_date" value="{{ $fromDateValue }}"
+                class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+            <input type="time" id="from_time" name="from_time" value="{{ $fromTimeValue }}" step="60"
+                class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+        </div>
     </div>
 
     <div>
-        <input type="date" id="to_date" name="to_date" value="{{ $request->to_date }}"
-            class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+        <label for="to_date" class="mb-1 text-sm font-medium text-gray-700">Hasta</label>
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <input type="date" id="to_date" name="to_date" value="{{ $toDateValue }}"
+                class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+            <input type="time" id="to_time" name="to_time" value="{{ $toTimeValue }}" step="60"
+                class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+        </div>
     </div>
 
     <!-- Toggle pendientes -->
@@ -77,3 +115,41 @@
         </button>
     </div>
 </form>
+
+@once
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const filterSelect = document.getElementById('filter');
+                const fromTime = document.getElementById('from_time');
+                const toTime = document.getElementById('to_time');
+
+                if (!filterSelect || !fromTime || !toTime) {
+                    return;
+                }
+
+                const originalUpdate = window.update;
+
+                window.update = function () {
+                    if (typeof originalUpdate === 'function') {
+                        originalUpdate.apply(this, arguments);
+                    }
+
+                    if (!filterSelect.value) {
+                        fromTime.value = '';
+                        toTime.value = '';
+                        return;
+                    }
+
+                    fromTime.value = '00:00';
+                    toTime.value = '23:59';
+                };
+
+                if (filterSelect.value) {
+                    fromTime.value = fromTime.value || '00:00';
+                    toTime.value = toTime.value || '23:59';
+                }
+            });
+        </script>
+    @endpush
+@endonce
