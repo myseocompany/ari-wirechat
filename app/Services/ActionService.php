@@ -32,10 +32,15 @@ private function buildBaseQuery(Request $request)
     $dateColumn = $isPending ? 'due_date' : 'created_at';
 
     $hasDates = $request->filled('from_date') && $request->filled('to_date');
-    $from = $hasDates ? Carbon\Carbon::parse($request->from_date)->startOfDay() : null;
-    $to   = $hasDates ? Carbon\Carbon::parse($request->to_date)->endOfDay()   : null;
+    $from = $hasDates
+        ? $this->normalizeDateInput($request->input('from_date'), $request->input('from_time'), false)
+        : null;
+    $to   = $hasDates
+        ? $this->normalizeDateInput($request->input('to_date'), $request->input('to_time'), true)
+        : null;
+    $hasRange = $hasDates && $from && $to;
 
-    return Action::where(function ($query) use ($request, $isPending, $dateColumn, $hasDates, $from, $to) {
+    return Action::where(function ($query) use ($request, $isPending, $dateColumn, $hasRange, $from, $to) {
 
         if ($isPending) {
             $query->whereNull('delivery_date')
@@ -50,24 +55,24 @@ private function buildBaseQuery(Request $request)
             if ($rangeType === 'overdue' && $isPending) {
                 // Vencidas: antes de hoy, y además respeta el rango si viene
                 $query->where($dateColumn, '<', $now->startOfDay());
-                if ($hasDates) $query->whereBetween($dateColumn, [$from, $to]);
+                if ($hasRange) $query->whereBetween($dateColumn, [$from, $to]);
 
             } elseif ($rangeType === 'today') {
                 // Hoy: del inicio al fin de hoy, y además respeta el rango si viene
                 $query->whereDate($dateColumn, $now->toDateString());
-                if ($hasDates) $query->whereBetween($dateColumn, [$from, $to]);
+                if ($hasRange) $query->whereBetween($dateColumn, [$from, $to]);
 
             } elseif ($rangeType === 'upcoming' && $isPending) {
                 // Próximas: después de hoy, y además respeta el rango si viene
                 $query->where($dateColumn, '>', $now->endOfDay());
-                if ($hasDates) $query->whereBetween($dateColumn, [$from, $to]);
+                if ($hasRange) $query->whereBetween($dateColumn, [$from, $to]);
 
             } elseif ($rangeType === 'all') {
                 // Todas: solo aplica el rango si viene
-                if ($hasDates) $query->whereBetween($dateColumn, [$from, $to]);
+                if ($hasRange) $query->whereBetween($dateColumn, [$from, $to]);
             }
 
-        } else if ($hasDates) {
+        } else if ($hasRange) {
             // Sin range_type: usa únicamente el rango explícito
             $query->whereBetween($dateColumn, [$from, $to]);
         }
@@ -78,6 +83,38 @@ private function buildBaseQuery(Request $request)
             $query->where('note', 'like', '%'.$request->action_search.'%');
         }
     });
+}
+
+/**
+ * Normaliza la fecha del filtro combinándola con la hora (si existe).
+ */
+private function normalizeDateInput(?string $dateValue, ?string $timeValue, bool $isEndOfRange): ?Carbon\Carbon
+{
+    if (!$dateValue) {
+        return null;
+    }
+
+    $dateValue = trim($dateValue);
+    $dateIncludesTime = preg_match('/\d{2}:\d{2}/', $dateValue) === 1;
+    $dateIncludesSeconds = preg_match('/\d{2}:\d{2}:\d{2}/', $dateValue) === 1;
+
+    $date = Carbon\Carbon::parse($dateValue);
+
+    if ($timeValue !== null && $timeValue !== '') {
+        [$hour, $minute] = array_pad(explode(':', $timeValue), 2, '0');
+        $hour = (int) $hour;
+        $minute = (int) $minute;
+        $second = $isEndOfRange ? 59 : 0;
+        $date->setTime($hour, $minute, $second);
+
+    } elseif (!$dateIncludesTime) {
+        $isEndOfRange ? $date->endOfDay() : $date->startOfDay();
+
+    } elseif ($isEndOfRange && !$dateIncludesSeconds) {
+        $date->endOfMinute();
+    }
+
+    return $date;
 }
 
 
@@ -116,7 +153,7 @@ public function createFilteredRequest($originalRequest, $dateRangeType, $forcePe
 {
     $filteredRequest = new Request();
 
-    $filters = ['user_id', 'type_id', 'action_search', 'from_date', 'to_date'];
+    $filters = ['user_id', 'type_id', 'action_search', 'from_date', 'to_date', 'from_time', 'to_time'];
     foreach ($filters as $filter) {
         if ($originalRequest->has($filter)) {
             $filteredRequest->merge([
@@ -149,6 +186,8 @@ public function createFilteredRequest($originalRequest, $dateRangeType, $forcePe
         $filteredRequest->merge([
             'from_date' => $fromDate->toDateString(),
             'to_date' => $toDate->toDateString(),
+            'from_time' => '00:00',
+            'to_time' => '23:59',
         ]);
     }
 
