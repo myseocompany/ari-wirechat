@@ -459,7 +459,7 @@
 						 <div class="modal-body">
 							<p>@if(isset($item->product)){{$item->product->name}}@endif</p>
 						 <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-						 <a href="/order/product/{{ $item->id }}/destroy"> 
+                                                <a href="/orders/product/{{ $item->id }}/destroy">
 							<input type="" value="Sí" data-toggle="modal" data-target="#destroy_{{$item->id}}" class="btn btn-primary" size="3"></a>
 						 </div>
 
