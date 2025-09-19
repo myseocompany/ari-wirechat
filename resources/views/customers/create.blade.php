@@ -2,6 +2,44 @@
 
 @section('content')
 <h1>Crear Cliente</h1>
+@if (session('duplicate_message'))
+    <div class="alert alert-warning" role="alert">
+        <strong>{{ session('duplicate_message') }}</strong>
+        @php
+            $duplicateCustomers = collect(session('duplicate_customers'));
+        @endphp
+        @if ($duplicateCustomers->isNotEmpty())
+            <p class="mt-2">Revisa los siguientes registros coincidentes:</p>
+            <ul>
+                @foreach ($duplicateCustomers as $customer)
+                    <li>
+                        @if (!empty($customer['id']))
+                            <a href="{{ route('customers.show', $customer['id']) }}" target="_blank">
+                                {{ $customer['name'] ?? 'Cliente sin nombre' }}
+                            </a>
+                        @else
+                            {{ $customer['name'] ?? 'Cliente sin nombre' }}
+                        @endif
+                        @php
+                            $emails = array_filter([($customer['email'] ?? null)]);
+                            $phones = array_filter([
+                                $customer['phone'] ?? null,
+                                $customer['phone2'] ?? null,
+                                $customer['contact_phone2'] ?? null,
+                            ]);
+                        @endphp
+                        @if (!empty($emails))
+                            <span>- Correo: {{ implode(', ', $emails) }}</span>
+                        @endif
+                        @if (!empty($phones))
+                            <span>- Teléfonos: {{ implode(', ', $phones) }}</span>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    </div>
+@endif
 {{-- FORMULARIO CLIENTES --}}
 <form method="POST" action="/customers">
 {{ csrf_field() }}
