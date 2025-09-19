@@ -275,6 +275,14 @@ class CustomerController extends Controller
         return preg_replace('/[^0-9]/', '', $phoneNumber);
     }
 
+    protected function phoneNormalizationExpression(string $column): string
+    {
+        return sprintf(
+            "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(%s, ' ', ''), '-', ''), '(', ''), ')', ''), '+', ''), '.', ''), '/', '')",
+            $column
+        );
+    }
+
     public function updateDesmechadora()
     {
         $emails = $this->extractEmailsFromLogs(); // Asume que esta es la función que escribimos antes
@@ -635,6 +643,89 @@ class CustomerController extends Controller
      */
     public function store(Request $request)
     {
+        $phoneValue = trim((string) $request->phone);
+        $normalizedPhone = $this->normalizePhoneNumber($phoneValue);
+        $hasPhone = $phoneValue !== '' || $normalizedPhone !== '';
+
+        $duplicateQuery = Customer::query();
+        $hasConditions = false;
+
+        if ($request->filled('email')) {
+            $duplicateQuery->where(function ($query) use ($request) {
+                $query->where('email', $request->email)
+                    ->orWhere('contact_email', $request->email);
+            });
+            $hasConditions = true;
+        }
+
+        if ($hasPhone) {
+            $controller = $this;
+            $phoneConditions = function ($query) use ($phoneValue, $normalizedPhone, $controller) {
+                $columns = ['phone', 'phone2', 'contact_phone2'];
+                $firstColumn = true;
+
+                foreach ($columns as $column) {
+                    $expression = $controller->phoneNormalizationExpression($column);
+
+                    $columnConditions = function ($inner) use ($column, $expression, $phoneValue, $normalizedPhone) {
+                        $hasInnerCondition = false;
+
+                        if ($phoneValue !== '') {
+                            $inner->where($column, $phoneValue);
+                            $hasInnerCondition = true;
+                        }
+
+                        if ($normalizedPhone !== '') {
+                            if ($hasInnerCondition) {
+                                $inner->orWhereRaw("$expression = ?", [$normalizedPhone]);
+                            } else {
+                                $inner->whereRaw("$expression = ?", [$normalizedPhone]);
+                                $hasInnerCondition = true;
+                            }
+                        }
+
+                        if (!$hasInnerCondition) {
+                            $inner->whereRaw('0 = 1');
+                        }
+                    };
+
+                    if ($firstColumn) {
+                        $query->where($columnConditions);
+                        $firstColumn = false;
+                    } else {
+                        $query->orWhere($columnConditions);
+                    }
+                }
+            };
+
+            if ($hasConditions) {
+                $duplicateQuery->orWhere($phoneConditions);
+            } else {
+                $duplicateQuery->where($phoneConditions);
+                $hasConditions = true;
+            }
+        }
+
+        $duplicateCustomers = $hasConditions
+            ? $duplicateQuery
+                ->orderBy('id', 'desc')
+                ->get(['id', 'name', 'email', 'phone', 'phone2', 'contact_phone2'])
+            : collect();
+
+        if ($duplicateCustomers->isNotEmpty()) {
+            return redirect()->back()
+                ->withInput()
+                ->with([
+                    'duplicate_message' => 'Ya existe un cliente con el mismo correo o teléfono.',
+                    'duplicate_customers' => $duplicateCustomers
+                        ->map(function ($customer) {
+                            return $customer->only(['id', 'name', 'email', 'phone', 'phone2', 'contact_phone2']);
+                        })
+                        ->values()
+                        ->all(),
+                ]);
+        }
+
         $model = new Customer;
         $model->name = $request->name;
         $model->document = $request->document;
