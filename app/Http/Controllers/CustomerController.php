@@ -277,10 +277,13 @@ class CustomerController extends Controller
 
     protected function phoneNormalizationExpression(string $column): string
     {
-        return sprintf(
-            "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(%s, ' ', ''), '-', ''), '(', ''), ')', ''), '+', ''), '.', ''), '/', '')",
-            $column
-        );
+        $driver = DB::connection()->getDriverName();
+
+        if ($driver === 'pgsql') {
+            return sprintf("REGEXP_REPLACE(%s, '[^0-9]', '', 'g')", $column);
+        }
+
+        return sprintf("REGEXP_REPLACE(%s, '[^0-9]', '')", $column);
     }
 
     public function updateDesmechadora()
