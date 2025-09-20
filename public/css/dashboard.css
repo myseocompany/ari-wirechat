@@ -706,14 +706,6 @@
       border-color: #f7cbd8;
     }
     
-    .alert {
-      padding: 0.75rem 1.25rem;
-      margin-bottom: 1rem;
-      border-radius: 0.25rem;
-      text-align-last: center;
-      color: white;
-    }
-    
     @media screen and (max-width: 992px) {
       .responsive {
         font-size: 8px;
