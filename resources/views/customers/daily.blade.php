@@ -164,38 +164,44 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
 *    Combo de usuarios
 *
 -->
-          <script>
-            function updateUser(cid) {
-              console.log(cid);
-              var uid = $("#user_id_" + cid).val();
-              var parameters = {
-                customer_id: cid,
-                user_id: uid
-              };
-              console.log(parameters);
-              $.ajax({
-                data: parameters,
-                url: '/customers/ajax/update_user',
-                type: 'get',
-                beforeSend: function() {},
-                success: function(response) {
-                  console.log(response);
-                  $("#notication_area").css('display', 'block');
-                  $("#notication_area_text").html("Se actualizó el cliente " + response);
-                }
-              });
-            }
-          </script>
-          <select name="user_id" class="custom-select" id="user_id_{{$item->id}}" onchange="updateUser({{$item->id}});">
-            <option value="">Usuario...</option>
-            <option value="null">Sin asignar</option>
-            @foreach($users as $user)
-            <option value="{{$user->id}}" @if ($item->user_id == $user->id) selected="selected" @endif>
-              <?php echo substr($user->name, 0, 10); ?>
+          @if ($canAssignCustomers)
+            <script>
+              function updateUser(cid) {
+                console.log(cid);
+                var uid = $("#user_id_" + cid).val();
+                var parameters = {
+                  customer_id: cid,
+                  user_id: uid
+                };
+                console.log(parameters);
+                $.ajax({
+                  data: parameters,
+                  url: '/customers/ajax/update_user',
+                  type: 'get',
+                  beforeSend: function() {},
+                  success: function(response) {
+                    console.log(response);
+                    $("#notication_area").css('display', 'block');
+                    $("#notication_area_text").html("Se actualizó el cliente " + response);
+                  }
+                });
+              }
+            </script>
+            <select name="user_id" class="custom-select" id="user_id_{{$item->id}}" onchange="updateUser({{$item->id}});">
+              <option value="">Usuario...</option>
+              <option value="null">Sin asignar</option>
+              @foreach($users as $user)
+              <option value="{{$user->id}}" @if ($item->user_id == $user->id) selected="selected" @endif>
+                <?php echo substr($user->name, 0, 10); ?>
 
-            </option>
-            @endforeach
-          </select>
+              </option>
+              @endforeach
+            </select>
+          @else
+            <div class="form-control-plaintext">
+              {{ optional($item->user)->name ?? 'Sin asignar' }}
+            </div>
+          @endif
           <div id="customer_status_{{$item->id}}"></div>
 
 

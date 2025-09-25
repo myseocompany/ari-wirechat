@@ -43,6 +43,17 @@ class User extends Authenticatable
         return true;
     }
 
+    public function canAssignCustomers(): bool
+    {
+        $allowedRoles = array_map('intval', config('permissions.customer_assign_roles', []));
+
+        if ($this->role_id === null) {
+            return false;
+        }
+
+        return in_array((int) $this->role_id, $allowedRoles, true);
+    }
+
 
     public function searchChatables(string $query): Collection
     {
