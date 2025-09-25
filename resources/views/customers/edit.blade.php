@@ -7,14 +7,20 @@
    {{-- Asignado a --}}
   <div class="form-group">
     <label for="users">Asignado A:</label>
-    <select name="user_id" id="user_id" class="form-control">
-      <option value="">Seleccione...</option>
-      @foreach ($users as $item)
-       @if($item->status_id == 1)
-        <option value="{{$item->id}}" @if($item->id==$model->user_id)selected="selected" @endif>{{$item->name}}</option>
-        @endif
-      @endforeach
-    </select>
+    @if ($canAssignCustomers)
+      @php $selectedUserId = old('user_id', $model->user_id); @endphp
+      <select name="user_id" id="user_id" class="form-control">
+        <option value="">Seleccione...</option>
+        @foreach ($users as $item)
+          @if($item->status_id == 1)
+            <option value="{{$item->id}}" @selected((string) $selectedUserId === (string) $item->id)>{{$item->name}}</option>
+          @endif
+        @endforeach
+      </select>
+    @else
+      <input type="hidden" name="user_id" value="{{ $lockedAssignedUserId }}">
+      <input type="text" class="form-control" value="{{ optional($model->user)->name ?? optional(Auth::user())->name }}" readonly>
+    @endif
   </div>
 
 

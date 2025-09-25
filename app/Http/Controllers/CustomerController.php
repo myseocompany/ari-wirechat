@@ -52,6 +52,19 @@ class CustomerController extends Controller
         $this->customerService = $customerService;
     }
 
+    private function normalizeUserId($value): ?int
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if ($value === 'null' || $value === '') {
+            return null;
+        }
+
+        return (int) $value;
+    }
+
     public function index(Request $request)
     {
         $menu = $this->customerService->getUserMenu(Auth::user());
@@ -636,7 +649,11 @@ class CustomerController extends Controller
             ->get();
         $customer_sources = CustomerSource::orderBy('name')->get();
         $products = Product::all();
-        return view('customers.create', compact('products', 'customers_statuses', 'users', 'customer_sources'));
+        $authUser = Auth::user();
+        $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
+        $defaultAssignedUserId = $canAssignCustomers ? null : $authUser?->id;
+
+        return view('customers.create', compact('products', 'customers_statuses', 'users', 'customer_sources', 'canAssignCustomers', 'defaultAssignedUserId'));
     }
     /**
      * Store a newly created resource in storage.
@@ -729,6 +746,11 @@ class CustomerController extends Controller
                 ]);
         }
 
+        $authUser = Auth::user();
+        $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
+        $requestedUserId = $this->normalizeUserId($request->input('user_id'));
+        $assignedUserId = $canAssignCustomers ? $requestedUserId : ($authUser?->id ?? null);
+
         $model = new Customer;
         $model->name = $request->name;
         $model->document = $request->document;
@@ -748,7 +770,7 @@ class CustomerController extends Controller
         $model->total_sold = $request->total_sold;
         $model->purchase_date = $request->purchase_date;
         $model->status_id = $request->status_id;
-        $model->user_id = $request->user_id;
+        $model->user_id = $assignedUserId;
         $model->source_id = $request->source_id;
         $model->technical_visit = $request->technical_visit;
         //datos de contacto
@@ -888,7 +910,11 @@ class CustomerController extends Controller
             ->get();
         $scoring_profile = $this->getProfileOptionsOrder();
         $products = Product::all();
-        return view('customers.edit', compact('products', 'model', 'customer_statuses', 'users', 'customer_sources', 'scoring_profile'));
+        $authUser = Auth::user();
+        $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
+        $lockedAssignedUserId = $model->user_id ?? ($authUser?->id ?? null);
+
+        return view('customers.edit', compact('products', 'model', 'customer_statuses', 'users', 'customer_sources', 'scoring_profile', 'canAssignCustomers', 'lockedAssignedUserId'));
     }
     public function assignMe($id)
     {
@@ -904,8 +930,13 @@ class CustomerController extends Controller
     }
     public function updateAjax(Request $request)
     {
-        $model = Customer::find($request->customer_id);
-        $model->user_id = $request->user_id;
+        $authUser = Auth::user();
+        if (! $authUser || ! $authUser->canAssignCustomers()) {
+            abort(403);
+        }
+
+        $model = Customer::findOrFail($request->customer_id);
+        $model->user_id = $this->normalizeUserId($request->input('user_id'));
         $model->save();
         return $model->id;
     }
@@ -918,8 +949,19 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //dd($request);
-        $model = Customer::find($id);
+        $model = Customer::findOrFail($id);
+        $authUser = Auth::user();
+        $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
+        $currentUserId = $model->user_id !== null ? (int) $model->user_id : null;
+        $requestedUserId = $request->has('user_id')
+            ? $this->normalizeUserId($request->input('user_id'))
+            : $currentUserId;
+        $lockedUserId = $currentUserId ?? ($authUser?->id ?? null);
+
+        if (! $canAssignCustomers && $request->has('user_id') && $requestedUserId !== $lockedUserId) {
+            abort(403);
+        }
+
         $cHistory = new CustomerHistory;
         $cHistory->saveFromModel($model);
         $model->name = $request->name;
@@ -938,7 +980,7 @@ class CustomerController extends Controller
         $model->technical_visit = $request->technical_visit;
         $model->bought_products = $request->bought_products;
         $model->purchase_date = $request->purchase_date;
-        $model->user_id = $request->user_id;
+        $model->user_id = $canAssignCustomers ? $requestedUserId : $lockedUserId;
         $model->source_id = $request->source_id;
         $model->status_id = $request->status_id;
         //Agregamos el producto en edicion de prospecto
@@ -1626,7 +1668,10 @@ $message->to("mateogiraldo420@gmail.com");
         if ($customer != null) {
             $references = Reference::where('customer_id', '=', $customer->id)->orderby("created_at", "DESC")->get();
         }
-        return view('customers.daily', compact('model', 'request', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'phase', 'menu'));
+        $authUser = Auth::user();
+        $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
+
+        return view('customers.daily', compact('model', 'request', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'phase', 'menu', 'canAssignCustomers'));
     }
 
     public function startConversationFromCRM2(Request $request)
