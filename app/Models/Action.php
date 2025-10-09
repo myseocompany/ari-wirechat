@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 // use Laravel\Scout\Searchable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Action extends Model
 {
+    use SoftDeletes;
+
        /** Campos que se pueden asignar en masa (create / update). */
     protected $fillable = [
         'note',

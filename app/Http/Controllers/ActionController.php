@@ -236,10 +236,24 @@ class ActionController extends Controller
     public function destroy($id)
     {
         $model = Action::find($id);
-        $customer_id = $model->customer_id;
-        if ($model->delete()) {
-            return redirect('customers/'.$customer_id."/show")->with('statusone', 'La acción <strong>'.$model->name.'</strong> fué eliminada con éxito!'); 
+
+        if (!$model) {
+            return redirect()->back()->with('statustwo', 'La acción solicitada no existe.');
         }
+
+        $user = Auth::user();
+
+        if (!$user || !$user->canDeleteActions()) {
+            return redirect('customers/'.$model->customer_id."/show")->with('statustwo', 'No tienes permisos para eliminar acciones.');
+        }
+
+        $customer_id = $model->customer_id;
+
+        if ($model->delete()) {
+            return redirect('customers/'.$customer_id."/show")->with('statusone', 'La acción <strong>'.$model->note.'</strong> fue eliminada con éxito!');
+        }
+
+        return redirect()->back()->with('statustwo', 'No fue posible eliminar la acción.');
     }
 
 

@@ -54,6 +54,11 @@ class User extends Authenticatable
         return in_array((int) $this->role_id, $allowedRoles, true);
     }
 
+    public function canDeleteActions(): bool
+    {
+        return $this->canAssignCustomers();
+    }
+
 
     public function searchChatables(string $query): Collection
     {
