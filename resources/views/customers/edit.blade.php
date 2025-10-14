@@ -19,7 +19,7 @@
       </select>
     @else
       <input type="hidden" name="user_id" value="{{ $lockedAssignedUserId }}">
-      <input type="text" class="form-control" value="{{ optional($model->user)->name ?? optional(Auth::user())->name }}" readonly>
+      <input type="text" class="form-control" value="{{ optional($model->user)->name ?? 'Sin asignar' }}" readonly>
     @endif
   </div>
 

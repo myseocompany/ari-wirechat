@@ -912,7 +912,7 @@ class CustomerController extends Controller
         $products = Product::all();
         $authUser = Auth::user();
         $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
-        $lockedAssignedUserId = $model->user_id ?? ($authUser?->id ?? null);
+        $lockedAssignedUserId = $model->user_id;
 
         return view('customers.edit', compact('products', 'model', 'customer_statuses', 'users', 'customer_sources', 'scoring_profile', 'canAssignCustomers', 'lockedAssignedUserId'));
     }
@@ -956,9 +956,9 @@ class CustomerController extends Controller
         $requestedUserId = $request->has('user_id')
             ? $this->normalizeUserId($request->input('user_id'))
             : $currentUserId;
-        $lockedUserId = $currentUserId ?? ($authUser?->id ?? null);
+        $lockedUserId = $currentUserId;
 
-        if (! $canAssignCustomers && $request->has('user_id') && $requestedUserId !== $lockedUserId) {
+        if (! $canAssignCustomers && $request->filled('user_id') && $requestedUserId !== $lockedUserId) {
             abort(403);
         }
 
@@ -980,7 +980,7 @@ class CustomerController extends Controller
         $model->technical_visit = $request->technical_visit;
         $model->bought_products = $request->bought_products;
         $model->purchase_date = $request->purchase_date;
-        $model->user_id = $canAssignCustomers ? $requestedUserId : $lockedUserId;
+        $model->user_id = $canAssignCustomers ? $requestedUserId : $currentUserId;
         $model->source_id = $request->source_id;
         $model->status_id = $request->status_id;
         //Agregamos el producto en edicion de prospecto
