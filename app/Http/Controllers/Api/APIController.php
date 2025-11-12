@@ -719,6 +719,31 @@ class APIController extends Controller
         if (isset($request->utm_content)) $model->utm_content = $request->utm_content;
         if (isset($request->utm_term)) $model->utm_term = $request->utm_term;
 
+        $adsetName = $request->input('adset_name');
+        if (!$adsetName && $request->has('ad_set_name')) {
+            $adsetName = $request->input('ad_set_name');
+        }
+
+        $adName = $request->input('ad_name');
+        if (!$adName && $request->has('add_name')) {
+            $adName = $request->input('add_name');
+        }
+
+        $campaignName = $request->input('campaign_name');
+        if (!$campaignName && $request->has('campaing_name')) {
+            $campaignName = $request->input('campaing_name');
+        }
+
+        if ($adsetName) {
+            $model->adset_name = $adsetName;
+        }
+        if ($adName) {
+            $model->ad_name = $adName;
+        }
+        if ($campaignName) {
+            $model->campaign_name = $campaignName;
+        }
+
         if (isset($request->product_id))
             $model->product_id = $request->product_id;
         if (isset($request->technical_visit))

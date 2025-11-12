@@ -10,7 +10,7 @@ class CheckApiToken
     public function handle(Request $request, Closure $next)
     {
         $header = $request->bearerToken();
-        $valid  = env('API_STATIC_TOKEN');
+        $valid  = env('el ');
 
         
 
