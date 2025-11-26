@@ -162,24 +162,23 @@ class User extends Authenticatable
     }
 
     public function getTotalStatus($status, $request){
-        $model = Customer::where(
-            function ($query) use ($status, $request) {
-                
-                if(isset($request->from_date)&& ($request->from_date!=null)){
-                    $query = $query->whereBetween('updated_at', array($request->from_date, $request->to_date));
-                    
+        $dateField = ($request->created_updated ?? 'created') === 'created' ? 'created_at' : 'updated_at';
+
+        $model = Customer::where(function ($query) use ($status, $request, $dateField) {
+                if(isset($request->from_date) && ($request->from_date!=null)){
+                    $from = Carbon::parse($request->from_date)->startOfDay();
+                    $to = Carbon::parse($request->to_date ?? $request->from_date)->endOfDay();
+                    $query = $query->whereBetween($dateField, [$from, $to]);
                 }else{
                     $query = $query->where('customers.id', "=", "-1");
                 }
                 if(isset($status)  && ($status!=null)){
                     $query = $query->where('status_id', $status);
-
                 }
                 $query = $query->where('user_id', $this->id);
             })
             ->get();
-            
-            
+
         return $model->count();
     }
 

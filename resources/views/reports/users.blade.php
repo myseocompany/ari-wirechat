@@ -104,7 +104,7 @@
 <div>
   	<form action="/reports/users/" method="GET" id="filter_form">
   	<input type="hidden" name="search" id="search" @if(isset($request->search))value="{{$request->search}}"@endif>
-  		 <select name="filter" class="custom-select" id="filter" onchange="update()">
+ 		 <select name="filter" class="custom-select" id="filter" onchange="update()">
         <option value="">Seleccione tiempo</option>
         <option value="0" @if ($request->filter == "0") selected="selected" @endif>hoy</option>
         <option value="-1" @if ($request->filter == "-1") selected="selected" @endif>ayer</option>
@@ -117,6 +117,10 @@
         <option value="-30" @if ($request->filter == "-30") selected="selected" @endif>ultimos 30 dias</option>
         
       </select>
+	  <select name="created_updated" class="custom-select" style="width:auto;">
+		<option value="created" @if(($request->created_updated ?? 'created') === 'created') selected @endif>Por fecha de creación</option>
+		<option value="updated" @if(($request->created_updated ?? '') === 'updated') selected @endif>Por fecha de actualización</option>
+	  </select>
       <input class="input-date" type="date" id="from_date" name="from_date" onchange="cleanFilter()" value="{{$request->from_date}}">
       <input class="input-date" type="date" id="to_date" name="to_date" onchange="cleanFilter()" value="{{$request->to_date}}">
 
