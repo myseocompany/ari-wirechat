@@ -2515,6 +2515,7 @@ class APIController extends Controller
                 if ($model->product_id != 15)
                     $model->status_id = $request_model->status_id;
 
+                $this->updatePhonesFromRequest($model, $request_model);
                 $model->save();
                 $this->updateCustomerHistory($opportunity, $model, $request_model);
             } else {
@@ -2526,12 +2527,17 @@ class APIController extends Controller
                 else 
                     $request_model->user_id = $this->getNextUserID();
                 */
+                $request_model->phone = $this->cleanPhoneCharters($request_model->phone);
+                $request_model->phone2 = $this->cleanPhoneCharters($request_model->phone2);
+                $request_model->contact_phone2 = $this->cleanPhoneCharters($request_model->contact_phone2);
                 $request_model->save();
 
                 $model = $request_model;
             }
         } else {
             $model = $equal;
+            $this->updatePhonesFromRequest($model, $request_model);
+            $model->save();
         }
 
         //dd($similar);
@@ -2891,6 +2897,74 @@ class APIController extends Controller
 
         return $cleaned;
     }
+
+    private function addPhoneNote(Customer $model, string $label, string $phone): void
+    {
+        $model->notes = $model->notes ?? '';
+
+        if (!str_contains($model->notes, $phone)) {
+            $model->notes = trim($model->notes . ' ' . $label . $phone);
+        }
+    }
+
+    private function storePhoneSafely(Customer $model, ?string $phone, bool $forcePrimary = false): void
+    {
+        $clean = $this->cleanPhoneCharters($phone);
+        if (!$clean) {
+            return;
+        }
+
+        $existing = array_filter([
+            $this->cleanPhoneCharters($model->phone),
+            $this->cleanPhoneCharters($model->phone2),
+            $this->cleanPhoneCharters($model->contact_phone2),
+        ]);
+
+        if (in_array($clean, $existing)) {
+            return;
+        }
+
+        if ($forcePrimary) {
+            $oldPrimary = $model->phone;
+            $model->phone = $clean;
+            // Intenta conservar el antiguo número
+            $this->storePhoneSafely($model, $oldPrimary, false);
+            return;
+        }
+
+        if (!$this->cleanPhoneCharters($model->phone2)) {
+            $model->phone2 = $clean;
+            return;
+        }
+
+        if (!$this->cleanPhoneCharters($model->contact_phone2)) {
+            $model->contact_phone2 = $clean;
+            return;
+        }
+
+        $this->addPhoneNote($model, 'Tel previo:', $phone);
+    }
+
+    private function updatePhonesFromRequest(Customer $model, Customer $requestModel): void
+    {
+        $incoming = array_values(array_filter([
+            $requestModel->phone ?? null,
+            $requestModel->phone2 ?? null,
+        ]));
+
+        if (empty($incoming)) {
+            return;
+        }
+
+        // Primer número entrante pasa a ser el principal
+        $primary = array_shift($incoming);
+        $this->storePhoneSafely($model, $primary, true);
+
+        // El resto se almacena sin perder los existentes
+        foreach ($incoming as $extraPhone) {
+            $this->storePhoneSafely($model, $extraPhone, false);
+        }
+    }
     public function getSourceRD($request)
     {
         //POST RD STATION
@@ -3086,10 +3160,6 @@ class APIController extends Controller
             'trace' => $e->getTraceAsString(),
         ]);
     }
-
-    
-
-
 
 }
 
