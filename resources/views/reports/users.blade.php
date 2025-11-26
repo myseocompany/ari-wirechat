@@ -135,9 +135,9 @@
 <table class="table-report" id="taskTable">
 <thead class="thead-default">
 	<tr>
-		<th>Usuario</th>
+		<th>Estado</th>
 		@php
-			// Filtra solo los estados con leads en alguna celda
+			// Filtra solo los estados con leads en alguna celda y precalcula conteos
 			$statusData = [];
 			$statusesWithLeads = [];
 			foreach ($statuses as $status) {
@@ -154,37 +154,34 @@
 				}
 			}
 		@endphp
-		@foreach($statusesWithLeads as $status)
-			<th class="rotate"><span class="rotate-header">{{$status->name}}</span></th>
+		@foreach($users as $user)
+			<th class="rotate"><span class="rotate-header">{{$user->name}}</span></th>
 		@endforeach
 		<th>Total</th>
 	</tr>
 </thead>
 <tbody>
-@foreach($users as $user)
-	@php $userTotal = 0; @endphp
+@foreach($statusesWithLeads as $status)
+	@php $rowTotal = array_sum($statusData[$status->id]); @endphp
 	<tr>
-		<td>{{$user->name}}</td>
-		@foreach($statusesWithLeads as $status)
+		<td>{{$status->name}}</td>
+		@foreach($users as $user)
 			@php
 				$count = $statusData[$status->id][$user->id] ?? 0;
-				$userTotal += $count;
 			@endphp
 			<td class="numeric">{{$count > 0 ? $count : ''}}</td>
 		@endforeach
-		<td><strong class="numeric">{{$userTotal > 0 ? $userTotal : ''}}</strong></td>
+		<td class="numeric"><strong>{{$rowTotal > 0 ? $rowTotal : ''}}</strong></td>
 	</tr>
 @endforeach
 
-@php
-	$grandTotal = 0;
-@endphp
+@php $grandTotal = 0; @endphp
 <tr class="total-row">
 	<td>Total</td>
-	@foreach($statusesWithLeads as $status)
+	@foreach($users as $user)
 		@php
-			$colTotal = collect($users)->sum(function($u) use ($statusData, $status) {
-				return $statusData[$status->id][$u->id] ?? 0;
+			$colTotal = collect($statusesWithLeads)->sum(function($status) use ($statusData, $user) {
+				return $statusData[$status->id][$user->id] ?? 0;
 			});
 			$grandTotal += $colTotal;
 		@endphp
