@@ -1,7 +1,104 @@
 @extends('layout')
 
 @section('content')
-<h1>Reporte de usuarios</h1>
+<style>
+	.report-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		margin-bottom: 12px;
+	}
+	.report-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 10px;
+		border-radius: 999px;
+		background: #f3f4f6;
+		font-size: 13px;
+		color: #4b5563;
+	}
+	.table-report {
+		width: 100%;
+		border-collapse: collapse;
+	}
+	.table-report thead th {
+		position: sticky;
+		top: 0;
+		background: #fff;
+		box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+	}
+.table-report th, .table-report td {
+	padding: 10px 12px;
+	border-bottom: 1px solid #e5e7eb;
+}
+.table-report {
+	min-width: 960px;
+}
+.table-report th.rotate {
+	height: 120px;
+	vertical-align: bottom;
+	padding: 4px 6px;
+	text-align: right;
+}
+.rotate-header {
+	writing-mode: vertical-rl;
+	transform: rotate(180deg);
+	white-space: nowrap;
+	display: inline-block;
+	font-weight: 600;
+	color: #374151;
+	text-align: right;
+}
+.table-report tbody tr:nth-child(even) {
+	background: #f9fafb;
+}
+.table-report td.numeric {
+	text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+	.table-report tr.total-row {
+		background: #eef2ff;
+		font-weight: 600;
+	}
+	.actions-bar {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin: 8px 0 16px;
+		flex-wrap: wrap;
+	}
+	.btn-secondary {
+		padding: 6px 10px;
+		border: 1px solid #d1d5db;
+		border-radius: 6px;
+		background: #fff;
+		cursor: pointer;
+	}
+	.btn-secondary:hover {
+		background: #f3f4f6;
+	}
+	.table-wrapper {
+		width: 100%;
+		overflow-x: auto;
+	}
+</style>
+
+<div class="report-header">
+	<div>
+		<h1 style="margin:0;">Reporte de usuarios</h1>
+		<div class="report-chip">
+			<span>{{$filterLabel ?? 'Rango'}}</span>
+			@if(isset($dateRange))
+			<strong>{{$dateRange['from']}} → {{$dateRange['to']}}</strong>
+			@endif
+		</div>
+	</div>
+	<div class="actions-bar">
+		<button type="button" class="btn-secondary" onclick="exportReportCSV()">Exportar CSV</button>
+	</div>
+</div>
 
 <!--Inicio del formulario-->
 <div>
@@ -34,90 +131,95 @@
 
 
 
-<table class="table table-striped table-hover table-responsive" id="taskTable">
+<div class="table-wrapper">
+<table class="table-report" id="taskTable">
 <thead class="thead-default">
 	<tr>
-		<th></th>
-		@foreach($users as $item)
-		<th>{{$item->name}}</th>
+		<th>Usuario</th>
+		@php
+			// Filtra solo los estados con leads en alguna celda
+			$statusData = [];
+			$statusesWithLeads = [];
+			foreach ($statuses as $status) {
+				$rowTotal = 0;
+				$statusCounts = [];
+				foreach ($users as $user) {
+					$count = $user->getTotalStatus($status->id, $request);
+					$statusCounts[$user->id] = $count;
+					$rowTotal += $count;
+				}
+				if ($rowTotal > 0) {
+					$statusesWithLeads[] = $status;
+					$statusData[$status->id] = $statusCounts;
+				}
+			}
+		@endphp
+		@foreach($statusesWithLeads as $status)
+			<th class="rotate"><span class="rotate-header">{{$status->name}}</span></th>
 		@endforeach
+		<th>Total</th>
 	</tr>
 </thead>
 <tbody>
-	@foreach ($statuses as $status)
+@foreach($users as $user)
+	@php $userTotal = 0; @endphp
 	<tr>
-		<td>
-			{{$status->name}}
-		</td>
-		@foreach($users as $user)
-		<td>
-			{{$user->getTotalStatus($status->id, $request)}}
-		</td>
+		<td>{{$user->name}}</td>
+		@foreach($statusesWithLeads as $status)
+			@php
+				$count = $statusData[$status->id][$user->id] ?? 0;
+				$userTotal += $count;
+			@endphp
+			<td class="numeric">{{$count > 0 ? $count : ''}}</td>
 		@endforeach
-		
-		
-	</tr>	
-	@endforeach
-
-	
-	<tr>
-		<td>
-			Total
-		</td>
-		@foreach($users as $user)
-		<td>
-			<strong>{{$user->getTotalStatus(null, $request)}}</strong>
-		</td>
-		@endforeach
-		
-		
-	</tr>	
-
-
-	<tr>
-		<td>
-			--
-		</td>
-		@foreach($users as $user)
-		<td>
-			--
-		</td>
-		@endforeach
-		
-		
-	</tr>	
-
-	@foreach ($actions as $action)
-	<tr>
-		<td>
-			{{$action->name}}
-		</td>
-		@foreach($users as $user)
-		<td>
-			{{$user->getTotalActions($action->id, $request)}}
-		</td>
-		@endforeach
-		
-		
-	</tr>	
-	@endforeach
-	<tr>
-		<td>
-			Total
-		</td>
-		@foreach($users as $user)
-		<td>
-			<strong>{{$user->getTotalActions(null, $request)}}</strong>
-		</td>
-		@endforeach
-		
-		
+		<td><strong class="numeric">{{$userTotal > 0 ? $userTotal : ''}}</strong></td>
 	</tr>
+@endforeach
 
+@php
+	$grandTotal = 0;
+@endphp
+<tr class="total-row">
+	<td>Total</td>
+	@foreach($statusesWithLeads as $status)
+		@php
+			$colTotal = collect($users)->sum(function($u) use ($statusData, $status) {
+				return $statusData[$status->id][$u->id] ?? 0;
+			});
+			$grandTotal += $colTotal;
+		@endphp
+		<td class="numeric"><strong>{{$colTotal > 0 ? $colTotal : ''}}</strong></td>
+	@endforeach
+	<td class="numeric"><strong>{{$grandTotal > 0 ? $grandTotal : ''}}</strong></td>
+</tr>
 
 </tbody>
 </table>
+</div>
 
+<script>
+function exportReportCSV() {
+	const table = document.getElementById('taskTable');
+	if (!table) return;
 
+	const rows = Array.from(table.querySelectorAll('tr'));
+	const csv = rows.map(row => {
+		const cells = Array.from(row.querySelectorAll('th,td'));
+		return cells
+			.map(cell => `"${(cell.innerText || '').trim().replace(/"/g, '""')}"`)
+			.join(',');
+	}).join('\n');
+
+	const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement('a');
+	link.href = url;
+	link.download = 'reporte_usuarios.csv';
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	URL.revokeObjectURL(url);
+}
+</script>
 
 @endsection

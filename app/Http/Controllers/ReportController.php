@@ -46,12 +46,60 @@ class ReportController extends Controller
        //Esto lo cambio Amed
         $statuses = CustomerStatus::orderBy("weight", "ASC")->get(); 
         $actions = ActionType::all(); 
-        $users = User::where('status_id',1)
-            ->where('role_id', 2)
-            ->where('role_id', 10)
+
+        // Usuarios que tuvieron customers en el rango seleccionado
+        $dates = $this->getDates($request);
+        $customerQuery = Customer::whereBetween('updated_at', $dates);
+
+        $userIdsWithCustomers = (clone $customerQuery)
+            ->whereNotNull('user_id')
+            ->distinct()
+            ->pluck('user_id');
+
+        $users = User::where('status_id', 1)
+            ->whereIn('id', $userIdsWithCustomers)
             ->get();
 
-        return view('reports.users', compact('statuses','actions' ,'users', 'request'));
+        // Agregar fila de “Sin asignar” si hay customers sin user_id
+        $hasUnassigned = (clone $customerQuery)->whereNull('user_id')->exists();
+        if ($hasUnassigned) {
+            $unassigned = new User();
+            $unassigned->id = null;
+            $unassigned->name = 'Sin asignar';
+            $users->push($unassigned);
+        }
+
+        $dateRange = [
+            'from' => $dates[0],
+            'to'   => substr($dates[1], 0, 10),
+        ];
+        $filterLabel = $this->getFilterLabel($request);
+
+        return view('reports.users', compact('statuses','actions' ,'users', 'request', 'dateRange', 'filterLabel'));
+    }
+
+    private function getFilterLabel(Request $request): string
+    {
+        $map = [
+            '0'            => 'Hoy',
+            '-1'           => 'Ayer',
+            'thisweek'     => 'Esta semana',
+            'lastweek'     => 'Semana pasada',
+            'lastmonth'    => 'Mes pasado',
+            'currentmonth' => 'Mes en curso',
+            '-7'           => 'Últimos 7 días',
+            '-30'          => 'Últimos 30 días',
+        ];
+
+        if (!empty($request->filter) && isset($map[$request->filter])) {
+            return $map[$request->filter];
+        }
+
+        if (!empty($request->from_date) && !empty($request->to_date)) {
+            return 'Rango personalizado';
+        }
+
+        return 'Personalizado';
     }
 
 
