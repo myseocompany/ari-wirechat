@@ -23,12 +23,16 @@
   </thead>
   <tbody>
     @foreach($model as $item)
+    @php
+      $customer = $item->customer;
+      $user = $item->user;
+    @endphp
     <tr>
       
       <td>
-        @if($item->customer->status)
-          <span class="badge" style="background-color: {{ $item->customer->status->color }}">
-            {{ $item->customer->status->name }}
+        @if($customer && $customer->status)
+          <span class="badge" style="background-color: {{ $customer->status->color }}">
+            {{ $customer->status->name }}
           </span>
         @else
           <span class="badge bg-secondary">Sin estado</span>
@@ -38,16 +42,16 @@
       <td>
   <div class="d-flex align-items-center">
     @php
-      $initials = strtoupper(Str::substr($item->customer->name ?? '??', 0, 2));
+      $initials = strtoupper(Str::substr($customer?->name ?? '??', 0, 2));
     @endphp
     <div class="rounded-circle bg-success text-white me-2 d-flex justify-content-center align-items-center" style="width: 36px; height: 36px;">
       {{ $initials }}
     </div>
     <div>
-      <a href="{{ route('customers.show', $item->customer->id) }}" class="text-dark text-decoration-none">
-        <strong>{{ $item->customer->name ?? 'Desconocido' }}</strong>
+      <a href="{{ $customer ? route('customers.show', $customer->id) : '#' }}" class="text-dark text-decoration-none">
+        <strong>{{ $customer?->name ?? 'Desconocido' }}</strong>
       </a><br>
-      <small>{{ $item->customer->getPhone() ?? '' }}</small>
+      <small>{{ $customer?->getPhone() ?? '' }}</small>
     </div>
   </div>
 </td>
@@ -58,14 +62,14 @@
 <td>
   <div class="d-flex align-items-center">
     @php
-      $userName = $item->user->name ?? '??';
+      $userName = $user?->name ?? '??';
       $initials = collect(explode(' ', $userName))->map(fn($s) => strtoupper(substr($s, 0, 1)))->implode('');
     @endphp
     <div class="rounded-circle bg-primary text-white me-2 d-flex justify-content-center align-items-center" style="width: 36px; height: 36px;">
       {{ $initials }}
     </div>
     <div>
-      <strong>{{ $item->user->name ?? 'Sin asignar' }}</strong>
+      <strong>{{ $user?->name ?? 'Sin asignar' }}</strong>
     </div>
   </div>
 </td>
@@ -87,13 +91,13 @@
 
     <td>
     
-      {{ $item->customer->business }}
+      {{ $customer?->business ?? 'N/A' }}
  
   </td>
 
       <td>
         
-         {{ $item->customer->country }}
+         {{ $customer?->country ?? 'N/A' }}
       
       </td>
 
