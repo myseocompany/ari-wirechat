@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\WAToolBoxController;
 use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\Api\RetellWebhookController;
 use App\Http\Controllers\Api\CustomerApiController;
+use App\Http\Controllers\Api\QuizController;
 use App\Http\Middleware\CheckApiToken;
 
 
@@ -23,6 +24,7 @@ Route::middleware('api')->group(
         Route::post('/actions/save', [APIController::class, 'saveQuickAction']);
         Route::post('/channels-action', [APIController::class, 'saveChannelsAction']);
         Route::post('/retell-action', [APIController::class, 'handle']);
+        Route::post('/quizzes/escalable', [QuizController::class, 'store']);
 
         
 });
@@ -38,6 +40,5 @@ Route::middleware([CheckApiToken::class, 'throttle:60,1'])->group(function () {
     Route::post('/customers/bulk/status', [CustomerApiController::class, 'bulkUpdateStatus']);
     Route::post('/customers/bulk/actions', [CustomerApiController::class, 'bulkAddAction']);
 });
-
 
 

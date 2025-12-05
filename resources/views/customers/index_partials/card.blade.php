@@ -18,7 +18,7 @@
           {{-- Nombre del cliente + estrellas en una sola línea --}}
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}" class="font-weight-bold">
+              <a href="{{ route('customers.show', ['customer' => $item->id]) }}" class="font-weight-bold">
                 {!! $item->maker === 1 ? '🥟' : ($item->maker === 0 ? '💡' : ($item->maker === 2 ? '🍗🥩⚙️' : '')) !!}
                 &nbsp;{{ Str::limit($item->name ?? 'Sin nombre', 21) }}
               </a>
@@ -52,7 +52,7 @@
               {{ $item->country }}
             @endif
             &nbsp;|&nbsp;
-            <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}">
+            <a href="{{ route('customers.show', ['customer' => $item->id]) }}">
               {{ $item->getBestPhoneCandidate()
                 ? $item->getInternationalPhone($item->getBestPhoneCandidate())
                 : 'Sin teléfono válido' }}
