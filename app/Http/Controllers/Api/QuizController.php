@@ -38,6 +38,8 @@ class QuizController extends Controller
             $customer = new Customer();
             $customer->phone = $phone;
             $customer->phone2 = $phone;
+            $customer->status_id = 1;
+            $customer->notes = '#quiz-escalable';
             $customer->save();
         }
 
