@@ -851,11 +851,15 @@ class CustomerController extends Controller
             ->orderBy("weight", "ASC")->get();
         $actual = true;
         $today = Carbon\Carbon::now();
+        $quizMetaId = 2000;
+        $quizQuestionMetaIds = [2001, 2002, 2003, 2004, 2005, 2006, 2007];
+        $quizMetaIds = array_merge([$quizMetaId], $quizQuestionMetaIds);
         $audiences = Audience::all();
         $meta_data = CustomerMetaData::all();
         $metas = CustomerMetaData::leftJoin('customer_metas', 'customer_meta_datas.id', 'customer_metas.meta_data_id')
             ->select('customer_meta_datas.value as name', 'customer_metas.value', 'customer_metas.created_at', 'customer_meta_datas.type_id', 'customer_meta_datas.parent_id')
             ->where('customer_id', '=', $id)
+            ->whereNotIn('customer_meta_datas.id', $quizMetaIds)
             ->get();
         $weighted = 0;
         $test = CustomerMeta::leftJoin('customer_meta_datas', 'customer_meta_datas.id', 'customer_metas.meta_data_id')
@@ -863,7 +867,37 @@ class CustomerController extends Controller
             ->where('customer_metas.customer_id', '=', $id)
             ->where('customer_meta_datas.type_id', '=', 1)
             ->get();
-        return view('customers.show', compact('model', 'histories', 'test',  'meta_data', 'metas', 'audiences', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today'));
+        // Quiz Escalable: resumen y respuestas
+        $quizSummary = CustomerMeta::where('customer_id', $id)
+            ->where('meta_data_id', $quizMetaId)
+            ->orderByDesc('created_at')
+            ->first();
+        $quizAnswers = CustomerMeta::where('customer_id', $id)
+            ->whereIn('meta_data_id', $quizQuestionMetaIds)
+            ->orderByDesc('created_at')
+            ->get();
+        $quizQuestions = CustomerMetaData::with('CustomerMetaDataChildren')
+            ->whereIn('id', $quizQuestionMetaIds)
+            ->get()
+            ->keyBy('id');
+
+        return view('customers.show', compact(
+            'model',
+            'histories',
+            'test',
+            'meta_data',
+            'metas',
+            'audiences',
+            'actions',
+            'action_options',
+            'email_options',
+            'statuses_options',
+            'actual',
+            'today',
+            'quizSummary',
+            'quizAnswers',
+            'quizQuestions'
+        ));
     }
     public function showAction($id, $Aid)
     {
@@ -876,7 +910,24 @@ class CustomerController extends Controller
         $statuses_options = CustomerStatus::orderBy("weight", "ASC")->get();
         $actual = true;
         $today = Carbon\Carbon::now();
-        return view('customers.show', compact('model', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'actionProgramed'));
+        $quizSummary = null;
+        $quizAnswers = collect();
+        $quizQuestions = collect();
+
+        return view('customers.show', compact(
+            'model',
+            'histories',
+            'actions',
+            'action_options',
+            'email_options',
+            'statuses_options',
+            'actual',
+            'today',
+            'actionProgramed',
+            'quizSummary',
+            'quizAnswers',
+            'quizQuestions'
+        ));
     }
     public function showHistory($id)
     {

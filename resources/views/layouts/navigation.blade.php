@@ -12,7 +12,6 @@
                           
         <li class="nav-item"><a class="nav-link text-dark" href="{{ route('login') }}">Iniciar sesión</a></li>
         @else
-        
 
           @foreach(App\Models\Menu::getUserMenu(Auth::user()) as $item)
               <li class="@if($item->hasChildren()) dropdown @else nav-item @endif">
@@ -31,12 +30,18 @@
                       @else
                       <a class="nav-link text-dark @if($item->hasChildren()) dropdown-toggle @endif" href="{{$item->url}}" @if($item->hasChildren()) data-toggle="dropdown" role="button" aria-expanded="false" @endif>
                       
-                          {{$item->name}} @if($item->hasChildren()) - @endif
+                          {{$item->name}} @if($item->hasChildren()) @endif
                           
                       </a>
                       @endif
                   @if($item->hasChildren())
                     <ul class="dropdown-menu" role="menu">
+                    @if(Auth::check())
+                      <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
+                        {{ Auth::user()->name }}
+                      </li>
+                      <li class="dropdown-divider"></li>
+                    @endif
                     @foreach($item->getChildren() as $subitem)
                     <li class="nav-item">
 

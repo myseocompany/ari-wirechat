@@ -23,6 +23,7 @@ class CustomerService {
         $dates = $this->getDates($request);
 
         $query = Customer::query()
+            ->with(['user']) // needed for card view (asesor)
             ->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
 
         $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm) {

@@ -13,6 +13,7 @@
                   <li><a href="#tabSurvey" class="tab-link" onclick="openTab(event, 'Servicios')">Servicios</a></li>
                   <li><a href="#tabSurvey" class="tab-link" onclick="openTab(event, 'Cproductos')">Crear de productos</a></li>
                   <li><a href="#tabSurvey" class="tab-link" onclick="openTab(event, 'Cservicios')">Crear de servicios</a></li>
+                  <li><a href="#tabSurvey" class="tab-link" onclick="openTab(event, 'QuizEscalable')">Quiz Escalable</a></li>
                 </ul>
 
                 <div id="Productos" class="tab-content">
@@ -393,5 +394,59 @@
                     </div>
                   </div>
 
+                </div>
+
+                <div id="QuizEscalable" class="tab-content">
+                  @php
+                    $quizSummaryData = $quizSummary ? json_decode($quizSummary->value ?? '{}', true) : null;
+                  @endphp
+
+                  @if($quizSummary || $quizAnswers->count())
+                    @if($quizSummary)
+                      <div class="mb-3">
+                        <strong>Fecha:</strong> {{ $quizSummary->created_at }}<br>
+                        @if(!empty($quizSummaryData['final_score']))<strong>Puntaje final:</strong> {{ $quizSummaryData['final_score'] }}<br>@endif
+                        @if(!empty($quizSummaryData['stage']))<strong>Etapa:</strong> {{ $quizSummaryData['stage'] }}<br>@endif
+                        @if(!empty($quizSummaryData['completed_at']))<strong>Completado en:</strong> {{ $quizSummaryData['completed_at'] }}<br>@endif
+                      </div>
+                    @endif
+
+                    @if($quizAnswers->count())
+                      <div class="table">
+                        <table class="table table-striped">
+                          <thead>
+                            <tr>
+                              <th>Pregunta</th>
+                              <th>Respuesta</th>
+                              <th>Score</th>
+                              <th>Fecha</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @foreach($quizAnswers as $answer)
+                              @php
+                                $payload = json_decode($answer->value ?? '{}', true);
+                                $question = $quizQuestions[$answer->meta_data_id] ?? null;
+                                $questionText = $question?->value ?? "Pregunta {$answer->meta_data_id}";
+                                $answerText = null;
+                                if ($question && isset($payload['answer_meta_id'])) {
+                                    $option = $question->CustomerMetaDataChildren->firstWhere('id', $payload['answer_meta_id']);
+                                    $answerText = $option?->value;
+                                }
+                              @endphp
+                              <tr>
+                                <td>{{ $questionText }}</td>
+                                <td>{{ $answerText ?? ($payload['answer_meta_id'] ?? '') }}</td>
+                                <td>{{ $payload['score'] ?? '' }}</td>
+                                <td>{{ $answer->created_at }}</td>
+                              </tr>
+                            @endforeach
+                          </tbody>
+                        </table>
+                      </div>
+                    @endif
+                  @else
+                    <p class="text-muted">Sin datos del quiz.</p>
+                  @endif
                 </div>
               </div>

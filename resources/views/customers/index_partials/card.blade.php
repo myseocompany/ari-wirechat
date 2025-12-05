@@ -18,7 +18,7 @@
           {{-- Nombre del cliente + estrellas en una sola línea --}}
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <a href="{{ route('customers.show', ['customer' => $item->id]) }}" class="font-weight-bold">
+              <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}" class="font-weight-bold">
                 {!! $item->maker === 1 ? '🥟' : ($item->maker === 0 ? '💡' : ($item->maker === 2 ? '🍗🥩⚙️' : '')) !!}
                 &nbsp;{{ Str::limit($item->name ?? 'Sin nombre', 21) }}
               </a>
@@ -52,7 +52,7 @@
               {{ $item->country }}
             @endif
             &nbsp;|&nbsp;
-            <a href="{{ route('customers.show', ['customer' => $item->id]) }}">
+            <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}">
               {{ $item->getBestPhoneCandidate()
                 ? $item->getInternationalPhone($item->getBestPhoneCandidate())
                 : 'Sin teléfono válido' }}
@@ -72,54 +72,54 @@
     </div>
   </div>
 
-  {{-- Línea inferior: última acción + asesor --}}
-  @if($lastAction)
-    <div class="border-top px-3 py-2">
-      <div class="d-flex justify-content-between align-items-center">
+  {{-- Línea inferior: última acción + asesor (si no hay acción, muestra placeholder igual) --}}
+  <div class="border-top px-3 py-2">
+    <div class="d-flex justify-content-between align-items-center">
 
-        {{-- Fecha última acción --}}
-        @php
-          $createdAt = \Carbon\Carbon::parse($lastAction->created_at);
-          $diffDays = $createdAt->diffInDays(now());
-          $color = $diffDays < 2 ? 'success' : ($diffDays < 90 ? 'warning' : 'danger');
-          $icon = $color === 'success' ? 'fa-check-circle' : ($color === 'warning' ? 'fa-clock-o' : 'fa-exclamation-triangle');
-        @endphp
+      {{-- Fecha última acción --}}
+      @php
+        $createdAt = $lastAction ? \Carbon\Carbon::parse($lastAction->created_at) : null;
+        $diffDays = $createdAt ? $createdAt->diffInDays(now()) : null;
+        $color = $createdAt
+          ? ($diffDays < 2 ? 'success' : ($diffDays < 90 ? 'warning' : 'danger'))
+          : 'secondary';
+        $icon = $createdAt
+          ? ($color === 'success' ? 'fa-check-circle' : ($color === 'warning' ? 'fa-clock-o' : 'fa-exclamation-triangle'))
+          : 'fa-clock-o';
+      @endphp
 
-        <div>
-          <span class="badge badge-{{ $color }}">
-            <i class="fa {{ $icon }}"></i> {{ $createdAt->diffForHumans() }}
-          </span>
-        </div>
-
-        {{-- Asesor --}}
-        <a href="/customers/{{$item->id}}/show">
-          <div class="d-flex align-items-center">
-            @if($item->user)
-            <small class="mr-2">{{ $item->user->name }}</small>
-              <div class="customer-circle assessor-circle" style="background-color: #6c757d;">
-                {{ $item->user->getInitials() }}
-              </div>
-              
-            @else
-            <small class="text-muted mr-2">Sin asesor</small>
-              <div class="customer-circle assessor-circle" style="background-color: #ccc;">
-                <i class="fa fa-user" aria-hidden="true"></i>
-              </div>
-              
-            @endif
-          </div>
-        </a>
-
-
+      <div>
+        <span class="badge badge-{{ $color }}">
+          <i class="fa {{ $icon }}"></i>
+          {{ $createdAt ? $createdAt->diffForHumans() : 'Sin acciones' }}
+        </span>
       </div>
-      @if($lastAction->note)
-        <div class="mt-1 text-muted" style="font-size: 0.85rem;">
-          <i class="fa fa-sticky-note-o" aria-hidden="true"></i>
-          "{{ \Illuminate\Support\Str::limit($lastAction->note, 80) }}"
+
+      {{-- Asesor --}}
+      <a href="/customers/{{$item->id}}/show">
+        <div class="d-flex align-items-center">
+          @if($item->user)
+            <small class="mr-2">{{ $item->user->name }}</small>
+            <div class="customer-circle assessor-circle" style="background-color: #6c757d;">
+              {{ $item->user->getInitials() }}
+            </div>
+          @else
+            <small class="text-muted mr-2">Sin asesor</small>
+            <div class="customer-circle assessor-circle" style="background-color: #ccc;">
+              <i class="fa fa-user" aria-hidden="true"></i>
+            </div>
+          @endif
         </div>
-      @endif
+      </a>
+
     </div>
-  @endif
+    @if($lastAction && $lastAction->note)
+      <div class="mt-1 text-muted" style="font-size: 0.85rem;">
+        <i class="fa fa-sticky-note-o" aria-hidden="true"></i>
+        "{{ \Illuminate\Support\Str::limit($lastAction->note, 80) }}"
+      </div>
+    @endif
+  </div>
 </div>
 
 <style>

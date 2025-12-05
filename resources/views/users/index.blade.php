@@ -12,6 +12,7 @@
                   <th>User</th>
                   <th>Email</th>
                   <th>Status</th>
+                  <th>Rol</th>
                   <th>Options</th>
                 </tr>
               </thead>
@@ -27,6 +28,9 @@
                                echo $user->status->name;
                             }
                         ?> 
+                  </td>
+                  <td>
+                    {{ $user->role->name ?? '' }}
                   </td>
                   <td><a href="/users/{{$user->id }}/edit" class="btn btn-sm btn-warning my-2 my-sm-0">Editar</a></td>
                 </tr>

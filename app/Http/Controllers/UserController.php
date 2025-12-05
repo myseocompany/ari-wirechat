@@ -29,7 +29,7 @@ class UserController extends Controller
     public function index()
     {
         //
-        $users = User::all();
+        $users = User::with(['role', 'status'])->get();
         $user_statuses = UserStatus::all();
         
 
