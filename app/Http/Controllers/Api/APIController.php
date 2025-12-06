@@ -2029,7 +2029,7 @@ class APIController extends Controller
 
         $modelRD = $this->saveAPIRD($model, $opportunity);
 
-        $this->sendToN8n($modelRD->id);
+        //$this->sendToN8n($modelRD->id);
         
         return $modelRD->id;
     }
