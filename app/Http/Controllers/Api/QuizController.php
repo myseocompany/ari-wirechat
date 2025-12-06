@@ -212,6 +212,12 @@ class QuizController extends Controller
                 ?: 'https://maquiempanadas.com/quiz-escalable/diagnostico',
             '/'
         );
+
+        // Ensure the path includes /diagnostico before the slug.
+        if (!str_contains($base, '/diagnostico')) {
+            $base .= '/diagnostico';
+        }
+
         return "{$base}/{$slug}";
     }
 
