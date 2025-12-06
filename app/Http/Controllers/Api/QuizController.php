@@ -53,6 +53,9 @@ class QuizController extends Controller
             $customer->save();
         }
 
+        // If stage is missing, derive it from score using defined ranges.
+        $payload['stage'] = $payload['stage'] ?? $this->stageFromScore($payload['final_score']);
+
         $quizResult = null;
 
         DB::transaction(function () use ($customer, $payload, &$quizResult) {
@@ -202,14 +205,14 @@ class QuizController extends Controller
 
     private function buildResultLink(string $slug): string
     {
-        // Prefer explicit env override, then Vite CRM URL, then app.url.
+        // Prefer explicit public/report URL, falling back to frontend path.
         $base = rtrim(
-            env('QUIZ_RESULT_BASE_URL')
-                ?: env('VITE_CRM_API_URL')
-                ?: (config('app.url') ?: 'https://maquiempanadas.com'),
+            env('QUIZ_RESULT_PUBLIC_BASE')
+                ?: env('QUIZ_RESULT_BASE_URL')
+                ?: 'https://maquiempanadas.com/diagnostico',
             '/'
         );
-        return "{$base}/api/quizzes/escalable/result/{$slug}";
+        return "{$base}/{$slug}";
     }
 
     private function sanitizeTemplateParam(?string $text): string
@@ -222,6 +225,36 @@ class QuizController extends Controller
         $clean = preg_replace('/ {2,}/', ' ', $clean);
 
         return trim($clean ?? '');
+    }
+
+    private function stageFromScore($score): ?string
+    {
+        if ($score === null) {
+            return null;
+        }
+
+        $score = (float)$score;
+
+        if ($score >= 0 && $score <= 20) {
+            return 'Inicio Manual';
+        }
+        if ($score >= 21 && $score <= 40) {
+            return 'Crecimiento Artesanal';
+        }
+        if ($score >= 41 && $score <= 60) {
+            return 'Fábrica en Orden';
+        }
+        if ($score >= 61 && $score <= 80) {
+            return 'Producción Escalable';
+        }
+        if ($score >= 81 && $score <= 90) {
+            return 'Expansión Mayorista';
+        }
+        if ($score >= 91 && $score <= 100) {
+            return 'Marca que Trasciende';
+        }
+
+        return null;
     }
 
     private function buildInvitationText(?string $stage): string
