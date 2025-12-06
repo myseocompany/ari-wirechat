@@ -209,7 +209,7 @@ class QuizController extends Controller
         $base = rtrim(
             env('QUIZ_RESULT_PUBLIC_BASE')
                 ?: env('QUIZ_RESULT_BASE_URL')
-                ?: 'https://maquiempanadas.com/diagnostico',
+                ?: 'https://maquiempanadas.com/quiz-escalable/diagnostico',
             '/'
         );
         return "{$base}/{$slug}";
