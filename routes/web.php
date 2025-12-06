@@ -172,6 +172,16 @@ Route::middleware('auth')->prefix('roles')->group(function () {
 // Site Routes
 Route::get('/config', [SiteController::class, 'config']);
 Route::get('/report', [SiteController::class, 'report']);
+Route::middleware('auth')->prefix('whatsapp-accounts')->name('whatsapp-accounts.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\WhatsAppAccountController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\WhatsAppAccountController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\WhatsAppAccountController::class, 'store'])->name('store');
+    Route::post('/send-test', [\App\Http\Controllers\WhatsAppAccountController::class, 'sendTestTemplate'])->name('send-test');
+    Route::post('/{whatsappAccount}/default', [\App\Http\Controllers\WhatsAppAccountController::class, 'makeDefault'])->name('default');
+    Route::delete('/{whatsappAccount}', [\App\Http\Controllers\WhatsAppAccountController::class, 'destroy'])->name('destroy');
+    Route::put('/{whatsappAccount}', [\App\Http\Controllers\WhatsAppAccountController::class, 'update'])->name('update');
+    Route::post('/{whatsappAccount}/sync-templates', [\App\Http\Controllers\WhatsAppAccountController::class, 'syncTemplates'])->name('sync-templates');
+});
 
 // User Routes
 Route::middleware('auth')->prefix('users')->group(function () {

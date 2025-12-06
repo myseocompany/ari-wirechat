@@ -36,4 +36,7 @@
 <div class="list-group">
     <a href="/products" class="list-group-item">Productos</a>
 </div>
+<div class="list-group">
+    <a href="/whatsapp-accounts" class="list-group-item">Cuentas de WhatsApp</a>
+</div>
 @endsection
