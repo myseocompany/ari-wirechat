@@ -1,13 +1,13 @@
               <div class="card">
                 <div class="card-header" id="headingfour">
                   <h3>
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapsefour" aria-expanded="true" aria-controls="collapsefour">
+                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapsefour" aria-expanded="false" aria-controls="collapsefour">
                       POA
                     </button>
                   </h3>
                 </div>
 
-                <div id="collapsefour" class="collapsed" aria-labelledby="headingfour" data-parent="#accordifourxample">
+                <div id="collapsefour" class="collapse" aria-labelledby="headingfour">
 
                   @php
                   $last_date = "";
