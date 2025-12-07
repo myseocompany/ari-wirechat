@@ -1,11 +1,18 @@
-<?php function clearWP($str)
+<?php
+function clearWP($str)
 {
   $str = trim($str);
   $str = str_replace("+", "", $str);
   return $str;
-} ?>
+}
 
-@if($customer != null)
+// Normaliza el customer en caso de que llegue un paginator o nulo
+if ($customer instanceof \Illuminate\Pagination\LengthAwarePaginator) {
+    $customer = $customer->first();
+}
+?>
+
+@if($customer instanceof \App\Models\Customer)
   @include('customers.index_partials.customer_header')
   
     <div class="row">

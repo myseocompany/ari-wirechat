@@ -1,3 +1,7 @@
+@if(!$customer instanceof \App\Models\Customer)
+  @php return; @endphp
+@endif
+
 <div class="accordion">
       <div class="card">
             <div class="card-header" id="headingOne">
@@ -26,7 +30,9 @@
        </div>
     </div>
     @include('customers.partials.acordion.files')
-    @include('customers.partials.acordion.polls')
+    @isset($metas)
+      @include('customers.partials.acordion.polls')
+    @endisset
 
 
 </div>

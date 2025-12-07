@@ -1,7 +1,11 @@
 <div id="divmsg"></div>
 
 <div class="card-block">
-  <form action="customers/{{$customer->id}}/edit">
+@if(!$customer instanceof \App\Models\Customer)
+  @php return; @endphp
+@endif
+
+<form action="customers/{{$customer->id}}/edit">
     {{ csrf_field() }}
 
 

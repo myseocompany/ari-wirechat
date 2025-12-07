@@ -1,3 +1,8 @@
+@if(!$customer instanceof \App\Models\Customer)
+  {{-- Sin cliente válido, no renderizamos header --}}
+  @php return; @endphp
+@endif
+
 <div class="container">
     <div class="row mb-2">
     <div class="col-md-12">

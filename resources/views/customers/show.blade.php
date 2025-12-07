@@ -408,8 +408,8 @@
             @if($actual)
           
             @include('customers.partials.acordion.emails')
-            @include('customers.partials.acordion.polls')
             @include('customers.partials.acordion.files', ['customer' => $model])                                                        
+            @include('customers.partials.acordion.polls')
             @include('customers.partials.acordion.poa')
           
 
