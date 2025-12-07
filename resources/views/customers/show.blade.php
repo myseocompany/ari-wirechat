@@ -176,8 +176,9 @@
                 <div
                   id="customer-notes-display"
                   class="notes-display border rounded p-2"
+                  contenteditable="true"
                   data-save-url="/customers/{{$model->id}}/notes"
-                >{!! nl2br(e($model->notes)) !!}</div>
+                >{{ $model->notes }}</div>
                 <button type="button" class="btn btn-light btn-sm notes-edit-btn" id="customer-notes-edit-btn" aria-label="Editar notas">
                   ✏️
                 </button>
@@ -192,6 +193,13 @@
                 min-height: 60px;
                 white-space: pre-wrap;
                 word-break: break-word;
+                display: block;
+              }
+              .notes-display:focus {
+                outline: none;
+              }
+              .notes-display.notes-display--active {
+                box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.05);
               }
               .notes-edit-btn {
                 position: absolute;
@@ -232,27 +240,22 @@
                 var saveUrl = $display.data('save-url');
                 var $modal = $('#notesModal');
                 var $textarea = $('#customer-notes-textarea');
+                var lastValue = $display.text();
 
-                $('#customer-notes-edit-btn').on('click', function () {
-                  console.log('Notas abrir modal');
-                  $textarea.val($display.html().replace(/<br\s*\/?>/gi, '\n').replace(/&nbsp;/g, ' ').replace(/\s+$/,''));
-                  $modal.modal('show');
-                });
-
-                $('#customer-notes-save').on('click', function () {
-                  var current = $textarea.val().trim();
-                  console.log('Notas guardar');
+                function persist(newText) {
+                  var payload = newText || '';
                   $feedback.text('Guardando...');
                   $.ajax({
                     url: saveUrl,
                     method: 'POST',
                     data: {
-                      notes: current,
+                      notes: payload,
                       _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (resp) {
-                      var newText = resp && typeof resp.notes !== 'undefined' ? resp.notes : current;
-                      $display.html(newText.replace(/\n/g, '<br>'));
+                      var updated = resp && typeof resp.notes !== 'undefined' ? resp.notes : payload;
+                      lastValue = updated;
+                      $display.text(updated);
                       $feedback.text('Notas guardadas');
                       $modal.modal('hide');
                     },
@@ -260,6 +263,41 @@
                       $feedback.text('No se pudo guardar las notas');
                     }
                   });
+                }
+
+                $display.on('focus', function () {
+                  console.log('Notas focus');
+                  $display.addClass('notes-display--active');
+                  lastValue = $display.text();
+                });
+
+                $display.on('blur', function () {
+                  console.log('Notas blur');
+                  $display.removeClass('notes-display--active');
+                  var current = $display.text();
+                  if (current === lastValue) return;
+                  persist(current);
+                });
+
+                $('#customer-notes-edit-btn').on('click', function () {
+                  console.log('Notas abrir modal');
+                  $('.modal-backdrop').remove();
+                  $('body').removeClass('modal-open');
+                  $textarea.val($display.text().replace(/\s+$/,''));
+                  $modal.modal('show');
+                  $modal.on('shown.bs.modal', function () {
+                    $textarea.trigger('focus');
+                  });
+                });
+
+                $('#customer-notes-save').on('click', function () {
+                  var current = ($textarea.val() || '');
+                  console.log('Notas guardar');
+                  if (current === lastValue) {
+                    $modal.modal('hide');
+                    return;
+                  }
+                  persist(current);
                 });
               });
             </script>

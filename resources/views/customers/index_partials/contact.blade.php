@@ -158,8 +158,9 @@
         <div
           id="customer-notes-side"
           class="notes-display border rounded p-2"
+          contenteditable="true"
           data-save-url="/customers/{{$customer->id}}/notes"
-        >{!! nl2br(e($customer->notes)) !!}</div>
+        >{{ $customer->notes }}</div>
         <button type="button" class="btn btn-light btn-sm notes-edit-btn" id="customer-notes-side-edit" aria-label="Editar notas">
           ✏️
         </button>
@@ -193,7 +194,10 @@
           min-height: 60px;
           white-space: pre-wrap;
           word-break: break-word;
+          display: block;
         }
+        .notes-display:focus { outline: none; }
+        .notes-display.notes-display--active { box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.05); }
         .notes-edit-btn {
           position: absolute;
           right: 8px;

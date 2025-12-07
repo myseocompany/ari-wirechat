@@ -215,31 +215,32 @@
       var $textarea = $scope.find('#customer-notes-side-textarea');
       var $btn = $scope.find('#customer-notes-side-edit');
       var $save = $scope.find('#customer-notes-side-save');
+      var lastValue = $display.text();
 
-      // Evitar doble binding
-      if ($btn.data('notes-bound')) return;
-      $btn.data('notes-bound', true);
+      // Mover modal al body para evitar overlays que bloqueen
+      if ($modal.length) {
+        $modal.appendTo('body');
+      }
 
-      $btn.on('click', function() {
-        console.log('Notas lado abrir modal');
-        $textarea.val($display.text().replace(/\u00A0/g, ' ').replace(/\s+$/,''));
-        $modal.modal('show');
-      });
-
-      $save.on('click', function() {
-        var current = ($textarea.val() || '').trim();
-        console.log('Notas lado guardar');
+      function htmlToText(html) {
+        return $('<div>').html(html || '').text();
+      }
+      function textToHtml(text) {
+        return (text || '').replace(/\n/g, '<br>');
+      }
+      function persist(newText) {
         if ($feedback.length) $feedback.text('Guardando...');
         $.ajax({
           url: saveUrl,
           method: 'POST',
           data: {
-            notes: current,
+            notes: newText,
             _token: $('meta[name="csrf-token"]').attr('content')
           },
           success: function(resp) {
-            var newText = resp && typeof resp.notes !== 'undefined' ? resp.notes : current;
-            $display.html(newText.replace(/\n/g, '<br>'));
+            var updated = resp && typeof resp.notes !== 'undefined' ? resp.notes : newText;
+            lastValue = updated;
+            $display.text(updated);
             if ($feedback.length) $feedback.text('Notas guardadas');
             $modal.modal('hide');
           },
@@ -247,6 +248,45 @@
             if ($feedback.length) $feedback.text('No se pudo guardar las notas');
           }
         });
+      }
+
+      // Evitar doble binding
+      if ($btn.data('notes-bound')) return;
+      $btn.data('notes-bound', true);
+
+      $display.on('focus', function() {
+        console.log('Notas lado focus');
+        $display.addClass('notes-display--active');
+        lastValue = htmlToText($display.html());
+      });
+
+      $display.on('blur', function() {
+        console.log('Notas lado blur');
+        $display.removeClass('notes-display--active');
+        var current = htmlToText($display.html());
+        if (current === lastValue) return;
+        persist(current);
+      });
+
+      $btn.on('click', function() {
+        console.log('Notas lado abrir modal');
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open');
+        $textarea.val(htmlToText($display.html()).replace(/\s+$/,''));
+        $modal.modal('show');
+        $modal.on('shown.bs.modal', function() {
+          $textarea.trigger('focus');
+        });
+      });
+
+      $save.on('click', function() {
+        var current = ($textarea.val() || '');
+        console.log('Notas lado guardar');
+        if (current === lastValue) {
+          $modal.modal('hide');
+          return;
+        }
+        persist(current);
       });
     };
     $(function() {

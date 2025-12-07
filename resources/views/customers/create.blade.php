@@ -43,6 +43,26 @@
 {{-- FORMULARIO CLIENTES --}}
 <form method="POST" action="/customers">
 {{ csrf_field() }}
+
+{{-- Asignado a --}}
+<div class="form-group">
+  <label for="users">Asignado A:</label>
+  @if ($canAssignCustomers)
+    @php $selectedUserId = old('user_id', $defaultAssignedUserId); @endphp
+    <select name="user_id" id="user_id" class="form-control">
+      <option value="">Seleccione...</option>
+      @foreach ($users as $item)
+        @if($item->status_id == 1)
+          <option value="{{ $item->id }}" @selected((string) $selectedUserId === (string) $item->id)>{{  $item->name }}</option>
+        @endif
+      @endforeach
+    </select>
+  @else
+    <input type="hidden" name="user_id" value="{{ $defaultAssignedUserId }}">
+    <input type="text" class="form-control" value="{{ optional(Auth::user())->name }}" readonly>
+  @endif
+</div>
+
 <fieldset class="scheduler-border">
   <legend class="scheduler-border">Datos Personales:</legend>
   <div class="row">
@@ -274,7 +294,9 @@
       <select name="user_id" id="user_id" class="form-control">
         <option value="">Seleccione...</option>
         @foreach ($users as $item)
-          <option value="{{ $item->id }}" @selected((string) $selectedUserId === (string) $item->id)>{{  $item->name }}</option>
+          @if($item->status_id == 1)
+            <option value="{{ $item->id }}" @selected((string) $selectedUserId === (string) $item->id)>{{  $item->name }}</option>
+          @endif
         @endforeach
       </select>
     @else
@@ -283,10 +305,6 @@
     @endif
   </div>
   {{-- fuente --}}
-    <div class="">
-    <label for="notes">Visitas Técnicas:</label>
-    <textarea name="technical_visit" id="technical_visit" placeholder="" cols="30" rows="10" class="form-control"></textarea>
-  </div>
   <div class="">
     <label for="notes">Notas:</label>
     <textarea name="notes" id="notes" placeholder="" cols="30" rows="10" class="form-control"></textarea>
