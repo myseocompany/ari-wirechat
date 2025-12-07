@@ -370,9 +370,6 @@
               @endif
               @endif
               <button class="btn btn-primary btn-sm" id="btnCopiar" size="5"> POA</button>
-              <a href="/orders/create/{{ $model->id }}">
-                <span class="btn btn-primary btn-sm" aria-hidden="true" title="Eliminar">Cotizar</span>
-              </a>
             </div>
 
 
@@ -448,12 +445,6 @@
       <div class="col-md-8">
         @include('customers.partials.actions_form')
         @include('customers.show_partials.actions_widget_wp')
-
-
-        @include('customers.partials.action_opportunity')
-        @include('customers.partials.action_sale_form')
-        @include('customers.partials.action_PQR')
-        @include('customers.partials.action_spare')
 
 
         <!-- inicio acordeon -->

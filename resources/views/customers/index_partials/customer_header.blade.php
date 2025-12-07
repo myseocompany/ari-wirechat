@@ -127,12 +127,7 @@
 
       <div class="row mt-3">
         <div class="col-md-12">
-          @include('customers.partials.action_poorly_rated')
-          @include('customers.partials.action_opportunity')
-          @include('customers.partials.action_sale_form')
-          @include('customers.partials.action_spare')
-          @include('customers.partials.action_PQR')
-          @include('customers.partials.action_order')
+          {{-- Acciones rápidas deshabilitadas --}}
         </div>
       </div>
 
