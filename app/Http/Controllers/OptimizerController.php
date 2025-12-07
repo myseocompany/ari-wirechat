@@ -14,6 +14,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\CustomerFile;
 use App\Models\CustomerHistory;
+use App\Models\CustomerMeta;
 
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -189,6 +190,9 @@ public function mergeDuplicates(Request $request)
             } else {
                 CustomerFile::whereIn('customer_id', $others)->update(['customer_id' => $winnerId]);
             }
+
+            // Customer metas (encuestas / metadata)
+            CustomerMeta::whereIn('customer_id', $others)->update(['customer_id' => $winnerId]);
 
             // History
             CustomerHistory::whereIn('customer_id', $others)->update(['customer_id' => $winnerId]);
