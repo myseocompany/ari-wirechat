@@ -764,3 +764,7 @@ body#sidebody nav {
   position: sticky;
   top: 0;
 }
+#side_content.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

@@ -3,7 +3,8 @@
   $diasSinContacto = $lastAction ? \Carbon\Carbon::parse($lastAction->created_at)->diffInDays(now()) : null;
 @endphp
 
-<div class="card mb-3 bg-light" onmouseover="showEditIcon({{ $item->id }})" onmouseout="hideEditIcon({{ $item->id }})">
+@php $cardUrl = request()->fullUrlWithQuery(['customer_id' => $item->id]); @endphp
+<div class="card mb-3 bg-light customer-card" data-url="{{ $cardUrl }}" onmouseover="showEditIcon({{ $item->id }})" onmouseout="hideEditIcon({{ $item->id }})" style="cursor: pointer;">
   <div class="card-body p-2">
     <div class="row no-gutters align-items-center">
 
@@ -96,7 +97,7 @@
       </div>
 
       {{-- Asesor --}}
-      <a href="/customers/{{$item->id}}/show">
+      <a href="/customers/{{$item->id}}/show" class="advisor-link">
         <div class="d-flex align-items-center">
           @if($item->user)
             <small class="mr-2">{{ $item->user->name }}</small>

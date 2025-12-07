@@ -61,59 +61,66 @@
               <div id="tags-feedback-index" class="small text-muted mt-2"></div>
               @push('scripts')
               <script>
-                $(function() {
-                  var $form = $('#customer-tags-form-index');
-                  if (!$form.length) return;
-                  var $feedback = $('#tags-feedback-index');
-                  var $badgesContainer = $('#customer-tags-badges');
+                (function() {
+                  window.initCustomerTags = function(scope) {
+                    var $scope = scope ? $(scope) : $(document);
+                    var $form = $scope.find('#customer-tags-form-index');
+                    if (!$form.length) return;
+                    var $feedback = $scope.find('#tags-feedback-index');
+                    var $badgesContainer = $scope.find('#customer-tags-badges');
 
-                  function renderBadgesFromSelection() {
-                    var selected = [];
-                    $form.find('.tag-checkbox:checked').each(function() {
-                      selected.push({
-                        name: $(this).data('name'),
-                        color: $(this).data('color') || '#e2e8f0'
+                    function renderBadgesFromSelection() {
+                      var selected = [];
+                      $form.find('.tag-checkbox:checked').each(function() {
+                        selected.push({
+                          name: $(this).data('name'),
+                          color: $(this).data('color') || '#e2e8f0'
+                        });
                       });
-                    });
 
-                    if (!selected.length) {
-                      $badgesContainer.html('<span class="text-muted">Sin etiquetas</span>');
-                      return;
-                    }
-
-                    var html = selected.map(function(tag) {
-                      return '<span class="px-2 py-1 rounded-full text-xs font-semibold mr-2 mb-1 d-inline-block" style="background-color: ' + tag.color + ';">' + tag.name + '</span>';
-                    }).join('');
-                    $badgesContainer.html(html);
-                  }
-
-                  function sendTags() {
-                    var payload = $form.serializeArray();
-                    if (!$form.find('.tag-checkbox:checked').length) {
-                      payload.push({ name: 'tags', value: '' });
-                    }
-
-                    $feedback.text('Guardando etiquetas...');
-                    $.ajax({
-                      url: $form.attr('action'),
-                      type: 'POST',
-                      data: $.param(payload),
-                      headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                      },
-                      success: function(resp) {
-                        $feedback.text(resp.message || 'Etiquetas actualizadas.');
-                        renderBadgesFromSelection();
-                      },
-                      error: function() {
-                        $feedback.text('No se pudieron guardar las etiquetas.');
+                      if (!selected.length) {
+                        $badgesContainer.html('<span class="text-muted">Sin etiquetas</span>');
+                        return;
                       }
-                    });
-                  }
 
-                  $form.on('change', '.tag-checkbox', sendTags);
-                  renderBadgesFromSelection();
-                });
+                      var html = selected.map(function(tag) {
+                        return '<span class="px-2 py-1 rounded-full text-xs font-semibold mr-2 mb-1 d-inline-block" style="background-color: ' + tag.color + ';">' + tag.name + '</span>';
+                      }).join('');
+                      $badgesContainer.html(html);
+                    }
+
+                    function sendTags() {
+                      var payload = $form.serializeArray();
+                      if (!$form.find('.tag-checkbox:checked').length) {
+                        payload.push({ name: 'tags', value: '' });
+                      }
+
+                      $feedback.text('Guardando etiquetas...');
+                      $.ajax({
+                        url: $form.attr('action'),
+                        type: 'POST',
+                        data: $.param(payload),
+                        headers: {
+                          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(resp) {
+                          $feedback.text(resp.message || 'Etiquetas actualizadas.');
+                          renderBadgesFromSelection();
+                        },
+                        error: function() {
+                          $feedback.text('No se pudieron guardar las etiquetas.');
+                        }
+                      });
+                    }
+
+                    $form.off('change.tag-sync').on('change.tag-sync', '.tag-checkbox', sendTags);
+                    renderBadgesFromSelection();
+                  };
+
+                  $(document).ready(function() {
+                    window.initCustomerTags();
+                  });
+                })();
               </script>
               @endpush
             @endif

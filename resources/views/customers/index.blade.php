@@ -115,6 +115,37 @@
 
 @push('scripts')
 <script>
+// Navegación: al hacer click en la tarjeta, cargar detalle via AJAX (excepto click en asesor)
+$(document).on('click', '.customer-card', function(e) {
+  const isAdvisor = $(e.target).closest('.advisor-link').length > 0;
+  if (isAdvisor) {
+    return;
+  }
+  e.preventDefault();
+  e.stopPropagation();
+  const url = $(this).data('url');
+  if (url) {
+    const $side = $('#side_content');
+    $side.addClass('loading');
+    $.get(url, function(resp) {
+      const $html = $('<div>').html(resp);
+      const newContent = $html.find('#side_content').html();
+      if (newContent) {
+        $side.html(newContent);
+        if (window.initCustomerTags) {
+          window.initCustomerTags($('#side_content'));
+        }
+      } else {
+        window.location.href = url;
+      }
+    }).fail(function() {
+      window.location.href = url;
+    }).always(function() {
+      $side.removeClass('loading');
+    });
+  }
+});
+
 (function() {
   // ======== CONFIG ========
   const ORIGEN_MAXIMO = moment('1900-01-01', 'YYYY-MM-DD'); // cambia si prefieres 1970-01-01
