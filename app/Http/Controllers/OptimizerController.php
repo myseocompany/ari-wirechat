@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\CustomerFile;
 use App\Models\CustomerHistory;
 use App\Models\CustomerMeta;
+use App\Models\CustomerMetaData;
 
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -65,9 +66,21 @@ class OptimizerController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Metadatos asociados a estos customers (para mostrar y consolidar)
+        $metaByCustomer = collect();
+        $metaNames = collect();
+        $customerIds = $model->pluck('id');
+        if ($customerIds->isNotEmpty()) {
+            $metaByCustomer = CustomerMeta::whereIn('customer_id', $customerIds)->get()->groupBy('customer_id');
+            $metaIds = $metaByCustomer->flatten()->pluck('meta_data_id')->filter()->unique();
+            if ($metaIds->isNotEmpty()) {
+                $metaNames = CustomerMetaData::whereIn('id', $metaIds)->get()->keyBy('id');
+            }
+        }
+
         $controller = $this;
 
-        return view('optimizer.show', compact('model', 'statuses_options', 'controller', 'products', 'customers_source', 'user'));
+        return view('optimizer.show', compact('model', 'statuses_options', 'controller', 'products', 'customers_source', 'user', 'metaByCustomer', 'metaNames'));
     }
 
 public function mergeDuplicates(Request $request)

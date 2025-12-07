@@ -172,6 +172,36 @@
           </td>
         @endforeach
       </tr>
+
+      {{-- Metadatos --}}
+      <tr>
+        <td><strong>Metadata</strong></td>
+        <td></td>
+        @foreach($model as $item)
+          @php
+            $metas = $metaByCustomer[$item->id] ?? collect();
+          @endphp
+          <td>
+            @if($metas->isEmpty())
+              <div class="text-muted">Sin metadata</div>
+            @else
+              <ul style="padding-left:18px;">
+                @foreach($metas as $m)
+                  @php $label = optional($metaNames[$m->meta_data_id] ?? null)->value; @endphp
+                  <li>
+                    <label>
+                      {{-- los metadatos se consolidan siempre; checkbox informativo --}}
+                      <input type="checkbox" checked disabled>
+                      <strong>{{ $label ?: ('Meta '.$m->meta_data_id) }}:</strong>
+                      {{ $m->value }}
+                    </label>
+                  </li>
+                @endforeach
+              </ul>
+            @endif
+          </td>
+        @endforeach
+      </tr>
     </table>
 
     <div class="text-center">
