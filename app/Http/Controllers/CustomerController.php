@@ -78,7 +78,14 @@ class CustomerController extends Controller
 
         $model = $this->customerService->filterCustomers($request, $statuses, null, false, 10);
         $customersGroup = $this->customerService->filterCustomers($request, $statuses, null, true);
-        
+
+        if (!empty($request->search) && method_exists($model, 'total') && $model->total() === 1) {
+            $onlyCustomer = $model->first();
+            if ($onlyCustomer) {
+                return redirect()->route('customers.show', $onlyCustomer->id);
+            }
+        }
+
         $customer = $model[0] ?? null;
         if ($request->filled('customer_id')) {
             $customer = Customer::find($request->customer_id);

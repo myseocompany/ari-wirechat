@@ -26,6 +26,7 @@
        </div>
     </div>
     @include('customers.partials.acordion.files')
+    @include('customers.partials.acordion.polls')
 
 
 </div>

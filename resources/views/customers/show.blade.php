@@ -15,7 +15,12 @@
 <h1 style="color:red;"> <i class="fa fa-exclamation-circle" style="color:gray; "></i> {{$model->name}} <br> </h1>
 @else
 
-<h1 class="customer_name"> {{$model->name}}
+@php
+  $makerIcon = $model->maker === 1 ? '🥟 ' : ($model->maker === 0 ? '💡 ' : ($model->maker === 2 ? '🍗🥩⚙️ ' : ''));
+  $makerLabel = $model->maker === 1 ? 'Hace empanadas' : ($model->maker === 0 ? 'Proyecto' : ($model->maker === 2 ? 'Desmechadora' : null));
+@endphp
+
+<h1 class="customer_name"> {!! $makerIcon !!}{{$model->name}}
 
 
   <br>
@@ -125,6 +130,11 @@
             <div><span class="lavel"><strong>Estado:</strong></span> @if(isset($model->status)&& !is_null($model->status)&&$model->status!='')
               <span class="badge" style="background-color: @if(isset($model->status) && ($model->status != '')) {{$model->status->color}};@else gray @endif">{{$model->status->name}}</span> @endif
             </div>
+            @if($makerLabel)
+            <div>
+              <span class="lavel"><strong>Tipo de cliente:</strong></span> {!! $makerIcon !!} {{ $makerLabel }}
+            </div>
+            @endif
             <div><strong>Asignado a:</strong>
               @if(isset($model->user)&& !is_null($model->user)&&$model->user!=''){{$model->user->name}} @else Sin asignar @endif
             </div>
