@@ -127,6 +127,7 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     Route::get('/{customer}/assignMe', [CustomerController::class, 'assignMe'])->whereNumber('customer');
     Route::post('/{customer}/audience', [CustomerController::class, 'storeAudience'])->whereNumber('customer');
     Route::get('/history/{customer}/show', [CustomerController::class, 'showHistory'])->whereNumber('customer');
+    Route::post('/{customer}/notes', [CustomerController::class, 'updateNotes'])->whereNumber('customer');
 
     // Específicas
     Route::get('/ajax/update_user', [CustomerController::class, 'updateAjax']);

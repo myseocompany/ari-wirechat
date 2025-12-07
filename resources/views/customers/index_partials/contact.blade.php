@@ -154,12 +154,70 @@
     <div class="mb-4 border-bottom pb-2">
       <h5 class="text-dark">Notas</h5>
 
-      @if(!empty($customer->notes))
-        <p><strong>Observaciones:</strong> <span class="text-dark">{{ $customer->notes }}</span></p>
-      @endif
+      <div
+        id="customer-notes-side"
+        class="form-control notes-editable"
+        contenteditable="true"
+        data-save-url="/customers/{{$customer->id}}/notes"
+        style="min-height: 60px; border: 1px solid transparent; box-shadow: none;"
+        aria-label="Notas"
+      >{{ $customer->notes }}</div>
+      <small id="customer-notes-side-feedback" class="text-muted"></small>
+
+      <style>
+        .notes-editable {
+          border: 1px solid transparent;
+          box-shadow: none;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .notes-editable:focus {
+          outline: none;
+        }
+        .notes-editable.notes-editable--active {
+          border-color: #ced4da;
+          box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.05);
+        }
+      </style>
+      <script>
+        (function () {
+          var $notes = $('#customer-notes-side');
+          if (!$notes.length) return;
+          var $feedback = $('#customer-notes-side-feedback');
+          var saveUrl = $notes.data('save-url');
+          var lastValue = $notes.text().trim();
+
+          $notes.on('focus', function () {
+            $notes.addClass('notes-editable--active');
+          });
+
+          $notes.on('blur', function () {
+            $notes.removeClass('notes-editable--active');
+            var current = $notes.text().trim();
+            if (current === lastValue) return;
+
+            $feedback.text('Guardando...');
+            $.ajax({
+              url: saveUrl,
+              method: 'POST',
+              data: {
+                notes: current,
+                _token: $('meta[name="csrf-token"]').attr('content')
+              },
+              success: function (resp) {
+                lastValue = resp && typeof resp.notes !== 'undefined' ? resp.notes : current;
+                $notes.text(lastValue);
+                $feedback.text('Notas guardadas');
+              },
+              error: function () {
+                $feedback.text('No se pudo guardar las notas');
+              }
+            });
+          });
+        })();
+      </script>
 
       @if(!empty($customer->technical_visit))
-        <p><strong>Visitas Técnicas:</strong> <span class="text-dark">{{ $customer->technical_visit }}</span></p>
+        <p class="mt-3"><strong>Visitas Técnicas:</strong> <span class="text-dark">{{ $customer->technical_visit }}</span></p>
       @endif
     </div>
 

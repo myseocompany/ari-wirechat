@@ -170,9 +170,71 @@
 
             </div>
 
-            <div>
-              <span class="lavel"><strong>Notas:</strong></span> {{$model->notes}}
+            <div class="mt-2">
+              <span class="lavel"><strong>Notas:</strong></span>
+              <div
+                id="customer-notes"
+                class="form-control notes-editable"
+                contenteditable="true"
+                data-save-url="/customers/{{$model->id}}/notes"
+                style="min-height: 60px; border: 1px solid transparent; box-shadow: none;"
+                aria-label="Notas"
+              >{{$model->notes}}</div>
+              <small id="customer-notes-feedback" class="text-muted"></small>
             </div>
+            <style>
+              .notes-editable {
+                border: 1px solid transparent;
+                box-shadow: none;
+                transition: border-color 0.15s ease, box-shadow 0.15s ease;
+              }
+              .notes-editable:focus {
+                outline: none;
+              }
+              .notes-editable.notes-editable--active {
+                border-color: #ced4da;
+                box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.05);
+              }
+            </style>
+            @push('scripts')
+            <script>
+              $(function () {
+                var $notes = $('#customer-notes');
+                if (!$notes.length) return;
+                var $feedback = $('#customer-notes-feedback');
+                var saveUrl = $notes.data('save-url');
+                var lastValue = $notes.text().trim();
+
+                $notes.on('focus', function () {
+                  $notes.addClass('notes-editable--active');
+                });
+
+                $notes.on('blur', function () {
+                  $notes.removeClass('notes-editable--active');
+                  var current = $notes.text().trim();
+                  if (current === lastValue) return;
+
+                  $feedback.text('Guardando...');
+                  $.ajax({
+                    url: saveUrl,
+                    method: 'POST',
+                    data: {
+                      notes: current,
+                      _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (resp) {
+                      lastValue = resp && typeof resp.notes !== 'undefined' ? resp.notes : current;
+                      $notes.text(lastValue);
+                      $feedback.text('Notas guardadas');
+                    },
+                    error: function () {
+                      $feedback.text('No se pudo guardar las notas');
+                    }
+                  });
+                });
+              });
+            </script>
+            @endpush
 
             <div>
               <span class="lavel"><strong>Campaña:</strong></span> {{$model->campaign_name}}

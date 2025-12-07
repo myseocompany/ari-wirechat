@@ -115,39 +115,100 @@
 
 @push('scripts')
 <script>
-// Navegación: al hacer click en la tarjeta, cargar detalle via AJAX (excepto click en asesor)
-$(document).on('click', '.customer-card', function(e) {
-  const isAdvisor = $(e.target).closest('.advisor-link').length > 0;
-  if (isAdvisor) {
-    return;
+  // Navegación: al hacer click en la tarjeta, cargar detalle via AJAX (excepto click en asesor)
+  $(document).on('click', '.customer-card', function(e) {
+    const isAdvisor = $(e.target).closest('.advisor-link').length > 0;
+    if (isAdvisor) {
+      return;
   }
   e.preventDefault();
   e.stopPropagation();
-  const url = $(this).data('url');
-  if (url) {
-    const $side = $('#side_content');
-    $side.addClass('loading');
-    $.get(url, function(resp) {
-      const $html = $('<div>').html(resp);
-      const newContent = $html.find('#side_content').html();
-      if (newContent) {
-        $side.html(newContent);
-        if (window.initCustomerTags) {
-          window.initCustomerTags($('#side_content'));
+    const url = $(this).data('url');
+    if (url) {
+      const $side = $('#side_content');
+      $side.addClass('loading');
+      $.get(url, function(resp) {
+        const $html = $('<div>').html(resp);
+        const newContent = $html.find('#side_content').html();
+        if (newContent) {
+          $side.html(newContent);
+          if (window.initCustomerTags) {
+            window.initCustomerTags($('#side_content'));
+          }
+          if (window.initCustomerNotes) {
+            window.initCustomerNotes($('#side_content'));
+          }
+        } else {
+          window.location.href = url;
         }
-      } else {
+      }).fail(function() {
         window.location.href = url;
-      }
-    }).fail(function() {
-      window.location.href = url;
     }).always(function() {
       $side.removeClass('loading');
     });
   }
-});
+  });
 
-(function() {
-  // ======== CONFIG ========
+  (function() {
+    // Notas inline (contenteditable + auto-guardado)
+    window.initCustomerNotes = function(scope) {
+      var $scope = scope ? $(scope) : $(document);
+      $scope.find('.notes-editable').each(function() {
+        var $notes = $(this);
+        if ($notes.data('notes-bound')) return;
+        $notes.data('notes-bound', true);
+
+        var saveUrl = $notes.data('save-url');
+        var $feedback = $scope.find('#customer-notes-side-feedback');
+        var lastValue = ($notes.text() || '').trim();
+
+        function setActive(active) {
+          $notes.toggleClass('notes-editable--active', active);
+        }
+
+        $notes.on('focus', function() {
+          setActive(true);
+        });
+
+        $notes.on('blur', function() {
+          setActive(false);
+          var current = ($notes.text() || '').trim();
+          if (current === lastValue) return;
+          if (!saveUrl) return;
+
+          if ($feedback.length) {
+            $feedback.text('Guardando...');
+          }
+          $.ajax({
+            url: saveUrl,
+            method: 'POST',
+            data: {
+              notes: current,
+              _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(resp) {
+              lastValue = resp && typeof resp.notes !== 'undefined' ? resp.notes : current;
+              $notes.text(lastValue);
+              if ($feedback.length) {
+                $feedback.text('Notas guardadas');
+              }
+            },
+            error: function() {
+              if ($feedback.length) {
+                $feedback.text('No se pudo guardar las notas');
+              }
+            }
+          });
+        });
+      });
+    };
+    $(function() {
+      if (window.initCustomerNotes) {
+        window.initCustomerNotes($('#side_content'));
+      }
+    });
+
+    // ======== CONFIG ========
   const ORIGEN_MAXIMO = moment('1900-01-01', 'YYYY-MM-DD'); // cambia si prefieres 1970-01-01
   const $quickForm = $('#mini_filter_form');
   const $advForm   = $('#filter_form');

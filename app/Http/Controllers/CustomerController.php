@@ -918,6 +918,26 @@ class CustomerController extends Controller
             'allTags'
         ));
     }
+
+    public function updateNotes(Request $request, $customerId)
+    {
+        $data = $request->validate([
+            'notes' => ['nullable', 'string'],
+        ]);
+
+        $customer = Customer::findOrFail($customerId);
+        $customer->notes = $data['notes'] ?? '';
+        if (Auth::id()) {
+            $customer->updated_user_id = Auth::id();
+        }
+        $customer->save();
+
+        return response()->json([
+            'ok' => true,
+            'notes' => $customer->notes,
+            'updated_at' => $customer->updated_at,
+        ]);
+    }
     public function showAction($id, $Aid)
     {
         $actionProgramed = Action::find($Aid);
