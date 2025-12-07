@@ -222,7 +222,7 @@
 
       $btn.on('click', function() {
         console.log('Notas lado abrir modal');
-        $textarea.val($display.text().trim());
+        $textarea.val($display.text().replace(/\u00A0/g, ' ').replace(/\s+$/,''));
         $modal.modal('show');
       });
 

@@ -235,7 +235,7 @@
 
                 $('#customer-notes-edit-btn').on('click', function () {
                   console.log('Notas abrir modal');
-                  $textarea.val($display.text().trim());
+                  $textarea.val($display.html().replace(/<br\s*\/?>/gi, '\n').replace(/&nbsp;/g, ' ').replace(/\s+$/,''));
                   $modal.modal('show');
                 });
 
