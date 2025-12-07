@@ -18,15 +18,33 @@
 @php
   $makerIcon = $model->maker === 1 ? '🥟 ' : ($model->maker === 0 ? '💡 ' : ($model->maker === 2 ? '🍗🥩⚙️ ' : ''));
   $makerLabel = $model->maker === 1 ? 'Hace empanadas' : ($model->maker === 0 ? 'Proyecto' : ($model->maker === 2 ? 'Desmechadora' : null));
+  $circleColor = method_exists($model, 'getStatusColor') ? $model->getStatusColor() : '#DFAAFF';
+  $initials = method_exists($model, 'getInitials') ? $model->getInitials() : strtoupper(substr($model->name, 0, 2));
 @endphp
 
-<h1 class="customer_name"> {!! $makerIcon !!}{{$model->name}}
-
-
-  <br>
-</h1>
-<div class="customer_created_at  gray-dark"><small>ID: {{$model->id}}</small></div>
-<div class="customer_created_at  gray-dark"><small>{{$model->created_at}}</small></div>
+<div class="d-flex align-items-center mb-2">
+  <div class="customer-circle small-circle mr-2" style="background-color: {{ $circleColor }}">
+    {{ $initials }}
+  </div>
+  <div class="flex-grow-1">
+    <h1 class="customer_name mb-1"> {!! $makerIcon !!}{{$model->name}}</h1>
+    <div class="customer_created_at gray-dark"><small>ID: {{$model->id}}</small></div>
+    <div class="customer_created_at gray-dark"><small>{{$model->created_at}}</small></div>
+  </div>
+  <div class="d-flex align-items-center ml-auto">
+    @if($model->user)
+      <small class="mr-2">{{ $model->user->name }}</small>
+      <div class="customer-circle assessor-circle" style="background-color: #6c757d;">
+        {{ method_exists($model->user, 'getInitials') ? $model->user->getInitials() : strtoupper(substr($model->user->name,0,2)) }}
+      </div>
+    @else
+      <small class="text-muted mr-2">Sin asesor</small>
+      <div class="customer-circle assessor-circle" style="background-color: #ccc;">
+        <i class="fa fa-user" aria-hidden="true"></i>
+      </div>
+    @endif
+  </div>
+</div>
 @endif
 
 {{-- Alertas --}}
@@ -50,6 +68,30 @@
 @endif
 {{-- fin alertas --}}
 
+<style>
+  .customer-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  .small-circle { width: 40px; height: 40px; }
+  .assessor-circle {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    font-size: 0.75rem;
+    border-radius: 50%;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+  }
+</style>
 
 <div class="card-block">
   
@@ -135,9 +177,6 @@
               <span class="lavel"><strong>Tipo de cliente:</strong></span> {!! $makerIcon !!} {{ $makerLabel }}
             </div>
             @endif
-            <div><strong>Asignado a:</strong>
-              @if(isset($model->user)&& !is_null($model->user)&&$model->user!=''){{$model->user->name}} @else Sin asignar @endif
-            </div>
             <div><span class="lavel"><strong>Interes:</strong></span>
               <span style="background-color: #66C366; border-radius: 50%; width: 25px; height: 25px; text-align: center; color: white; align-items: left;">{{$model->scoring_interest}}</span>
             </div>
@@ -172,18 +211,16 @@
 
             <div class="mt-2">
               <span class="lavel"><strong>Notas:</strong></span>
-              <div class="notes-wrapper position-relative">
+              <div class="notes-wrapper position-relative notes-editor" data-save-url="/customers/{{$model->id}}/notes">
                 <div
-                  id="customer-notes-display"
                   class="notes-display border rounded p-2"
                   contenteditable="true"
-                  data-save-url="/customers/{{$model->id}}/notes"
                 >{{ $model->notes }}</div>
-                <button type="button" class="btn btn-light btn-sm notes-edit-btn" id="customer-notes-edit-btn" aria-label="Editar notas">
+                <button type="button" class="btn btn-light btn-sm notes-edit-btn" data-modal="#notesModalMain" aria-label="Editar notas">
                   ✏️
                 </button>
+                <small class="notes-feedback text-muted"></small>
               </div>
-              <small id="customer-notes-feedback" class="text-muted"></small>
             </div>
             <style>
               .notes-wrapper {
@@ -211,7 +248,7 @@
             </style>
 
             <!-- Modal notas -->
-            <div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal fade" id="notesModalMain" tabindex="-1" role="dialog" aria-hidden="true">
               <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -221,87 +258,17 @@
                     </button>
                   </div>
                   <div class="modal-body">
-                    <textarea id="customer-notes-textarea" class="form-control" rows="8" aria-label="Notas"></textarea>
+                    <textarea class="form-control notes-textarea" rows="8" aria-label="Notas"></textarea>
                   </div>
                   <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="customer-notes-save">Guardar</button>
+                    <button type="button" class="btn btn-primary notes-save-btn">Guardar</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            @push('scripts')
-            <script>
-              $(function () {
-                var $display = $('#customer-notes-display');
-                if (!$display.length) return;
-                var $feedback = $('#customer-notes-feedback');
-                var saveUrl = $display.data('save-url');
-                var $modal = $('#notesModal');
-                var $textarea = $('#customer-notes-textarea');
-                var lastValue = $display.text();
-
-                function persist(newText) {
-                  var payload = newText || '';
-                  $feedback.text('Guardando...');
-                  $.ajax({
-                    url: saveUrl,
-                    method: 'POST',
-                    data: {
-                      notes: payload,
-                      _token: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (resp) {
-                      var updated = resp && typeof resp.notes !== 'undefined' ? resp.notes : payload;
-                      lastValue = updated;
-                      $display.text(updated);
-                      $feedback.text('Notas guardadas');
-                      $modal.modal('hide');
-                    },
-                    error: function () {
-                      $feedback.text('No se pudo guardar las notas');
-                    }
-                  });
-                }
-
-                $display.on('focus', function () {
-                  console.log('Notas focus');
-                  $display.addClass('notes-display--active');
-                  lastValue = $display.text();
-                });
-
-                $display.on('blur', function () {
-                  console.log('Notas blur');
-                  $display.removeClass('notes-display--active');
-                  var current = $display.text();
-                  if (current === lastValue) return;
-                  persist(current);
-                });
-
-                $('#customer-notes-edit-btn').on('click', function () {
-                  console.log('Notas abrir modal');
-                  $('.modal-backdrop').remove();
-                  $('body').removeClass('modal-open');
-                  $textarea.val($display.text().replace(/\s+$/,''));
-                  $modal.modal('show');
-                  $modal.on('shown.bs.modal', function () {
-                    $textarea.trigger('focus');
-                  });
-                });
-
-                $('#customer-notes-save').on('click', function () {
-                  var current = ($textarea.val() || '');
-                  console.log('Notas guardar');
-                  if (current === lastValue) {
-                    $modal.modal('hide');
-                    return;
-                  }
-                  persist(current);
-                });
-              });
-            </script>
-            @endpush
+            @include('customers.partials.notes_script')
 
             <div>
               <span class="lavel"><strong>Campaña:</strong></span> {{$model->campaign_name}}

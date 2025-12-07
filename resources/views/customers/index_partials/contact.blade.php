@@ -154,18 +154,16 @@
     <div class="mb-4 border-bottom pb-2">
       <h5 class="text-dark">Notas</h5>
 
-      <div class="notes-wrapper position-relative">
+      <div class="notes-wrapper position-relative notes-editor" data-save-url="/customers/{{$customer->id}}/notes">
         <div
-          id="customer-notes-side"
           class="notes-display border rounded p-2"
           contenteditable="true"
-          data-save-url="/customers/{{$customer->id}}/notes"
         >{{ $customer->notes }}</div>
-        <button type="button" class="btn btn-light btn-sm notes-edit-btn" id="customer-notes-side-edit" aria-label="Editar notas">
+        <button type="button" class="btn btn-light btn-sm notes-edit-btn" data-modal="#notesModalSide" aria-label="Editar notas">
           ✏️
         </button>
+        <small class="notes-feedback text-muted"></small>
       </div>
-      <small id="customer-notes-side-feedback" class="text-muted"></small>
 
       <!-- Modal notas (side panel) -->
       <div class="modal fade" id="notesModalSide" tabindex="-1" role="dialog" aria-hidden="true">
@@ -178,11 +176,11 @@
               </button>
             </div>
             <div class="modal-body">
-              <textarea id="customer-notes-side-textarea" class="form-control" rows="8" aria-label="Notas"></textarea>
+              <textarea class="form-control notes-textarea" rows="8" aria-label="Notas"></textarea>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-              <button type="button" class="btn btn-primary" id="customer-notes-side-save">Guardar</button>
+              <button type="button" class="btn btn-primary notes-save-btn">Guardar</button>
             </div>
           </div>
         </div>
