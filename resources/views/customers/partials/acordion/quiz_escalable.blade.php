@@ -1,3 +1,9 @@
+@php
+  $quizSummary = $quizSummary ?? null;
+  $quizAnswers = $quizAnswers ?? collect();
+  $quizQuestions = $quizQuestions ?? collect();
+@endphp
+
 <div class="card">
   <div class="card-header" id="headingQuizEscalable">
     <h3>
