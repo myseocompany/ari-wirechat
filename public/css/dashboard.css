@@ -723,3 +723,44 @@
     #sidecontent #sidenav .customer.customer_row.row{
       width: 100%;
     }
+
+/* ===== Scroll independiente en layout agile ===== */
+body#sidebody {
+  min-height: 100vh;
+}
+body#sidebody > .row {
+  min-height: 100vh;
+  margin: 0;
+}
+body#sidebody nav {
+  max-height: 100vh;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+}
+#sidenav {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+#sidefilter {
+  overflow-y: auto;
+}
+#sidecontent {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+#sidecontent-footer {
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  padding: 8px;
+  position: sticky;
+  bottom: 0;
+}
+#side_content {
+  max-height: 100vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+}

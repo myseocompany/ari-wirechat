@@ -40,6 +40,7 @@ use App\Models\CampaignMessage;
 use App\Models\Log;
 use App\Models\Country;
 use App\Services\CustomerService;
+use App\Models\Tag;
 
 class CustomerController extends Controller
 {
@@ -84,6 +85,10 @@ class CustomerController extends Controller
         }
 
         $id = $customer?->id ?? 0;
+        $allTags = Tag::orderBy('name')->get();
+        if ($customer) {
+            $customer->load('tags');
+        }
 
         return view('customers.index', [
             'request'           => $request,
@@ -103,6 +108,8 @@ class CustomerController extends Controller
             'email_options'     => Email::where('type_id', 1)->where('active', 1)->get(),
             'statuses_options'  => $statuses,
             'country_options'   => Country::all(),
+            'tags'              => $allTags,
+            'allTags'           => $allTags,
         ]);
     }
 
@@ -836,6 +843,9 @@ class CustomerController extends Controller
     public function show($id)
     {
         $model = Customer::find($id);
+        if ($model) {
+            $model->load('tags');
+        }
         $action_options = ActionType::orderby('weigth')->get();
         $actions = Action::where('customer_id', '=', $id)
             ->orderby("created_at", "DESC")
@@ -880,6 +890,7 @@ class CustomerController extends Controller
             ->whereIn('id', $quizQuestionMetaIds)
             ->get()
             ->keyBy('id');
+        $allTags = Tag::orderBy('name')->get();
 
         return view('customers.show', compact(
             'model',
@@ -896,13 +907,15 @@ class CustomerController extends Controller
             'today',
             'quizSummary',
             'quizAnswers',
-            'quizQuestions'
+            'quizQuestions',
+            'allTags'
         ));
     }
     public function showAction($id, $Aid)
     {
         $actionProgramed = Action::find($Aid);
         $model = Customer::find($id);
+        $allTags = Tag::orderBy('name')->get();
         $actions = Action::where('customer_id', '=', $id)->orderby("created_at", "DESC")->get();
         $action_options = ActionType::all();
         $histories = CustomerHistory::where('customer_id', '=', $id)->get();
@@ -926,19 +939,21 @@ class CustomerController extends Controller
             'actionProgramed',
             'quizSummary',
             'quizAnswers',
-            'quizQuestions'
+            'quizQuestions',
+            'allTags'
         ));
     }
     public function showHistory($id)
     {
         $model = CustomerHistory::find($id);
+        $allTags = collect();
         $actions = Action::where('customer_id', '=', $id)->orderby("created_at", "DESC")->get();
         $action_options = ActionType::all();
         $histories = null;
         $email_options = Email::all();
         $statuses_options = CustomerStatus::orderBy("weight", "ASC")->get();
         $actual = false;
-        return view('customers.show', compact('model', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual'));
+        return view('customers.show', compact('model', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'allTags'));
     }
     /**
      * Show the form for editing the specified resource.

@@ -27,6 +27,8 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\WhatsAppAPIController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\CustomerTagController;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -52,6 +54,18 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::middleware('auth')
+    ->prefix('admin/tags')
+    ->name('tags.')
+    ->group(function () {
+        Route::get('/', [TagController::class, 'index'])->name('index');
+        Route::get('/create', [TagController::class, 'create'])->name('create');
+        Route::post('/', [TagController::class, 'store'])->name('store');
+        Route::get('/{tag}/edit', [TagController::class, 'edit'])->name('edit');
+        Route::put('/{tag}', [TagController::class, 'update'])->name('update');
+        Route::delete('/{tag}', [TagController::class, 'destroy'])->name('destroy');
+    });
 
 require __DIR__.'/auth.php';
 
@@ -93,6 +107,7 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     
     Route::get('/create', [CustomerController::class, 'create']);
     Route::post('/', [CustomerController::class, 'store']);
+    Route::post('/{customer}/tags', [CustomerTagController::class, 'update'])->name('customers.tags.update');
     // Chat
     Route::post('/start-chat', [CustomerController::class, 'startConversationFromCRM'])->name('customers.start-chat');
 

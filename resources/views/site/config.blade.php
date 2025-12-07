@@ -34,6 +34,13 @@
 	<a href="/faq" class="list-group-item">Preguntas Frecuentes</a>
 </div>
 <div class="list-group">
+    <div class="list-group-item">
+        <h3 class="h5 mb-1">Etiquetas de clientes</h3>
+        <p class="mb-2">Administra las etiquetas disponibles para clasificar clientes.</p>
+        <a href="{{ route('tags.index') }}" class="btn btn-sm btn-primary">Gestionar etiquetas</a>
+    </div>
+</div>
+<div class="list-group">
     <a href="/products" class="list-group-item">Productos</a>
 </div>
 <div class="list-group">

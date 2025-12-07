@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Action;
+use App\Models\Tag;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -95,6 +96,11 @@ class Customer extends Authenticatable
 
     function files(){
         return $this->hasMany('App\Models\CustomerFile');
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'customer_tag')->withTimestamps();
     }
     // por compatibilidad con tu Blade actual
     public function customer_files()

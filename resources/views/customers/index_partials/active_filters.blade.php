@@ -28,6 +28,11 @@ $countryName = function($iso2) use ($country_options) {
   $item = collect($country_options)->firstWhere('iso2', $iso2);
   return $item->name ?? $iso2;
 };
+$tagName = function($id) use ($tags) {
+  if (empty($id) || empty($tags)) return $id;
+  $item = collect($tags)->firstWhere('id', (int)$id);
+  return $item->name ?? $id;
+};
 $statusName = function($id) use ($statuses) {
   if (empty($id) || empty($statuses)) return $id;
   $item = collect($statuses)->firstWhere('id', (int)$id);
@@ -58,7 +63,7 @@ $hasAny =
   ($q['from_date'] ?? null) || ($q['to_date'] ?? null) ||
   ($q['scoring_profile'] ?? null) || ($q['scoring_interest'] ?? null) ||
   ($q['country'] ?? null) || ($q['status_id'] ?? null) ||
-  ($q['user_id'] ?? null) || ($q['source_id'] ?? null) ||
+  ($q['user_id'] ?? null) || ($q['source_id'] ?? null) || ($q['tag_id'] ?? null) ||
   ($q['maker'] ?? null) || ($q['created_updated'] ?? null) ||
   ($q['has_quote'] ?? null);
 @endphp
@@ -106,6 +111,15 @@ $hasAny =
       Fecha en: {{ $q['created_updated'] === 'created' ? 'Creado' : 'Actualizado' }}
       <a class="ml-1 text-danger"
          href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['created_updated'])) }}">×</a>
+    </span>
+  @endif
+
+  {{-- Etiqueta --}}
+  @if(array_key_exists('tag_id', $q) && $q['tag_id'] !== '')
+    <span class="badge badge-pill badge-light border text-danger ml-2">
+      Etiqueta: {{ $tagName($q['tag_id']) }}
+      <a class="ml-1 text-danger"
+         href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['tag_id'])) }}">×</a>
     </span>
   @endif
 

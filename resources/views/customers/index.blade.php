@@ -37,13 +37,16 @@
 }
 
   </style>
+
+
+@endsection
+
+@section('list_footer')
 <div class="row">
   <div class="col-12 d-flex justify-content-center">
       {!! $model->appends(request()->input())->links() !!}
   </div>
 </div>
-
-
 @endsection
 
 @section('filter')

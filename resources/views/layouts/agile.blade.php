@@ -28,7 +28,7 @@
   
 <div class="row">
   <nav class="col-sm-12 col-md-4 " >
-    <div id="sidenav">
+    <div id="sidenav" class="d-flex flex-column h-100">
       <div id="brand">
         <a class="navbar-brand" href="/customers/"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
 
@@ -45,11 +45,14 @@
       <div>
         <h1>@yield('title')</h1>
       </div>
-      <div id="sidefilter">
+      <div id="sidefilter" class="flex-shrink-0">
         @yield('filter')
       </div>
-      <div id="sidecontent">
+      <div id="sidecontent" class="flex-fill">
         @yield('list')
+      </div>
+      <div id="sidecontent-footer" class="flex-shrink-0">
+        @yield('list_footer')
       </div>
     </div>
   @include('layouts.left_navigation')

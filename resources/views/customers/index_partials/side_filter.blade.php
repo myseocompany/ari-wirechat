@@ -22,6 +22,7 @@
   'statuses'        => $statuses ?? [],
   'users'           => $users ?? [],
   'sources'         => $sources ?? [],
+  'tags'            => $tags ?? [],
 ])
 
 {{-- Sección de filtros colapsable --}}
@@ -142,6 +143,16 @@
           @endforeach
         </select>
       </div>
+    </div>
+
+    <div class="form-group">
+      <label for="tag_id">Etiqueta</label>
+      <select name="tag_id" class="form-control" id="tag_id">
+        <option value="">Todas</option>
+        @foreach($tags as $tag)
+          <option value="{{ $tag->id }}" @selected($request->tag_id == $tag->id)>{{ $tag->name }}</option>
+        @endforeach
+      </select>
     </div>
 
     {{-- Tiene cotización --}}

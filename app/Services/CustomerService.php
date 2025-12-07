@@ -58,6 +58,14 @@ class CustomerService {
             if (isset($request->scoring_profile) && $request->scoring_profile !== null)
                                                     $query->where('customers.scoring_profile', $request->scoring_profile);
             if (!empty($request->inquiry_product_id)) $query->where('customers.inquiry_product_id', $request->inquiry_product_id);
+            if (!empty($request->tag_id)) {
+                $query->whereExists(function ($sub) use ($request) {
+                    $sub->select(DB::raw(1))
+                        ->from('customer_tag')
+                        ->whereColumn('customer_tag.customer_id', 'customers.id')
+                        ->where('customer_tag.tag_id', $request->tag_id);
+                });
+            }
 
             if (!empty($searchTerm)) {
                 $query->where(function ($innerQuery) use ($searchTerm) {

@@ -181,7 +181,9 @@ function openTab(evt, tabName) {
 
       $(document).ready(function(){
       starTotal = 4;
-      ratings.forEach(renderStar);
+      if (typeof ratings !== 'undefined' && Array.isArray(ratings)) {
+        ratings.forEach(renderStar);
+      }
 
       function renderStar(value, index, array){
         starPercentage = (array[index] / starTotal) * 100;
@@ -212,12 +214,10 @@ function openTab(evt, tabName) {
 
 
     function showEditIcon(id){
-    console.log("show_edit_icon_"+id);
     $("#edit_icon_"+id).css("display", "inline");
     $("#edit_icon_campaings_"+id).css("display", "inline");
   }
   function hideEditIcon(id){
-    console.log("hide_edit_icon_"+id);
     $("#edit_icon_"+id).css("display", "none");
      $("#edit_icon_campaings_"+id).css("display", "none");
 }
