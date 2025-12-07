@@ -154,67 +154,54 @@
     <div class="mb-4 border-bottom pb-2">
       <h5 class="text-dark">Notas</h5>
 
-      <div
-        id="customer-notes-side"
-        class="form-control notes-editable"
-        contenteditable="true"
-        data-save-url="/customers/{{$customer->id}}/notes"
-        style="min-height: 60px; border: 1px solid transparent; box-shadow: none;"
-        aria-label="Notas"
-      >{{ $customer->notes }}</div>
+      <div class="notes-wrapper position-relative">
+        <div
+          id="customer-notes-side"
+          class="notes-display border rounded p-2"
+          data-save-url="/customers/{{$customer->id}}/notes"
+        >{!! nl2br(e($customer->notes)) !!}</div>
+        <button type="button" class="btn btn-light btn-sm notes-edit-btn" id="customer-notes-side-edit" aria-label="Editar notas">
+          ✏️
+        </button>
+      </div>
       <small id="customer-notes-side-feedback" class="text-muted"></small>
 
+      <!-- Modal notas (side panel) -->
+      <div class="modal fade" id="notesModalSide" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Editar notas</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <textarea id="customer-notes-side-textarea" class="form-control" rows="8" aria-label="Notas"></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-primary" id="customer-notes-side-save">Guardar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <style>
-        .notes-editable {
-          border: 1px solid transparent;
-          box-shadow: none;
-          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        .notes-wrapper { margin-bottom: 6px; }
+        .notes-display {
+          min-height: 60px;
+          white-space: pre-wrap;
+          word-break: break-word;
         }
-        .notes-editable:focus {
-          outline: none;
-        }
-        .notes-editable.notes-editable--active {
-          border-color: #ced4da;
-          box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.05);
+        .notes-edit-btn {
+          position: absolute;
+          right: 8px;
+          bottom: 8px;
+          padding: 4px 8px;
+          font-size: 14px;
         }
       </style>
-      <script>
-        (function () {
-          var $notes = $('#customer-notes-side');
-          if (!$notes.length) return;
-          var $feedback = $('#customer-notes-side-feedback');
-          var saveUrl = $notes.data('save-url');
-          var lastValue = $notes.text().trim();
-
-          $notes.on('focus', function () {
-            $notes.addClass('notes-editable--active');
-          });
-
-          $notes.on('blur', function () {
-            $notes.removeClass('notes-editable--active');
-            var current = $notes.text().trim();
-            if (current === lastValue) return;
-
-            $feedback.text('Guardando...');
-            $.ajax({
-              url: saveUrl,
-              method: 'POST',
-              data: {
-                notes: current,
-                _token: $('meta[name="csrf-token"]').attr('content')
-              },
-              success: function (resp) {
-                lastValue = resp && typeof resp.notes !== 'undefined' ? resp.notes : current;
-                $notes.text(lastValue);
-                $feedback.text('Notas guardadas');
-              },
-              error: function () {
-                $feedback.text('No se pudo guardar las notas');
-              }
-            });
-          });
-        })();
-      </script>
 
       @if(!empty($customer->technical_visit))
         <p class="mt-3"><strong>Visitas Técnicas:</strong> <span class="text-dark">{{ $customer->technical_visit }}</span></p>

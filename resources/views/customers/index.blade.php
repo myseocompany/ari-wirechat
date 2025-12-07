@@ -135,12 +135,15 @@
           if (window.initCustomerTags) {
             window.initCustomerTags($('#side_content'));
           }
-          if (window.initCustomerNotes) {
-            window.initCustomerNotes($('#side_content'));
-          }
-        } else {
-          window.location.href = url;
+        if (window.initCustomerNotes) {
+          window.initCustomerNotes($('#side_content'));
         }
+        if (window.initCustomerNotesModalSide) {
+          window.initCustomerNotesModalSide($('#side_content'));
+        }
+      } else {
+        window.location.href = url;
+      }
       }).fail(function() {
         window.location.href = url;
     }).always(function() {
@@ -202,9 +205,56 @@
         });
       });
     };
+    window.initCustomerNotesModalSide = function(scope) {
+      var $scope = scope ? $(scope) : $(document);
+      var $display = $scope.find('#customer-notes-side');
+      if (!$display.length) return;
+      var $feedback = $scope.find('#customer-notes-side-feedback');
+      var saveUrl = $display.data('save-url');
+      var $modal = $scope.find('#notesModalSide');
+      var $textarea = $scope.find('#customer-notes-side-textarea');
+      var $btn = $scope.find('#customer-notes-side-edit');
+      var $save = $scope.find('#customer-notes-side-save');
+
+      // Evitar doble binding
+      if ($btn.data('notes-bound')) return;
+      $btn.data('notes-bound', true);
+
+      $btn.on('click', function() {
+        console.log('Notas lado abrir modal');
+        $textarea.val($display.text().trim());
+        $modal.modal('show');
+      });
+
+      $save.on('click', function() {
+        var current = ($textarea.val() || '').trim();
+        console.log('Notas lado guardar');
+        if ($feedback.length) $feedback.text('Guardando...');
+        $.ajax({
+          url: saveUrl,
+          method: 'POST',
+          data: {
+            notes: current,
+            _token: $('meta[name="csrf-token"]').attr('content')
+          },
+          success: function(resp) {
+            var newText = resp && typeof resp.notes !== 'undefined' ? resp.notes : current;
+            $display.html(newText.replace(/\n/g, '<br>'));
+            if ($feedback.length) $feedback.text('Notas guardadas');
+            $modal.modal('hide');
+          },
+          error: function() {
+            if ($feedback.length) $feedback.text('No se pudo guardar las notas');
+          }
+        });
+      });
+    };
     $(function() {
       if (window.initCustomerNotes) {
         window.initCustomerNotes($('#side_content'));
+      }
+      if (window.initCustomerNotesModalSide) {
+        window.initCustomerNotesModalSide($('#side_content'));
       }
     });
 

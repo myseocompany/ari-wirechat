@@ -172,48 +172,76 @@
 
             <div class="mt-2">
               <span class="lavel"><strong>Notas:</strong></span>
-              <div
-                id="customer-notes"
-                class="form-control notes-editable"
-                contenteditable="true"
-                data-save-url="/customers/{{$model->id}}/notes"
-                style="min-height: 60px; border: 1px solid transparent; box-shadow: none;"
-                aria-label="Notas"
-              >{{$model->notes}}</div>
+              <div class="notes-wrapper position-relative">
+                <div
+                  id="customer-notes-display"
+                  class="notes-display border rounded p-2"
+                  data-save-url="/customers/{{$model->id}}/notes"
+                >{!! nl2br(e($model->notes)) !!}</div>
+                <button type="button" class="btn btn-light btn-sm notes-edit-btn" id="customer-notes-edit-btn" aria-label="Editar notas">
+                  ✏️
+                </button>
+              </div>
               <small id="customer-notes-feedback" class="text-muted"></small>
             </div>
             <style>
-              .notes-editable {
-                border: 1px solid transparent;
-                box-shadow: none;
-                transition: border-color 0.15s ease, box-shadow 0.15s ease;
+              .notes-wrapper {
+                margin-bottom: 6px;
               }
-              .notes-editable:focus {
-                outline: none;
+              .notes-display {
+                min-height: 60px;
+                white-space: pre-wrap;
+                word-break: break-word;
               }
-              .notes-editable.notes-editable--active {
-                border-color: #ced4da;
-                box-shadow: 0 0 0 0.1rem rgba(0, 0, 0, 0.05);
+              .notes-edit-btn {
+                position: absolute;
+                right: 8px;
+                bottom: 8px;
+                padding: 4px 8px;
+                font-size: 14px;
               }
             </style>
+
+            <!-- Modal notas -->
+            <div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Editar notas</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <textarea id="customer-notes-textarea" class="form-control" rows="8" aria-label="Notas"></textarea>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="customer-notes-save">Guardar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             @push('scripts')
             <script>
               $(function () {
-                var $notes = $('#customer-notes');
-                if (!$notes.length) return;
+                var $display = $('#customer-notes-display');
+                if (!$display.length) return;
                 var $feedback = $('#customer-notes-feedback');
-                var saveUrl = $notes.data('save-url');
-                var lastValue = $notes.text().trim();
+                var saveUrl = $display.data('save-url');
+                var $modal = $('#notesModal');
+                var $textarea = $('#customer-notes-textarea');
 
-                $notes.on('focus', function () {
-                  $notes.addClass('notes-editable--active');
+                $('#customer-notes-edit-btn').on('click', function () {
+                  console.log('Notas abrir modal');
+                  $textarea.val($display.text().trim());
+                  $modal.modal('show');
                 });
 
-                $notes.on('blur', function () {
-                  $notes.removeClass('notes-editable--active');
-                  var current = $notes.text().trim();
-                  if (current === lastValue) return;
-
+                $('#customer-notes-save').on('click', function () {
+                  var current = $textarea.val().trim();
+                  console.log('Notas guardar');
                   $feedback.text('Guardando...');
                   $.ajax({
                     url: saveUrl,
@@ -223,9 +251,10 @@
                       _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (resp) {
-                      lastValue = resp && typeof resp.notes !== 'undefined' ? resp.notes : current;
-                      $notes.text(lastValue);
+                      var newText = resp && typeof resp.notes !== 'undefined' ? resp.notes : current;
+                      $display.html(newText.replace(/\n/g, '<br>'));
                       $feedback.text('Notas guardadas');
+                      $modal.modal('hide');
                     },
                     error: function () {
                       $feedback.text('No se pudo guardar las notas');
