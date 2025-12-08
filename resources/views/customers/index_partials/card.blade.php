@@ -1,6 +1,11 @@
 @php
   $lastAction = $item->getLastUserAction();
   $diasSinContacto = $lastAction ? \Carbon\Carbon::parse($lastAction->created_at)->diffInDays(now()) : null;
+  $authUser = auth()->user();
+  $limited = $item->limited_access ?? ! $item->hasFullAccess($authUser);
+  $visiblePhone = $item->getVisiblePhone($authUser);
+  $visibleEmail = $item->getVisibleEmail($authUser);
+  $visibleName = $item->getVisibleName($authUser);
 @endphp
 
 @php $cardUrl = request()->fullUrlWithQuery(['customer_id' => $item->id]); @endphp
@@ -21,22 +26,24 @@
             <div>
               <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}" class="font-weight-bold">
                 {!! $item->maker === 1 ? '🥟' : ($item->maker === 0 ? '💡' : ($item->maker === 2 ? '🍗🥩⚙️' : '')) !!}
-                &nbsp;{{ Str::limit($item->name ?? 'Sin nombre', 21) }}
+                &nbsp;{{ Str::limit($visibleName ?? 'Sin nombre', 21) }}
               </a>
             </div>
 
-            <div>
-              @php $stars = $item->getScoringToNumber(); @endphp
-              @for ($i = 1; $i <= 4; $i++)
-                <span style="color: {{ $i <= $stars ? 'gold' : 'lightgray' }}; font-size: 16px;">
-                  {{ $i <= $stars ? '★' : '☆' }}
-                </span>
-              @endfor
+            @unless($limited)
+              <div>
+                @php $stars = $item->getScoringToNumber(); @endphp
+                @for ($i = 1; $i <= 4; $i++)
+                  <span style="color: {{ $i <= $stars ? 'gold' : 'lightgray' }}; font-size: 16px;">
+                    {{ $i <= $stars ? '★' : '☆' }}
+                  </span>
+                @endfor
 
-              @if($item->scoring_interest)
-                <span class="badge bg-secondary ml-1">{{ $item->scoring_interest }}</span>
-              @endif
-            </div>
+                @if($item->scoring_interest)
+                  <span class="badge bg-secondary ml-1">{{ $item->scoring_interest }}</span>
+                @endif
+              </div>
+            @endunless
           </div>
 
 
@@ -53,16 +60,23 @@
               {{ $item->country }}
             @endif
             &nbsp;|&nbsp;
-            <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}">
-              {{ $item->getBestPhoneCandidate()
-                ? $item->getInternationalPhone($item->getBestPhoneCandidate())
-                : 'Sin teléfono válido' }}
-            </a>
+            @if($visiblePhone)
+              <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}">
+                {{ $visiblePhone }}
+              </a>
+            @else
+              <span class="text-muted">Teléfono restringido</span>
+            @endif
+
+            @if($visibleEmail)
+              &nbsp;|&nbsp;
+              <span class="text-muted">{{ $visibleEmail }}</span>
+            @endif
             
           </div>
 
           {{-- Nota --}}
-          @if($item->note)
+          @if(!$limited && $item->note)
             <div class="small text-muted mt-1">
               Nota: "{{ \Illuminate\Support\Str::limit($item->note, 40) }}"
             </div>
@@ -89,12 +103,20 @@
           : 'fa-clock-o';
       @endphp
 
-      <div>
-        <span class="badge badge-{{ $color }}">
-          <i class="fa {{ $icon }}"></i>
-          {{ $createdAt ? $createdAt->diffForHumans() : 'Sin acciones' }}
-        </span>
-      </div>
+      @if($limited)
+        <div>
+          <span class="badge badge-secondary">
+            <i class="fa fa-lock"></i> Acceso restringido
+          </span>
+        </div>
+      @else
+        <div>
+          <span class="badge badge-{{ $color }}">
+            <i class="fa {{ $icon }}"></i>
+            {{ $createdAt ? $createdAt->diffForHumans() : 'Sin acciones' }}
+          </span>
+        </div>
+      @endif
 
       {{-- Asesor --}}
       <a href="/customers/{{$item->id}}/show" class="advisor-link">
@@ -114,7 +136,7 @@
       </a>
 
     </div>
-    @if($lastAction && $lastAction->note)
+    @if(!$limited && $lastAction && $lastAction->note)
       <div class="mt-1 text-muted" style="font-size: 0.85rem;">
         <i class="fa fa-sticky-note-o" aria-hidden="true"></i>
         "{{ \Illuminate\Support\Str::limit($lastAction->note, 80) }}"

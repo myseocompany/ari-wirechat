@@ -21,12 +21,14 @@ class CustomerService {
 
         $searchTerm = $request->search;
         $dates = $this->getDates($request);
+        $authUser = Auth::user();
+        $forceOwnCustomers = $authUser && ! $authUser->canViewAllCustomers();
 
         $query = Customer::query()
             ->with(['user']) // needed for card view (asesor)
             ->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
 
-        $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm) {
+        $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm, $forceOwnCustomers, $authUser) {
             if (!empty($request->from_date)) {
                 $column = ($request->created_updated === "created") ? 'created_at' : 'updated_at';
                 $query->whereBetween("customers.$column", $dates);
@@ -34,7 +36,9 @@ class CustomerService {
                 $query->whereBetween("customers.created_at", $dates);
             }
 
-            if (!empty($request->user_id)) {
+            if ($forceOwnCustomers && empty($searchTerm)) {
+                $query->where('customers.user_id', $authUser->id);
+            } elseif (! $forceOwnCustomers && !empty($request->user_id)) {
                 $query->where('customers.user_id', $request->user_id === "null" ? null : $request->user_id);
             }
 
@@ -147,6 +151,19 @@ class CustomerService {
         // Si ya añadías "action", seguimos igual por compatibilidad:
         $result->action = "customers";
         $result->benchmark_ms = round($elapsedMs, 2);
+
+        $annotateAccess = function ($item) use ($authUser) {
+            if (method_exists($item, 'hasFullAccess')) {
+                $item->limited_access = ! $item->hasFullAccess($authUser);
+            }
+            return $item;
+        };
+
+        if ($result instanceof \Illuminate\Pagination\LengthAwarePaginator || $result instanceof \Illuminate\Pagination\Paginator) {
+            $result->getCollection()->transform($annotateAccess);
+        } else {
+            $result = $result->map($annotateAccess);
+        }
 
         return $result;
     }

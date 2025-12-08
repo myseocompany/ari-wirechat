@@ -8,6 +8,7 @@ use App\Models\Tag;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\User;
 use Namu\WireChat\Traits\Chatable;
 
 class Customer extends Authenticatable
@@ -372,8 +373,49 @@ class Customer extends Authenticatable
         if ($this->status && $this->status->color) {
             return $this->status->color;
         }
-    
+
         return '#000000'; // Negro por defecto si no tiene estado
+    }
+
+    public function hasFullAccess(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->canViewAllCustomers()) {
+            return true;
+        }
+
+        $owner = $this->user;
+        $ownerIsActive = $owner && (int) ($owner->status_id ?? 1) === 1; // si no hay status, asumimos activo para no filtrar de más
+
+        if (! $ownerIsActive) {
+            return true;
+        }
+
+        return (int) ($this->user_id ?? 0) === (int) $user->id;
+    }
+
+    public function getVisibleName(?User $user): string
+    {
+        return $this->getName();
+    }
+
+    public function getVisibleEmail(?User $user): ?string
+    {
+        // Email se considera campo básico, siempre visible.
+        return $this->email ?: null;
+    }
+
+    public function getVisiblePhone(?User $user): ?string
+    {
+        if (! $this->hasFullAccess($user)) {
+            return null;
+        }
+
+        $candidate = $this->getBestPhoneCandidate();
+        return $candidate ? $this->getInternationalPhone($candidate) : null;
     }
 
     

@@ -10,141 +10,147 @@ function clearWP($str)
 if ($customer instanceof \Illuminate\Pagination\LengthAwarePaginator) {
     $customer = $customer->first();
 }
+$authUser = auth()->user();
+$limited = $customer instanceof \App\Models\Customer ? ! $customer->hasFullAccess($authUser) : false;
 ?>
 
 @if($customer instanceof \App\Models\Customer)
   @include('customers.index_partials.customer_header')
   
-    <div class="row">
-      <div class="col-md-4">
-        <div id="customer_show">
-          <div><a href="#" onclick="searchInGoogle('{{$customer->name}}')">Buscar en Google</a></div>
-          <div>
-            @if(isset($customer->rd_public_url))
-              <a href="{{$customer->rd_public_url}}" target="_blank">Buscar en RD Station</a>
-            @endif
-          </div>
-          @include('customers.index_partials.contact')
-          <br>
-
-          {{-- Etiquetas del cliente --}}
-          <div class="mt-3">
-            <h3 class="text-sm font-semibold">Etiquetas</h3>
-            <div class="mb-2" id="customer-tags-badges">
-              @if($customer->tags && $customer->tags->count())
-                @foreach($customer->tags as $tag)
-                  <span class="px-2 py-1 rounded-full text-xs font-semibold mr-2 mb-1 d-inline-block" style="background-color: {{ $tag->color ?? '#e2e8f0' }};">
-                    {{ $tag->name }}
-                  </span>
-                @endforeach
-              @else
-                <span class="text-muted">Sin etiquetas</span>
+    @if($limited)
+      <div class="alert alert-info mt-3">Acceso restringido: solo datos básicos visibles.</div>
+    @else
+      <div class="row">
+        <div class="col-md-4">
+          <div id="customer_show">
+            <div><a href="#" onclick="searchInGoogle('{{$customer->name}}')">Buscar en Google</a></div>
+            <div>
+              @if(isset($customer->rd_public_url))
+                <a href="{{$customer->rd_public_url}}" target="_blank">Buscar en RD Station</a>
               @endif
             </div>
+            @include('customers.index_partials.contact')
+            <br>
 
-            @if(isset($allTags) && $allTags->count())
-              <form method="POST" action="{{ route('customers.tags.update', $customer) }}" id="customer-tags-form-index">
-                @csrf
-                <div class="grid grid-cols-2 gap-2">
-                  @foreach($allTags as $tagOption)
-                    @php
-                      $checked = $customer->tags->contains($tagOption->id);
-                      $color = $tagOption->color ?: '#edf2f7';
-                    @endphp
-                    <label class="flex items-center gap-2 px-3 py-2 rounded border cursor-pointer text-sm" style="border-color: {{ $checked ? $color : '#e2e8f0' }}; background-color: {{ $checked ? $color : '#fff' }};">
-                      <input
-                        type="checkbox"
-                        name="tags[]"
-                        value="{{ $tagOption->id }}"
-                        class="form-checkbox tag-checkbox"
-                        data-name="{{ $tagOption->name }}"
-                        data-color="{{ $tagOption->color ?: '#e2e8f0' }}"
-                        @checked($checked)>
-                      <span>{{ $tagOption->name }}</span>
-                    </label>
+            {{-- Etiquetas del cliente --}}
+            <div class="mt-3">
+              <h3 class="text-sm font-semibold">Etiquetas</h3>
+              <div class="mb-2" id="customer-tags-badges">
+                @if($customer->tags && $customer->tags->count())
+                  @foreach($customer->tags as $tag)
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold mr-2 mb-1 d-inline-block" style="background-color: {{ $tag->color ?? '#e2e8f0' }};">
+                      {{ $tag->name }}
+                    </span>
                   @endforeach
-                </div>
-              </form>
-              <div id="tags-feedback-index" class="small text-muted mt-2"></div>
-              @push('scripts')
-              <script>
-                (function() {
-                  window.initCustomerTags = function(scope) {
-                    var $scope = scope ? $(scope) : $(document);
-                    var $form = $scope.find('#customer-tags-form-index');
-                    if (!$form.length) return;
-                    var $feedback = $scope.find('#tags-feedback-index');
-                    var $badgesContainer = $scope.find('#customer-tags-badges');
+                @else
+                  <span class="text-muted">Sin etiquetas</span>
+                @endif
+              </div>
 
-                    function renderBadgesFromSelection() {
-                      var selected = [];
-                      $form.find('.tag-checkbox:checked').each(function() {
-                        selected.push({
-                          name: $(this).data('name'),
-                          color: $(this).data('color') || '#e2e8f0'
+              @if(isset($allTags) && $allTags->count())
+                <form method="POST" action="{{ route('customers.tags.update', $customer) }}" id="customer-tags-form-index">
+                  @csrf
+                  <div class="grid grid-cols-2 gap-2">
+                    @foreach($allTags as $tagOption)
+                      @php
+                        $checked = $customer->tags->contains($tagOption->id);
+                        $color = $tagOption->color ?: '#edf2f7';
+                      @endphp
+                      <label class="flex items-center gap-2 px-3 py-2 rounded border cursor-pointer text-sm" style="border-color: {{ $checked ? $color : '#e2e8f0' }}; background-color: {{ $checked ? $color : '#fff' }};">
+                        <input
+                          type="checkbox"
+                          name="tags[]"
+                          value="{{ $tagOption->id }}"
+                          class="form-checkbox tag-checkbox"
+                          data-name="{{ $tagOption->name }}"
+                          data-color="{{ $tagOption->color ?: '#e2e8f0' }}"
+                          @checked($checked)>
+                        <span>{{ $tagOption->name }}</span>
+                      </label>
+                    @endforeach
+                  </div>
+                </form>
+                <div id="tags-feedback-index" class="small text-muted mt-2"></div>
+                @push('scripts')
+                <script>
+                  (function() {
+                    window.initCustomerTags = function(scope) {
+                      var $scope = scope ? $(scope) : $(document);
+                      var $form = $scope.find('#customer-tags-form-index');
+                      if (!$form.length) return;
+                      var $feedback = $scope.find('#tags-feedback-index');
+                      var $badgesContainer = $scope.find('#customer-tags-badges');
+
+                      function renderBadgesFromSelection() {
+                        var selected = [];
+                        $form.find('.tag-checkbox:checked').each(function() {
+                          selected.push({
+                            name: $(this).data('name'),
+                            color: $(this).data('color') || '#e2e8f0'
+                          });
                         });
-                      });
 
-                      if (!selected.length) {
-                        $badgesContainer.html('<span class="text-muted">Sin etiquetas</span>');
-                        return;
-                      }
-
-                      var html = selected.map(function(tag) {
-                        return '<span class="px-2 py-1 rounded-full text-xs font-semibold mr-2 mb-1 d-inline-block" style="background-color: ' + tag.color + ';">' + tag.name + '</span>';
-                      }).join('');
-                      $badgesContainer.html(html);
-                    }
-
-                    function sendTags() {
-                      var payload = $form.serializeArray();
-                      if (!$form.find('.tag-checkbox:checked').length) {
-                        payload.push({ name: 'tags', value: '' });
-                      }
-
-                      $feedback.text('Guardando etiquetas...');
-                      $.ajax({
-                        url: $form.attr('action'),
-                        type: 'POST',
-                        data: $.param(payload),
-                        headers: {
-                          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(resp) {
-                          $feedback.text(resp.message || 'Etiquetas actualizadas.');
-                          renderBadgesFromSelection();
-                        },
-                        error: function() {
-                          $feedback.text('No se pudieron guardar las etiquetas.');
+                        if (!selected.length) {
+                          $badgesContainer.html('<span class="text-muted">Sin etiquetas</span>');
+                          return;
                         }
-                      });
-                    }
 
-                    $form.off('change.tag-sync').on('change.tag-sync', '.tag-checkbox', sendTags);
-                    renderBadgesFromSelection();
-                  };
+                        var html = selected.map(function(tag) {
+                          return '<span class="px-2 py-1 rounded-full text-xs font-semibold mr-2 mb-1 d-inline-block" style="background-color: ' + tag.color + ';">' + tag.name + '</span>';
+                        }).join('');
+                        $badgesContainer.html(html);
+                      }
 
-                  $(document).ready(function() {
-                    window.initCustomerTags();
-                  });
-                })();
-              </script>
-              @endpush
-            @endif
+                      function sendTags() {
+                        var payload = $form.serializeArray();
+                        if (!$form.find('.tag-checkbox:checked').length) {
+                          payload.push({ name: 'tags', value: '' });
+                        }
+
+                        $feedback.text('Guardando etiquetas...');
+                        $.ajax({
+                          url: $form.attr('action'),
+                          type: 'POST',
+                          data: $.param(payload),
+                          headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                          },
+                          success: function(resp) {
+                            $feedback.text(resp.message || 'Etiquetas actualizadas.');
+                            renderBadgesFromSelection();
+                          },
+                          error: function() {
+                            $feedback.text('No se pudieron guardar las etiquetas.');
+                          }
+                        });
+                      }
+
+                      $form.off('change.tag-sync').on('change.tag-sync', '.tag-checkbox', sendTags);
+                      renderBadgesFromSelection();
+                    };
+
+                    $(document).ready(function() {
+                      window.initCustomerTags();
+                    });
+                  })();
+                </script>
+                @endpush
+              @endif
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- segunda columna -->
-      <div class="col-md-8">
-        <div id="customer_fallowup">
-          @include('customers.partials.actions_form')
-          @include('customers.index_partials.time_line')
-          @include('customers.index_partials.accordion')
+        <!-- segunda columna -->
+        <div class="col-md-8">
+          <div id="customer_fallowup">
+            @include('customers.partials.actions_form')
+            @include('customers.index_partials.time_line')
+            @include('customers.index_partials.accordion')
+          </div>
         </div>
-      </div>
 
-    </div> <!-- row -->
+      </div> <!-- row -->
+    @endif
 
 
 @else

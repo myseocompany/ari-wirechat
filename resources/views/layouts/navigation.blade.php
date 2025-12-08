@@ -18,8 +18,8 @@
                   
 
 
-                  @if($item->url =="/logout")
-                          <a class="nav-link text-dark" href="{{ route('logout') }}"
+                  @if($item->url == "/logout")
+                          <a class="nav-link text-dark" href="#"
                               onclick="event.preventDefault();
                                        document.getElementById('logout-form').submit();">
                               Salir
@@ -45,8 +45,8 @@
                     @foreach($item->getChildren() as $subitem)
                     <li class="nav-item">
 
-                      @if($subitem->url =="/logout")
-                          <a class="nav-link text-dark" href="{{ route('logout') }}"
+                      @if($subitem->url == "/logout")
+                          <a class="nav-link text-dark" href="#"
                               onclick="event.preventDefault();
                                        document.getElementById('logout-form').submit();">
                               Salir

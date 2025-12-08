@@ -124,15 +124,20 @@
 
     {{-- Usuario y fuente --}}
     <div class="form-row">
+      @php $canViewAll = auth()->user()?->canViewAllCustomers() ?? false; @endphp
       <div class="form-group col-md-6">
         <label for="user_id">Usuario</label>
-        <select name="user_id" class="form-control" id="user_id">
-          <option value="">Todos</option>
-          <option value="null" @selected($request->user_id === 'null')>Sin asignar</option>
-          @foreach($users as $user)
-            <option value="{{ $user->id }}" @selected($request->user_id == $user->id)>{{ Str::limit($user->name, 15) }}</option>
-          @endforeach
-        </select>
+        @if($canViewAll)
+          <select name="user_id" class="form-control" id="user_id">
+            <option value="">Todos</option>
+            <option value="null" @selected($request->user_id === 'null')>Sin asignar</option>
+            @foreach($users as $user)
+              <option value="{{ $user->id }}" @selected($request->user_id == $user->id)>{{ Str::limit($user->name, 15) }}</option>
+            @endforeach
+          </select>
+        @else
+          <div class="form-control bg-light text-muted">Solo tus clientes</div>
+        @endif
       </div>
       <div class="form-group col-md-6">
         <label for="source_id">Fuente</label>

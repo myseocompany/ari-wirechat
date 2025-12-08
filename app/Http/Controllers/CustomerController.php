@@ -53,6 +53,13 @@ class CustomerController extends Controller
         $this->customerService = $customerService;
     }
 
+    private function ensureCanAccessCustomer(Customer $customer): void
+    {
+        if (! $customer->hasFullAccess(Auth::user())) {
+            abort(403);
+        }
+    }
+
     private function normalizeUserId($value): ?int
     {
         if ($value === null) {
@@ -88,7 +95,8 @@ class CustomerController extends Controller
 
         $customer = $model[0] ?? null;
         if ($request->filled('customer_id')) {
-            $customer = Customer::find($request->customer_id);
+            $customer = Customer::findOrFail($request->customer_id);
+            $this->ensureCanAccessCustomer($customer);
         }
 
         $id = $customer?->id ?? 0;
@@ -267,7 +275,8 @@ class CustomerController extends Controller
             $id = $customer->id;
         }
         if (isset($request->customer_id)) {
-            $customer = Customer::find($request->customer_id);
+            $customer = Customer::findOrFail($request->customer_id);
+            $this->ensureCanAccessCustomer($customer);
             $id = $request->customer_id;
         }
         //dd($model->scoring_profile);
@@ -849,10 +858,17 @@ class CustomerController extends Controller
      */
     public function show($id)
     {
-        $model = Customer::find($id);
-        if ($model) {
-            $model->load('tags');
+        $model = Customer::findOrFail($id);
+        $model->loadMissing(['user', 'status']);
+        $fullAccess = $model->hasFullAccess(Auth::user());
+
+        if (! $fullAccess) {
+            return view('customers.readonly', [
+                'model' => $model,
+            ]);
         }
+
+        $model->load('tags');
         $action_options = ActionType::orderby('weigth')->get();
         $actions = Action::where('customer_id', '=', $id)
             ->orderby("created_at", "DESC")
@@ -926,6 +942,7 @@ class CustomerController extends Controller
         ]);
 
         $customer = Customer::findOrFail($customerId);
+        $this->ensureCanAccessCustomer($customer);
         $customer->notes = $data['notes'] ?? '';
         if (Auth::id()) {
             $customer->updated_user_id = Auth::id();
@@ -941,7 +958,8 @@ class CustomerController extends Controller
     public function showAction($id, $Aid)
     {
         $actionProgramed = Action::find($Aid);
-        $model = Customer::find($id);
+        $model = Customer::findOrFail($id);
+        $this->ensureCanAccessCustomer($model);
         $allTags = Tag::orderBy('name')->get();
         $actions = Action::where('customer_id', '=', $id)->orderby("created_at", "DESC")->get();
         $action_options = ActionType::all();
@@ -991,7 +1009,8 @@ class CustomerController extends Controller
     public function edit($id, Request $request)
     {
         $stage_id = session("stage_id", 1);
-        $model = Customer::find($id);
+        $model = Customer::findOrFail($id);
+        $this->ensureCanAccessCustomer($model);
         $customer_statuses = CustomerStatus::orderBy("stage_id", "ASC")
             ->where("stage_id", $stage_id)
             ->where('status_id', "1")
@@ -1029,6 +1048,7 @@ class CustomerController extends Controller
         }
 
         $model = Customer::findOrFail($request->customer_id);
+        $this->ensureCanAccessCustomer($model);
         $model->user_id = $this->normalizeUserId($request->input('user_id'));
         $model->save();
         return $model->id;
@@ -1043,6 +1063,7 @@ class CustomerController extends Controller
     public function update(Request $request, $id)
     {
         $model = Customer::findOrFail($id);
+        $this->ensureCanAccessCustomer($model);
         $authUser = Auth::user();
         $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
         $currentUserId = $model->user_id !== null ? (int) $model->user_id : null;
@@ -1100,7 +1121,8 @@ class CustomerController extends Controller
     }
     public function updateAjaxStatus(Request $request)
     {
-        $model = Customer::find($request->customer_id);
+        $model = Customer::findOrFail($request->customer_id);
+        $this->ensureCanAccessCustomer($model);
         $cHistory = new CustomerHistory;
         $cHistory->saveFromModel($model);
         $model->status_id = $request->status_id;
@@ -1188,7 +1210,8 @@ class CustomerController extends Controller
      */
     public function destroy($id)
     {
-        $model = Customer::find($id);
+        $model = Customer::findOrFail($id);
+        $this->ensureCanAccessCustomer($model);
         if ($model->delete()) {
             return redirect('customers')->with('statustwo', 'El Cliente <strong>' . $model->name . '</strong> fué eliminado con éxito!');
         }
@@ -1370,7 +1393,8 @@ class CustomerController extends Controller
         $date_programed = Carbon\Carbon::parse($request->date_programed);
         $today = Carbon\Carbon::now();
         //dd($request);
-        $customer = Customer::find($request->customer_id);
+        $customer = Customer::findOrFail($request->customer_id);
+        $this->ensureCanAccessCustomer($customer);
         if (is_null($request->type_id)) {
             return back()->with('statustwo', 'El Cliente <strong>' . $customer->name . '</strong> no fue modificado!');
         }
@@ -1419,11 +1443,13 @@ class CustomerController extends Controller
     }
     public function saleAction(Request $request)
     {
+        $customer = Customer::findOrFail($request->customer_id);
+        $this->ensureCanAccessCustomer($customer);
         $model = new Action();
         $model->type_id = 27;
         $model->sale_date = $request->sale_date;
         $model->sale_amount = $request->sale_amount;
-        $model->customer_id = $request->customer_id;
+        $model->customer_id = $customer->id;
         $model->creator_user_id = Auth::id();
         if ($request->machine == "on") {
             $model->note = "Venta de máquina";
@@ -1435,21 +1461,25 @@ class CustomerController extends Controller
     }
     public function opportunityAction(Request $request)
     {
+        $customer = Customer::findOrFail($request->customer_id);
+        $this->ensureCanAccessCustomer($customer);
         $action = new Action;
         $action->object_id = $request->id;
         $action->type_id = 28;
         $action->creator_user_id = Auth::id();
-        $action->customer_id = $request->customer_id;
+        $action->customer_id = $customer->id;
         $action->save();
         return redirect()->back();
     }
     public function poorlyRatedAction(Request $request)
     {
+        $customer = Customer::findOrFail($request->customer_id);
+        $this->ensureCanAccessCustomer($customer);
         $action = new Action;
         $action->object_id = $request->id;
         $action->type_id = 32;
         $action->creator_user_id = Auth::id();
-        $action->customer_id = $request->customer_id;
+        $action->customer_id = $customer->id;
         $action->save();
         /*$customer = Customer::find($request->customer_id);
     $customer->status_id = 53;
@@ -1458,14 +1488,15 @@ class CustomerController extends Controller
     }
     public function pqrAction(Request $request)
     {
+        $customer = Customer::findOrFail($request->customer_id);
+        $this->ensureCanAccessCustomer($customer);
         $model = new Action();
         $model->type_id = 29;
         $model->created_at = $request->created_at;
         $model->note = $request->note;
-        $model->customer_id = $request->customer_id;
+        $model->customer_id = $customer->id;
         $model->creator_user_id = Auth::id();
         $model->save();
-        $customer =  Customer::find($request->customer_id);
         $cHistory = new CustomerHistory;
         $cHistory->saveFromModel($customer);
         $customer->status_id = 29;
@@ -1476,14 +1507,15 @@ class CustomerController extends Controller
     }
     public function spareAction(Request $request)
     {
+        $customer = Customer::findOrFail($request->customer_id);
+        $this->ensureCanAccessCustomer($customer);
         $model = new Action();
         $model->type_id = 30;
         $model->delivery_date = $request->delivery_date;
         $model->note = $request->note;
-        $model->customer_id = $request->customer_id;
+        $model->customer_id = $customer->id;
         $model->creator_user_id = Auth::id();
         $model->save();
-        $customer =  Customer::find($request->customer_id);
         $cHistory = new CustomerHistory;
         $cHistory->saveFromModel($customer);
         $customer->status_id = 46;
@@ -1502,7 +1534,8 @@ class CustomerController extends Controller
     public function storeMail(Request $request)
     {
         $this->enviarCorreo();
-        $customer = Customer::find($request->customer_id);
+        $customer = Customer::findOrFail($request->customer_id);
+        $this->ensureCanAccessCustomer($customer);
         $email = Email::find($request->email_id);
         $emailcontent = array(
             'subject' => $email->subject,
@@ -1744,7 +1777,8 @@ $message->to("mateogiraldo420@gmail.com");
             $id = $customer->id;
         }
         if (isset($request->customer_id)) {
-            $customer = Customer::find($request->customer_id);
+            $customer = Customer::findOrFail($request->customer_id);
+            $this->ensureCanAccessCustomer($customer);
             $id = $request->customer_id;
         }
         //dd($model->scoring_profile);
@@ -1772,6 +1806,7 @@ $message->to("mateogiraldo420@gmail.com");
 
        // dd($request->all());
         $customer = Customer::findOrFail($request->customer_id);
+        $this->ensureCanAccessCustomer($customer);
         //$customerUser = $customer->getChatUser(); // el User equivalente al Customer
         $waUser = User::find(1); // Usuario con WA Toolbox activo
         
@@ -1821,6 +1856,7 @@ $message->to("mateogiraldo420@gmail.com");
 public function startConversationFromCRM(Request $request)
 {
     $customer = Customer::findOrFail($request->customer_id);
+    $this->ensureCanAccessCustomer($customer);
     $waUser = User::find(1); // Usuario "robot" o herramienta WA Toolbox
     $adminUser = User::find(auth()->id()); // Usuario actual logueado
 

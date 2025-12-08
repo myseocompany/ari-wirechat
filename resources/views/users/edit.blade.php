@@ -14,9 +14,20 @@
    
     <input type="text" class="form-control" id="email" name="email" placeholder="email" required="required" value="{{$user->email}}">
   </div>
-  <div class="form-group">
-    <label for="budget">Contraseña:</label>
-    <input type="password" class="form-control" id="password" name="password" placeholder="passwords" value="">   
+  <div class="card mb-3">
+    <div class="card-header p-2">
+      <button class="btn btn-link p-0" type="button" data-toggle="collapse" data-target="#passwordCollapse" aria-expanded="false" aria-controls="passwordCollapse">
+        Cambiar contraseña (opcional)
+      </button>
+    </div>
+    <div id="passwordCollapse" class="collapse">
+      <div class="card-body">
+        <div class="form-group mb-0">
+          <label for="password">Nueva contraseña:</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Dejar vacío para no cambiar">
+        </div>
+      </div>
+    </div>
   </div>
   <div class="form-group">
     <label for="budget">Estado:</label>

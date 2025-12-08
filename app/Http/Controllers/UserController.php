@@ -111,13 +111,14 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         //
-        $model = User::find($id);
+        $model = User::findOrFail($id);
 
         $model->name = $request->name;
         $model->email = $request->email;
         $model->status_id = $request->status_id;
-        if($model->password != $request->password)
+        if ($request->filled('password')) {
             $model->password = bcrypt($request->password);
+        }
         $model->role_id = $request->role_id;
         
         $model->save();

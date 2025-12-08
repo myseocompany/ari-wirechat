@@ -97,14 +97,14 @@
 
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
-                                        <a href="{{ route('logout') }}"
+                                        <a href="#"
                                             onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                             Salir
                                         </a>
 
                                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                            {{ csrf_field() }}
+                                            @csrf
                                         </form>
                                     </li>
                                 </ul>
