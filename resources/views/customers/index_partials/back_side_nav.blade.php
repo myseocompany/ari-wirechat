@@ -100,17 +100,46 @@
                                 </a>
 
                                 <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="#"
-                                            onclick="event.preventDefault();
-                                                     document.getElementById('logout-form-backnav').submit();">
-                                            Salir
-                                        </a>
-
-                                        <form id="logout-form-backnav" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                            @csrf
-                                        </form>
+                                    <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
+                                        {{ Auth::user()->name }}
                                     </li>
+                                    <li class="dropdown-divider"></li>
+                                    @if(Auth::user()->role_id == 2)
+                                      <li class="nav-item dropdown">
+                                        <a class="nav-link text-dark dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false">
+                                          Cuenta
+                                        </a>
+                                        <ul class="dropdown-menu" role="menu">
+                                          <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
+                                            {{ Auth::user()->name }}
+                                          </li>
+                                          <li class="dropdown-divider"></li>
+                                          <li>
+                                              <a href="#"
+                                                  onclick="event.preventDefault();
+                                                           document.getElementById('logout-form-backnav').submit();">
+                                                  Salir
+                                              </a>
+
+                                              <form id="logout-form-backnav" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                                  @csrf
+                                              </form>
+                                          </li>
+                                        </ul>
+                                      </li>
+                                    @else
+                                      <li>
+                                          <a href="#"
+                                              onclick="event.preventDefault();
+                                                       document.getElementById('logout-form-backnav').submit();">
+                                              Salir
+                                          </a>
+
+                                          <form id="logout-form-backnav" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                              @csrf
+                                          </form>
+                                      </li>
+                                    @endif
                                 </ul>
                             </li>
                         @endif

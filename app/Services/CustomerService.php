@@ -138,8 +138,29 @@ class CustomerService {
             }
         }
 
+        // Ordenamiento personalizado
+        $sort = $request->get('sort');
+        $sortKey = $sort === 'recent' ? 'recent' : ($sort ?: 'next_action');
+
+        if ($sortKey === 'next_action') {
+            $query->leftJoin(DB::raw('(SELECT customer_id, MIN(due_date) AS next_due_date FROM actions WHERE delivery_date IS NULL GROUP BY customer_id) AS next_actions'), 'next_actions.customer_id', '=', 'customers.id')
+                ->orderByRaw('CASE WHEN next_due_date IS NULL THEN 1 ELSE 0 END')
+                ->orderBy('next_due_date', 'ASC')
+                ->orderBy('customers.created_at', 'DESC');
+        } elseif ($sortKey === 'last_action') {
+            $query->leftJoin(DB::raw('(SELECT customer_id, MAX(created_at) AS last_action_at FROM actions GROUP BY customer_id) AS last_actions'), 'last_actions.customer_id', '=', 'customers.id')
+                ->orderBy('last_actions.last_action_at', 'DESC');
+        } elseif ($sortKey === 'advisor') {
+            $query->leftJoin('users as advisor_sort', 'advisor_sort.id', '=', 'customers.user_id')
+                ->orderBy('advisor_sort.name', 'ASC');
+        } elseif ($sortKey === 'recent') {
+            $query->orderBy('customers.created_at', 'DESC');
+        }
+
         // Ejecutar y medir
         if ($countOnly) {
+            // Evitar ORDER BY con columnas no agregadas en modo only_full_group_by
+            $query->getQuery()->orders = null;
             $result = $query->select(
                     DB::raw('count(distinct(customers.id)) as count'),
                     'customers.status_id',

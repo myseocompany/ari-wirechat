@@ -9,7 +9,7 @@
   return $str;
 } ?>
 <!-- MAQUIEMPANADAS -->@section('content')
-<h1>Clientes</h1>
+{{-- Encabezado principal movido a bloque contextual --}}
 <style>
   a:hover {
     color: #4178be;
@@ -40,6 +40,12 @@
     border-radius: 4px;
     clip-path: polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%);
     border: 1px solid #e2e8f0;
+    font-size: 10px;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
   }
   .tag-checkbox {
     position: absolute;
@@ -77,51 +83,105 @@ function requestToStr($request)
 }
 ?>
 
-<div><a style="color: #4178be;" href="customers/create">Crear
-    <i class="fa fa-plus" aria-hidden="true"></i>
-  </a> | <a href="/leads/excel{{ requestToStr($request) }}">Excel</a>
-  | <a href="/import/">Importar</a>
-</div>
-<br>
 {{-- obteber datos del tiempo --}}
+@php
+  $totalCount = $model->total();
+  $todayLabel = \Carbon\Carbon::now()->format('d M Y');
+@endphp
 
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="mb-1">Seguimientos</h1>
+    <div class="text-muted small">Actualiza estados, agenda acciones o etiquetas. Hoy: {{ $todayLabel }}.</div>
+    <div class="font-weight-bold">{{ $totalCount }} clientes</div>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <a href="/customers/create" class="btn btn-primary btn-sm mr-2">Crear</a>
+    <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="collapse" data-target="#daily-filter" aria-expanded="false">Filtros</button>
+  </div>
+</div>
 
-<div>
+<div id="daily-filter" class="collapse mb-3">
   @include('customers.filter_daily')
 </div>
 
+@php
+  $sort = $request->get('sort', 'next_action');
+  $baseParams = $request->except('page');
+  $sortUrl = function($key) use ($request, $baseParams) {
+    $params = array_merge($baseParams, ['sort' => $key, 'page' => null]);
+    return $request->url().'?'.http_build_query(array_filter($params, fn($v) => $v !== null && $v !== ''));
+  };
+@endphp
 
-
-<div>
-  <?php $cont_group = 0; ?>
-  @if($customersGroup->count()!=0)
-
-
-  @foreach($customersGroup as $item)
-  <?php if ($item->count > 0) {
-    $cont_group++;
-  } ?>
-  @endforeach
-  <ul class="groupbar bb_hbox">
-
-    @foreach($customersGroup as $item)
-    @if($item->count != 0)
-    <li class="groupBarGroup" style="background-color: {{$item->color}}; width: <?php
-                                                                                if ($cont_group != 0) {
-                                                                                  echo 100 / $cont_group;
-                                                                                }
-                                                                                ?>%">
-      <h3>{{$item->count}}</h3>
-
-      <div><a href="#" onclick="changeStatus({{$item->id}})">{{$item->name}}</a></div>
-    </li>
-    @endif
-    @endforeach
-  </ul>
-  @else
-  Sin Estados
-  @endif
+<div class="d-flex flex-wrap align-items-center mb-3 justify-content-end" style="gap: 8px;">
+  <span class="text-muted small mr-2">Ordenar por:</span>
+  <a href="{{ $sortUrl('next_action') }}" class="btn btn-sm {{ $sort === 'next_action' ? 'btn-primary' : 'btn-outline-secondary' }}">Próx. acción</a>
+  <a href="{{ $sortUrl('last_action') }}" class="btn btn-sm {{ $sort === 'last_action' ? 'btn-primary' : 'btn-outline-secondary' }}">Última acción</a>
+  <a href="{{ $sortUrl('advisor') }}" class="btn btn-sm {{ $sort === 'advisor' ? 'btn-primary' : 'btn-outline-secondary' }}">Asesor</a>
+  <a href="{{ $sortUrl('recent') }}" class="btn btn-sm {{ $sort === 'recent' ? 'btn-primary' : 'btn-outline-secondary' }}">Reciente</a>
 </div>
+
+@php
+  $mqlTag = isset($allTags) ? $allTags->firstWhere('name', 'MQL') : null;
+@endphp
+
+@if(isset($searchResults) && $request->filled('search'))
+  <div class="bg-white shadow rounded-lg mb-3">
+    <div class="px-4 py-3 border-b">
+      <h4 class="m-0 text-sm font-semibold">Resultados de búsqueda</h4>
+    </div>
+    @if($searchResults->count())
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Cliente</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Contacto</th>
+              <th class="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Acción</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            @foreach($searchResults as $sCustomer)
+              @php
+                $hasMql = $mqlTag ? $sCustomer->tags->contains($mqlTag->id) : false;
+              @endphp
+              <tr>
+                <td class="px-4 py-2 text-sm">
+                  <div class="font-semibold">
+                    <a href="{{ route('customers.show', $sCustomer) }}" class="hover:underline">{{ $sCustomer->name }}</a>
+                  </div>
+                  <div class="text-xs text-gray-500">ID: {{ $sCustomer->id }}</div>
+                </td>
+                <td class="px-4 py-2 text-sm text-gray-700">
+                  @if($sCustomer->email)<div>{{ $sCustomer->email }}</div>@endif
+                  @if($sCustomer->phone)<div>{{ $sCustomer->phone }}</div>@endif
+                </td>
+                <td class="px-4 py-2 text-sm">
+                  @if($mqlTag)
+                    @if($hasMql)
+                      <span class="inline-block px-2 py-1 text-xs rounded bg-gray-200 text-gray-700">Ya es MQL</span>
+                    @else
+                      <form method="POST" action="{{ route('customers.tags.add_mql', $sCustomer) }}">
+                        @csrf
+                        <input type="hidden" name="redirect_to" value="{{ url('/reports/views/daily_customers_followup') }}">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Agregar como MQL</button>
+                      </form>
+                    @endif
+                  @else
+                    <span class="text-muted text-xs">Etiqueta MQL no configurada.</span>
+                  @endif
+                </td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    @else
+      <div class="p-3 text-sm text-gray-600">No hay coincidencias.</div>
+    @endif
+  </div>
+@endif
 
 <div>
   <div class="alert alert-primary alert-dismissible fade show" role="alert" style="display:none" id="notication_area">
@@ -159,28 +219,31 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
 <br>
 {{-- <div>{{$model->total()}} Registro(s)</div> --}}
 <br>
-<div class="">
+<div class="bg-white shadow rounded-lg overflow-hidden">
   @if (count($model) > 0)
-  <table class="table table-striped">
-    <thead class="thead-light">
-      <tr>
-        <th>Cliente</th>
-        @if (Auth::user()->role_id !== 2)
-          <th>Asesor</th>
-        @endif
-        <th>Gestion</th>
-        <th>Última acción</th>
-        <th>Próxima acción</th>
-        @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 10)
-          <th></th>
-        @endif
-      </tr>
-    </thead>
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Cliente</th>
+          @if (Auth::user()->role_id !== 2)
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Asesor</th>
+          @endif
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Gestion</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Etiquetas</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Última</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Próxima</th>
+          @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 10)
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide"></th>
+          @endif
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide"></th>
+        </tr>
+      </thead>
 
-    <?php $lastStatus = -1 ?>
-    <tbody>
-      <?php $count = 1; ?>
-      @foreach($model as $item)
+      <?php $lastStatus = -1 ?>
+      <tbody class="divide-y divide-gray-200">
+        <?php $count = 1; ?>
+        @foreach($model as $item)
 
       {{-- Modal seguimiento --}}
       <div class="modal fade" id="addActionModal-{{$item->id}}" tabindex="-1" role="dialog" aria-labelledby="addActionModalLabel-{{$item->id}}" aria-hidden="true">
@@ -242,33 +305,53 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
         </div>
       </div>
 
-      <tr>
-        <td class="d-flex align-items-center">
-          <div class="customer-circle small-circle mr-2" style="background-color: {{ $item->getStatusColor() ?? '#DFAAFF' }}">
-            {{ $item->getInitials() }}
-          </div>
-          <div>
-            <div><a href="/customers/{{ $item->id }}/show">{{$item->name}}</a></div>
-
-            @if(isset($item->scoring_interest) && ($item->scoring_interest>0))
-            <span style="background-color: #ccc; border-radius: 50%; width: 25px; height: 25px; text-align: center; color: white; align-items: left; font-size: 12px; padding: 2px;">{{$customer->scoring_interest}}</span>
-            @endif
-            <div class="col-md-12 scoring">
-              <div class="stars-outer">
-                <div class="stars-inner" style="width: {{ ($item->getScoringToNumber()/4)*100 }}%"></div>
+      <tr class="bg-white hover:bg-gray-50">
+        <td class="px-0 py-4 align-top" style="border-left: 4px solid {{ $item->getStatusColor() ?? '#DFAAFF' }};">
+          <div class="px-4">
+            <div class="d-flex align-items-center">
+              <div class="customer-circle small-circle mr-2" style="background-color: {{ $item->getStatusColor() ?? '#DFAAFF' }}">
+                {{ $item->getInitials() }}
+              </div>
+              <div class="position-relative w-100">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="font-semibold text-gray-900">
+                    <a href="/customers/{{ $item->id }}/show" class="hover:underline">{{$item->name}}</a>
+                  </div>
+                </div>
+                <div class="small text-muted mt-1">
+                  @if(isset($item->email))<div class="text-gray-600">{{$item->email}}</div>@endif
+                  @if(!empty($item->phone))
+                    <div class="d-flex align-items-center gap-2">
+                      <a class="text-indigo-600 hover:underline" @if(isset($customer->phone)) href="https://wa.me/{{ clearWP($customer->getPhone()) }}" @else href="" @endif target="_empty">{{$customer->phone}}</a>
+                      @if(!empty($customer->phone))
+                      <button type="button" class="btn btn-link p-0 text-gray-600 copy-phone" data-phone="{{$customer->phone}}" aria-label="Copiar teléfono">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                        </svg>
+                      </button>
+                      @endif
+                    </div>
+                  @endif
+                  @if(!empty($item->phone2))
+                    <div class="d-flex align-items-center gap-2">
+                      <a class="text-indigo-600 hover:underline" @if(isset($customer->phone2)) href="https://wa.me/{{ clearWP($customer->getPhone()) }}" @else href="" @endif target="_empty">{{$customer->phone2}}</a>
+                      @if(!empty($customer->phone2))
+                      <button type="button" class="btn btn-link p-0 text-gray-600 copy-phone" data-phone="{{$customer->phone2}}" aria-label="Copiar teléfono">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                        </svg>
+                      </button>
+                      @endif
+                    </div>
+                  @endif
+                </div>
               </div>
             </div>
-            @if(isset($item->email))<div>{{$item->email}}</div>@endif
-            @if(isset($item->phone))<div><a @if(isset($customer->phone)) href="https://wa.me/{{ clearWP($customer->getPhone()) }}" @else href="" @endif target="_empty">{{$customer->phone}}</a></div>@endif
-            @if(isset($item->phone2))<div><a @if(isset($customer->phone2)) href="https://wa.me/{{ clearWP($customer->getPhone()) }}" @else href="" @endif target="_empty">{{$customer->phone2}}</a></div>@endif
-
-
-
           </div>
         </td>
 
         @if (Auth::user()->role_id !== 2)
-        <td>
+        <td class="px-4 py-4 align-top">
           <!--  
 *
 *    Combo de usuarios
@@ -297,7 +380,7 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
                 });
               }
             </script>
-            <select name="user_id" class="custom-select" id="user_id_{{$item->id}}" onchange="updateUser({{$item->id}});">
+            <select name="user_id" class="custom-select w-full border-gray-300 rounded-md text-sm" id="user_id_{{$item->id}}" onchange="updateUser({{$item->id}});">
               <option value="">Usuario...</option>
               <option value="null">Sin asignar</option>
               @foreach($users as $user)
@@ -308,7 +391,7 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
               @endforeach
             </select>
           @else
-            <div class="form-control-plaintext">
+            <div class="text-sm text-gray-700">
               {{ optional($item->user)->name ?? 'Sin asignar' }}
             </div>
           @endif
@@ -316,47 +399,48 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
         </td>
         @endif
 
-        <td>
+        <td class="px-4 py-4 align-top">
           @if(isset($item->status_id)&&($item->status_id!="")&&(!is_null($item->status)))
-            <span class="customer_status" style="background-color: {{$item->status->color}}">{{$item->status->name}}</span>
+            <span class="customer_status inline-flex items-center px-2 py-1 rounded text-white text-xs font-semibold" style="background-color: {{$item->status->color}}">{{$item->status->name}}</span>
           @endif
-          <div class="mt-2">
-            @if(isset($allTags) && $allTags->count())
-              <form
-                method="POST"
-                action="{{ route('customers.tags.update', $item) }}"
-                class="customer-tags-form"
-                data-tags-feedback="#tags-feedback-{{$item->id}}">
-                @csrf
-                <div class="d-flex flex-wrap" style="gap: 6px;">
-                  @foreach($allTags as $tagOption)
-                    @php
-                      $checked = $item->tags->contains($tagOption->id);
-                      $color = $tagOption->color ?: '#edf2f7';
-                    @endphp
-                    <label class="tag-label text-sm">
-                      <input
-                        type="checkbox"
-                        name="tags[]"
-                        value="{{ $tagOption->id }}"
-                        class="form-checkbox tag-checkbox mr-2"
-                        data-name="{{ $tagOption->name }}"
-                        data-color="{{ $tagOption->color ?: '#e2e8f0' }}"
-                        @checked($checked)>
-                      <span class="tag-swatch" style="border-color: {{ $checked ? $color : '#e2e8f0' }}; background-color: {{ $checked ? $color : 'transparent' }};"></span>
-                      <span>{{ $tagOption->name }}</span>
-                    </label>
-                  @endforeach
-                </div>
-              </form>
-              <div class="tags-feedback small text-muted mt-1" id="tags-feedback-{{$item->id}}"></div>
-              @once
-                @include('customers.partials.tags_script')
-              @endonce
-            @endif
-          </div>
         </td>
-        <td>
+        <td class="px-4 py-4 align-top">
+          @if(isset($allTags) && $allTags->count())
+            <form
+              method="POST"
+              action="{{ route('customers.tags.update', $item) }}"
+              class="customer-tags-form"
+              data-tags-feedback="#tags-feedback-{{$item->id}}">
+              @csrf
+              <div class="flex flex-wrap gap-2">
+                @foreach($allTags as $tagOption)
+                  @php
+                    $checked = $item->tags->contains($tagOption->id);
+                    $color = $tagOption->color ?: '#edf2f7';
+                  @endphp
+                  <label class="tag-label text-sm">
+                    <input
+                      type="checkbox"
+                      name="tags[]"
+                      value="{{ $tagOption->id }}"
+                      class="form-checkbox tag-checkbox mr-2"
+                      data-name="{{ $tagOption->name }}"
+                      data-color="{{ $tagOption->color ?: '#e2e8f0' }}"
+                      @checked($checked)>
+                    <span class="tag-swatch" style="border-color: {{ $checked ? $color : '#e2e8f0' }}; background-color: {{ $checked ? $color : 'transparent' }}; color: {{ $checked ? '#fff' : '#000' }};">
+                      {{ $tagOption->name }}
+                    </span>
+                  </label>
+                @endforeach
+              </div>
+            </form>
+            <div class="tags-feedback small text-muted mt-1" id="tags-feedback-{{$item->id}}"></div>
+            @once
+              @include('customers.partials.tags_script')
+            @endonce
+          @endif
+        </td>
+        <td class="px-4 py-4 align-top space-y-2">
           @php
             $lastAction = $item->actions()
               ->where(function($q) {
@@ -364,30 +448,53 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
               })
               ->orderBy('created_at', 'desc')
               ->first();
+            $nextAction = $item->actions()->whereNull('delivery_date')->orderBy('due_date')->first();
+            $badgeText = null;
+            $badgeClass = 'badge-secondary';
+            if ($nextAction && $nextAction->due_date) {
+              $due = \Carbon\Carbon::parse($nextAction->due_date);
+              if ($due->isPast() && !$due->isToday()) {
+                $badgeText = 'Vencido';
+                $badgeClass = 'badge-danger';
+              } elseif ($due->isToday()) {
+                $badgeText = 'Hoy';
+                $badgeClass = 'badge-danger';
+              } elseif ($due->isTomorrow()) {
+                $badgeText = 'Mañana';
+                $badgeClass = 'badge-warning';
+              }
+            }
           @endphp
           @if($lastAction)
             <div class="text-muted small mb-1">{{ $lastAction->created_at }}</div>
-            <div><strong>{{ optional($lastAction->type)->name }}:</strong> {{ $lastAction->getDescription() }}</div>
+            <div>{{ $lastAction->getDescription() }}</div>
           @endif
-          <button class="btn btn-sm btn-outline-primary mt-2" data-toggle="modal" data-target="#addActionModal-{{$item->id}}">
-            Seguimiento
-          </button>
         </td>
-        <td>
-          @php $nextAction = $item->actions()->whereNull('delivery_date')->orderBy('due_date')->first(); @endphp
+        <td class="px-4 py-4 align-top space-y-2">
           @if($nextAction && $nextAction->due_date)
-            <div class="text-muted small">{{ $nextAction->due_date }}</div>
-            <div><strong>{{ optional($nextAction->type)->name }}:</strong> {{ $nextAction->getDescription() }}</div>
+            <div class="text-muted small d-flex align-items-center" style="gap:6px;">
+              <span>{{ $nextAction->due_date }}</span>
+              @if($badgeText)
+                <span class="badge {{ $badgeClass }}">{{ $badgeText }}</span>
+              @endif
+            </div>
+            <div>{{ $nextAction->getDescription() }}</div>
           @else
             <span class="text-muted">Sin próxima acción</span>
           @endif
         </td>
         @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 10)
-        <td>
+        <td class="px-4 py-4 align-top">
           {{-- Delete --}}
           <a href="customers/{{ $item->id }}/destroy"><span class="btn btn-sm btn-danger fa fa-trash-o" aria-hidden="true" title="Eliminar"></span></a>
         </td>
         @endif
+        <td class="px-4 py-4 align-top">
+          <button class="d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1px solid #cbd5e0; color: #6b7280; font-size: 18px; line-height: 1;"
+            data-toggle="modal" data-target="#addActionModal-{{$item->id}}" aria-label="Agregar seguimiento">
+            +
+          </button>
+        </td>
 
 
         <!--
@@ -414,14 +521,44 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
     }
     $count++;
     ?>
-  </table>
-
-  @endif
-  {{-- {{$model->links()}} --}}
-  {{ $model->appends(request()->input())->links() }}
-  <div>
-    {{-- Registro {{ $model->currentPage()*$model->perPage() - ( $model->perPage() - 1 ) }} a {{ $model->currentPage()*$model->perPage()}} de {{ $model->total()}} --}}
-
+    </table>
   </div>
+  @else
+    <div class="p-4 text-sm text-gray-600">Sin registros.</div>
+  @endif
 </div>
+{{-- {{$model->links()}} --}}
+{{ $model->appends(request()->input())->links() }}
+<div>
+  {{-- Registro {{ $model->currentPage()*$model->perPage() - ( $model->perPage() - 1 ) }} a {{ $model->currentPage()*$model->perPage()}} de {{ $model->total()}} --}}
+
+</div>
+<script>
+  (function() {
+    function showCopyNotice(message) {
+      var $note = $('#notication_area');
+      var $text = $('#notication_area_text');
+      if (!$note.length) return;
+      $text.text(message || 'Copiado');
+      $note.show();
+      setTimeout(function() { $note.fadeOut(); }, 2000);
+    }
+
+    $(document).on('click', '.copy-phone', function() {
+      var phone = $(this).data('phone');
+      if (!phone) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(phone.toString())
+          .then(function() { showCopyNotice('Teléfono copiado'); })
+          .catch(function() { showCopyNotice('No se pudo copiar'); });
+      } else {
+        var $tmp = $('<textarea>').val(phone.toString()).appendTo('body');
+        $tmp[0].select();
+        try { document.execCommand('copy'); showCopyNotice('Teléfono copiado'); }
+        catch (e) { showCopyNotice('No se pudo copiar'); }
+        $tmp.remove();
+      }
+    });
+  })();
+</script>
 @endsection

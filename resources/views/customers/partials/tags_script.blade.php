@@ -31,7 +31,8 @@
             if ($swatch.length) {
               $swatch.css({
                 'background-color': checked ? color : 'transparent',
-                'border-color': checked ? color : '#e2e8f0'
+                'border-color': checked ? color : '#e2e8f0',
+                'color': checked ? '#fff' : '#000'
               });
             }
           });

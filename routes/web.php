@@ -108,6 +108,7 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     Route::get('/create', [CustomerController::class, 'create']);
     Route::post('/', [CustomerController::class, 'store']);
     Route::post('/{customer}/tags', [CustomerTagController::class, 'update'])->name('customers.tags.update');
+    Route::post('/{customer}/tags/mql', [CustomerTagController::class, 'addMql'])->name('customers.tags.add_mql');
     // Chat
     Route::post('/start-chat', [CustomerController::class, 'startConversationFromCRM'])->name('customers.start-chat');
 

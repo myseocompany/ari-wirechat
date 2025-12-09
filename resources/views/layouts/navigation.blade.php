@@ -47,29 +47,53 @@
                         {{ Auth::user()->name }}
                       </li>
                       <li class="dropdown-divider"></li>
-                    @endif
-                    @foreach($item->getChildren() as $subitem)
-                    <li class="nav-item">
-
-                      @if($subitem->url == "/logout")
-                          <a class="nav-link text-dark" href="#"
-                              onclick="event.preventDefault();
-                                       document.getElementById('logout-form').submit();">
-                              Salir
+                      @if(Auth::user()->role_id == 2)
+                        <li class="nav-item dropdown">
+                          <a class="nav-link text-dark dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false">
+                            Cuenta
                           </a>
-                          <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                              {{ csrf_field() }}
-                          </form>
+                          <ul class="dropdown-menu" role="menu">
+                            <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
+                              {{ Auth::user()->name }}
+                            </li>
+                            <li class="dropdown-divider"></li>
+                            <li class="nav-item">
+                              <a class="nav-link text-dark" href="#"
+                                  onclick="event.preventDefault();
+                                           document.getElementById('logout-form').submit();">
+                                  Salir
+                              </a>
+                              <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                  {{ csrf_field() }}
+                              </form>
+                            </li>
+                          </ul>
+                        </li>
                       @else
-                      <a class="nav-link text-dark" href="{{$subitem->url}}">
-                          
-                              {{$subitem->name}} 
-                          
-                      </a>
-                      @endif
-                    </li>
+                        @foreach($item->getChildren() as $subitem)
+                        <li class="nav-item">
 
-                    @endforeach
+                          @if($subitem->url == "/logout")
+                              <a class="nav-link text-dark" href="#"
+                                  onclick="event.preventDefault();
+                                           document.getElementById('logout-form').submit();">
+                                  Salir
+                              </a>
+                              <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                  {{ csrf_field() }}
+                              </form>
+                          @else
+                          <a class="nav-link text-dark" href="{{$subitem->url}}">
+                              
+                                  {{$subitem->name}} 
+                              
+                          </a>
+                          @endif
+                        </li>
+
+                        @endforeach
+                      @endif
+                    @endif
                     </ul> 
                   @endif 
               </li>     

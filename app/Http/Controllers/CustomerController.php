@@ -1773,6 +1773,7 @@ $message->to("mateogiraldo420@gmail.com");
         $scoring_profile = $this->getProfileOptions($request);
         $allTags = Tag::orderBy('name')->get();
         $customer = null;
+        $searchResults = null;
         $id = 0;
         if ($model && isset($model[0])) {
             //dd($model);
@@ -1783,6 +1784,9 @@ $message->to("mateogiraldo420@gmail.com");
             $customer = Customer::findOrFail($request->customer_id);
             $this->ensureCanAccessCustomer($customer);
             $id = $request->customer_id;
+        }
+        if ($request->filled('search')) {
+            $searchResults = $this->customerService->filterCustomers($request, $statuses, null, false, 15, false, false);
         }
         //dd($model->scoring_profile);
         $actions = Action::where('customer_id', '=', $id)->orderby("created_at", "DESC")->get();
@@ -1801,7 +1805,7 @@ $message->to("mateogiraldo420@gmail.com");
         $authUser = Auth::user();
         $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
 
-        return view('customers.daily', compact('model', 'request', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'phase', 'menu', 'canAssignCustomers', 'allTags'));
+        return view('customers.daily', compact('model', 'request', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'phase', 'menu', 'canAssignCustomers', 'allTags', 'searchResults'));
     }
 
     public function startConversationFromCRM2(Request $request)
