@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use App\DemoEmail;
+use App\Models\DemoEmail;
 use Illuminate\Support\Facades\Log;
 
 class MailController extends Controller
