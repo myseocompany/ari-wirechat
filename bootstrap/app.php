@@ -22,4 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    ->withCommands([
+        \App\Console\Commands\ProcessRetellInbox::class,
+        \App\Console\Commands\NotifyPendingActions::class,
+    ])->create();

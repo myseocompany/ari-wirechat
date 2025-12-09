@@ -149,6 +149,7 @@ class CustomerController extends Controller
     {
         $model = Action::whereNotNull('due_date')
             ->whereNull('delivery_date')
+            ->where('due_date', '>=', now())
             ->where('creator_user_id', "=", Auth::id())
             ->get();
         return $model;
