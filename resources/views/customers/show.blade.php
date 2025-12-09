@@ -276,7 +276,7 @@
 
             <div class="mt-3">
               <h3 class="text-sm font-semibold">Etiquetas</h3>
-              <div class="mb-2">
+              <div class="mb-2 tags-badges" id="customer-tags-badges-show">
                 @if($model->tags && $model->tags->count())
                   @foreach($model->tags as $tag)
                     <span class="px-2 py-1 rounded-full text-xs font-semibold mr-2 mb-1 d-inline-block" style="background-color: {{ $tag->color ?? '#e2e8f0' }};">
@@ -289,7 +289,13 @@
               </div>
 
               @if(isset($allTags) && $allTags->count())
-                <form method="POST" action="{{ route('customers.tags.update', $model) }}" id="customer-tags-form">
+                <form
+                  method="POST"
+                  action="{{ route('customers.tags.update', $model) }}"
+                  id="customer-tags-form"
+                  class="customer-tags-form"
+                  data-tags-badges="#customer-tags-badges-show"
+                  data-tags-feedback="#tags-feedback">
                   @csrf
                   <div class="grid grid-cols-2 gap-2" id="tag-options-grid">
                     @foreach($allTags as $tagOption)
@@ -317,63 +323,8 @@
                     <div class="text-danger small mt-2">{{ $message }}</div>
                   @enderror
                 </form>
-                <div id="tags-feedback" class="small text-muted mt-2"></div>
-                @push('scripts')
-                <script>
-                  $(function() {
-                    var $form = $('#customer-tags-form');
-                    var $feedback = $('#tags-feedback');
-                    var $badgesContainer = $form.prev('.mb-2');
-
-                    function renderBadgesFromSelection() {
-                      var selected = [];
-                      $form.find('.tag-checkbox:checked').each(function() {
-                        selected.push({
-                          name: $(this).data('name'),
-                          color: $(this).data('color') || '#e2e8f0'
-                        });
-                      });
-
-                      if (!selected.length) {
-                        $badgesContainer.html('<span class="text-muted">Sin etiquetas</span>');
-                        return;
-                      }
-
-                      var html = selected.map(function(tag) {
-                        return '<span class="px-2 py-1 rounded-full text-xs font-semibold mr-2 mb-1 d-inline-block" style="background-color: ' + tag.color + ';">' + tag.name + '</span>';
-                      }).join('');
-                      $badgesContainer.html(html);
-                    }
-
-                    function sendTags() {
-                      var payload = $form.serializeArray();
-                      if (!$form.find('.tag-checkbox:checked').length) {
-                        payload.push({ name: 'tags', value: '' });
-                      }
-
-                      $feedback.text('Guardando etiquetas...');
-                      $.ajax({
-                        url: $form.attr('action'),
-                        type: 'POST',
-                        data: $.param(payload),
-                        headers: {
-                          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        success: function(resp) {
-                          $feedback.text(resp.message || 'Etiquetas actualizadas.');
-                          renderBadgesFromSelection();
-                        },
-                        error: function() {
-                          $feedback.text('No se pudieron guardar las etiquetas.');
-                        }
-                      });
-                    }
-
-                    $form.on('change', '.tag-checkbox', sendTags);
-                    renderBadgesFromSelection();
-                  });
-                </script>
-                @endpush
+                <div id="tags-feedback" class="small text-muted mt-2 tags-feedback"></div>
+                @include('customers.partials.tags_script')
               @endif
             </div>
            

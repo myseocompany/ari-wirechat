@@ -6,6 +6,9 @@ use DB;
 use Auth;
 use Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Arr;
 use App\Models\Menu;
 use App\Models\CustomerStatus;
 use App\Models\Customer;
@@ -15,7 +18,7 @@ use App\Models\RoleProduct;
 class CustomerService {
 
 
-    public function filterCustomers(Request $request, $statuses, $stage_id, $countOnly = false, $pageSize = 0)
+    public function filterCustomers(Request $request, $statuses, $stage_id, $countOnly = false, $pageSize = 0, bool $applyDefaultDateRange = true, bool $onlyWithTags = false)
     {
         $t0 = function_exists('hrtime') ? hrtime(true) : (int) (microtime(true) * 1e9);
 
@@ -25,14 +28,14 @@ class CustomerService {
         $forceOwnCustomers = $authUser && ! $authUser->canViewAllCustomers();
 
         $query = Customer::query()
-            ->with(['user']) // needed for card view (asesor)
+            ->with(['user', 'tags', 'status']) // needed for card view (asesor) y etiquetas
             ->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
 
-        $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm, $forceOwnCustomers, $authUser) {
+        $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm, $forceOwnCustomers, $authUser, $applyDefaultDateRange, $onlyWithTags) {
             if (!empty($request->from_date)) {
                 $column = ($request->created_updated === "created") ? 'created_at' : 'updated_at';
                 $query->whereBetween("customers.$column", $dates);
-            } elseif (empty($searchTerm)) {
+            } elseif ($applyDefaultDateRange && empty($searchTerm)) {
                 $query->whereBetween("customers.created_at", $dates);
             }
 
@@ -62,12 +65,21 @@ class CustomerService {
             if (isset($request->scoring_profile) && $request->scoring_profile !== null)
                                                     $query->where('customers.scoring_profile', $request->scoring_profile);
             if (!empty($request->inquiry_product_id)) $query->where('customers.inquiry_product_id', $request->inquiry_product_id);
-            if (!empty($request->tag_id)) {
-                $query->whereExists(function ($sub) use ($request) {
+            $tagIds = Arr::wrap($request->tag_id);
+            $tagIds = array_filter($tagIds, fn ($id) => $id !== null && $id !== '');
+            if (!empty($tagIds)) {
+                $query->whereExists(function ($sub) use ($tagIds) {
                     $sub->select(DB::raw(1))
                         ->from('customer_tag')
                         ->whereColumn('customer_tag.customer_id', 'customers.id')
-                        ->where('customer_tag.tag_id', $request->tag_id);
+                        ->whereIn('customer_tag.tag_id', $tagIds);
+                });
+            }
+            if ($onlyWithTags) {
+                $query->whereExists(function ($sub) {
+                    $sub->select(DB::raw(1))
+                        ->from('customer_tag')
+                        ->whereColumn('customer_tag.customer_id', 'customers.id');
                 });
             }
 
@@ -178,6 +190,8 @@ class CustomerService {
             ->leftJoin("role_menus", "menus.id", "role_menus.menu_id")
             ->leftJoin("roles", "roles.id", "role_menus.role_id")
             ->where("roles.id", $user->role_id)
+            ->whereNotIn('menus.name', ['Posventa', 'Logistica', 'Logística'])
+            ->whereNotIn('menus.url', ['/customers/phase/3', '/customers/phase/4'])
             ->get();
         return $menu;
     }
@@ -241,6 +255,38 @@ class CustomerService {
         else
             $role_product_array = "";
         return $role_product_array;
+    }
+
+    public function getModelPhase(Request $request, $statuses, $stageId, int $pageSize = 10, bool $applyDefaultDateRange = true, bool $onlyWithTags = false)
+    {
+        $model = $this->filterCustomers($request, $statuses, $stageId, false, $pageSize, $applyDefaultDateRange, $onlyWithTags);
+
+        foreach ($model as $item) {
+            if (isset($item->status_id)) {
+                $status = CustomerStatus::find($item->status_id);
+                $item->status_name = $status->name ?? null;
+            }
+        }
+
+        if ($model instanceof LengthAwarePaginator || $model instanceof Paginator) {
+            $model->getActualRows = min($model->currentPage() * $model->perPage(), $model->total());
+        } else {
+            $model->getActualRows = $model->count();
+        }
+
+        $model->action = $request->path();
+
+        return $model;
+    }
+
+    public function countFilterCustomers(Request $request, $statuses, $stageId, bool $applyDefaultDateRange = true, bool $onlyWithTags = false)
+    {
+        return $this->filterCustomers($request, $statuses, $stageId, true, 0, $applyDefaultDateRange, $onlyWithTags);
+    }
+
+    public function filterModel(Request $request, $statuses)
+    {
+        return $this->getModelPhase($request, $statuses, null);
     }
 
     function looksLikePhoneNumber($input)

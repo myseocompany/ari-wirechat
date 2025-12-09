@@ -30,7 +30,13 @@
                       @else
                       <a class="nav-link text-dark @if($item->hasChildren()) dropdown-toggle @endif" href="{{$item->url}}" @if($item->hasChildren()) data-toggle="dropdown" role="button" aria-expanded="false" @endif>
                       
-                          {{$item->name}} @if($item->hasChildren()) @endif
+                          @php
+                            $menuName = $item->name;
+                            if ($item->url === '/reports/views/daily_customers_followup') {
+                                $menuName = 'Seguimientos';
+                            }
+                          @endphp
+                          {{$menuName}} @if($item->hasChildren()) @endif
                           
                       </a>
                       @endif

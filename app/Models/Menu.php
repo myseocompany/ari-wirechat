@@ -12,6 +12,8 @@ class Menu extends Model{
             ->leftJoin ("role_menus", "menus.id", "role_menus.menu_id")
             ->leftJoin("roles", "roles.id", "role_menus.role_id")
             ->where("roles.id", $user->role_id)
+            ->whereNotIn('menus.name', ['Posventa', 'Logistica', 'Logística'])
+            ->whereNotIn('menus.url', ['/customers/phase/3', '/customers/phase/4'])
             ->orderBy('weight', 'ASC')
             ->get();
 

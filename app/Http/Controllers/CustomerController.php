@@ -281,7 +281,9 @@ class CustomerController extends Controller
         }
         //dd($model->scoring_profile);
         $actions = Action::where('customer_id', '=', $id)->orderby("created_at", "DESC")->get();
-        $action_options = ActionType::orderby('weigth')->get();
+        $action_options = ActionType::where('status_id', 1)
+            ->orderBy('weigth')
+            ->get();
         $histories = CustomerHistory::where('customer_id', '=', $id)->get();
         $email_options = Email::where('type_id', '=', 1)->where('active', '=', '1')->get();
         $statuses_options = CustomerStatus::where('stage_id', $pid)->orderBy("weight", "ASC")->get();
@@ -1761,14 +1763,15 @@ $message->to("mateogiraldo420@gmail.com");
         $pid = 1;
         $customer_options = CustomerStatus::where('stage_id', $pid)->orderBy("weight", "ASC")->get();
         $statuses = $this->getStatuses($request, $pid);
-        $model = $this->customerService->getModelPhase($request, $statuses, $pid);
-        $customersGroup = $this->customerService->countFilterCustomers($request, $statuses, $pid);
+        $model = $this->customerService->getModelPhase($request, $statuses, $pid, 10, false, true);
+        $customersGroup = $this->customerService->countFilterCustomers($request, $statuses, $pid, false, true);
         $pending_actions = $this->getPendingActions();
         $phase = CustomerStatusPhase::find($pid);
         $sources = CustomerSource::all();
         $products = Product::all();
         $scoring_interest = $this->getInterestOptions($request);
         $scoring_profile = $this->getProfileOptions($request);
+        $allTags = Tag::orderBy('name')->get();
         $customer = null;
         $id = 0;
         if ($model && isset($model[0])) {
@@ -1798,7 +1801,7 @@ $message->to("mateogiraldo420@gmail.com");
         $authUser = Auth::user();
         $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
 
-        return view('customers.daily', compact('model', 'request', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'phase', 'menu', 'canAssignCustomers'));
+        return view('customers.daily', compact('model', 'request', 'customer_options', 'customersGroup', 'users', 'sources', 'pending_actions', 'products', 'statuses', 'scoring_interest', 'scoring_profile', 'customer', 'histories', 'actions', 'action_options', 'email_options', 'statuses_options', 'actual', 'today', 'audiences', 'references', 'phase', 'menu', 'canAssignCustomers', 'allTags'));
     }
 
     public function startConversationFromCRM2(Request $request)
