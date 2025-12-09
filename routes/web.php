@@ -596,3 +596,12 @@ Route::get('/landing/checkin', [LandingController::class,'checkinForm'])->name('
 Route::post('/landing/checkin', [LandingController::class,'checkinSubmit'])->name('landing.checkin.submit');
 Route::post('/landing/rebook', [LandingController::class,'rebook'])->name('landing.rebook');
 Route::post('/landing/cancel', [LandingController::class,'cancel'])->name('landing.cancel');
+
+
+Route::get('/test-email', function () {
+    Mail::raw('Test Mailgun desde Laravel OK', function ($m) {
+        $m->to('nicolas@myseocompany.co')->subject('Mailgun funcionando');
+    });
+
+    return 'Email enviado (si todo está bien)';
+});
