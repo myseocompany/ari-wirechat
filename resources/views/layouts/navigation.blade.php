@@ -1,3 +1,15 @@
+@php
+  $pendingActions = null;
+  if (Auth::check()) {
+    $pendingQuery = \App\Models\Action::whereNotNull('due_date')->whereNull('delivery_date');
+    if (Auth::user()->role_id == 2) {
+      $pendingQuery->join('customers', 'customers.id', '=', 'actions.customer_id')
+                   ->where('customers.user_id', Auth::id());
+    }
+    $pendingActions = $pendingQuery->count();
+  }
+@endphp
+
 <nav class="navbar navbar-expand-md navbar-light fixed-top bg-white container">
       
   <a class="navbar-brand" href="/customers"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
@@ -32,9 +44,7 @@
                       
                           @php
                             $menuName = $item->name;
-                            if ($item->url === '/reports/views/daily_customers_followup') {
-                                $menuName = 'Seguimientos';
-                            }
+
                           @endphp
                           {{$menuName}} @if($item->hasChildren()) @endif
                           
@@ -106,12 +116,30 @@
         
 
          @if (!Auth::guest())
-          <form class="form-inline mt-2 mt-md-0" action="/customers" method="GET">
-
-          <input class="form-control mr-sm-2" type="text" placeholder="Busca o escribe..." aria-label="Cliente" id="name_" name="search" @if (isset($request->search)) value="{{$request->search}}" @endif>
-          <button class="btn btn-primary my-2 my-sm-0" type="submit">Ir</button>
-        </form>  
-      @endif
+          <div class="d-flex align-items-center">
+            @php
+              $actionsLink = '/actions/?range_type=&filter=&from_date=&from_time=&to_date=&to_time=&pending=true&type_id=&user_id=';
+              if (Auth::user()->role_id == 2) {
+                $actionsLink .= Auth::id();
+              }
+              $actionsLink .= '&action_search=';
+            @endphp
+            <a href="{{ $actionsLink }}" target="_self" class="position-relative d-flex align-items-center justify-content-center text-secondary mr-3" title="Acciones pendientes">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              @if(!is_null($pendingActions))
+                <span class="position-absolute badge badge-pill badge-danger" style="top: -4px; right: -6px; padding: 2px 6px; font-size: 11px;">
+                  {{ $pendingActions }}
+                </span>
+              @endif
+            </a>
+            <form class="form-inline mt-2 mt-md-0" action="/customers" method="GET">
+              <input class="form-control mr-sm-2" type="text" placeholder="Busca o escribe..." aria-label="Cliente" id="name_" name="search" @if (isset($request->search)) value="{{$request->search}}" @endif>
+              <button class="btn btn-primary my-2 my-sm-0" type="submit">Ir</button>
+            </form>
+          </div>
+        @endif
 
       </div>
   </nav>

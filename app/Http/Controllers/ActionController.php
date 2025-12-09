@@ -273,6 +273,7 @@ class ActionController extends Controller
             'note' => 'required|string',
             'type_id' => 'required|exists:action_types,id',
             'status_id' => 'required|exists:customer_statuses,id',
+            'new_due_date' => 'nullable|date',
         ]);
 
         $pendingAction = Action::findOrFail($request->action_id);
@@ -286,6 +287,9 @@ class ActionController extends Controller
         $newAction->type_id = $request->type_id;
         $newAction->creator_user_id = Auth::id();
         $newAction->customer_id = $pendingAction->customer_id;
+        if ($request->filled('new_due_date')) {
+            $newAction->due_date = Carbon\Carbon::parse($request->new_due_date);
+        }
         $newAction->save();
 
         if ($customer) {

@@ -70,11 +70,6 @@
                         Acciones por usuario
                     </a>
                 </li>
-                </li>    
-                      <a href="/reports/views/customers_followup">
-                        Seguimientos
-                    </a>
-                </li>
             </ul>
         </li>
           <li class="nav-item"><a class="nav-link" href="/config">Configuracion</a></li>

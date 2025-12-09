@@ -92,15 +92,17 @@
     </div>
 
     <!-- Usuario -->
-    <div>
-        <select name="user_id" id="user_id"
-            class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
-            <option value="">Todos los usuarios</option>
-            @foreach($users as $user)
-                <option value="{{ $user->id }}" @if ($request->user_id == $user->id) selected @endif>{{ $user->name }}</option>
-            @endforeach
-        </select>
-    </div>
+    @if(Auth::check() && (Auth::user()->role_id == 1 || Auth::user()->role_id == 10))
+        <div>
+            <select name="user_id" id="user_id"
+                class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="">Todos los usuarios</option>
+                @foreach($users as $user)
+                    <option value="{{ $user->id }}" @if ($request->user_id == $user->id) selected @endif>{{ $user->name }}</option>
+                @endforeach
+            </select>
+        </div>
+    @endif
 
     <!-- Búsqueda -->
     <div>

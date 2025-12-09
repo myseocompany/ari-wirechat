@@ -57,9 +57,11 @@
 </style>
 
 <script>
-function toggleDateInput(id) {
-  const container = document.getElementById('dateInputContainer_' + id);
-  const checkbox = document.getElementById('toggleDate_' + id);
+function toggleDateInput(id, options = {}) {
+  const containerId = options.containerId || ('dateInputContainer_' + id);
+  const checkboxId = options.checkboxId || ('toggleDate_' + id);
+  const container = document.getElementById(containerId);
+  const checkbox = document.getElementById(checkboxId);
   if (container && checkbox) {
     container.style.display = checkbox.checked ? 'block' : 'none';
   }
@@ -229,14 +231,10 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
           @if (Auth::user()->role_id !== 2)
             <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Asesor</th>
           @endif
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Gestion</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Etiquetas</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Última</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Próxima</th>
-          @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 10)
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide"></th>
-          @endif
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide"></th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Última Acción</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Acción pendiente</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Días sin seg.</th>
+          <th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wide">Acciones</th>
         </tr>
       </thead>
 
@@ -305,6 +303,80 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
         </div>
       </div>
 
+      {{-- Modal: completar acción pendiente --}}
+      @php
+        $nextActionModal = $item->actions()
+          ->whereNull('delivery_date')
+          ->reorder()
+          ->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')
+          ->orderBy('due_date')
+          ->orderByDesc('created_at')
+          ->first();
+      @endphp
+      @if($nextActionModal)
+      <div class="modal fade" id="completeActionModal-{{$item->id}}" tabindex="-1" role="dialog" aria-labelledby="completeActionModalLabel-{{$item->id}}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="completeActionModalLabel-{{$item->id}}">Marcar acción como hecha</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="/customers/action/pending" method="POST">
+              @csrf
+              <input type="hidden" name="action_id" value="{{ $nextActionModal->id }}">
+              <div class="modal-body">
+                @if($nextActionModal->note)
+                  <div class="mb-2 text-muted small">Acción pendiente: {{ $nextActionModal->note }}</div>
+                @endif
+                <div class="form-group">
+                  <label for="complete_note_{{$item->id}}">Comentario</label>
+                  <textarea name="note" id="complete_note_{{$item->id}}" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="complete_type_{{$item->id}}">Tipo de acción</label>
+                    <select name="type_id" id="complete_type_{{$item->id}}" class="form-control" required>
+                      @foreach($action_options as $actionType)
+                        <option value="{{$actionType->id}}" @if($nextActionModal->type_id == $actionType->id) selected @endif>{{$actionType->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label for="complete_status_{{$item->id}}">Estado del cliente</label>
+                    <select name="status_id" id="complete_status_{{$item->id}}" class="form-control" required>
+                      @foreach($statuses_options as $statusOption)
+                        <option value="{{$statusOption->id}}" @if($item->status_id == $statusOption->id) selected @endif>{{$statusOption->name}}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group mb-2">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="toggleCompleteDate_{{$item->id}}"
+                      onclick="toggleDateInput({{$item->id}}, {containerId: 'completeDateContainer_{{$item->id}}', checkboxId: 'toggleCompleteDate_{{$item->id}}'})">
+                    <label class="form-check-label" for="toggleCompleteDate_{{$item->id}}">Programar próxima acción</label>
+                  </div>
+                </div>
+                <div class="form-group" id="completeDateContainer_{{$item->id}}" style="display:none;">
+                  <label for="complete_due_{{$item->id}}">Próxima fecha</label>
+                  <input type="datetime-local" name="new_due_date" id="complete_due_{{$item->id}}" class="form-control">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-success">Marcar como hecha</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      @endif
+
       <tr class="bg-white hover:bg-gray-50">
         <td class="px-0 py-4 align-top" style="border-left: 4px solid {{ $item->getStatusColor() ?? '#DFAAFF' }};">
           <div class="px-4">
@@ -313,10 +385,8 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
                 {{ $item->getInitials() }}
               </div>
               <div class="position-relative w-100">
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="font-semibold text-gray-900">
-                    <a href="/customers/{{ $item->id }}/show" class="hover:underline">{{$item->name}}</a>
-                  </div>
+                <div class="font-semibold text-gray-900">
+                  <a href="/customers/{{ $item->id }}/show" class="hover:underline">{{$item->name}}</a>
                 </div>
                 <div class="small text-muted mt-1">
                   @if(isset($item->email))<div class="text-gray-600">{{$item->email}}</div>@endif
@@ -343,9 +413,51 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
                       </button>
                       @endif
                     </div>
-                  @endif
-                </div>
+                @endif
+                {{-- Estado --}}
+                @if(isset($item->status_id)&&($item->status_id!="")&&(!is_null($item->status)))
+                  <div class="mt-2 d-inline-flex align-items-center text-xs font-semibold" style="color: #6b7280;">
+                    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background-color: {{$item->status->color}};margin-right:6px;"></span>
+                    {{$item->status->name}}
+                  </div>
+                @endif
+                {{-- Etiquetas --}}
+                @if(isset($allTags) && $allTags->count())
+                  <form
+                    method="POST"
+                    action="{{ route('customers.tags.update', $item) }}"
+                    class="customer-tags-form mt-2"
+                    data-tags-feedback="#tags-feedback-{{$item->id}}">
+                    @csrf
+                    <div class="flex flex-wrap gap-2">
+                      @foreach($allTags as $tagOption)
+                        @php
+                          $checked = $item->tags->contains($tagOption->id);
+                          $color = $tagOption->color ?: '#edf2f7';
+                        @endphp
+                        <label class="tag-label text-sm">
+                          <input
+                            type="checkbox"
+                            name="tags[]"
+                            value="{{ $tagOption->id }}"
+                            class="form-checkbox tag-checkbox mr-2"
+                            data-name="{{ $tagOption->name }}"
+                            data-color="{{ $tagOption->color ?: '#e2e8f0' }}"
+                            @checked($checked)>
+                          <span class="tag-swatch" style="border-color: {{ $checked ? $color : '#e2e8f0' }}; background-color: {{ $checked ? $color : 'transparent' }}; color: {{ $checked ? '#fff' : '#000' }};">
+                            {{ $tagOption->name }}
+                          </span>
+                        </label>
+                      @endforeach
+                    </div>
+                  </form>
+                  <div class="tags-feedback small text-muted mt-1" id="tags-feedback-{{$item->id}}"></div>
+                  @once
+                    @include('customers.partials.tags_script')
+                  @endonce
+                @endif
               </div>
+            </div>
             </div>
           </div>
         </td>
@@ -398,48 +510,6 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
           <div id="customer_status_{{$item->id}}"></div>
         </td>
         @endif
-
-        <td class="px-4 py-4 align-top">
-          @if(isset($item->status_id)&&($item->status_id!="")&&(!is_null($item->status)))
-            <span class="customer_status inline-flex items-center px-2 py-1 rounded text-white text-xs font-semibold" style="background-color: {{$item->status->color}}">{{$item->status->name}}</span>
-          @endif
-        </td>
-        <td class="px-4 py-4 align-top">
-          @if(isset($allTags) && $allTags->count())
-            <form
-              method="POST"
-              action="{{ route('customers.tags.update', $item) }}"
-              class="customer-tags-form"
-              data-tags-feedback="#tags-feedback-{{$item->id}}">
-              @csrf
-              <div class="flex flex-wrap gap-2">
-                @foreach($allTags as $tagOption)
-                  @php
-                    $checked = $item->tags->contains($tagOption->id);
-                    $color = $tagOption->color ?: '#edf2f7';
-                  @endphp
-                  <label class="tag-label text-sm">
-                    <input
-                      type="checkbox"
-                      name="tags[]"
-                      value="{{ $tagOption->id }}"
-                      class="form-checkbox tag-checkbox mr-2"
-                      data-name="{{ $tagOption->name }}"
-                      data-color="{{ $tagOption->color ?: '#e2e8f0' }}"
-                      @checked($checked)>
-                    <span class="tag-swatch" style="border-color: {{ $checked ? $color : '#e2e8f0' }}; background-color: {{ $checked ? $color : 'transparent' }}; color: {{ $checked ? '#fff' : '#000' }};">
-                      {{ $tagOption->name }}
-                    </span>
-                  </label>
-                @endforeach
-              </div>
-            </form>
-            <div class="tags-feedback small text-muted mt-1" id="tags-feedback-{{$item->id}}"></div>
-            @once
-              @include('customers.partials.tags_script')
-            @endonce
-          @endif
-        </td>
         <td class="px-4 py-4 align-top space-y-2">
           @php
             $lastAction = $item->actions()
@@ -448,7 +518,17 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
               })
               ->orderBy('created_at', 'desc')
               ->first();
-            $nextAction = $item->actions()->whereNull('delivery_date')->orderBy('due_date')->first();
+            $nextAction = $item->actions()
+              ->whereNull('delivery_date')
+              ->reorder()
+              ->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')
+              ->orderBy('due_date')
+              ->orderByDesc('created_at')
+              ->first();
+            $daysWithoutFollowup = null;
+            if ($lastAction) {
+              $daysWithoutFollowup = \Carbon\Carbon::parse($lastAction->created_at)->diffInDays(\Carbon\Carbon::now());
+            }
             $badgeText = null;
             $badgeClass = 'badge-secondary';
             if ($nextAction && $nextAction->due_date) {
@@ -471,29 +551,45 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
           @endif
         </td>
         <td class="px-4 py-4 align-top space-y-2">
-          @if($nextAction && $nextAction->due_date)
+          @if($nextAction)
             <div class="text-muted small d-flex align-items-center" style="gap:6px;">
-              <span>{{ $nextAction->due_date }}</span>
-              @if($badgeText)
+              <span>{{ $nextAction->due_date ?? 'Sin fecha' }}</span>
+              @if($badgeText && $nextAction->due_date)
                 <span class="badge {{ $badgeClass }}">{{ $badgeText }}</span>
               @endif
             </div>
-            <div>{{ $nextAction->getDescription() }}</div>
+            <div class="d-flex align-items-center" style="gap:8px;">
+              <span>{{ $nextAction->getDescription() }}</span>
+              <input type="checkbox"
+                data-toggle="modal"
+                data-target="#completeActionModal-{{$item->id}}"
+                class="w-6 h-6 rounded-full border-2 border-blue-500 text-blue-600 focus:ring-2 focus:ring-blue-400 checked:bg-blue-600 checked:border-transparent"
+                onclick="this.checked=false"
+                aria-label="Marcar como hecha">
+            </div>
           @else
-            <span class="text-muted">Sin próxima acción</span>
+            <span class="text-muted">Sin acción pendiente</span>
           @endif
         </td>
-        @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 10)
-        <td class="px-4 py-4 align-top">
-          {{-- Delete --}}
-          <a href="customers/{{ $item->id }}/destroy"><span class="btn btn-sm btn-danger fa fa-trash-o" aria-hidden="true" title="Eliminar"></span></a>
+        <td class="px-4 py-4 align-top space-y-2">
+          @if(!is_null($daysWithoutFollowup))
+            <span class="font-semibold">{{ (int) $daysWithoutFollowup }}</span>
+          @else
+            <span class="text-muted">-</span>
+          @endif
         </td>
-        @endif
-        <td class="px-4 py-4 align-top">
-          <button class="d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1px solid #cbd5e0; color: #6b7280; font-size: 18px; line-height: 1;"
-            data-toggle="modal" data-target="#addActionModal-{{$item->id}}" aria-label="Agregar seguimiento">
-            +
-          </button>
+        <td class="px-4 py-4 align-top text-right">
+          <div class="d-inline-flex align-items-center" style="gap: 8px;">
+            <button class="d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%; background: #fff; border: 1px solid #cbd5e0; color: #6b7280; font-size: 18px; line-height: 1;"
+              data-toggle="modal" data-target="#addActionModal-{{$item->id}}" aria-label="Agregar seguimiento">
+              +
+            </button>
+            @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 10)
+              <a href="customers/{{ $item->id }}/destroy" class="btn btn-sm btn-danger" title="Eliminar">
+                <span class="fa fa-trash-o" aria-hidden="true"></span>
+              </a>
+            @endif
+          </div>
         </td>
 
 

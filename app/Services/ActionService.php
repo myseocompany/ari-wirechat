@@ -77,7 +77,16 @@ private function buildBaseQuery(Request $request)
             $query->whereBetween($dateColumn, [$from, $to]);
         }
 
-        if ($request->filled('user_id'))   $query->where('creator_user_id', $request->user_id);
+        // Filtro de usuario: si es pending usamos el owner del cliente, sino el creador
+        if ($request->filled('user_id')) {
+            if ($isPending) {
+                $query->whereHas('customer', function($q) use ($request) {
+                    $q->where('user_id', $request->user_id);
+                });
+            } else {
+                $query->where('creator_user_id', $request->user_id);
+            }
+        }
         if ($request->filled('type_id'))   $query->where('type_id', $request->type_id);
         if ($request->filled('action_search')) {
             $query->where('note', 'like', '%'.$request->action_search.'%');
