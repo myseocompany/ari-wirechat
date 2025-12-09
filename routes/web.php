@@ -345,6 +345,10 @@ Route::middleware('auth')->prefix('reports')->group(function () {
     Route::get('/fm', [ReportController::class, 'RFM']);
 });
 
+// Configs
+Route::middleware('auth')->get('/configs', [\App\Http\Controllers\ConfigController::class, 'index'])->name('configs.index');
+Route::middleware('auth')->get('/config', [\App\Http\Controllers\ConfigController::class, 'index']);
+
 // Dashboard Routes
 
 Route::get('/dashboard', function () {
