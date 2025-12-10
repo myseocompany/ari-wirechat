@@ -599,8 +599,8 @@ Route::post('/landing/cancel', [LandingController::class,'cancel'])->name('landi
 
 
 Route::get('/test-email', function () {
-    Mail::raw('Test Mailgun desde Laravel OK', function ($m) {
-        $m->to('nicolas@myseocompany.co')->subject('Mailgun funcionando');
+    Mail::raw('Test Mailtrap desde Laravel OK', function ($m) {
+        $m->to('nicolas@myseocompany.co')->subject('Mailtrap funcionando');
     });
 
     return 'Email enviado (si todo está bien)';
