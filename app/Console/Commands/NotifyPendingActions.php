@@ -27,13 +27,7 @@ class NotifyPendingActions extends Command
         $now = now();
         $windowEnd = $now->copy()->addMinutes($windowMinutes);
 
-        Log::info('actions:notify starting', [
-            'window_minutes' => $windowMinutes,
-            'window_start' => $now->toDateTimeString(),
-            'window_end' => $windowEnd->toDateTimeString(),
-            'system_now' => now()->toDateTimeString(),
-            'criteria' => 'delivery_date IS NULL, notified_at IS NULL, due_date BETWEEN window_start and window_end',
-        ]);
+
 
         $sent = 0;
         $skippedNoEmail = 0;
