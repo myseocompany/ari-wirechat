@@ -89,7 +89,23 @@ class Customer extends Authenticatable
         return $this->hasMany('App\Models\Action')->orderBy('created_at', 'desc');
     }
 
+    public function nextPendingAction()
+    {
+        return $this->hasOne(Action::class)
+            ->whereNull('delivery_date')
+            ->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('due_date')
+            ->orderByDesc('created_at');
+    }
 
+    public function lastRelevantAction()
+    {
+        return $this->hasOne(Action::class)
+            ->where(function ($query) {
+                $query->whereNull('due_date')->orWhereNotNull('delivery_date');
+            })
+            ->latest('created_at');
+    }
 
     function histories(){
         return $this->hasMany('App\Models\CustomerHistory');

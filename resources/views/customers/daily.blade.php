@@ -305,13 +305,7 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
 
       {{-- Modal: completar acción pendiente --}}
       @php
-        $nextActionModal = $item->actions()
-          ->whereNull('delivery_date')
-          ->reorder()
-          ->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')
-          ->orderBy('due_date')
-          ->orderByDesc('created_at')
-          ->first();
+        $nextActionModal = $item->nextPendingAction;
       @endphp
       @if($nextActionModal)
       <div class="modal fade" id="completeActionModal-{{$item->id}}" tabindex="-1" role="dialog" aria-labelledby="completeActionModalLabel-{{$item->id}}" aria-hidden="true">
@@ -512,19 +506,8 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
         @endif
         <td class="px-4 py-4 align-top space-y-2">
           @php
-            $lastAction = $item->actions()
-              ->where(function($q) {
-                  $q->whereNull('due_date')->orWhereNotNull('delivery_date');
-              })
-              ->orderBy('created_at', 'desc')
-              ->first();
-            $nextAction = $item->actions()
-              ->whereNull('delivery_date')
-              ->reorder()
-              ->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')
-              ->orderBy('due_date')
-              ->orderByDesc('created_at')
-              ->first();
+            $lastAction = $item->lastRelevantAction;
+            $nextAction = $item->nextPendingAction;
             $daysWithoutFollowup = null;
             if ($lastAction) {
               $daysWithoutFollowup = \Carbon\Carbon::parse($lastAction->created_at)->diffInDays(\Carbon\Carbon::now());

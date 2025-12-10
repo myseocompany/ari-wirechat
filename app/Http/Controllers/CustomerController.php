@@ -16,6 +16,8 @@ use Mail;
 use File;
 use Illuminate\Support\Facades\Auth;
 use Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use App\Models\Customer;
 use App\Models\CustomerStatus;
 use App\Models\CustomerStatusPhase;
@@ -1765,6 +1767,19 @@ $message->to("mateogiraldo420@gmail.com");
         $customer_options = CustomerStatus::where('stage_id', $pid)->orderBy("weight", "ASC")->get();
         $statuses = $this->getStatuses($request, $pid);
         $model = $this->customerService->getModelPhase($request, $statuses, $pid, 10, false, true);
+        $actionRelations = [
+            'nextPendingAction' => function ($query) {
+                $query->select(['id', 'customer_id', 'type_id', 'note', 'due_date', 'delivery_date', 'created_at', 'object_id']);
+            },
+            'lastRelevantAction' => function ($query) {
+                $query->select(['id', 'customer_id', 'type_id', 'note', 'due_date', 'delivery_date', 'created_at', 'object_id']);
+            },
+        ];
+        if ($model instanceof LengthAwarePaginator || $model instanceof Paginator) {
+            $model->getCollection()->load($actionRelations);
+        } elseif ($model) {
+            $model->load($actionRelations);
+        }
         $customersGroup = $this->customerService->countFilterCustomers($request, $statuses, $pid, false, true);
         $pending_actions = $this->getPendingActions();
         $phase = CustomerStatusPhase::find($pid);
