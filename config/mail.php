@@ -94,6 +94,10 @@ return [
                 'postmark',
             ],
         ],
+        'mailgun' => [
+            'transport' => 'mailgun',
+        ],
+
 
     ],
 
