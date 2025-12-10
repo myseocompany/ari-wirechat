@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use Resend\Laravel\Facades\Resend;
 
 use App\Http\Controllers\LandingController;
 
@@ -599,9 +600,17 @@ Route::post('/landing/cancel', [LandingController::class,'cancel'])->name('landi
 
 
 Route::get('/test-email', function () {
+    Resend::emails()->send([
+        'from' => 'Maquiempanadas <marketing@maquiempanadas.com>',
+        'to' => 'nicolas@myseocompany.co',
+        'subject' => 'Test Resend desde Laravel OK',
+        'text' => 'Test Resend desde Laravel OK',
+    ]);
+    /*
     Mail::raw('Test Mailtrap desde Laravel OK', function ($m) {
         $m->to('nicolas@myseocompany.co')->subject('Mailtrap funcionando');
     });
 
-    return 'Email enviado (si todo está bien)';
+    */
+    return 'Email enviado por resend (si todo está bien)';
 });

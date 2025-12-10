@@ -7,6 +7,7 @@ use App\Models\Action;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Resend\Laravel\Facades\Resend;
 
 class NotifyPendingActions extends Command
 {
@@ -58,6 +59,17 @@ class NotifyPendingActions extends Command
                     }
 
                     Mail::to($email)->send(new ActionReminderMail($action));
+
+
+                    $resend = new Resend(env('RESEND_KEY'));
+
+                    $resend->emails()->send([
+                        'from' => 'Maquiempanadas <marketing@maquiempanadas.com>',
+                        'to' => $email,
+                        'subject' => 'Tarea pendiente',
+                        'text' => "Tienes una acción pendiente: {$action->note}",
+                    ]);
+
 
                     $action->forceFill(['notified_at' => now()])->save();
                     $sent++;
