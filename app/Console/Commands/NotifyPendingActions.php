@@ -58,7 +58,7 @@ class NotifyPendingActions extends Command
                         continue;
                     }
 
-                    Mail::to($email)->send(new ActionReminderMail($action));
+                    //Mail::to($email)->send(new ActionReminderMail($action));
 
 
                     $resend = new Resend(env('RESEND_KEY'));
