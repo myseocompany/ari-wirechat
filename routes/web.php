@@ -614,3 +614,8 @@ Route::get('/test-email', function () {
     */
     return 'Email enviado por resend (si todo está bien)';
 });
+
+
+Route::get('/mailer', function () {
+    return config('mail.default');
+});
