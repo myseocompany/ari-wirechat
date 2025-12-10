@@ -12,7 +12,7 @@
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3",
         "namu/wirechat": "dev-main",
-        "symfony/http-client": "^8.0",
+        "symfony/http-client": "^7.4",
         "symfony/mailgun-mailer": "^7.4"
     },
     "require-dev": {
