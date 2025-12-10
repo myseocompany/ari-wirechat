@@ -153,14 +153,28 @@
             @if($phone1)
               <div>
                 <span class="label"><strong>Teléfono:</strong></span>
-                <span>{{ $phone1 }}</span>
+                <span class="d-inline-flex align-items-center" style="gap:8px;">
+                  <span>{{ $phone1 }}</span>
+                  <button type="button" class="btn btn-link p-0 text-gray-600 copy-phone" data-phone="{{ $phone1 }}" aria-label="Copiar teléfono">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                    </svg>
+                  </button>
+                </span>
               </div>
             @endif
 
             @if($phone2 && $phone2 !== $phone1)
               <div>
                 <span class="label"><strong>Celular:</strong></span>
-                <span>{{ $phone2 }}</span>
+                <span class="d-inline-flex align-items-center" style="gap:8px;">
+                  <span>{{ $phone2 }}</span>
+                  <button type="button" class="btn btn-link p-0 text-gray-600 copy-phone" data-phone="{{ $phone2 }}" aria-label="Copiar teléfono">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                    </svg>
+                  </button>
+                </span>
               </div>
             @endif
             <!-- fin teléfono -->
@@ -490,6 +504,38 @@
       document.body.removeChild(elementoInput);
       alert("¡URL copiada al portapapeles!");
     });
+
+    (function() {
+      function copyToClipboard(text, onSuccess, onError) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(onSuccess).catch(onError);
+          return;
+        }
+        var $tmp = document.createElement('textarea');
+        $tmp.value = text;
+        document.body.appendChild($tmp);
+        $tmp.select();
+        try {
+          document.execCommand('copy');
+          onSuccess();
+        } catch (e) {
+          onError();
+        }
+        document.body.removeChild($tmp);
+      }
+
+      document.addEventListener('click', function (event) {
+        var trigger = event.target.closest('.copy-phone');
+        if (!trigger) return;
+        var phone = trigger.getAttribute('data-phone');
+        if (!phone) return;
+        copyToClipboard(phone.toString(), function () {
+          alert('Teléfono copiado');
+        }, function () {
+          alert('No se pudo copiar el teléfono');
+        });
+      });
+    })();
   </script>
 </div>
 @endsection

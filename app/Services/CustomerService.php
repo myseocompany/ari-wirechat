@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use App\Models\Menu;
 use App\Models\CustomerStatus;
 use App\Models\Customer;
@@ -31,7 +32,12 @@ class CustomerService {
             ->with(['user', 'tags', 'status']) // needed for card view (asesor) y etiquetas
             ->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
 
-        $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm, $forceOwnCustomers, $authUser, $applyDefaultDateRange, $onlyWithTags) {
+        $filterTagIds = array_values(array_filter(
+            Arr::wrap($request->tag_id),
+            fn ($id) => $id !== null && $id !== ''
+        ));
+
+        $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm, $forceOwnCustomers, $authUser, $applyDefaultDateRange, $onlyWithTags, $filterTagIds) {
             if (! is_null($stage_id)) {
                 $query->where('customer_statuses.stage_id', $stage_id);
             }
@@ -69,14 +75,12 @@ class CustomerService {
             if (isset($request->scoring_profile) && $request->scoring_profile !== null)
                                                     $query->where('customers.scoring_profile', $request->scoring_profile);
             if (!empty($request->inquiry_product_id)) $query->where('customers.inquiry_product_id', $request->inquiry_product_id);
-            $tagIds = Arr::wrap($request->tag_id);
-            $tagIds = array_filter($tagIds, fn ($id) => $id !== null && $id !== '');
-            if (!empty($tagIds)) {
-                $query->whereExists(function ($sub) use ($tagIds) {
+            if (!empty($filterTagIds)) {
+                $query->whereExists(function ($sub) use ($filterTagIds) {
                     $sub->select(DB::raw(1))
                         ->from('customer_tag')
                         ->whereColumn('customer_tag.customer_id', 'customers.id')
-                        ->whereIn('customer_tag.tag_id', $tagIds);
+                        ->whereIn('customer_tag.tag_id', $filterTagIds);
                 });
             }
             if ($onlyWithTags) {
@@ -144,7 +148,7 @@ class CustomerService {
 
         // Ordenamiento personalizado
         $sort = $request->get('sort');
-        $sortKey = $sort === 'recent' ? 'recent' : ($sort ?: 'next_action');
+        $sortKey = $sort ?: 'recent';
 
         if ($sortKey === 'next_action') {
             $query->leftJoin(DB::raw('(SELECT customer_id, MIN(due_date) AS next_due_date FROM actions WHERE delivery_date IS NULL GROUP BY customer_id) AS next_actions'), 'next_actions.customer_id', '=', 'customers.id')
@@ -188,6 +192,45 @@ class CustomerService {
         // Si ya añadías "action", seguimos igual por compatibilidad:
         $result->action = "customers";
         $result->benchmark_ms = round($elapsedMs, 2);
+
+        // Trazas ligeras de rendimiento para detectar cuellos de botella en /customers.
+        // Solo registra cuando tarda más del umbral o en modo debug.
+        $logThresholdMs = 400; // ajusta si hace falta más sensibilidad
+        if (config('app.debug') || $elapsedMs > $logThresholdMs) {
+            $isPaginator = ($result instanceof \Illuminate\Pagination\LengthAwarePaginator) || ($result instanceof \Illuminate\Pagination\Paginator);
+            $rowsReturned = $isPaginator ? $result->count() : ($result->count() ?? null);
+            $totalRows = $isPaginator && method_exists($result, 'total') ? $result->total() : null;
+
+            $logContext = [
+                'elapsed_ms'        => round($elapsedMs, 2),
+                'count_only'        => $countOnly,
+                'page_size'         => $pageSize,
+                'rows_returned'     => $rowsReturned,
+                'total_rows'        => $totalRows,
+                'stage_id'          => $stage_id,
+                'sort'              => $sortKey,
+                'apply_default_dt'  => $applyDefaultDateRange,
+                'only_with_tags'    => $onlyWithTags,
+                'filters' => [
+                    'search'            => $searchTerm ? 'yes' : 'no',
+                    'user_id'           => $request->user_id ?? null,
+                    'product_id'        => $request->product_id ?? null,
+                    'source_id'         => $request->source_id ?? null,
+                    'status_id'         => $request->status_id ?? null,
+                    'scoring_interest'  => $request->scoring_interest ?? null,
+                    'scoring_profile'   => $request->scoring_profile ?? null,
+                    'country'           => $request->country ?? null,
+                    'tag_ids'           => $filterTagIds ?? [],
+                    'has_quote'         => $request->has_quote ?? null,
+                    'from_date'         => $request->from_date ?? null,
+                    'to_date'           => $request->to_date ?? null,
+                ],
+                'user_id'           => $authUser?->id,
+                'force_own'         => $forceOwnCustomers,
+            ];
+
+            Log::info('customers.filter.performance', $logContext);
+        }
 
         $annotateAccess = function ($item) use ($authUser) {
             if (method_exists($item, 'hasFullAccess')) {
