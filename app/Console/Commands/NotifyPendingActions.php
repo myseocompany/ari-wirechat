@@ -7,6 +7,7 @@ use App\Models\Action;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Resend\Laravel\Facades\Resend;
 
 class NotifyPendingActions extends Command
@@ -43,7 +44,8 @@ class NotifyPendingActions extends Command
             ->chunkById(200, function ($actions) use (&$sent, &$skippedNoEmail, &$total) {
                 foreach ($actions as $action) {
                     $total++;
-                    $user = optional($action->customer)->user;
+                    $customer = $action->customer;
+                    $user = optional($customer)->user;
                     $email = $user->email ?? null;
 
                     if (! $email) {
@@ -52,16 +54,26 @@ class NotifyPendingActions extends Command
                         continue;
                     }
 
-                    //Mail::to($email)->send(new ActionReminderMail($action));
-
-
                     $resend = new Resend(env('RESEND_KEY'));
+
+                    $customerName = $customer?->name ?: 'Cliente sin nombre';
+                    $customerId = $customer?->id ?: $action->customer_id;
+                    $customerUrl = route('customers.show', $customerId);
+                    $note = trim((string) $action->note);
+                    $description = $note !== '' ? $note : 'Acción pendiente sin descripción.';
+                    $subject = 'Tarea pendiente - '.Str::limit($customerName, 50);
+                    $body = <<<TXT
+Tienes una acción pendiente del cliente {$customerName} (ID {$customerId}).
+
+Detalle: {$description}
+Ver cliente: {$customerUrl}
+TXT;
 
                     $resend->emails()->send([
                         'from' => 'Maquiempanadas <marketing@maquiempanadas.com>',
                         'to' => $email,
-                        'subject' => 'Tarea pendiente',
-                        'text' => "Tienes una acción pendiente: {$action->note}",
+                        'subject' => $subject,
+                        'text' => $body,
                     ]);
 
 
