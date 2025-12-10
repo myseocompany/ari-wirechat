@@ -32,6 +32,10 @@ class CustomerService {
             ->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
 
         $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm, $forceOwnCustomers, $authUser, $applyDefaultDateRange, $onlyWithTags) {
+            if (! is_null($stage_id)) {
+                $query->where('customer_statuses.stage_id', $stage_id);
+            }
+
             if (!empty($request->from_date)) {
                 $column = ($request->created_updated === "created") ? 'created_at' : 'updated_at';
                 $query->whereBetween("customers.$column", $dates);
