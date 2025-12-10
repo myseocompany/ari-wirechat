@@ -108,23 +108,6 @@ function requestToStr($request)
 </div>
 
 @php
-  $sort = $request->get('sort', 'next_action');
-  $baseParams = $request->except('page');
-  $sortUrl = function($key) use ($request, $baseParams) {
-    $params = array_merge($baseParams, ['sort' => $key, 'page' => null]);
-    return $request->url().'?'.http_build_query(array_filter($params, fn($v) => $v !== null && $v !== ''));
-  };
-@endphp
-
-<div class="d-flex flex-wrap align-items-center mb-3 justify-content-end" style="gap: 8px;">
-  <span class="text-muted small mr-2">Ordenar por:</span>
-  <a href="{{ $sortUrl('next_action') }}" class="btn btn-sm {{ $sort === 'next_action' ? 'btn-primary' : 'btn-outline-secondary' }}">Próx. acción</a>
-  <a href="{{ $sortUrl('last_action') }}" class="btn btn-sm {{ $sort === 'last_action' ? 'btn-primary' : 'btn-outline-secondary' }}">Última acción</a>
-  <a href="{{ $sortUrl('advisor') }}" class="btn btn-sm {{ $sort === 'advisor' ? 'btn-primary' : 'btn-outline-secondary' }}">Asesor</a>
-  <a href="{{ $sortUrl('recent') }}" class="btn btn-sm {{ $sort === 'recent' ? 'btn-primary' : 'btn-outline-secondary' }}">Reciente</a>
-</div>
-
-@php
   $mqlTag = isset($allTags) ? $allTags->firstWhere('name', 'MQL') : null;
 @endphp
 

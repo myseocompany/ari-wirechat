@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
 use App\Models\Menu;
 use App\Models\CustomerStatus;
 use App\Models\Customer;
@@ -148,14 +147,10 @@ class CustomerService {
 
         // Ordenamiento personalizado
         $sort = $request->get('sort');
-        $sortKey = $sort ?: 'recent';
+        $allowedSorts = ['recent', 'last_action', 'advisor'];
+        $sortKey = in_array($sort, $allowedSorts, true) ? $sort : 'recent';
 
-        if ($sortKey === 'next_action') {
-            $query->leftJoin(DB::raw('(SELECT customer_id, MIN(due_date) AS next_due_date FROM actions WHERE delivery_date IS NULL GROUP BY customer_id) AS next_actions'), 'next_actions.customer_id', '=', 'customers.id')
-                ->orderByRaw('CASE WHEN next_due_date IS NULL THEN 1 ELSE 0 END')
-                ->orderBy('next_due_date', 'ASC')
-                ->orderBy('customers.created_at', 'DESC');
-        } elseif ($sortKey === 'last_action') {
+        if ($sortKey === 'last_action') {
             $query->leftJoin(DB::raw('(SELECT customer_id, MAX(created_at) AS last_action_at FROM actions GROUP BY customer_id) AS last_actions'), 'last_actions.customer_id', '=', 'customers.id')
                 ->orderBy('last_actions.last_action_at', 'DESC');
         } elseif ($sortKey === 'advisor') {
@@ -192,45 +187,6 @@ class CustomerService {
         // Si ya añadías "action", seguimos igual por compatibilidad:
         $result->action = "customers";
         $result->benchmark_ms = round($elapsedMs, 2);
-
-        // Trazas ligeras de rendimiento para detectar cuellos de botella en /customers.
-        // Solo registra cuando tarda más del umbral o en modo debug.
-        $logThresholdMs = 400; // ajusta si hace falta más sensibilidad
-        if (config('app.debug') || $elapsedMs > $logThresholdMs) {
-            $isPaginator = ($result instanceof \Illuminate\Pagination\LengthAwarePaginator) || ($result instanceof \Illuminate\Pagination\Paginator);
-            $rowsReturned = $isPaginator ? $result->count() : ($result->count() ?? null);
-            $totalRows = $isPaginator && method_exists($result, 'total') ? $result->total() : null;
-
-            $logContext = [
-                'elapsed_ms'        => round($elapsedMs, 2),
-                'count_only'        => $countOnly,
-                'page_size'         => $pageSize,
-                'rows_returned'     => $rowsReturned,
-                'total_rows'        => $totalRows,
-                'stage_id'          => $stage_id,
-                'sort'              => $sortKey,
-                'apply_default_dt'  => $applyDefaultDateRange,
-                'only_with_tags'    => $onlyWithTags,
-                'filters' => [
-                    'search'            => $searchTerm ? 'yes' : 'no',
-                    'user_id'           => $request->user_id ?? null,
-                    'product_id'        => $request->product_id ?? null,
-                    'source_id'         => $request->source_id ?? null,
-                    'status_id'         => $request->status_id ?? null,
-                    'scoring_interest'  => $request->scoring_interest ?? null,
-                    'scoring_profile'   => $request->scoring_profile ?? null,
-                    'country'           => $request->country ?? null,
-                    'tag_ids'           => $filterTagIds ?? [],
-                    'has_quote'         => $request->has_quote ?? null,
-                    'from_date'         => $request->from_date ?? null,
-                    'to_date'           => $request->to_date ?? null,
-                ],
-                'user_id'           => $authUser?->id,
-                'force_own'         => $forceOwnCustomers,
-            ];
-
-            Log::info('customers.filter.performance', $logContext);
-        }
 
         $annotateAccess = function ($item) use ($authUser) {
             if (method_exists($item, 'hasFullAccess')) {
