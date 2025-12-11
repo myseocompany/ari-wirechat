@@ -40,7 +40,6 @@
                 <th>Pregunta</th>
                 <th>Respuesta</th>
                 <th>Score</th>
-                <th>Fecha</th>
               </tr>
             </thead>
             <tbody>
@@ -59,7 +58,6 @@
                   <td>{{ $questionText }}</td>
                   <td>{{ $answerText ?? ($payload['answer_meta_id'] ?? '') }}</td>
                   <td>{{ $payload['score'] ?? '' }}</td>
-                  <td>{{ $answer->created_at }}</td>
                 </tr>
               @endforeach
             </tbody>

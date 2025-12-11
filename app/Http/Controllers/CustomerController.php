@@ -891,7 +891,14 @@ class CustomerController extends Controller
         $today = Carbon\Carbon::now();
         $quizMetaId = 2000;
         $quizQuestionMetaIds = [2001, 2002, 2003, 2004, 2005, 2006, 2007];
-        $quizMetaIds = array_merge([$quizMetaId], $quizQuestionMetaIds);
+        $calculatorMetaRootIds = [3000, 30000];
+        $calculatorParentId = 30000;
+        $defaultCalculatorQuestionMetaIds = [30010, 30011, 30012, 30013, 30014, 30015, 30016, 30017, 30018, 30019];
+        $calculatorQuestionMetaIds = CustomerMetaData::where('parent_id', $calculatorParentId)->pluck('id')->toArray();
+        if (empty($calculatorQuestionMetaIds)) {
+            $calculatorQuestionMetaIds = $defaultCalculatorQuestionMetaIds;
+        }
+        $quizMetaIds = array_merge([$quizMetaId], $calculatorMetaRootIds, $quizQuestionMetaIds, $calculatorQuestionMetaIds);
         $audiences = Audience::all();
         $meta_data = CustomerMetaData::all();
         $metas = CustomerMetaData::leftJoin('customer_metas', 'customer_meta_datas.id', 'customer_metas.meta_data_id')
@@ -918,6 +925,32 @@ class CustomerController extends Controller
             ->whereIn('id', $quizQuestionMetaIds)
             ->get()
             ->keyBy('id');
+        // Calculadora: resumen y respuestas más recientes
+        $calculatorSummary = CustomerMeta::where('customer_id', $id)
+            ->whereIn('meta_data_id', $calculatorMetaRootIds)
+            ->orderByDesc('created_at')
+            ->first();
+
+            //dd($calculatorSummary);
+        $calculatorSummaryData = $calculatorSummary ? (json_decode($calculatorSummary->value, true) ?: []) : null;
+        $calculatorAnswersRaw = CustomerMeta::leftJoin('customer_meta_datas', 'customer_meta_datas.id', '=', 'customer_metas.meta_data_id')
+            ->where('customer_metas.customer_id', $id)
+            ->where(function ($query) use ($calculatorQuestionMetaIds, $calculatorParentId) {
+                $query->whereIn('customer_metas.meta_data_id', $calculatorQuestionMetaIds)
+                    ->orWhere('customer_meta_datas.parent_id', $calculatorParentId);
+            })
+            ->orderByDesc('customer_metas.created_at')
+            ->get(['customer_metas.*', 'customer_meta_datas.value as question_value', 'customer_meta_datas.parent_id']);
+
+        $calculatorAnswers = $calculatorAnswersRaw
+            ->groupBy('meta_data_id')
+            ->map(function ($group) {
+                return $group->first();
+            })
+            ->sortBy('meta_data_id')
+            ->values();
+
+        $calculatorQuestions = CustomerMetaData::whereIn('id', $calculatorQuestionMetaIds)->get()->keyBy('id');
         $allTags = Tag::orderBy('name')->get();
 
         return view('customers.show', compact(
@@ -936,6 +969,10 @@ class CustomerController extends Controller
             'quizSummary',
             'quizAnswers',
             'quizQuestions',
+            'calculatorSummary',
+            'calculatorSummaryData',
+            'calculatorAnswers',
+            'calculatorQuestions',
             'allTags'
         ));
     }

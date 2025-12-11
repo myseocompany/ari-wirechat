@@ -463,6 +463,7 @@
             @include('customers.partials.acordion.files', ['customer' => $model])                                                        
             @include('customers.partials.acordion.polls')
             @include('customers.partials.acordion.quiz_escalable')
+            @include('customers.partials.acordion.calculator')
             @include('customers.partials.acordion.poa')
           
 

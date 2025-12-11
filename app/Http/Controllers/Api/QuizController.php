@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class QuizController extends Controller
@@ -104,6 +105,130 @@ class QuizController extends Controller
             'customer_id' => $customer->id,
             'saved'       => true,
             'slug'        => $quizResult?->slug,
+        ], 201);
+    }
+
+    public function storeCalculator(Request $request)
+    {
+        Log::info('calculator.store.received', [
+            'payload_keys' => array_keys($request->all() ?? []),
+        ]);
+        $rawContent = $request->getContent();
+        if ($request->isJson() && $rawContent) {
+            $decoded = json_decode($rawContent, true);
+            if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+                Log::warning('calculator.store.invalid_json', [
+                    'error' => json_last_error_msg(),
+                ]);
+                return response()->json([
+                    'error' => 'Invalid JSON payload',
+                    'detail' => json_last_error_msg(),
+                ], 400);
+            }
+        }
+
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|string',
+            'final_score' => 'nullable|numeric',
+            'stage' => 'nullable|string',
+            'quiz_meta_id' => 'required|integer',
+            'completed_at' => 'nullable|string',
+            'invitation_eligible' => 'nullable|boolean',
+            'answers' => 'required|array|min:1',
+            'answers.*.question_id' => 'required|integer',
+            'answers.*.question_meta_id' => 'required|integer',
+            'answers.*.answer_meta_id' => 'required|integer',
+            'answers.*.score' => 'nullable|numeric',
+            'answers.*.answer_text' => 'nullable|string',
+            'answers.*.question_text' => 'nullable|string',
+            'answers.*.comment' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            Log::warning('calculator.store.validation_failed', [
+                'errors' => $validator->errors()->toArray(),
+                'payload_keys' => array_keys($request->all() ?? []),
+            ]);
+
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $payload = $validator->validated();
+
+        $phone = $this->cleanPhone($payload['phone']);
+        if (!$phone) {
+            return response()->json(['error' => 'Invalid phone'], 422);
+        }
+
+        $customer = Customer::where('phone', $phone)
+            ->orWhere('phone2', $phone)
+            ->first();
+
+        if (!$customer) {
+            $customer = new Customer();
+            $customer->phone = $phone;
+            $customer->phone2 = $phone;
+            $customer->status_id = 1;
+            $customer->notes = '#calculator';
+            $customer->save();
+        }
+
+        $payload['stage'] = $payload['stage'] ?? $this->stageFromScore($payload['final_score']);
+
+        try {
+            Log::info('calculator.store.start', [
+                'customer_id' => $customer->id,
+                'phone' => $phone,
+                'quiz_meta_id' => $payload['quiz_meta_id'],
+                'answers_count' => count($payload['answers'] ?? []),
+                'stage' => $payload['stage'] ?? null,
+            ]);
+
+            DB::transaction(function () use ($customer, $payload) {
+                $this->saveMeta(
+                    $customer->id,
+                    $payload['quiz_meta_id'],
+                    [
+                        'final_score' => $payload['final_score'] ?? null,
+                        'stage' => $payload['stage'] ?? null,
+                        'completed_at' => $payload['completed_at'] ?? null,
+                        'invitation_eligible' => $payload['invitation_eligible'] ?? null,
+                    ]
+                );
+
+                foreach ($payload['answers'] as $answer) {
+                    $this->saveMeta(
+                        $customer->id,
+                        $answer['question_meta_id'],
+                        [
+                            'question_id' => $answer['question_id'],
+                            'answer_meta_id' => $answer['answer_meta_id'],
+                            'score' => $answer['score'] ?? null,
+                            'answer_text' => $answer['answer_text'] ?? null,
+                            'question_text' => $answer['question_text'] ?? null,
+                            'comment' => $answer['comment'] ?? null,
+                        ]
+                    );
+                }
+            });
+
+            Log::info('calculator.store.done', [
+                'customer_id' => $customer->id,
+                'quiz_meta_id' => $payload['quiz_meta_id'],
+                'answers_saved' => count($payload['answers'] ?? []),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('calculator.store.error', [
+                'customer_id' => $customer->id ?? null,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'Unable to save calculator data'], 500);
+        }
+
+        return response()->json([
+            'customer_id' => $customer->id,
+            'saved' => true,
         ], 201);
     }
 
