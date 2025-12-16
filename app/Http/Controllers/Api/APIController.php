@@ -32,7 +32,7 @@ use App\Models\Reference;
 use App\Models\RdStation;
 use Illuminate\Support\Facades\Http;
 use App\Models\RequestLog;
-use App\Services\WAToolboxService;
+use App\Services\WhatsAppService;
 
 
 use Illuminate\Support\Facades\Cache;
@@ -45,7 +45,6 @@ class APIController extends Controller
     protected $appends = ['status_name'];
     protected $status_name;
 
-    protected $waToolboxService;
     protected $defaultMessageSource;
 
     public function __construct()
@@ -1249,6 +1248,23 @@ class APIController extends Controller
             if ($similar->count() == 0) {
                 $model = $this->saveAPICustomer($request);
                 $this->storeActionAPI($request, $model->id);
+
+                $customerName = trim($model->name ?? '') ?: 'allí';
+                $components = [
+                    [
+                        'type' => 'body',
+                        'parameters' => [
+                            ['type' => 'text', 'text' => $customerName],
+                        ],
+                    ],
+                ];
+                app(WhatsAppService::class)->sendTemplateToCustomer($model, 'drip_01', $components);
+                Action::create([
+                    'customer_id' => $model->id,
+                    'type_id' => 105,
+                    'note' => 'Se envió la campaña WhatsApp drip_01 (bot).',
+                    'creator_user_id' => 0,
+                ]);
 
                 if ($model->source_id == 23) {
 
@@ -2981,7 +2997,7 @@ class APIController extends Controller
     }
 
 
-    public function sendCampaign($campaign_id, $customer_id)
+    public function sendCampaign(Request $request, $campaign_id, $customer_id)
     {
 
         $campaign = Campaign::find($campaign_id);
@@ -2989,55 +3005,16 @@ class APIController extends Controller
             return;
         }
 
-        \Log::info('campaign=>' , [$campaign] );
+        \Log::info('campaign=>', [$campaign]);
 
-        $this->defaultMessageSource = MessageSource::getDefaultMessageSource();
-
-
-
-        if ($this->defaultMessageSource) {
-            //logger('reacched');
-            $this->waToolboxService = new WAToolboxService($this->defaultMessageSource);
-            
-        
-        }
-
-        
         $customer = Customer::find($customer_id);
         if (!$customer) {
             return;
         }
 
-        $phone = $customer->getPhone();
-        if (empty($phone)) {
-            return;
-        }
+        $channel = $request->get('channel');
 
-        // 🔍 Evitar mensajes duplicados
-        $sent_texts = [];
-        
-        \Log::info("campaign->messages: " ,[ $campaign->messages ]);
-
-        foreach ($campaign->messages as $message) {
-            if (empty($message->text) || in_array($message->text, $sent_texts)) {
-                continue;
-            }
-
-            $sent_texts[] = $message->text; // Guardar texto para evitar repetidos
-
-            $payload = [
-                'phone_number' => $phone,
-                'message' => $message->text,
-                'action' => 'send-message',
-                'type' => 'text',
-            ];
-
-            try {
-                $this->waToolboxService->sendMessageToWhatsApp($payload);
-            } catch (\Exception $e) {
-                \Log::error("Error enviando mensaje en sendCampaign: " . $e->getMessage());
-            }
-        }
+        app(WhatsAppService::class)->sendCampaignMessages($campaign, $customer, $channel);
     }
 
     public function sendToN8n($cid){

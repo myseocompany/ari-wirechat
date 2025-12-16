@@ -893,7 +893,7 @@ class CustomerController extends Controller
         $quizQuestionMetaIds = [2001, 2002, 2003, 2004, 2005, 2006, 2007];
         $calculatorMetaRootIds = [3000, 30000];
         $calculatorParentId = 30000;
-        $defaultCalculatorQuestionMetaIds = [30010, 30011, 30012, 30013, 30014, 30015, 30016, 30017, 30018, 30019];
+        $defaultCalculatorQuestionMetaIds = [30009, 30010, 30011, 30012, 30013, 30014, 30015, 30016, 30017, 30018, 30019];
         $calculatorQuestionMetaIds = CustomerMetaData::where('parent_id', $calculatorParentId)->pluck('id')->toArray();
         if (empty($calculatorQuestionMetaIds)) {
             $calculatorQuestionMetaIds = $defaultCalculatorQuestionMetaIds;
