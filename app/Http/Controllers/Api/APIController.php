@@ -2287,8 +2287,19 @@ class APIController extends Controller
 
         $modelRD = $this->saveAPIRD($model, $opportunity);
 
+        $customerName = trim($modelRD->name ?? '') ?: 'allí';
+        $components = [
+            [
+                'type' => 'body',
+                'parameters' => [
+                    ['type' => 'text', 'text' => $customerName],
+                ],
+            ],
+        ];
+        $this->sendWelcomeTemplate($modelRD, $components);
+
         //$this->sendToN8n($modelRD->id);
-        
+
         return $modelRD->id;
     }
 
