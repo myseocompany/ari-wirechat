@@ -276,6 +276,7 @@ Route::get('api/customers/saveCustomer', [APIController::class, 'saveApi'])->wit
 
 Route::middleware('auth')->get('/request-logs', [APIController::class, 'requestLogsView'])->name('request_logs.index');
 Route::middleware('auth')->get('/request-logs/{id}', [APIController::class, 'showRequestLog'])->name('request_logs.show');
+Route::middleware('auth')->post('/request-logs/{id}/resend', [APIController::class, 'resendRequestLogWeb'])->name('request_logs.resend');
 
 // References Routes
 Route::middleware('auth')->prefix('references')->group(function () {

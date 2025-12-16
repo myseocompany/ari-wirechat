@@ -2032,6 +2032,27 @@ class APIController extends Controller
         ]);
     }
 
+    public function resendRequestLogWeb(int $id)
+    {
+        try {
+            $result = $this->forwardRequestLogPayload($id);
+
+            $payloadPretty = json_encode($result['payload'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+            $serverPretty = is_array($result['server_response'])
+                ? json_encode($result['server_response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                : $result['server_response'];
+
+            return view('request_logs.resend', [
+                'result' => $result,
+                'payloadPretty' => $payloadPretty,
+                'serverPretty' => $serverPretty,
+            ]);
+        } catch (\Throwable $e) {
+            $status = $e->getCode() >= 400 ? $e->getCode() : 500;
+            return redirect()->route('request_logs.index')->with('error', $e->getMessage())->setStatusCode($status);
+        }
+    }
+
     public function showRequestLog(int $id)
     {
         $log = RequestLog::find($id);
