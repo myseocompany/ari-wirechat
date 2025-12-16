@@ -1233,6 +1233,11 @@ class APIController extends Controller
     {
         $model = null;
         $this->saveLogFromRequest($request);
+        Log::info('saveAPI received payload', [
+            'route' => $request->path(),
+            'ip' => $request->ip(),
+            'params' => $request->all(),
+        ]);
         // vericamos que no se inserte 2 veces
        
         $count = $this->isEqual($request);
@@ -1258,6 +1263,10 @@ class APIController extends Controller
                         ],
                     ],
                 ];
+                Log::info('Triggering WhatsApp template drip_01', [
+                    'customer_id' => $model->id,
+                    'name' => $customerName,
+                ]);
                 app(WhatsAppService::class)->sendTemplateToCustomer($model, 'drip_01', $components);
                 Action::create([
                     'customer_id' => $model->id,

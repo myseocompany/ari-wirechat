@@ -273,7 +273,6 @@ Route::middleware('auth')->prefix('api')->group(function () {
     Route::post('/update_lead_score', [APIController::class, 'saveFromRD2']);
 });
 Route::get('api/customers/saveCustomer', [APIController::class, 'saveApi'])->withoutMiddleware(['auth']);
-Route::post('api/customers/update', [APIController::class, 'updateFromRD'])->withoutMiddleware(['auth'])->name('updateRD');
 
 // References Routes
 Route::middleware('auth')->prefix('references')->group(function () {
@@ -524,18 +523,6 @@ Route::get('/reset_password', function(){
 Route::get('/rdtest', [RDTestController::class, 'test']);
 Route::post('/rdtest', [RDTestController::class, 'handleRequest'])->name('rdtest.post');
 
-Route::get('/test-rd', function () {
-    $payload = json_decode(file_get_contents(base_path('lead.json')), true);
-
-    //dd(file_get_contents(base_path('lead.json')));
-
-    $request = Request::create('/api/customers/update', 'POST', [], [], [], [], json_encode($payload));
-    $request->headers->set('Content-Type', 'application/json');
-
-    // Llama directamente al controlador
-    $controller = app(APIController::class);
-    return $controller->updateFromRD($request);
-});
 
 
 // routes/web.php
@@ -614,4 +601,3 @@ Route::get('/test-email', function () {
     */
     return 'Email enviado por resend (si todo está bien)';
 });
-

@@ -2428,6 +2428,11 @@ https://maquiempanadas.com/maquina-para-hacer-empanadas-semiautomatica-para-dos-
     public function updateFromRD(Request $request)
     {   
         $this->saveLogFromRequest($request);
+        \Log::info('updateFromRD received payload', [
+            'ip' => $request->ip(),
+            'path' => $request->path(),
+            'lead_id' => $request->input('leads.0.id'),
+        ]);
         $json = $request->json()->all();
         $data = $json['leads'][0] ?? [];
 
