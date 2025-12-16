@@ -369,9 +369,9 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
                   @if(isset($item->email))<div class="text-gray-600">{{$item->email}}</div>@endif
                   @if(!empty($item->phone))
                     <div class="d-flex align-items-center gap-2">
-                      <a class="text-indigo-600 hover:underline" @if(isset($customer->phone)) href="https://wa.me/{{ clearWP($customer->getPhone()) }}" @else href="" @endif target="_empty">{{$customer->phone}}</a>
-                      @if(!empty($customer->phone))
-                      <button type="button" class="btn btn-link p-0 text-gray-600 copy-phone" data-phone="{{$customer->phone}}" aria-label="Copiar teléfono">
+                      <a class="text-indigo-600 hover:underline" href="https://wa.me/{{ clearWP($item->phone) }}" target="_blank">{{$item->phone}}</a>
+                      @if(!empty($item->phone))
+                      <button type="button" class="btn btn-link p-0 text-gray-600 copy-phone" data-phone="{{$item->phone}}" aria-label="Copiar teléfono">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
                         </svg>
@@ -381,9 +381,9 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
                   @endif
                   @if(!empty($item->phone2))
                     <div class="d-flex align-items-center gap-2">
-                      <a class="text-indigo-600 hover:underline" @if(isset($customer->phone2)) href="https://wa.me/{{ clearWP($customer->getPhone()) }}" @else href="" @endif target="_empty">{{$customer->phone2}}</a>
-                      @if(!empty($customer->phone2))
-                      <button type="button" class="btn btn-link p-0 text-gray-600 copy-phone" data-phone="{{$customer->phone2}}" aria-label="Copiar teléfono">
+                      <a class="text-indigo-600 hover:underline" href="https://wa.me/{{ clearWP($item->phone2) }}" target="_blank">{{$item->phone2}}</a>
+                      @if(!empty($item->phone2))
+                      <button type="button" class="btn btn-link p-0 text-gray-600 copy-phone" data-phone="{{$item->phone2}}" aria-label="Copiar teléfono">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
                         </svg>
