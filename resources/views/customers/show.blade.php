@@ -352,7 +352,7 @@
 
 
             @if($actual)
-            <div>
+            <div class="d-flex align-items-center" style="gap:8px; flex-wrap:wrap;">
               <a href="/customers/{{$model->id}}/edit">
                 <span class="btn btn-primary btn-sm" aria-hidden="true">Editar</span>
               </a>
@@ -369,6 +369,13 @@
               @endif
               @endif
               <button class="btn btn-primary btn-sm" id="btnCopiar" size="5"> POA</button>
+
+              <form method="POST" action="{{ route('customers.send-welcome', $model->id) }}">
+                @csrf
+                <button type="submit" class="btn btn-primary btn-sm" @if($welcomeAlreadySent) disabled @endif title="Enviar mensaje de bienvenida drip_01">
+                  <small>D01</small>
+                </button>
+              </form>
             </div>
 
 

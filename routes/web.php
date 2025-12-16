@@ -126,6 +126,7 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     Route::post('/{customer}/action/pqr', [CustomerController::class, 'pqrAction'])->whereNumber('customer');
     Route::post('/{customer}/action/spare', [CustomerController::class, 'spareAction'])->whereNumber('customer');
     Route::post('/{customer}/action/mail', [CustomerController::class, 'storeMail'])->whereNumber('customer');
+    Route::post('/{customer}/send-welcome', [CustomerController::class, 'sendWelcomeTemplate'])->whereNumber('customer')->name('customers.send-welcome');
     Route::get('/{customer}/assignMe', [CustomerController::class, 'assignMe'])->whereNumber('customer');
     Route::post('/{customer}/audience', [CustomerController::class, 'storeAudience'])->whereNumber('customer');
     Route::get('/history/{customer}/show', [CustomerController::class, 'showHistory'])->whereNumber('customer');
