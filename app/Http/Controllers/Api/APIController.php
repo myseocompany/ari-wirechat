@@ -1902,6 +1902,84 @@ class APIController extends Controller
         return $str;
     }
 
+    private function extractEmailFromRequestPayload(array $payload): ?string
+    {
+        $paths = [
+            'email',
+            'Email',
+            'email_lead',
+            'leads.0.email',
+            'leads.0.Email',
+            'leads.0.email_lead',
+            'leads.0.first_conversion.content.email_lead',
+            'leads.0.last_conversion.content.email_lead',
+        ];
+
+        foreach ($paths as $path) {
+            $value = data_get($payload, $path);
+            if (is_string($value) && trim($value) !== '') {
+                return trim($value);
+            }
+        }
+
+        return null;
+    }
+
+    private function extractPhoneFromRequestPayload(array $payload): ?string
+    {
+        $paths = [
+            'phone',
+            'Phone',
+            'phone_lead',
+            'leads.0.phone',
+            'leads.0.personal_phone',
+            'leads.0.mobile_phone',
+            'leads.0.phone_lead',
+            'leads.0.first_conversion.content.phone_lead',
+            'leads.0.first_conversion.content.celular',
+            'leads.0.last_conversion.content.phone_lead',
+            'leads.0.last_conversion.content.celular',
+        ];
+
+        foreach ($paths as $path) {
+            $value = data_get($payload, $path);
+            if ($value === null || $value === '') {
+                continue;
+            }
+            $clean = $this->cleanPhoneCharters((string) $value);
+            if ($clean) {
+                return $clean;
+            }
+        }
+
+        return null;
+    }
+
+    private function extractFacebookIdFromRequestPayload(array $payload): ?string
+    {
+        $paths = [
+            'facebook_id',
+            'facebook_lead_id',
+            'leads.0.facebook_id',
+            'leads.0.facebook_lead_id',
+            'leads.0.first_conversion.content.facebook_id',
+            'leads.0.first_conversion.content.facebook_lead_id',
+            'leads.0.last_conversion.content.facebook_id',
+            'leads.0.last_conversion.content.facebook_lead_id',
+        ];
+
+        foreach ($paths as $path) {
+            $value = data_get($payload, $path);
+            if ($value === null || $value === '') {
+                continue;
+            }
+
+            return (string) $value;
+        }
+
+        return null;
+    }
+
     public function saveLogFromRequest(Request $request)
     {
         $model = new RequestLog();
@@ -1916,6 +1994,9 @@ class APIController extends Controller
 
         // Guardar la solicitud como JSON
         $model->request = json_encode($requestData);
+        $model->email = $this->extractEmailFromRequestPayload($requestData);
+        $model->phone = $this->extractPhoneFromRequestPayload($requestData);
+        $model->facebook_id = $this->extractFacebookIdFromRequestPayload($requestData);
         $model->save();
     }
 
