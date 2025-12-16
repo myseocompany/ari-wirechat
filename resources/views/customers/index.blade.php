@@ -294,6 +294,36 @@
     $inputDR.val('');
     return false;
   };
+
+  function copyPhoneToClipboard(phone, onSuccess, onError) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(phone).then(onSuccess).catch(onError);
+      return;
+    }
+    const $tmp = $('<textarea>').val(phone).appendTo('body');
+    $tmp.select();
+    try {
+      document.execCommand('copy');
+      onSuccess();
+    } catch (err) {
+      onError(err);
+    }
+    $tmp.remove();
+  }
+
+  $(document).on('click', '.copy-phone', function (event) {
+    event.preventDefault();
+    event.stopPropagation();
+    const phone = $(this).data('phone');
+    if (!phone) {
+      return;
+    }
+    copyPhoneToClipboard(phone.toString(), function () {
+      alert('Teléfono copiado');
+    }, function () {
+      alert('No se pudo copiar el teléfono');
+    });
+  });
 })();
 </script>
 @endpush
