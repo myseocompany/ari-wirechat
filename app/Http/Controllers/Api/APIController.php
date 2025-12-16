@@ -1232,125 +1232,134 @@ class APIController extends Controller
     public function saveAPI(Request $request)
     {
         $model = null;
-        $this->saveLogFromRequest($request);
-        Log::info('saveAPI received payload', [
-            'route' => $request->path(),
-            'ip' => $request->ip(),
-            'params' => $request->all(),
-        ]);
-        // vericamos que no se inserte 2 veces
-       
-        $count = $this->isEqual($request);
+
+        try {
+            $this->saveLogFromRequest($request);
+            Log::info('saveAPI received payload', [
+                'route' => $request->path(),
+                'ip' => $request->ip(),
+                'params' => $request->all(),
+            ]);
+            // vericamos que no se inserte 2 veces
         
-        $similar = $this->getSimilar($request);
+            $count = $this->isEqual($request);
+            
+            $similar = $this->getSimilar($request);
 
-        //dd($similar);
+            //dd($similar);
 
-        if (is_null($count) || ($count == 0)) {
-            // verificamos uno similar
+            if (is_null($count) || ($count == 0)) {
+                // verificamos uno similar
 
 
-            if ($similar->count() == 0) {
-                Log::info('saveAPI new lead detected, creating customer');
-                $model = $this->saveAPICustomer($request);
-                $this->storeActionAPI($request, $model->id);
+                if ($similar->count() == 0) {
+                    Log::info('saveAPI new lead detected, creating customer');
+                    $model = $this->saveAPICustomer($request);
+                    $this->storeActionAPI($request, $model->id);
 
-                $customerName = trim($model->name ?? '') ?: 'allí';
-                $components = [
-                    [
-                        'type' => 'body',
-                        'parameters' => [
-                            ['type' => 'text', 'text' => $customerName],
+                    $customerName = trim($model->name ?? '') ?: 'allí';
+                    $components = [
+                        [
+                            'type' => 'body',
+                            'parameters' => [
+                                ['type' => 'text', 'text' => $customerName],
+                            ],
                         ],
-                    ],
-                ];
-                Log::info('Triggering WhatsApp template drip_01', [
-                    'customer_id' => $model->id,
-                    'name' => $customerName,
-                ]);
-                app(WhatsAppService::class)->sendTemplateToCustomer($model, 'drip_01', $components);
-                Action::create([
-                    'customer_id' => $model->id,
-                    'type_id' => 105,
-                    'note' => 'Se envió la campaña WhatsApp drip_01 (bot).',
-                    'creator_user_id' => 0,
-                ]);
+                    ];
+                    Log::info('Triggering WhatsApp template drip_01', [
+                        'customer_id' => $model->id,
+                        'name' => $customerName,
+                    ]);
+                    app(WhatsAppService::class)->sendTemplateToCustomer($model, 'drip_01', $components);
+                    Action::create([
+                        'customer_id' => $model->id,
+                        'type_id' => 105,
+                        'note' => 'Se envió la campaña WhatsApp drip_01 (bot).',
+                        'creator_user_id' => 0,
+                    ]);
 
-                if ($model->source_id == 23) {
+                    if ($model->source_id == 23) {
 
-                    $model->rd_station_response = $this->saveRDSationCustomer($model);
-                    $model->save();
-                }
-                $email = Email::find(1);
-                $source = CustomerSource::find($model->source_id);
-                if ($request->product_id == 3 || $model->source_id == 28) {
-                    //Email::addEmailQueue($email, $model, 10, null);
-                    return $this->redirectingDesmechadora();
-                } else {
+                        $model->rd_station_response = $this->saveRDSationCustomer($model);
+                        $model->save();
+                    }
+                    $email = Email::find(1);
+                    $source = CustomerSource::find($model->source_id);
+                    if ($request->product_id == 3 || $model->source_id == 28) {
+                        //Email::addEmailQueue($email, $model, 10, null);
+                        return $this->redirectingDesmechadora();
+                    } else {
 
-                    if (isset($source)) {
+                        if (isset($source)) {
 
-                        if ($source->id == 26) { //Sitio Web - WhatsApp Manual
+                            if ($source->id == 26) { //Sitio Web - WhatsApp Manual
+                                return redirect('https://maquiempanadas.com/es/gracias-web');
+                            }
+                            return redirect('https://maquiempanadas.com/es/' . $source->redirect_url);
+                        } else {
                             return redirect('https://maquiempanadas.com/es/gracias-web');
                         }
-                        return redirect('https://maquiempanadas.com/es/' . $source->redirect_url);
-                    } else {
-                        return redirect('https://maquiempanadas.com/es/gracias-web');
                     }
+                } else {
+                    Log::info('saveAPI similar lead found, skipping new customer', [
+                        'similar_customer_id' => $similar[0]->id ?? null,
+                        'input_email' => $request->email ?? null,
+                    ]);
+
+                    $model = $similar[0];
+
+            
+
+                    $this->storeActionAPI($request, $model->id);
+                    $this->updateCreateDate($request, $model->id);
+                    
                 }
+                // este cliente ya existe. Se agrega una nueva nota
+                //else{
+
+
+                //$this->updateCreateDate($request, $model->id);
+                // return redirect('https://maquiempanadas.com/es/gracias-web');
+                //return redirect('https://maquiempanadas.com/es/gracias-web/');
+                //echo "similard";
+
+
+                //}
             } else {
-                Log::info('saveAPI similar lead found, skipping new customer', [
-                    'similar_customer_id' => $similar[0]->id ?? null,
-                    'input_email' => $request->email ?? null,
-                ]);
-
                 $model = $similar[0];
+                if ($model && $model->status_id == 1) { //miro si está nuevo
 
-         
 
-                $this->storeActionAPI($request, $model->id);
-                $this->updateCreateDate($request, $model->id);
-                
+                    $cHistory = new CustomerHistory;
+                    $cHistory->saveFromModel($model);
+                    $model->status_id  = 28; // se cambia a seguimiento 1
+                    $model->save();
+                }
+
+                if (($model->name == null) && (isset($request->name))) {
+                    $model->name = $request->name;
+                    $model->save();
+                }
+
+
+
+
+                $this->storeActionAPI($request, $similar[0]->id);
+
+
+                if (isset($request->session_id)) {
+
+                    $model = Customer::where("email", $request->email)->first();
+                    
+                }
+                return redirect('https://maquiempanadas.com/es/gracias-web/');
             }
-            // este cliente ya existe. Se agrega una nueva nota
-            //else{
-
-
-            //$this->updateCreateDate($request, $model->id);
-            // return redirect('https://maquiempanadas.com/es/gracias-web');
-            //return redirect('https://maquiempanadas.com/es/gracias-web/');
-            //echo "similard";
-
-
-            //}
-        } else {
-            $model = $similar[0];
-            if ($model && $model->status_id == 1) { //miro si está nuevo
-
-
-                $cHistory = new CustomerHistory;
-                $cHistory->saveFromModel($model);
-                $model->status_id  = 28; // se cambia a seguimiento 1
-                $model->save();
-            }
-
-            if (($model->name == null) && (isset($request->name))) {
-                $model->name = $request->name;
-                $model->save();
-            }
-
-
-
-
-            $this->storeActionAPI($request, $similar[0]->id);
-
-
-            if (isset($request->session_id)) {
-
-                $model = Customer::where("email", $request->email)->first();
-                
-            }
-            return redirect('https://maquiempanadas.com/es/gracias-web/');
+        } catch (\Throwable $e) {
+            Log::error('saveAPI failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'saveAPI failed', 'message' => $e->getMessage()], 500);
         }
     }
 
