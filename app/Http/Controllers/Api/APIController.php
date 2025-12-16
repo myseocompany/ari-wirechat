@@ -1932,40 +1932,58 @@ class APIController extends Controller
         return response()->json($logs);
     }
 
-    public function resendRequestLog(Request $request, int $id)
+    private function forwardRequestLogPayload(int $id): array
     {
         $log = RequestLog::find($id);
 
         if (!$log) {
-            return response()->json(['error' => 'Registro no encontrado'], 404);
+            throw new \RuntimeException('Registro no encontrado', 404);
         }
 
         $payload = json_decode($log->request, true);
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($payload)) {
-            return response()->json(['error' => 'El payload guardado no es un JSON válido'], 422);
+            throw new \RuntimeException('El payload guardado no es un JSON válido', 422);
         }
 
         $forwardRequest = new Request($payload);
-
         $response = $this->saveAPI($forwardRequest);
 
-        $responseData = null;
         $status = 200;
+        $responseData = null;
 
         if ($response instanceof \Illuminate\Http\JsonResponse) {
             $responseData = $response->getData(true);
             $status = $response->getStatusCode();
         } elseif ($response instanceof \Symfony\Component\HttpFoundation\Response) {
             $status = $response->getStatusCode();
-            $responseData = $response->getContent();
+            $content = $response->getContent();
+            $decoded = json_decode($content, true);
+            $responseData = json_last_error() === JSON_ERROR_NONE ? $decoded : $content;
         }
 
-        return response()->json([
+        return [
             'forwarded_to' => '/api/customers/update',
             'payload' => $payload,
             'server_response' => $responseData,
             'status' => $status,
-        ], $status);
+            'log' => $log,
+        ];
+    }
+
+    public function resendRequestLog(Request $request, int $id)
+    {
+        try {
+            $result = $this->forwardRequestLogPayload($id);
+            return response()->json($result, $result['status']);
+        } catch (\Throwable $e) {
+            $status = $e->getCode() >= 400 ? $e->getCode() : 500;
+            \Log::error('resendRequestLog failed', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => $e->getMessage()], $status);
+        }
     }
 
     public function requestLogsView(Request $request)
