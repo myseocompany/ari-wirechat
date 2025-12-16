@@ -25,6 +25,9 @@
 	<a href="/roles" class="list-group-item">Roles</a>
 </div>
 <div class="list-group">
+	<a href="/request-logs" class="list-group-item">Logs de solicitudes API</a>
+</div>
+<div class="list-group">
 	<a href="/customers/phase/4" class="list-group-item">PQR</a>
 </div>
 <div class="list-group">
