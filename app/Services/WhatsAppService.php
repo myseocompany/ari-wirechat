@@ -221,7 +221,12 @@ class WhatsAppService
         }
 
         try {
-            $this->graphService->sendTemplate($account, $phone, $templateName, $language, $components);
+            $response = $this->graphService->sendTemplate($account, $phone, $templateName, $language, $components);
+            Log::info('WhatsAppService template response', [
+                'customer_id' => $customer->id,
+                'template' => $templateName,
+                'response' => $response,
+            ]);
         } catch (\Throwable $e) {
             Log::error('WhatsAppService sendTemplateToCustomer failed', [
                 'customer_id' => $customer->id,

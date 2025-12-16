@@ -1251,6 +1251,7 @@ class APIController extends Controller
 
 
             if ($similar->count() == 0) {
+                Log::info('saveAPI new lead detected, creating customer');
                 $model = $this->saveAPICustomer($request);
                 $this->storeActionAPI($request, $model->id);
 
@@ -1298,6 +1299,10 @@ class APIController extends Controller
                     }
                 }
             } else {
+                Log::info('saveAPI similar lead found, skipping new customer', [
+                    'similar_customer_id' => $similar[0]->id ?? null,
+                    'input_email' => $request->email ?? null,
+                ]);
 
                 $model = $similar[0];
 
