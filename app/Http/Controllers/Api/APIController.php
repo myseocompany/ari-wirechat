@@ -1232,6 +1232,9 @@ class APIController extends Controller
     public function saveAPI(Request $request)
     {
         $model = null;
+        $created = false;
+
+        
 
         try {
             $this->saveLogFromRequest($request);
@@ -1244,6 +1247,10 @@ class APIController extends Controller
         
             $count = $this->isEqual($request);
             
+            Log::info('saveAPI is Equal detected', [
+                'equal_count' => $count,
+            ]);
+            
             $similar = $this->getSimilar($request);
 
             //dd($similar);
@@ -1255,28 +1262,24 @@ class APIController extends Controller
                 if ($similar->count() == 0) {
                     Log::info('saveAPI new lead detected, creating customer');
                     $model = $this->saveAPICustomer($request);
+                    Log::info('saveAPI customer created', [
+                        'customer_id' => $model->id,
+                        'email' => $model->email,
+                        'phone' => $model->phone,
+                    ]);
                     $this->storeActionAPI($request, $model->id);
+                    $created = true;
 
                     $customerName = trim($model->name ?? '') ?: 'allí';
-                    $components = [
-                        [
-                            'type' => 'body',
-                            'parameters' => [
-                                ['type' => 'text', 'text' => $customerName],
-                            ],
+                $components = [
+                    [
+                        'type' => 'body',
+                        'parameters' => [
+                            ['type' => 'text', 'text' => $customerName],
                         ],
-                    ];
-                    Log::info('Triggering WhatsApp template drip_01', [
-                        'customer_id' => $model->id,
-                        'name' => $customerName,
-                    ]);
-                    app(WhatsAppService::class)->sendTemplateToCustomer($model, 'drip_01', $components);
-                    Action::create([
-                        'customer_id' => $model->id,
-                        'type_id' => 105,
-                        'note' => 'Se envió la campaña WhatsApp drip_01 (bot).',
-                        'creator_user_id' => 0,
-                    ]);
+                    ],
+                ];
+                $this->sendWelcomeTemplate($model, $components);
 
                     if ($model->source_id == 23) {
 
@@ -1285,21 +1288,7 @@ class APIController extends Controller
                     }
                     $email = Email::find(1);
                     $source = CustomerSource::find($model->source_id);
-                    if ($request->product_id == 3 || $model->source_id == 28) {
-                        //Email::addEmailQueue($email, $model, 10, null);
-                        return $this->redirectingDesmechadora();
-                    } else {
-
-                        if (isset($source)) {
-
-                            if ($source->id == 26) { //Sitio Web - WhatsApp Manual
-                                return redirect('https://maquiempanadas.com/es/gracias-web');
-                            }
-                            return redirect('https://maquiempanadas.com/es/' . $source->redirect_url);
-                        } else {
-                            return redirect('https://maquiempanadas.com/es/gracias-web');
-                        }
-                    }
+                    // En API no redirigimos; devolvemos JSON al final.
                 } else {
                     Log::info('saveAPI similar lead found, skipping new customer', [
                         'similar_customer_id' => $similar[0]->id ?? null,
@@ -1313,6 +1302,11 @@ class APIController extends Controller
                     $this->storeActionAPI($request, $model->id);
                     $this->updateCreateDate($request, $model->id);
                     
+                    Log::info('saveAPI updated existing customer', [
+                        'customer_id' => $model->id,
+                        'email' => $model->email,
+                        'phone' => $model->phone,
+                    ]);
                 }
                 // este cliente ya existe. Se agrega una nueva nota
                 //else{
@@ -1326,6 +1320,10 @@ class APIController extends Controller
 
                 //}
             } else {
+                Log::info('saveAPI ultimo else - similar lead found, skipping new customer', [
+                    'similar_customer_id' => $similar[0]->id ?? null,
+                    'input_email' => $request->email ?? null,
+                ]);
                 $model = $similar[0];
                 if ($model && $model->status_id == 1) { //miro si está nuevo
 
@@ -1352,8 +1350,11 @@ class APIController extends Controller
                     $model = Customer::where("email", $request->email)->first();
                     
                 }
-                return redirect('https://maquiempanadas.com/es/gracias-web/');
             }
+            return response()->json([
+                'customer_id' => $model->id ?? null,
+                'created' => $created,
+            ]);
         } catch (\Throwable $e) {
             Log::error('saveAPI failed', [
                 'error' => $e->getMessage(),
@@ -1361,6 +1362,28 @@ class APIController extends Controller
             ]);
             return response()->json(['error' => 'saveAPI failed', 'message' => $e->getMessage()], 500);
         }
+    }
+
+    private function sendWelcomeTemplate(Customer $customer, array $components): void
+    {
+        Log::info('Triggering WhatsApp template drip_01', [
+            'customer_id' => $customer->id,
+            'name' => $customer->name,
+        ]);
+
+        app(WhatsAppService::class)->sendTemplateToCustomer($customer, 'drip_01', $components);
+
+        Action::create([
+            'customer_id' => $customer->id,
+            'type_id' => 105,
+            'note' => 'Se envió la campaña WhatsApp drip_01 (bot).',
+            'creator_user_id' => 0,
+        ]);
+
+        Log::info('saveAPI action created (template send)', [
+            'customer_id' => $customer->id,
+            'type_id' => 105,
+        ]);
     }
 
 
@@ -1638,6 +1661,12 @@ class APIController extends Controller
         $model->customer_id = $customer_id;
 
         $model->save();
+        Log::info('storeActionAPI created action', [
+            'customer_id' => $customer_id,
+            'action_id' => $model->id,
+            'type_id' => $model->type_id,
+            'note' => $model->note,
+        ]);
 
         return back();
     }
@@ -1874,6 +1903,139 @@ class APIController extends Controller
         // Guardar la solicitud como JSON
         $model->request = json_encode($requestData);
         $model->save();
+    }
+
+    public function listRequestLogs(Request $request)
+    {
+        $perPage = (int) $request->get('per_page', 25);
+        $perPage = $perPage > 0 ? min($perPage, 100) : 25;
+
+        $logs = RequestLog::orderByDesc('created_at')->paginate($perPage);
+
+        $logs->getCollection()->transform(function ($log) {
+            $payload = json_decode($log->request, true);
+
+            return [
+                'id' => $log->id,
+                'action' => $log->action,
+                'user_id' => $log->user_id,
+                'phone' => $log->phone,
+                'facebook_id' => $log->facebook_id,
+                'email' => $log->email,
+                'created_at' => $log->created_at,
+                'updated_at' => $log->updated_at,
+                'request' => $log->request,
+                'payload' => is_array($payload) ? $payload : null,
+            ];
+        });
+
+        return response()->json($logs);
+    }
+
+    public function resendRequestLog(Request $request, int $id)
+    {
+        $log = RequestLog::find($id);
+
+        if (!$log) {
+            return response()->json(['error' => 'Registro no encontrado'], 404);
+        }
+
+        $payload = json_decode($log->request, true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($payload)) {
+            return response()->json(['error' => 'El payload guardado no es un JSON válido'], 422);
+        }
+
+        $forwardRequest = new Request($payload);
+
+        $response = $this->saveAPI($forwardRequest);
+
+        $responseData = null;
+        $status = 200;
+
+        if ($response instanceof \Illuminate\Http\JsonResponse) {
+            $responseData = $response->getData(true);
+            $status = $response->getStatusCode();
+        } elseif ($response instanceof \Symfony\Component\HttpFoundation\Response) {
+            $status = $response->getStatusCode();
+            $responseData = $response->getContent();
+        }
+
+        return response()->json([
+            'forwarded_to' => '/api/customers/update',
+            'payload' => $payload,
+            'server_response' => $responseData,
+            'status' => $status,
+        ], $status);
+    }
+
+    public function requestLogsView(Request $request)
+    {
+        $perPage = (int) $request->get('per_page', 10);
+        $perPage = $perPage > 0 ? min($perPage, 100) : 10;
+        $search = trim((string) $request->get('q'));
+
+        $query = RequestLog::orderByDesc('created_at');
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('email', 'like', '%' . $search . '%')
+                    ->orWhere('phone', 'like', '%' . $search . '%')
+                    ->orWhere('request', 'like', '%' . $search . '%');
+            });
+        }
+
+        $logs = $query->paginate($perPage)->withQueryString();
+
+        $logs->getCollection()->transform(function ($log) {
+            $payload = json_decode($log->request, true);
+
+            $preview = [];
+            if (is_array($payload)) {
+                foreach ($payload as $key => $value) {
+                    $preview[$key] = is_scalar($value) ? $value : json_encode($value);
+                    if (count($preview) >= 5) {
+                        break;
+                    }
+                }
+            }
+
+            $email = $log->email ?? ($payload['email'] ?? ($payload['Email'] ?? null));
+
+            $log->payload_preview = $preview;
+            $log->display_email = $email;
+
+            return $log;
+        });
+
+        return view('request_logs.index', [
+            'logs' => $logs,
+            'search' => $search,
+            'perPage' => $perPage,
+        ]);
+    }
+
+    public function showRequestLog(int $id)
+    {
+        $log = RequestLog::find($id);
+
+        if (!$log) {
+            return redirect()->route('request_logs.index')->with('error', 'Registro no encontrado');
+        }
+
+        $payload = json_decode($log->request, true);
+        $payloadRaw = $log->request;
+        $payloadPretty = is_array($payload)
+            ? json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+            : null;
+
+        $email = $log->email ?? ($payload['email'] ?? ($payload['Email'] ?? null));
+
+        return view('request_logs.show', [
+            'log' => $log,
+            'payloadPretty' => $payloadPretty,
+            'payloadRaw' => $payloadRaw,
+            'displayEmail' => $email,
+        ]);
     }
 
 

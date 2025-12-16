@@ -274,6 +274,9 @@ Route::middleware('auth')->prefix('api')->group(function () {
 });
 Route::get('api/customers/saveCustomer', [APIController::class, 'saveApi'])->withoutMiddleware(['auth']);
 
+Route::middleware('auth')->get('/request-logs', [APIController::class, 'requestLogsView'])->name('request_logs.index');
+Route::middleware('auth')->get('/request-logs/{id}', [APIController::class, 'showRequestLog'])->name('request_logs.show');
+
 // References Routes
 Route::middleware('auth')->prefix('references')->group(function () {
     Route::get('/', [ReferencesController::class, 'show']);

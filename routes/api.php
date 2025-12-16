@@ -11,7 +11,10 @@ use App\Http\Middleware\CheckApiToken;
 Route::middleware('api')->group(
     function () {
         Route::get('/customers/saveCustomer', [APIController::class, 'saveApi']);
-        Route::post('/customers/update', [APIController::class, 'saveApi']);
+        #Route::post('/customers/update', [APIController::class, 'saveApi']);
+        Route::post('/customers/update', [APIController::class, 'updateFromRD']);
+        Route::get('/request-logs', [APIController::class, 'listRequestLogs']);
+        Route::post('/request-logs/{id}/resend', [APIController::class, 'resendRequestLog']);
         
         Route::post('/watoolbox', [WAToolBoxController::class, 'receiveMessage']);
         Route::post('/watoolbox/webhook', [WAToolBoxController::class, 'receiveMessage']);
