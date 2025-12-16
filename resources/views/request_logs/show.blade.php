@@ -35,7 +35,7 @@
                 <div class="meta-label">ID</div>
                 <h4 class="mb-0">#{{ $log->id }}</h4>
             </div>
-            <form method="POST" action="{{ url('/api/request-logs/'.$log->id.'/resend') }}">
+            <form method="POST" action="{{ route('request_logs.resend', $log->id) }}">
                 @csrf
                 <button class="btn btn-primary btn-sm" type="submit">Reenviar</button>
             </form>

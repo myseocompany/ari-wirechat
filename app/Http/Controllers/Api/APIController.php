@@ -1944,9 +1944,20 @@ class APIController extends Controller
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($payload)) {
             throw new \RuntimeException('El payload guardado no es un JSON válido', 422);
         }
+        $forwardRequest = Request::create(
+            '/api/customers/update',
+            'POST',
+            [],
+            [],
+            [],
+            [
+                'HTTP_ACCEPT' => 'application/json',
+                'CONTENT_TYPE' => 'application/json',
+            ],
+            json_encode($payload)
+        );
 
-        $forwardRequest = new Request($payload);
-        $response = $this->saveAPI($forwardRequest);
+        $response = app()->handle($forwardRequest);
 
         $status = 200;
         $responseData = null;
@@ -1972,8 +1983,10 @@ class APIController extends Controller
 
     public function resendRequestLog(Request $request, int $id)
     {
+        dd($result);
         try {
             $result = $this->forwardRequestLogPayload($id);
+            
             return response()->json($result, $result['status']);
         } catch (\Throwable $e) {
             $status = $e->getCode() >= 400 ? $e->getCode() : 500;
@@ -2049,6 +2062,11 @@ class APIController extends Controller
             ]);
         } catch (\Throwable $e) {
             $status = $e->getCode() >= 400 ? $e->getCode() : 500;
+            \Log::error('resendRequestLogWeb failed', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return redirect()->route('request_logs.index')->with('error', $e->getMessage())->setStatusCode($status);
         }
     }

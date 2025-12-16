@@ -16,6 +16,8 @@ Route::middleware('api')->group(
         Route::get('/request-logs', [APIController::class, 'listRequestLogs']);
         Route::post('/request-logs/{id}/resend', [APIController::class, 'resendRequestLog']);
         
+        
+
         Route::post('/watoolbox', [WAToolBoxController::class, 'receiveMessage']);
         Route::post('/watoolbox/webhook', [WAToolBoxController::class, 'receiveMessage']);
         Route::post('/watoolbox/testping', function () {

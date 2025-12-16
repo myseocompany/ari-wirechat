@@ -118,7 +118,7 @@
                             </td>
                             <td class="text-muted">{{ $log->created_at }}</td>
                             <td>
-                                <form method="POST" action="{{ url('/api/request-logs/'.$log->id.'/resend') }}">
+                                <form method="POST" action="{{ route('request_logs.resend', $log->id) }}">
                                     @csrf
                                     <button class="btn btn-outline-primary btn-sm" type="submit">Reenviar</button>
                                 </form>
