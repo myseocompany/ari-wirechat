@@ -2135,6 +2135,35 @@ class APIController extends Controller
         if (isset($data['bio'])) {
             $model->notes .= $data['bio'];
         }
+
+        $facebookLeadId = $this->extractFacebookLeadId($data);
+        if ($facebookLeadId !== null) {
+            $model->facebook_id = $facebookLeadId;
+        }
+    }
+
+
+    private function extractFacebookLeadId(array $data): ?string
+    {
+        $paths = [
+            'facebook_lead_id',
+            'facebook_id',
+            'first_conversion.content.facebook_lead_id',
+            'first_conversion.content.facebook_id',
+            'last_conversion.content.facebook_lead_id',
+            'last_conversion.content.facebook_id',
+            'custom_fields.facebook_lead_id',
+            'custom_fields.facebook_id',
+        ];
+
+        foreach ($paths as $path) {
+            $value = data_get($data, $path);
+            if ($value !== null && $value !== '') {
+                return (string) $value;
+            }
+        }
+
+        return null;
     }
 
 
