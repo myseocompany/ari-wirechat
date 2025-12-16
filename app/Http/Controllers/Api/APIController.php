@@ -1366,6 +1366,20 @@ class APIController extends Controller
 
     private function sendWelcomeTemplate(Customer $customer, array $components): void
     {
+        $note = 'Se envió la campaña WhatsApp drip_01 (bot).';
+
+        $alreadySent = Action::where('customer_id', $customer->id)
+            ->where('note', $note)
+            ->exists();
+
+        if ($alreadySent) {
+            Log::info('WhatsApp template drip_01 already sent, skipping duplicate send', [
+                'customer_id' => $customer->id,
+                'name' => $customer->name,
+            ]);
+            return;
+        }
+
         Log::info('Triggering WhatsApp template drip_01', [
             'customer_id' => $customer->id,
             'name' => $customer->name,
@@ -1376,7 +1390,7 @@ class APIController extends Controller
         Action::create([
             'customer_id' => $customer->id,
             'type_id' => 105,
-            'note' => 'Se envió la campaña WhatsApp drip_01 (bot).',
+            'note' => $note,
             'creator_user_id' => 0,
         ]);
 
