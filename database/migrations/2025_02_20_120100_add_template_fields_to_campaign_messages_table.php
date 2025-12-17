@@ -9,7 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('campaign_messages', function (Blueprint $table) {
-            $table->string('component', 50)->default('body')->after('campaign_id');
+            $table->string('template_name', 190)->nullable()->after('campaign_id');
+            $table->string('template_language', 10)->nullable()->after('template_name');
+            $table->string('component', 50)->default('body')->after('template_language');
             $table->unsignedInteger('sequence')->default(1)->after('component');
             $table->string('source')->nullable()->after('sequence');
             $table->string('fallback')->nullable()->after('source');
@@ -21,6 +23,8 @@ return new class extends Migration
     {
         Schema::table('campaign_messages', function (Blueprint $table) {
             $table->dropColumn([
+                'template_name',
+                'template_language',
                 'component',
                 'sequence',
                 'source',

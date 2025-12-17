@@ -303,14 +303,23 @@
                 </div>
                 <div class="today-customers-list">
                     <div class="today-customers-header">
-                        <h5>Clientes del rango</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Clientes del rango</h5>
+                            <span class="badge badge-dark">Total: {{ number_format($rangeUserCustomers->count()) }}</span>
+                        </div>
                         <span>Asignados a ti · Nuevos</span>
                     </div>
                     <div class="today-customers-body">
                         @forelse ($rangeUserCustomers as $customer)
                             <div class="today-customer-item">
                                 <div class="today-customer-name">
-                                    <span>{{ $customer->name ?? 'Sin nombre' }}</span>
+                                    @if ($customer->id)
+                                        <a href="{{ url('/customers/' . $customer->id . '/show') }}" class="font-weight-semibold text-dark text-decoration-none">
+                                            {{ $customer->name ?? 'Sin nombre' }}
+                                        </a>
+                                    @else
+                                        <span>{{ $customer->name ?? 'Sin nombre' }}</span>
+                                    @endif
                                     <small class="text-muted">{{ optional($customer->created_at)->format('H:i') }}</small>
                                 </div>
                                 <div class="today-customer-meta">

@@ -18,6 +18,8 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         [$startDate, $endDate, $selectedRange, $customRange] = $this->resolveDateRange($request);
+        $user = $request->user();
+        $userId = $user?->id;
 
         $tagSlugs = [
             'mql' => 'Clientes MQL',
@@ -30,6 +32,9 @@ class DashboardController extends Controller
         $tagsById = $tags->keyBy('id');
 
         $customerQuery = Customer::query();
+        if ($userId) {
+            $customerQuery->where('user_id', $userId);
+        }
         if ($startDate && $endDate) {
             $customerQuery->whereBetween('created_at', [$startDate, $endDate]);
         }
@@ -49,7 +54,7 @@ class DashboardController extends Controller
             $tag = $tagsBySlug->get($slug);
             $metrics[] = [
                 'title' => $label,
-                'value' => $this->countCustomersByTag($tag, $startDate, $endDate),
+                'value' => $this->countCustomersByTag($tag, $startDate, $endDate, $userId),
                 'subtitle' => $tag?->description
                     ? $this->buildSubtitle($selectedRange, $tag->description)
                     : $this->buildSubtitle($selectedRange, "Clientes con la etiqueta {$label}."),
@@ -73,7 +78,7 @@ class DashboardController extends Controller
         }
 
         $userBreakdown = $this->buildUserBreakdownByStatus($startDate, $endDate);
-        $rangeUserCustomers = $this->customersForRangeForUser($request->user(), $startDate, $endDate);
+        $rangeUserCustomers = $this->customersForRangeForUser($user, $startDate, $endDate);
 
         return view('dashboard', [
             'metrics' => $metrics,
@@ -88,13 +93,16 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function countCustomersByTag(?Tag $tag, ?CarbonInterface $startDate, ?CarbonInterface $endDate): int
+    private function countCustomersByTag(?Tag $tag, ?CarbonInterface $startDate, ?CarbonInterface $endDate, ?int $userId): int
     {
         if (! $tag) {
             return 0;
         }
 
         $query = $tag->customers();
+        if ($userId) {
+            $query->where('customers.user_id', $userId);
+        }
         if ($startDate && $endDate) {
             $query->wherePivotBetween('customer_tag.created_at', [$startDate, $endDate]);
         }

@@ -53,8 +53,7 @@ class WhatsAppBroadcastController extends Controller
             'name' => ['required', 'string', 'max:190'],
             'description' => ['nullable', 'string', 'max:500'],
             'account_id' => ['required', 'exists:whatsapp_accounts,id'],
-            'template_id' => ['nullable', 'exists:whatsapp_templates,id'],
-            'template_name' => ['required_without:template_id', 'string', 'max:190'],
+            'template_name' => ['required', 'string', 'max:190'],
             'template_language' => ['required', 'string', 'max:10'],
             'header_type' => ['required', Rule::in(['none', 'image', 'video', 'document'])],
             'header_media_url' => ['nullable', 'url', 'required_unless:header_type,none'],
@@ -102,9 +101,6 @@ class WhatsAppBroadcastController extends Controller
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'whatsapp_account_id' => $validated['account_id'],
-            'whatsapp_template_id' => $validated['template_id'] ?? null,
-            'template_name' => $validated['template_name'],
-            'template_language' => $validated['template_language'],
             'header_type' => $headerType,
             'header_media_url' => $headerUrl,
             'wait_seconds' => $validated['wait_seconds'],
@@ -114,6 +110,14 @@ class WhatsAppBroadcastController extends Controller
             'settings' => [
                 'source' => 'whatsapp_broadcast',
             ],
+        ]);
+
+        CampaignMessage::create([
+            'campaign_id' => $campaign->id,
+            'component' => 'template',
+            'sequence' => 0,
+            'template_name' => $validated['template_name'],
+            'template_language' => $validated['template_language'],
         ]);
 
         $bodyParameters = collect($validated['body_parameters'] ?? [])

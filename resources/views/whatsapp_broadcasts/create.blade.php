@@ -6,7 +6,9 @@
     $defaultAccountId = optional($defaultAccount)->id;
     $defaultTemplate = optional($defaultAccount)->templates->first();
     $selectedAccountId = old('account_id', $defaultAccountId);
-    $preselectedTemplateId = old('template_id', optional($defaultTemplate)->id);
+    $selectedTemplateName = old('template_name', optional($defaultTemplate)->name);
+    $defaultTemplateLanguage = optional($defaultTemplate)->language;
+    $selectedTemplateLanguage = old('template_language', $defaultTemplateLanguage ?? '');
     $oldStatusIds = old('filters.status_ids', []);
     if (!is_array($oldStatusIds)) {
         $oldStatusIds = [];
@@ -195,12 +197,12 @@
                     </select>
                 </div>
                 <div class="form-group col-md-4">
-                    <label for="template_id">Plantilla aprobada</label>
-                    <select class="form-control" id="template_id" name="template_id">
+                    <label for="template_selector">Plantilla aprobada</label>
+                    <select class="form-control" id="template_selector" name="template_selector">
                         <option value="">Selecciona una plantilla</option>
                         @if ($defaultAccount && $defaultAccount->id == $selectedAccountId)
                             @foreach ($defaultAccount->templates as $tpl)
-                                <option value="{{ $tpl->id }}" data-language="{{ $tpl->language }}" data-name="{{ $tpl->name }}" data-status="{{ $tpl->status }}" data-category="{{ $tpl->category }}" @selected($tpl->id == $preselectedTemplateId)>
+                                <option value="{{ $tpl->name }}" data-language="{{ $tpl->language }}" data-name="{{ $tpl->name }}" data-status="{{ $tpl->status }}" data-category="{{ $tpl->category }}" @selected($tpl->name === $selectedTemplateName && ($tpl->language ?? '') === $selectedTemplateLanguage)>
                                     {{ $tpl->name }} ({{ $tpl->language ?? 'sin idioma' }})
                                 </option>
                             @endforeach
@@ -210,7 +212,7 @@
                 </div>
                 <div class="form-group col-md-4">
                     <label for="template_language">Idioma (código)</label>
-                    <input type="text" class="form-control" id="template_language" name="template_language" value="{{ old('template_language', optional($defaultTemplate)->language ?? 'es') }}" placeholder="es, en_US, pt_BR...">
+                    <input type="text" class="form-control" id="template_language" name="template_language" value="{{ old('template_language', $defaultTemplateLanguage ?? '') }}" placeholder="es, en_US, pt_BR...">
                 </div>
             </div>
             <div class="form-group">
@@ -334,7 +336,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const templateCatalog = @json($templateCatalog);
-    const templateSelect = document.getElementById('template_id');
+    const templateSelect = document.getElementById('template_selector');
     const accountSelect = document.getElementById('account_id');
     const templateNameInput = document.getElementById('template_name');
     const templateLanguageInput = document.getElementById('template_language');
@@ -352,24 +354,25 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!templateSelect) {
             return;
         }
-        const selected = templateSelect.value;
+        const selectedName = templateNameInput ? templateNameInput.value : '';
+        const selectedLanguage = templateLanguageInput ? templateLanguageInput.value : '';
         templateSelect.innerHTML = '<option value="">Selecciona una plantilla</option>';
         const options = templateCatalog[accountId] || [];
         options.forEach((tpl) => {
             const option = document.createElement('option');
-            option.value = tpl.id;
+            option.value = tpl.name || '';
             option.textContent = `${tpl.name} (${tpl.language || 'sin idioma'})`;
             option.dataset.language = tpl.language || '';
             option.dataset.name = tpl.name || '';
             option.dataset.status = tpl.status || '';
             option.dataset.category = tpl.category || '';
-            if (String(tpl.id) === String(selected)) {
+            if ((tpl.name || '') === selectedName && (tpl.language || '') === selectedLanguage) {
                 option.selected = true;
             }
             templateSelect.appendChild(option);
         });
         if (!templateSelect.value && options.length) {
-            templateSelect.value = options[0].id;
+            templateSelect.value = options[0].name || '';
         }
         templateSelect.dispatchEvent(new Event('change'));
     }
@@ -401,10 +404,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (templateSelect) {
         templateSelect.addEventListener('change', updateTemplateMeta);
-        const presetTemplateId = @json($preselectedTemplateId);
-        if (presetTemplateId) {
-            templateSelect.value = presetTemplateId;
-        }
         updateTemplateMeta();
     }
 

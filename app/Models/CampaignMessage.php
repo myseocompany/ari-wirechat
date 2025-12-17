@@ -9,6 +9,8 @@ class CampaignMessage extends Model{
     protected $fillable = [
         'campaign_id',
         'text',
+        'template_name',
+        'template_language',
         'component',
         'sequence',
         'source',
