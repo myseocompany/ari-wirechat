@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Tag;
+use App\Models\CustomerStatus;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
@@ -71,7 +72,7 @@ class DashboardController extends Controller
             $toDateValue = $endDate->toDateString();
         }
 
-        $userBreakdown = $this->buildUserBreakdown($tagsById, $tagSlugs, $startDate, $endDate);
+        $userBreakdown = $this->buildUserBreakdownByStatus($startDate, $endDate);
         $todayUserCustomers = $this->customersCreatedTodayForUser($request->user());
 
         return view('dashboard', [
@@ -183,38 +184,32 @@ class DashboardController extends Controller
         };
     }
 
-    private function buildUserBreakdown(Collection $tagsById, array $tagLabels, ?CarbonInterface $start, ?CarbonInterface $end): array
+    private function buildUserBreakdownByStatus(?CarbonInterface $start, ?CarbonInterface $end): array
     {
-        if ($tagsById->isEmpty()) {
-            return [];
-        }
-
-        $tagIds = $tagsById->keys()->all();
         $rows = Customer::query()
-            ->join('customer_tag', 'customer_tag.customer_id', '=', 'customers.id')
             ->leftJoin('users', 'customers.user_id', '=', 'users.id')
-            ->whereIn('customer_tag.tag_id', $tagIds)
+            ->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id')
             ->selectRaw('COALESCE(users.id, 0) as user_id')
             ->selectRaw('COALESCE(users.name, "Sin asignar") as user_name')
-            ->selectRaw('customer_tag.tag_id as tag_id')
+            ->selectRaw('COALESCE(customer_statuses.id, 0) as status_id')
+            ->selectRaw('COALESCE(customer_statuses.name, "Sin estado") as status_name')
+            ->selectRaw('COALESCE(customer_statuses.color, "#64748b") as status_color')
             ->selectRaw('COUNT(*) as total');
 
         if ($start && $end) {
-            $rows->whereBetween('customer_tag.created_at', [$start, $end]);
+            $rows->whereBetween('customers.created_at', [$start, $end]);
         }
 
         $rows = $rows
-            ->groupBy('user_id', 'user_name', 'customer_tag.tag_id')
+            ->groupBy('user_id', 'user_name', 'status_id', 'status_name', 'status_color')
             ->get();
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
 
         $grouped = [];
         foreach ($rows as $row) {
-            $tag = $tagsById->get($row->tag_id);
-            if (! $tag) {
-                continue;
-            }
-
-            $slug = strtolower($tag->slug ?? $tag->name ?? '');
             if (! isset($grouped[$row->user_id])) {
                 $grouped[$row->user_id] = [
                     'user_id' => $row->user_id,
@@ -226,10 +221,10 @@ class DashboardController extends Controller
 
             $count = (int) $row->total;
             $grouped[$row->user_id]['segments'][] = [
-                'slug' => $slug,
-                'label' => $tagLabels[$slug] ?? $tag->name,
+                'slug' => 'status_'.$row->status_id,
+                'label' => $row->status_name,
                 'count' => $count,
-                'color' => $tag->color ?: '#64748b',
+                'color' => $row->status_color ?: '#64748b',
             ];
             $grouped[$row->user_id]['total'] += $count;
         }
