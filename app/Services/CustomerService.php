@@ -17,6 +17,8 @@ use App\Models\RoleProduct;
 
 class CustomerService {
 
+    public const STATUS_FILTER_UNASSIGNED = 'sin_estado';
+
 
     public function filterCustomers(Request $request, $statuses, $stage_id, $countOnly = false, $pageSize = 0, bool $applyDefaultDateRange = true, bool $onlyWithTags = false)
     {
@@ -36,7 +38,22 @@ class CustomerService {
             fn ($id) => $id !== null && $id !== ''
         ));
 
-        $query->where(function ($query) use ($stage_id, $dates, $request, $searchTerm, $forceOwnCustomers, $authUser, $applyDefaultDateRange, $onlyWithTags, $filterTagIds) {
+        $statusFilter = $request->status_id;
+        $filteringUnassignedStatus = ($statusFilter === self::STATUS_FILTER_UNASSIGNED);
+
+        $query->where(function ($query) use (
+            $stage_id,
+            $dates,
+            $request,
+            $searchTerm,
+            $forceOwnCustomers,
+            $authUser,
+            $applyDefaultDateRange,
+            $onlyWithTags,
+            $filterTagIds,
+            $filteringUnassignedStatus,
+            $statusFilter
+        ) {
             if (! is_null($stage_id)) {
                 $query->where('customer_statuses.stage_id', $stage_id);
             }
@@ -69,7 +86,14 @@ class CustomerService {
 
             if (!empty($request->source_id))          $query->where('customers.source_id', $request->source_id);
             if (!empty($request->country))            $query->where('customers.country', $request->country);
-            if (!empty($request->status_id))          $query->where('customers.status_id', $request->status_id);
+            if ($filteringUnassignedStatus) {
+                $query->where(function ($statusQuery) {
+                    $statusQuery->whereNull('customers.status_id')
+                        ->orWhereNull('customer_statuses.id');
+                });
+            } elseif (!empty($statusFilter)) {
+                $query->where('customers.status_id', $statusFilter);
+            }
             if (!empty($request->scoring_interest))   $query->where('customers.scoring_interest', $request->scoring_interest);
             if (isset($request->scoring_profile) && $request->scoring_profile !== null)
                                                     $query->where('customers.scoring_profile', $request->scoring_profile);
@@ -169,8 +193,9 @@ class CustomerService {
                     'customers.status_id',
                     DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
                     DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color'),
+                    DB::raw('customer_statuses.id as status_table_id')
                 )
-                ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color')
+                ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color', 'customer_statuses.id')
                 ->orderBy(DB::raw('COALESCE(customer_statuses.weight, 999)'), 'ASC')
                 ->get();
         } else {

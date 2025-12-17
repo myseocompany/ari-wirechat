@@ -29,6 +29,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\WhatsAppAPIController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\CustomerTagController;
+use App\Http\Controllers\DashboardController;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -357,9 +358,9 @@ Route::middleware('auth')->get('/configs', [\App\Http\Controllers\ConfigControll
 
 // Dashboard Routes
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::get('/dashboard/scroll_active', [ReportController::class, 'scrollActive']);
 Route::get('/dashboard/scroll_inactive', [ReportController::class, 'scrollInactive']);

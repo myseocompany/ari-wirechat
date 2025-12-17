@@ -1,3 +1,3 @@
 <footer class="footer">
-        <p>&copy; My SEO Company 2023-07-07</p>
+        <p>&copy; My SEO Company 2026</p>
 </footer>
