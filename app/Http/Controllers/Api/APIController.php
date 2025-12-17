@@ -33,6 +33,7 @@ use App\Models\RdStation;
 use Illuminate\Support\Facades\Http;
 use App\Models\RequestLog;
 use App\Services\WhatsAppService;
+use App\Services\MetaConversionsService;
 
 
 use Illuminate\Support\Facades\Cache;
@@ -2248,7 +2249,7 @@ class APIController extends Controller
     }
 
 
-    public function updateFromRD(Request $request)
+    public function updateFromRD(Request $request, MetaConversionsService $metaConversionsService)
     {
 
 
@@ -2398,6 +2399,23 @@ class APIController extends Controller
             $model->position = $data["custom_fields"]["Cargo que ocupas dentro de la empresa"];
         }
 
+        if ($metaConversionsService->isEnabled()) {
+            try {
+                $metaConversionsService->sendLeadEvent(
+                    $model,
+                    'raw_lead',
+                    optional($model->created_at)->timestamp ?? now()->timestamp,
+                    [
+                        'lead_event_source' => 'ARI CRM',
+                        'campaign_name' => $model->campaign_name,
+                    ]
+                );
+            } catch (\Throwable $e) {
+                Log::error('Meta raw_lead event failed', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
         $model->status_id = -1;
         //dd($this->getStatusRD($data));
         $model->status_id = $this->getStatusRD($data);

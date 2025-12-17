@@ -11,6 +11,7 @@ use Namu\WireChat\Enums\ConversationType;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use DB;
 use Mail;
 use File;
@@ -987,9 +988,14 @@ class CustomerController extends Controller
 
     private function resolveMetaEventName(Customer $customer): string
     {
-        return ((int) $customer->status_id === 1)
-            ? 'raw lead'
-            : (CustomerStatus::getName($customer->status_id) ?: 'Lead');
+        if ((int) $customer->status_id === 1) {
+            return 'raw_lead';
+        }
+
+        $statusName = CustomerStatus::getName($customer->status_id) ?: 'lead';
+        $slug = Str::slug($statusName, '_');
+
+        return $slug !== '' ? $slug : 'lead';
     }
 
     private function resolveMetaCustomData(Customer $customer): array

@@ -103,9 +103,9 @@ class CustomerTagController extends Controller
     {
         $slug = strtolower($tag->slug ?? $tag->name ?? '');
         return match ($slug) {
-            'mql' => 'Marketing Qualified Lead',
-            'sql' => 'Sales Opportunity',
-            'converted' => 'Converted',
+            'mql' => 'marketing_qualified_lead',
+            'sql' => 'sales_opportunity',
+            'converted' => 'converted',
             default => null,
         };
     }
