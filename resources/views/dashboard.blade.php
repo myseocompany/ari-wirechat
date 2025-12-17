@@ -316,8 +316,9 @@
                                 <div class="today-customer-meta">
                                     {{ $customer->business ?? 'Sin empresa' }}
                                 </div>
-                                @if (! empty($customer->email))
-                                    <div class="today-customer-meta">{{ $customer->email }}</div>
+                                @php($phone = $customer->phone ?? $customer->phone2 ?? $customer->contact_phone2)
+                                @if ($phone)
+                                    <div class="today-customer-meta">{{ $phone }}</div>
                                 @endif
                             </div>
                         @empty
@@ -398,8 +399,8 @@
             'Hoy': [moment(), moment()],
             'Ayer': [moment().subtract(1, 'day'), moment().subtract(1, 'day')],
             'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
-            'Últimos 10 días': [moment().subtract(9, 'days'), moment()],
             'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
+            'Últimos 90 días': [moment().subtract(89, 'days'), moment()],
             'Esta semana': [moment().startOf('isoWeek'), moment().endOf('isoWeek')],
             'Semana pasada': [moment().subtract(1,'week').startOf('isoWeek'), moment().subtract(1,'week').endOf('isoWeek')],
             'Este mes': [moment().startOf('month'), moment().endOf('month')],

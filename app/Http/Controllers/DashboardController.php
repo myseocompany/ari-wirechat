@@ -194,6 +194,7 @@ class DashboardController extends Controller
             ->selectRaw('COALESCE(customer_statuses.id, 0) as status_id')
             ->selectRaw('COALESCE(customer_statuses.name, "Sin estado") as status_name')
             ->selectRaw('COALESCE(customer_statuses.color, "#64748b") as status_color')
+            ->selectRaw('COALESCE(customer_statuses.weight, 999) as status_weight')
             ->selectRaw('COUNT(*) as total');
 
         if ($start && $end) {
@@ -225,11 +226,24 @@ class DashboardController extends Controller
                 'label' => $row->status_name,
                 'count' => $count,
                 'color' => $row->status_color ?: '#64748b',
+                'weight' => (int) $row->status_weight,
             ];
             $grouped[$row->user_id]['total'] += $count;
         }
 
-        return collect($grouped)
+        $grouped = collect($grouped)->map(function ($user) {
+            $user['segments'] = collect($user['segments'])
+                ->sortBy('weight')
+                ->map(function ($segment) {
+                    unset($segment['weight']);
+                    return $segment;
+                })
+                ->values()
+                ->all();
+            return $user;
+        });
+
+        return $grouped
             ->sortByDesc('total')
             ->values()
             ->all();
@@ -249,6 +263,6 @@ class DashboardController extends Controller
             ->whereBetween('created_at', [$start, $end])
             ->latest()
             ->limit(25)
-            ->get(['id', 'name', 'email', 'business', 'created_at']);
+            ->get(['id', 'name', 'phone', 'phone2', 'contact_phone2', 'business', 'created_at']);
     }
 }
