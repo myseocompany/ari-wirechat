@@ -1,0 +1,149 @@
+<div><div class="_4-u2 _57mb _1u44 _3fw6 _4-u8"><div class="_4-u3 _588p"><h1 id="3--developer-implementation">3: Developer Implementation</h1>
+<p>This page deals with the manual integration and covers:</p>
+
+<ul>
+<li><a href="#step-1--build-a-payload">Building the payload for CRM integration</a></li>
+<li><a href="#step-2--create-an-access-token-and-an-api-call" data-auto-logging-id="ffd13299a">Generating an access token and preparing an API call</a></li>
+<li><a href="#step-3--test-a-payload--optional-">Sending a test payload</a></li>
+<li><a href="#step-4--send-production-data" data-auto-logging-id="f54856741">Sending production data</a></li>
+</ul>
+
+<p>This section is only applicable if you decide to complete this integration using a manual integration and developer resources. If you instead decide to complete this integration using a partner, follow the respective partner instructions for the integration. You can skip to <a href="/docs/marketing-api/conversions-api/conversion-leads-integration/crm-integration/4-verify-your-data">4: Verify your data</a> section of this guide once the partner integration is complete.</p>
+
+<p>You will need Business Manager admin access to complete these integration steps. You may acquire access from the email sent to you if you were invited as a developer. Otherwise, contact a Business Manager admin to request access.</p>
+</div></div><div class="_4-u2 _57mb _1u44 _3fw6 _4-u8 _3la3"><div class="_4-u3 _588p"><h2 id="step-1--build-a-payload">Step 1: Build a payload</h2>
+
+<p>This step will lay out the payload specifications for the Conversions API for CRM integration and provide some recommendations on how to send it from your server.</p>
+<ol><li>Open the CRM integration guide from the <b>Settings</b> tab of your CRM Pixel to get started.</li><br><li>Review the <a href="/docs/marketing-api/conversions-api/using-the-api" target="_blank" data-auto-logging-id="f73d516b6" data-interactable="|click|">Conversions API Developers Guide</a> to gain an understanding of how the Conversions API functions.</li><br><li>We recommend using the <a href="https://developers.facebook.com/docs/marketing-api/conversions-api/payload-helper/?data=[%7B%22event_name%22%3A%22Lead%22%2C%22event_time%22%3A1664577963%2C%22action_source%22%3A%22system_generated%22%2C%22user_data%22%3A%7B%22lead_id%22%3A1234567890123456%7D%2C%22custom_data%22%3A%7B%22lead_event_source%22%3A%22Your%20CRM%22%2C%22event_source%22%3A%22crm%22%7D%7D]&amp;selectedProduct=Conversion%20Leads" data-auto-logging-id="f437f60e2">Payload Helper</a> to build your payload. The Payload Helper will format your payload and check for errors. Once all payload errors are resolved, click the <b>Get Code</b> button inside the Payload Helper to generate a code template for your programming language.</li><br><li>Here is the list of required parameters. Review the <a href="/docs/marketing-api/conversions-api/conversion-leads-integration/payload-specification" target="_blank" data-auto-logging-id="fc2d5045">Conversion Leads Integration - Payload Specification guide</a> to see the full description for each parameter.
+        
+        <b>This payload specification should only be used for Conversion Leads Optimization events.</b> This means the events should only pertain to Meta lead ads. Refrain from using this payload specification for other event types, such as website leads.
+        <br><br><b>Required Parameters</b><div class="_57-c"><table class="_4-ss _5k9x"><thead><tr><th style="width:30%">Name</th><th>Description</th></tr></thead><tbody class="_5m37" id="u_0_1_VJ"><tr class="row_0"><td><p><code>event_name</code></p>
+<div style="color:darkgrey;">
+                string
+              </div></td><td><p>Free-form field to capture the lead stages you use within your CRM.</p>
+<p>The <code>event_name</code> parameter should indicate a lead moving through the sales funnel in your CRM. <b>Make sure to send all stages as they are updated, including the raw lead.</b></p></td></tr><tr class="row_1 _5m29"><td><p><code>event_time</code></p>
+<div style="color:darkgrey;">
+                integer
+              </div></td><td><p>A Unix timestamp in seconds indicating when the lead stage update event is updated by your CRM.<br>
+The timestamp must occur after the lead generation time or else the event may be discarded.</p>
+</td></tr><tr class="row_2"><td><p><code>action_source</code></p>
+<div style="color:darkgrey;">
+                string
+              </div></td><td><p><strong>Value:</strong> <code>system_generated</code></p>
+<br><p>(By using the Conversions API, you agree that the <a href="/docs/marketing-api/conversions-api/parameters/server-event#action-source"><code>action_source</code></a> parameter is accurate to the best of your knowledge.)</p>
+</td></tr><tr class="row_3 _5m29"><td><p><code>user_data</code></p>
+<div style="color:darkgrey;">
+                object
+              </div></td><td><p>A map that contains customer information data. See <a href="/docs/marketing-api/conversions-api/parameters/customer-information-parameters">Customer Information Parameters</a> for options. See <a href="/docs/meta-pixel/advanced/advanced-matching">Advanced Matching</a> for comparable options available for data sent via Meta Pixel.</p>
+</td></tr><tr class="row_4"><td><p><code>lead_event_source</code></p>
+<div style="color:darkgrey;">
+                string
+              </div></td><td><p>The name of the CRM where the events are coming from.</p>
+</td></tr><tr class="row_5 _5m29"><td><p><code>event_source</code></p>
+<div style="color:darkgrey;">
+                string
+              </div></td><td><p><strong>Value:</strong> <code>crm</code></p>
+</td></tr></tbody></table></div><br><br><b>Customer Information Parameters</b><br>
+      Customer information helps Meta match events from your server with Meta accounts. Sending as many of the following parameters can lead to more accurate event data and better ad performance. <br><br><b>Note</b>: You must send at least one customer information parameter.<br><br>
+        
+        If sending <code>lead_id</code>,  please use a valid <code>lead_id</code> or else the system will reject the event. If you choose to send email, phone number, these have to be hashed. Click ID currently does not have API rejection level error, but a large volume of invalid <code>click_id</code> will cause an alert in the system.<br><br><div class="_57-c"><table class="_4-ss _5k9x"><thead><tr><th style="width:30%">Parameter</th><th style="width:30%">Priority</th><th>Description</th></tr></thead><tbody class="_5m37" id="u_0_2_Oe"><tr class="row_0"><td><p>Lead ID (recommended) <a href="/docs/marketing-api/conversions-api/conversion-leads-integration/how-to-find-the-lead-id" data-auto-logging-id="f2ac121ed">How to find the lead ID?</a></p>
+</td><td><p>Highest</p>
+</td><td><p><span class="cc-container-hmfoachifajaajjebifbjklokdcdbjke"><span>The Facebook generated ID for every lead. It is a</span><span> 15-17</span><span> digit number obtained from the </span></span><code>leadgen_id</code> <a href="/docs/marketing-api/guides/lead-ads/retrieving/#webhook-response">field in the lead generation Webhook</a> and included under the <code>user_data</code> parameter.</p>
+
+<p>Refer to <a href="/docs/marketing-api/conversions-api/conversion-leads-integration/how-to-find-the-lead-id">Find the Lead ID</a> for more information.</p>
+</td></tr><tr class="row_1 _5m29"><td><p>Click ID</p>
+</td><td><p>Highest</p>
+</td><td></td></tr><tr class="row_2"><td><p>Hashed email</p>
+</td><td><p>Highest</p>
+</td><td></td></tr><tr class="row_3 _5m29"><td><p>Hashed phone number</p>
+</td><td><p>High</p>
+</td><td></td></tr><tr class="row_4"><td><p>Other hashed Contact Information</p>
+</td><td><p>Medium</p>
+</td><td></td></tr></tbody></table></div><div class="_57yz _57z1 _3-8p"><div class="_57y-"><p><strong>Note</strong>: In addition to a hashed email and phone number, you can send hashed gender, date of birth, last name, first name, city, state, zip and more to Meta.</p>
+</div></div><b>Example</b><br>
+        An example payload may look like this. <pre class="_5s-8 prettyprint lang-code prettyprinted" style=""><span class="cc-container-hmfoachifajaajjebifbjklokdcdbjke"><span><span class="pun">{</span><span class="pln">
+    </span><span class="str">"data"</span><span class="pun">:</span><span class="pln"> </span><span class="pun">[</span><span class="pln">
+        </span><span class="pun">{</span><span class="pln">
+            </span><span class="str">"event_name"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"Lead"</span><span class="pun">,</span><span class="pln">
+            </span><span class="str">"event_time"</span><span class="pun">:</span></span><span><span class="pln"> </span><span class="lit">1664577963</span></span><span><span class="pun">,</span><span class="pln">
+            </span><span class="str">"action_source"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"system_generated"</span><span class="pun">,</span><span class="pln">
+            </span><span class="str">"user_data"</span><span class="pun">:</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+                </span><span class="str">"lead_id"</span><span class="pun">:</span></span><span><span class="pln"> </span><span class="lit">1234567890123456</span></span><span><span class="pun">,</span><span class="pln">
+                </span><span class="str">"em"</span><span class="pun">:</span><span class="pln"> </span><span class="pun">[</span><span class="pln">
+                    </span><span class="str">"973dfe463ec85785f5f95af5ba3906eedb2d931c24e69824a89ea65dba4e813b"</span><span class="pln">
+                </span><span class="pun">],</span><span class="pln">
+                </span><span class="str">"ph"</span><span class="pun">:</span><span class="pln"> </span><span class="pun">[</span><span class="pln">
+                   </span></span><span><span class="pln"> </span><span class="str">"74234</span></span><span><span class="str">e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"</span><span class="pln">
+                </span><span class="pun">]</span><span class="pln">
+            </span><span class="pun">},</span><span class="pln">
+            </span><span class="str">"custom_data"</span><span class="pun">:</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+                </span><span class="str">"lead_event_source"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"Your CRM"</span><span class="pun">,</span><span class="pln">
+                </span><span class="str">"event_source"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"crm"</span><span class="pln">
+            </span><span class="pun">}</span><span class="pln">
+        </span><span class="pun">}</span><span class="pln">
+    </span><span class="pun">]</span><span class="pln">
+</span><span class="pun">}</span></span></span></pre></li><br><li>If events do not follow the payload specification or do not match a Meta lead ad, then they will not be recognized for the integration and will not be used for training the model. <br>For example the Web payload would be accepted by the Conversions API and appear in Events Manager, but it will <b>not</b> be recognized for this integration. You must also use a valid <code>lead_id</code> or else the system will reject your event. <br><br><b>Note:</b> You must send at least one customer information parameter. If sending <code>lead_id</code>, please use valid <code>lead_id</code> or else the system will reject the event. If you choose to send email, phone number, these have to be hashed. Click ID currently does not have API rejection level error, but a large volume of invalid <code>click_id</code> will cause an alert in the system.<br><br>
+        Only the Conversion Leads payload will be recognized for the integration and used for training. </li><div style="text-align:center;"><a href="https://scontent.fbaq2-2.fna.fbcdn.net/v/t39.2365-6/306070973_798763977822397_5594494441058509130_n.png?_nc_cat=108&amp;ccb=1-7&amp;_nc_sid=e280be&amp;_nc_ohc=aydKyoHpO0QQ7kNvwEkRTy9&amp;_nc_oc=AdlASRCK814BJDWAaZUZUxl2ZmIQM-TRiTC8XFjvhQTao1OZ4pkkYmXG49wMXbqQMWg&amp;_nc_zt=14&amp;_nc_ht=scontent.fbaq2-2.fna&amp;_nc_gid=lzoLOV43W9gtxiGj3Ujv5w&amp;oh=00_Afmu4RdopUhDlnAmU6YKUkLlSACjwlEF__5rKZvhn4KezQ&amp;oe=695C442A" target="_blank" data-auto-logging-id="f373c9027"><img class="img" src="https://scontent.fbaq2-2.fna.fbcdn.net/v/t39.2365-6/306070973_798763977822397_5594494441058509130_n.png?_nc_cat=108&amp;ccb=1-7&amp;_nc_sid=e280be&amp;_nc_ohc=aydKyoHpO0QQ7kNvwEkRTy9&amp;_nc_oc=AdlASRCK814BJDWAaZUZUxl2ZmIQM-TRiTC8XFjvhQTao1OZ4pkkYmXG49wMXbqQMWg&amp;_nc_zt=14&amp;_nc_ht=scontent.fbaq2-2.fna&amp;_nc_gid=lzoLOV43W9gtxiGj3Ujv5w&amp;oh=00_Afmu4RdopUhDlnAmU6YKUkLlSACjwlEF__5rKZvhn4KezQ&amp;oe=695C442A" alt=""></a></div></ol><div data-click-area="to_top_nav"><a class="_2k32" href="#"><i alt="" data-visualcompletion="css-img" class="img sp_bUKixoMJa07_2x sx_2f8dba"></i></a></div></div></div><div class="_4-u2 _57mb _1u44 _3fw6 _4-u8 _3la3"><div class="_4-u3 _588p"><h2 id="step-2--create-an-access-token-and-an-api-call">Step 2: Create an access token and an API call</h2>
+
+<p>Once you configure what you will send, the next step is to configure where you will send the data.</p>
+
+<p>This step will help you generate an access token for your Meta Pixel, which will then be used to establish a connection between your server and the Conversions API.</p>
+<ol><li>You can return to the CRM integration guide from the <b>Settings</b> tab of your CRM Pixel.</li><br><li>Scroll down to the <b>Create Endpoint</b> section and click the <b>Generate Access Token</b> button. The access token will be used to build your API call.
+      <br>
+        You can generate a new access token by returning to the integration guide or from the <b>Settings</b> tab in <a href="https://www.facebook.com/events_manager2/list" target="_blank">Events Manager</a> by navigating to the <b>Conversions API</b> section and clicking the <b>Generate access token</b> link. 
+      </li><br><li>The rest of this guide will vary depending on whether you are using Meta's SDK. Using the <a href="https://developers.facebook.com/docs/business-sdk/overview" target="_blank">Meta Business SDK</a> is recommended because they provide better error and diagnostic messaging. You will need your Pixel ID and access token to make the API call via the Meta Business SDK. You can get the access token by clicking <b>Copy access token</b> in the CRM integration guide and saving it. Examples of SDK API calls can be found in the <a href="/docs/marketing-api/conversions-api/using-the-api#send" target="_blank" data-auto-logging-id="f65baedfd">Conversion API Developers Guide</a> or the <b>Get Code</b> functionality within the Meta Payload Helper.
+</li><br><li>This is the endpoint format to make a <code>POST</code> request to the Conversions API without the SDK. You can get the entire endpoint by clicking <b>Copy endpoint</b> in the CRM Integration guide and saving it. 
+
+<pre class="_5s-8 prettyprint lang-html prettyprinted" style=""><span class="pln">https://graph.facebook.com/API_VERSION/PIXEL_ID/events?access_token=ACCESS_TOKEN</span></pre><ul class="uiList _4of _4kg"><li><div class="fcb"><code>API_VERSION</code>: The current Marketing API version</div></li><li><div class="fcb"><code>PIXEL_ID</code>: The Pixel ID can be obtained from Events Manager for each Pixel</div></li><li><div class="fcb"><code>ACCESS_TOKEN</code>: The access token generated above</div></li></ul></li><li>You can see the Marketing API release and expiration dates in the <a href="/docs/graph-api/changelog/versions/" target="_blank">API Version documentation</a>. Be sure to update the API version or the Meta Business SDK in your code before the Marketing API expiration date. Using a deprecated version in your code could result in errors and your events may be discarded by the system.
+      </li></ol><div data-click-area="to_top_nav"><a class="_2k32" href="#"><i alt="" data-visualcompletion="css-img" class="img sp_bUKixoMJa07_2x sx_2f8dba"></i></a></div></div></div><div class="_4-u2 _57mb _1u44 _3fw6 _4-u8 _3la3"><div class="_4-u3 _588p"><h2 id="step-3--test-a-payload--optional-">Step 3: Test a payload (optional)</h2>
+<p>At this point you may want to send a test payload to your Pixel before implementing the code on your server. You can do so by using the <b>Test Events</b> tab in <a href="https://www.facebook.com/events_manager2/list" target="_blank" data-auto-logging-id="f6a137d">Events Manager</a>.</p><ol><li>In the <b>Test Server Events</b> section, click on the <b>Graph API Explorer</b> link. Using this unique link will prefill some information from your Pixel. (You can also directly access the <a href="https://developers.facebook.com/tools/explorer" target="_blank">Graph API Explorer</a> if you wish.) Take note of the <code>test_event_code</code> value, which can change over time.</li><br><li>Complete the following in the Graph API Explorer tool:
+        <ol type="a"><li>Ensure you are in <code>POST</code> mode.</li><li>Check that your API version and Pixel ID are correct.</li><li>Switch to the JSON view.</li><li>Input your payload. This can be manually created or generated using the <a href="/docs/marketing-api/conversions-api/payload-helper" target="_blank">Payload Helper</a>. Make sure to include the <code>test_event_code</code> parameter from the previous step and a valid <code>lead_id</code>.</li></ol></li><li>Enter your Pixel access token, and click the <b>Submit</b> button.</li><br><li>If your payload does not contain any syntax or API errors, you should receive a success message with a <code>fbtrace_id</code>.</li><br><li>The test event should appear under the <b>Test Events</b> tab in Events Manager after a short time.</li></ol><div data-click-area="to_top_nav"><a class="_2k32" href="#"><i alt="" data-visualcompletion="css-img" class="img sp_bUKixoMJa07_2x sx_2f8dba"></i></a></div></div></div><div class="_4-u2 _57mb _1u44 _3fw6 _4-u8 _3la3"><div class="_4-u3 _588p"><h2 id="step-4--send-production-data">Step 4: Send production data</h2>
+
+<p>The production data should be in the same format as the payload generated in Step 3, except the data will be coming directly from your server. This step will vary for every integration so this section will provide guidelines rather than a walkthrough.</p>
+<ol><li>Send the <code>lead_id</code> (recommended) and additional customer information parameters that are listed above for matching.</li><br><li>Make sure to <b>send all lead stages</b> as they are updated, including the raw lead event that represents all leads generated on Meta and downloaded into your CRM. Below is an example funnel. The event names and stages are advertiser-defined so they do not have to conform to this example.
+      
+        <div style="text-align:center;margin-top:40px;"><img class="img" src="https://lookaside.fbsbx.com/elementpath/media/?media_id=638668467470338&amp;version=1765556029" alt=""></div><br><br>  
+        If your campaigns generate 100 leads then we would expect 100 “Raw Lead” events uploaded to represent the first lead stage. Sending the first lead stage will let the system know that the lead was received and processed. As the leads move down the sales funnel, we would expect 70 “Marketing Qualified Lead”, 30 “Sales Opportunity", and 15 “Converted” stages to be uploaded.
+        <br><br>
+        To recap, 100 leads are generated from the campaigns but we would expect 215 events to be uploaded in this example scenario.
+      </li><br><li>Create a function that retrieves updates from your CRM’s API or database whenever the lead status updates. Then send your payload to Meta’s Conversions API using a custom function or Meta’s business SDK. What makes the most sense for your integration will depend on your CRM and database configuration.
+<br><br>
+        Variables are recommended for: 
+        <ul class="uiList _4of _4kg"><li><div class="fcb"><code>lead_id</code></div></li><li><div class="fcb"><code>event_name</code></div></li><li><div class="fcb"><code>event_time</code></div></li></ul>
+        For example, a payload that explicitly states the parameter values may look like this:
+        
+<pre class="_5s-8 prettyprint lang-code prettyprinted" style=""><span class="cc-container-hmfoachifajaajjebifbjklokdcdbjke"><span><span class="pun">{</span><span class="pln">
+  </span><span class="str">"event_name"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"initial_lead"</span><span class="pun">,</span><span class="pln">
+  </span><span class="str">"event_time"</span><span class="pun">:</span></span><span><span class="pln"> </span><span class="lit">1628294742</span></span><span><span class="pun">,</span><span class="pln">
+  </span><span class="str">"user_data"</span><span class="pun">:</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    </span><span class="str">"lead_id"</span><span class="pun">:</span></span><span><span class="pln"> </span><span class="lit">1234567890123456</span></span><span><span class="pln">
+  </span><span class="pun">},</span><span class="pln">
+  </span><span class="str">"action_source"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"system_generated"</span><span class="pun">,</span><span class="pln">
+  </span><span class="str">"custom_data:"</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    </span><span class="str">"lead_event_source"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"Salesforce"</span><span class="pun">,</span><span class="pln">
+    </span><span class="str">"event_source"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"crm"</span><span class="pln">
+  </span><span class="pun">}</span><span class="pln">
+</span><span class="pun">}</span></span></span></pre>
+        
+        A payload that passes in values from your database using variables may look like this:
+        
+<pre class="_5s-8 prettyprint lang-code prettyprinted" style=""><span class="cc-container-hmfoachifajaajjebifbjklokdcdbjke"><span><span class="pun">{</span><span class="pln">
+  </span><span class="str">"event_name"</span><span class="pun">:</span><span class="pln"> lead_stage </span><span class="com">// "initial_lead"</span><span class="pln">
+  </span><span class="str">"event_time"</span><span class="pun">:</span><span class="pln"> unix_time </span><span class="com">//</span></span><span><span class="com"> 1628294742</span></span><span><span class="pln">
+  </span><span class="str">"user_data"</span><span class="pun">:</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    </span><span class="str">"lead_id"</span><span class="pun">:</span><span class="pln"> fb_lead_id </span><span class="com">//</span></span><span><span class="com"> 1234567890123456</span></span><span><span class="pln">
+  </span><span class="pun">},</span><span class="pln">
+  </span><span class="str">"action_source"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"system_generated"</span><span class="pun">,</span><span class="pln">
+  </span><span class="str">"custom_data:"</span><span class="pln"> </span><span class="pun">{</span><span class="pln">
+    </span><span class="str">"lead_event_source"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"Salesforce"</span><span class="pun">,</span><span class="pln">
+    </span><span class="str">"event_source"</span><span class="pun">:</span><span class="pln"> </span><span class="str">"crm"</span><span class="pln">
+  </span><span class="pun">}</span><span class="pln">
+</span><span class="pun">}</span></span></span></pre></li><br><li>Upload data at least once a day.  Ideally the calls to your CRM should be made in real-time, but you may employ hourly or daily batching methods if a real-time integration is not feasible.  <br>
+        If you choose the batching methods, make sure you capture the lead status change history rather than a snapshot of the lead at the time of batching. For example, if a lead's status updates 3 times between batches, we would expect 3 events for this lead rather than just the final update.
+        <br><b>Note:</b><span class="cc-container-hmfoachifajaajjebifbjklokdcdbjke"><span> Each batch can include up to</span><span> 1,000</span><span> events. If there is an error in the batch, the whole batch will be discarded so we HIGHLY recommend employing smaller batches and adding logic for retrying attempts.</span></span></li><br><li><b>Optional</b>. We recommend logging error messages from the CAPI call and creating alerts if there are issues. Exception handling for these errors would also be a good idea.</li><br><li>You can backfill your data for up to 7 days in the past. The time difference is calculated between <code>event_time</code> and <code>upload_time</code>. Backfilling some data may speed up the training process.
+
+        <div class="_57yz _57y_ _3-8p"><div class="_57y-"><p>WARNING: Do not attempt to backfill more than 7 days of data by modifying the <code>event_time</code> values. The model relies on an accurate time stamp to optimize. Doing so may cause all your backfilled data to be discarded.</p>
+</div></div></li><li>Ensure that your <code>event_time</code> values are after the lead generation timestamp, otherwise your events may be discarded.</li><br><li>You should start seeing events appear in Events Manager for your Pixel within an hour if your integration is uploading events to Meta. Remember to use a valid <code>lead_id</code> in your payloads for events to appear. Open each event sent for the Conversion Leads CRM integration in Events Manager and check that they have the custom parameters <code>lead_event_source</code> and <code>event_source</code> populated. If the event does not have these parameters, it will not get registered as a Conversion Leads event.
+
+        <div style="text-align:center;margin-top:40px;margin-bottom:40px;"><img class="img" src="https://lookaside.fbsbx.com/elementpath/media/?media_id=429464615714393&amp;version=1765556029" alt=""></div></li><li>The system will verify if any of your events are valid Conversion Leads events. After 1 day, a green check will appear next to the <b>Send a CRM event</b> step of the integration if a valid event is detected.
+</li></ol><div data-click-area="to_top_nav"><a class="_2k32" href="#"><i alt="" data-visualcompletion="css-img" class="img sp_bUKixoMJa07_2x sx_2f8dba"></i></a></div></div></div><div class="_4-u2 _57mb _1u44 _3fw6 _4-u8 _3la3"><div class="_4-u3 _588p"><div class="_ap2s clearfix"><a class="_ap2t _ap2u" href="/docs/marketing-api/conversions-api/conversion-leads-integration/crm-integration/2-getting-started-with-integration" data-auto-logging-id="f8a7c2f66"><div class="_ap2x">←</div><div class="_ap2w">Anterior</div><div class="_ap2z">2: Getting Started With the CRM Integration</div></a><div class="_ap2y"></div><a class="_ap2t _ap2v" href="/docs/marketing-api/conversions-api/conversion-leads-integration/crm-integration/4-verify-your-data"><div class="_ap2x">→</div><div class="_ap2w">Siguiente</div><div class="_ap2z">4: Verify Your Data</div></a></div><div data-click-area="to_top_nav"><a class="_2k32" href="#"><i alt="" data-visualcompletion="css-img" class="img sp_bUKixoMJa07_2x sx_2f8dba"></i></a></div></div></div></div>

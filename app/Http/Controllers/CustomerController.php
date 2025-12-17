@@ -42,6 +42,7 @@ use App\Models\CampaignMessage;
 use App\Models\Log;
 use App\Models\Country;
 use App\Services\CustomerService;
+use App\Services\MetaConversionsService;
 use App\Services\WhatsAppService;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Log as Logger;
@@ -982,6 +983,89 @@ class CustomerController extends Controller
             'allTags',
             'welcomeAlreadySent'
         ));
+    }
+
+    private function resolveMetaEventName(Customer $customer): string
+    {
+        return ((int) $customer->status_id === 1)
+            ? 'raw lead'
+            : (CustomerStatus::getName($customer->status_id) ?: 'Lead');
+    }
+
+    private function resolveMetaCustomData(Customer $customer): array
+    {
+        return array_filter([
+            'lead_event_source' => 'ARI CRM',
+            'campaign_name' => $customer->campaign_name,
+        ]);
+    }
+
+    public function previewMetaPayload(Customer $customer, MetaConversionsService $metaConversionsService)
+    {
+        $this->ensureCanAccessCustomer($customer);
+
+        $eventName = $this->resolveMetaEventName($customer);
+        $eventTime = optional($customer->updated_at)->timestamp ?? now()->timestamp;
+        $customData = $this->resolveMetaCustomData($customer);
+
+        $payload = $metaConversionsService->buildRequestPayload(
+            $customer,
+            $eventName,
+            $eventTime,
+            $customData
+        );
+
+        return response()->json([
+            'ok' => true,
+            'endpoint' => $metaConversionsService->getEndpoint(),
+            'payload' => $payload,
+        ]);
+    }
+
+    public function sendMetaEvent(Customer $customer, MetaConversionsService $metaConversionsService)
+    {
+        $this->ensureCanAccessCustomer($customer);
+
+        if (! $metaConversionsService->isEnabled()) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'MetaConversionsService no está configurado.',
+            ], 422);
+        }
+
+        $eventName = $this->resolveMetaEventName($customer);
+        $eventTime = optional($customer->updated_at)->timestamp ?? now()->timestamp;
+        $customData = $this->resolveMetaCustomData($customer);
+
+        $payload = $metaConversionsService->buildRequestPayload(
+            $customer,
+            $eventName,
+            $eventTime,
+            $customData
+        );
+
+        try {
+            $response = $metaConversionsService->sendLeadEvent(
+                $customer,
+                $eventName,
+                $eventTime,
+                $customData
+            );
+        } catch (\Throwable $e) {
+            return response()->json([
+                'ok' => false,
+                'endpoint' => $metaConversionsService->getEndpoint(),
+                'payload' => $payload,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'ok' => true,
+            'endpoint' => $metaConversionsService->getEndpoint(),
+            'payload' => $payload,
+            'server_response' => $response,
+        ]);
     }
 
     public function sendWelcomeTemplate(Request $request, $customerId)

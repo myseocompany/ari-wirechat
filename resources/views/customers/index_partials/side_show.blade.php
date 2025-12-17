@@ -35,47 +35,14 @@ $limited = $customer instanceof \App\Models\Customer ? ! $customer->hasFullAcces
             {{-- Etiquetas del cliente --}}
             <div class="mt-3">
               <h3 class="text-sm font-semibold">Etiquetas</h3>
-              <div class="mb-2 tags-badges" id="customer-tags-badges">
-                @if($customer->tags && $customer->tags->count())
-                  @foreach($customer->tags as $tag)
-                    <span class="px-2 py-1 rounded-full text-xs font-semibold mr-2 mb-1 d-inline-block" style="background-color: {{ $tag->color ?? '#e2e8f0' }};">
-                      {{ $tag->name }}
-                    </span>
-                  @endforeach
-                @else
-                  <span class="text-muted">Sin etiquetas</span>
-                @endif
-              </div>
 
               @if(isset($allTags) && $allTags->count())
-                <form
-                  method="POST"
-                  action="{{ route('customers.tags.update', $customer) }}"
-                  id="customer-tags-form-index"
-                  class="customer-tags-form"
-                  data-tags-badges="#customer-tags-badges"
-                  data-tags-feedback="#tags-feedback-index">
-                  @csrf
-                  <div class="grid grid-cols-2 gap-2">
-                    @foreach($allTags as $tagOption)
-                      @php
-                        $checked = $customer->tags->contains($tagOption->id);
-                        $color = $tagOption->color ?: '#edf2f7';
-                      @endphp
-                      <label class="flex items-center gap-2 px-3 py-2 rounded border cursor-pointer text-sm" style="border-color: {{ $checked ? $color : '#e2e8f0' }}; background-color: {{ $checked ? $color : '#fff' }};">
-                        <input
-                          type="checkbox"
-                          name="tags[]"
-                          value="{{ $tagOption->id }}"
-                          class="form-checkbox tag-checkbox"
-                          data-name="{{ $tagOption->name }}"
-                          data-color="{{ $tagOption->color ?: '#e2e8f0' }}"
-                          @checked($checked)>
-                        <span>{{ $tagOption->name }}</span>
-                      </label>
-                    @endforeach
-                  </div>
-                </form>
+                @include('customers.partials.tags_selector', [
+                  'selectedTags' => $customer->tags,
+                  'formId' => 'customer-tags-form-index',
+                  'formAction' => route('customers.tags.update', $customer),
+                  'feedbackSelector' => '#tags-feedback-index',
+                ])
                 <div id="tags-feedback-index" class="small text-muted mt-2 tags-feedback"></div>
                 @include('customers.partials.tags_script')
               @endif

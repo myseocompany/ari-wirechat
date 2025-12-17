@@ -119,6 +119,8 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     Route::get('/{customer}/show', [CustomerController::class, 'show'])->whereNumber('customer')->name('customers.show');
     Route::get('/{customer}/show/{action}', [CustomerController::class, 'showAction'])->whereNumber('customer');
     Route::get('/{customer}/destroy', [CustomerController::class, 'destroy'])->whereNumber('customer');
+    Route::get('/{customer}/meta-payload', [CustomerController::class, 'previewMetaPayload'])->whereNumber('customer')->name('customers.meta-payload');
+    Route::post('/{customer}/meta-send', [CustomerController::class, 'sendMetaEvent'])->whereNumber('customer')->name('customers.meta-send');
     Route::post('/{customer}/action/store', [CustomerController::class, 'storeAction'])->whereNumber('customer');
     Route::post('/{customer}/action/sale', [CustomerController::class, 'saleAction'])->whereNumber('customer');
     Route::post('/{customer}/action/opportunity', [CustomerController::class, 'opportunityAction'])->whereNumber('customer');

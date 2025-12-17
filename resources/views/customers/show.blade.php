@@ -290,53 +290,13 @@
 
             <div class="mt-3">
               <h3 class="text-sm font-semibold">Etiquetas</h3>
-              <div class="mb-2 tags-badges" id="customer-tags-badges-show">
-                @if($model->tags && $model->tags->count())
-                  @foreach($model->tags as $tag)
-                    <span class="px-2 py-1 rounded-full text-xs font-semibold mr-2 mb-1 d-inline-block" style="background-color: {{ $tag->color ?? '#e2e8f0' }};">
-                      {{ $tag->name }}
-                    </span>
-                  @endforeach
-                @else
-                  <span class="text-muted">Sin etiquetas</span>
-                @endif
-              </div>
-
               @if(isset($allTags) && $allTags->count())
-                <form
-                  method="POST"
-                  action="{{ route('customers.tags.update', $model) }}"
-                  id="customer-tags-form"
-                  class="customer-tags-form"
-                  data-tags-badges="#customer-tags-badges-show"
-                  data-tags-feedback="#tags-feedback">
-                  @csrf
-                  <div class="grid grid-cols-2 gap-2" id="tag-options-grid">
-                    @foreach($allTags as $tagOption)
-                      @php
-                        $checked = $model->tags->contains($tagOption->id);
-                        $color = $tagOption->color ?: '#edf2f7';
-                      @endphp
-                      <label class="flex items-center gap-2 px-3 py-2 rounded border cursor-pointer text-sm" style="border-color: {{ $checked ? $color : '#e2e8f0' }}; background-color: {{ $checked ? $color : '#fff' }};">
-                        <input
-                          type="checkbox"
-                          name="tags[]"
-                          value="{{ $tagOption->id }}"
-                          class="form-checkbox tag-checkbox"
-                          data-name="{{ $tagOption->name }}"
-                          data-color="{{ $tagOption->color ?: '#e2e8f0' }}"
-                          @checked($checked)>
-                        <span>{{ $tagOption->name }}</span>
-                      </label>
-                    @endforeach
-                  </div>
-                  @error('tags')
-                    <div class="text-danger small mt-2">{{ $message }}</div>
-                  @enderror
-                  @error('tags.*')
-                    <div class="text-danger small mt-2">{{ $message }}</div>
-                  @enderror
-                </form>
+                @include('customers.partials.tags_selector', [
+                  'selectedTags' => $model->tags,
+                  'formId' => 'customer-tags-form',
+                  'formAction' => route('customers.tags.update', $model),
+                  'feedbackSelector' => '#tags-feedback',
+                ])
                 <div id="tags-feedback" class="small text-muted mt-2 tags-feedback"></div>
                 @include('customers.partials.tags_script')
               @endif
@@ -498,6 +458,38 @@
 
   </form>
   
+  <div class="modal fade" id="metaPayloadModal" tabindex="-1" role="dialog" aria-labelledby="metaPayloadModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="metaPayloadModalLabel">Preview payload Meta Ads</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted mb-2">
+            Endpoint:
+            <span id="metaPayloadEndpoint" class="font-weight-bold"></span>
+          </p>
+          <div id="metaPayloadError" class="alert alert-danger d-none"></div>
+          <div class="mb-3">
+            <p class="small text-muted mb-1">Payload:</p>
+            <pre class="bg-light p-3 rounded small text-break" id="metaPayloadContent" style="max-height: 300px; overflow: auto;"></pre>
+          </div>
+          <div>
+            <p class="small text-muted mb-1">Respuesta del servidor:</p>
+            <pre class="bg-light p-3 rounded small text-break" id="metaPayloadResponse" style="max-height: 200px; overflow: auto;"></pre>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-outline-primary" id="btnMetaPayloadCopy" disabled>Copiar JSON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.getElementById("btnCopiar").addEventListener("click", function() {
       var textoCopiar = "https://arichat.co/metadata/{{$model->id}}/create/poe/40";
@@ -543,6 +535,103 @@
           alert('No se pudo copiar el teléfono');
         });
       });
+    })();
+
+    (function() {
+      var $modal = $('#metaPayloadModal');
+      var content = document.getElementById('metaPayloadContent');
+      var responseBox = document.getElementById('metaPayloadResponse');
+      var endpoint = document.getElementById('metaPayloadEndpoint');
+      var errorBox = document.getElementById('metaPayloadError');
+      var copyBtn = document.getElementById('btnMetaPayloadCopy');
+      var csrfToken = '';
+      var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+      if (csrfMeta) {
+        csrfToken = csrfMeta.getAttribute('content') || '';
+      }
+
+      function stringify(value) {
+        if (value === null || typeof value === 'undefined') {
+          return '';
+        }
+        if (typeof value === 'string') {
+          return value;
+        }
+        try {
+          return JSON.stringify(value, null, 2);
+        } catch (e) {
+          return String(value);
+        }
+      }
+
+      function showPayload(data, expectsResponse) {
+        endpoint.textContent = data.endpoint || 'N/D';
+        content.textContent = stringify(data.payload || {});
+        responseBox.textContent = expectsResponse
+          ? stringify(data.server_response ?? 'Sin respuesta')
+          : 'Solo vista previa. No se envió al API.';
+        copyBtn.disabled = !content.textContent;
+      }
+
+      function handleError(message) {
+        content.textContent = '';
+        responseBox.textContent = '';
+        copyBtn.disabled = true;
+        errorBox.textContent = message || 'No se pudo procesar la solicitud';
+        errorBox.classList.remove('d-none');
+      }
+
+      function performAction(config) {
+        if (!config.button) {
+          return;
+        }
+
+        config.button.addEventListener('click', function() {
+          errorBox.classList.add('d-none');
+          errorBox.textContent = '';
+          content.textContent = 'Procesando...';
+          responseBox.textContent = config.expectsResponse ? 'Esperando respuesta del servidor...' : '';
+          endpoint.textContent = '';
+          copyBtn.disabled = true;
+          $modal.modal('show');
+
+          var options = {
+            method: config.method,
+            headers: { 'Accept': 'application/json' }
+          };
+
+          if (config.method !== 'GET') {
+            options.headers['Content-Type'] = 'application/json';
+            if (csrfToken) {
+              options.headers['X-CSRF-TOKEN'] = csrfToken;
+            }
+            options.body = JSON.stringify({});
+          }
+
+          fetch(config.url, options)
+            .then(function(response) {
+              if (!response.ok) {
+                return response.json()
+                  .catch(function() { return { message: 'Error ' + response.status }; })
+                  .then(function(json) {
+                    var message = json && json.message ? json.message : ('Error ' + response.status);
+                    throw new Error(message);
+                  });
+              }
+              return response.json();
+            })
+            .then(function(data) {
+              if (!data || data.ok !== true) {
+                throw new Error(data && data.message ? data.message : 'Respuesta inválida');
+              }
+              showPayload(data, config.expectsResponse);
+            })
+            .catch(function(error) {
+              handleError(error.message);
+            });
+        });
+      }
+
     })();
   </script>
 </div>

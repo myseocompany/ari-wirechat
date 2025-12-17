@@ -40,5 +40,11 @@ return [
         'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
     ],
 
+    'meta_conversions' => [
+        'dataset_id' => env('META_CONVERSIONS_DATASET_ID'),
+        'access_token' => env('META_CONVERSIONS_ACCESS_TOKEN'),
+        'test_event_code' => env('META_CONVERSIONS_TEST_EVENT_CODE'),
+    ],
+
 
 ];
