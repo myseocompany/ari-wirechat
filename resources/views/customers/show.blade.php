@@ -313,6 +313,9 @@
 
             @if($actual)
             <div class="d-flex align-items-center" style="gap:8px; flex-wrap:wrap;">
+              <a href="{{ route('orders.create', $model->id) }}">
+                <span class="btn btn-success btn-sm" aria-hidden="true">Crear orden</span>
+              </a>
               <a href="/customers/{{$model->id}}/edit">
                 <span class="btn btn-primary btn-sm" aria-hidden="true">Editar</span>
               </a>
