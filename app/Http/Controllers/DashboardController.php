@@ -73,7 +73,7 @@ class DashboardController extends Controller
         }
 
         $userBreakdown = $this->buildUserBreakdownByStatus($startDate, $endDate);
-        $todayUserCustomers = $this->customersCreatedTodayForUser($request->user());
+        $rangeUserCustomers = $this->customersForRangeForUser($request->user(), $startDate, $endDate);
 
         return view('dashboard', [
             'metrics' => $metrics,
@@ -84,7 +84,7 @@ class DashboardController extends Controller
             'hasUserBreakdown' => ! empty($userBreakdown),
             'fromDate' => $fromDateValue,
             'toDate' => $toDateValue,
-            'todayUserCustomers' => $todayUserCustomers,
+            'rangeUserCustomers' => $rangeUserCustomers,
         ]);
     }
 
@@ -259,17 +259,18 @@ class DashboardController extends Controller
             ->all();
     }
 
-    private function customersCreatedTodayForUser($user): Collection
+    private function customersForRangeForUser($user, ?CarbonInterface $start, ?CarbonInterface $end): Collection
     {
         if (! $user) {
             return collect();
         }
 
-        $start = now()->startOfDay();
-        $end = now()->endOfDay();
+        $start = $start ? $start->copy()->startOfDay() : now()->startOfDay();
+        $end = $end ? $end->copy()->endOfDay() : now()->endOfDay();
 
         return Customer::query()
             ->where('user_id', $user->id)
+            ->where('status_id', 1)
             ->whereBetween('created_at', [$start, $end])
             ->latest()
             ->limit(25)

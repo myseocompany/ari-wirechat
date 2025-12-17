@@ -235,7 +235,7 @@
 
 @section('content')
 @php($metrics = $metrics ?? [])
-@php($todayUserCustomers = $todayUserCustomers ?? collect())
+@php($rangeUserCustomers = $rangeUserCustomers ?? collect())
 <div class="container py-4">
     <div class="dashboard-wrapper">
         <form id="dashboard-filter" method="GET" class="time-filter-card">
@@ -303,11 +303,11 @@
                 </div>
                 <div class="today-customers-list">
                     <div class="today-customers-header">
-                        <h5>Clientes creados hoy</h5>
-                        <span>Asignados a ti</span>
+                        <h5>Clientes del rango</h5>
+                        <span>Asignados a ti · Nuevos</span>
                     </div>
                     <div class="today-customers-body">
-                        @forelse ($todayUserCustomers as $customer)
+                        @forelse ($rangeUserCustomers as $customer)
                             <div class="today-customer-item">
                                 <div class="today-customer-name">
                                     <span>{{ $customer->name ?? 'Sin nombre' }}</span>
@@ -322,7 +322,7 @@
                                 @endif
                             </div>
                         @empty
-                            <p class="text-muted mb-0">Hoy no tienes clientes nuevos asignados.</p>
+                            <p class="text-muted mb-0">No hay clientes en este rango.</p>
                         @endforelse
                     </div>
                 </div>
