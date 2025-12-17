@@ -28,8 +28,10 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\WhatsAppAPIController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\MenuController;
 use App\Http\Controllers\CustomerTagController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\LeadDistributionController;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -67,6 +69,19 @@ Route::middleware('auth')
         Route::get('/{tag}/edit', [TagController::class, 'edit'])->name('edit');
         Route::put('/{tag}', [TagController::class, 'update'])->name('update');
         Route::delete('/{tag}', [TagController::class, 'destroy'])->name('destroy');
+    });
+
+Route::middleware('auth')
+    ->prefix('admin/menus')
+    ->name('menus.')
+    ->group(function () {
+        Route::get('/', [MenuController::class, 'index'])->name('index');
+        Route::get('/create', [MenuController::class, 'create'])->name('create');
+        Route::post('/', [MenuController::class, 'store'])->name('store');
+        Route::get('/{menu}/edit', [MenuController::class, 'edit'])->name('edit');
+        Route::put('/{menu}', [MenuController::class, 'update'])->name('update');
+        Route::post('/reorder', [MenuController::class, 'reorder'])->name('reorder');
+        Route::delete('/{menu}', [MenuController::class, 'destroy'])->name('destroy');
     });
 
 require __DIR__.'/auth.php';
@@ -609,3 +624,10 @@ Route::get('/test-email', function () {
     */
     return 'Email enviado por resend (si todo está bien)';
 });
+Route::middleware('auth')
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/leads-distribution', [LeadDistributionController::class, 'index'])->name('leads-distribution.index');
+        Route::post('/leads-distribution', [LeadDistributionController::class, 'update'])->name('leads-distribution.update');
+    });

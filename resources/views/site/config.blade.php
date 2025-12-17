@@ -22,6 +22,13 @@
 	<a href="/users" class="list-group-item">Usuarios</a>
 </div>
 <div class="list-group">
+    <div class="list-group-item">
+        <h3 class="h5 mb-1">Distribución de leads</h3>
+        <p class="mb-2">Ajusta los porcentajes con los que cada asesor recibe nuevos leads.</p>
+        <a href="{{ route('admin.leads-distribution.index') }}" class="btn btn-sm btn-primary">Configurar distribución</a>
+    </div>
+</div>
+<div class="list-group">
 	<a href="/roles" class="list-group-item">Roles</a>
 </div>
 <div class="list-group">
@@ -41,6 +48,13 @@
         <h3 class="h5 mb-1">Etiquetas de clientes</h3>
         <p class="mb-2">Administra las etiquetas disponibles para clasificar clientes.</p>
         <a href="{{ route('tags.index') }}" class="btn btn-sm btn-primary">Gestionar etiquetas</a>
+    </div>
+</div>
+<div class="list-group">
+    <div class="list-group-item">
+        <h3 class="h5 mb-1">Menús del sistema</h3>
+        <p class="mb-2">Configura los enlaces visibles y su jerarquía en la navegación.</p>
+        <a href="{{ route('menus.index') }}" class="btn btn-sm btn-primary">Gestionar menús</a>
     </div>
 </div>
 <div class="list-group">

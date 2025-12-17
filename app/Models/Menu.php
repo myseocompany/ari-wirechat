@@ -6,6 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model{
 
+    protected $fillable = [
+        'name',
+        'url',
+        'parent_id',
+        'weight',
+        'inner_link',
+    ];
+
+    protected $casts = [
+        'parent_id' => 'integer',
+        'weight' => 'integer',
+        'inner_link' => 'boolean',
+    ];
+
     public static function getUserMenu($user){
 
         $model = Menu::select('menus.id','menus.name', 'menus.url')
@@ -41,6 +55,16 @@ class Menu extends Model{
         return $this->belongsToMany(Role::class, 'role_menus')
                     ->withPivot(['create', 'read', 'update', 'delete'])
                     ->withTimestamps();
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Menu::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Menu::class, 'parent_id');
     }
 	
 }

@@ -29,10 +29,17 @@ use Namu\WireChat\Jobs\NotifyParticipants;
 use App\Http\Controllers\Api\APIController;
 use Namu\WireChat\Models\Message as ModelsMessage;
 use App\Enums\WAMessageType;
+use App\Services\LeadAssignmentService;
 
 
 class WAToolBoxController extends Controller{
     public $imageBase64 = "";
+    protected LeadAssignmentService $leadAssignmentService;
+
+    public function __construct(LeadAssignmentService $leadAssignmentService)
+    {
+        $this->leadAssignmentService = $leadAssignmentService;
+    }
 
     public function receiveMessage(Request $request){
         $this->saveRequestLog($request);
@@ -60,7 +67,7 @@ class WAToolBoxController extends Controller{
         }
         $reciver_phone = $messageSource->settings['phone_number']; // 57300...
 
-        $api = new APIController();
+        $api = app(APIController::class);
 
         // Armamos un objeto tipo request para que funcione con la lógica ya existente
         $apiRequest = new \Illuminate\Http\Request();
@@ -77,9 +84,10 @@ class WAToolBoxController extends Controller{
         $sender = $api->getSimilarModel($apiRequest);
         if (!$sender) {
             $sender = $api->saveAPICustomer($apiRequest);
-                // Asignar el user_id con el algoritmo de turnos
-            $sender->user_id = $api->getRandomNextUserID();
-            $sender->save();
+            if (! $sender->user_id) {
+                $sender->user_id = $this->leadAssignmentService->getRandomNextUserId();
+                $sender->save();
+            }
             
             $api->storeActionAPI($apiRequest, $sender->id);
         }

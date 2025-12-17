@@ -32,6 +32,7 @@ use App\Models\Reference;
 use App\Models\RdStation;
 use Illuminate\Support\Facades\Http;
 use App\Models\RequestLog;
+use App\Services\LeadAssignmentService;
 use App\Services\WhatsAppService;
 use App\Services\MetaConversionsService;
 
@@ -48,8 +49,11 @@ class APIController extends Controller
 
     protected $defaultMessageSource;
 
-    public function __construct()
+    protected LeadAssignmentService $leadAssignmentService;
+
+    public function __construct(LeadAssignmentService $leadAssignmentService)
     {
+        $this->leadAssignmentService = $leadAssignmentService;
     }
 
     public function index(Request $request)
@@ -779,6 +783,15 @@ class APIController extends Controller
             $model->status_id = 41;
         } else {
             $model->status_id = 1;
+        }
+
+        if (isset($request->user_id)) {
+            $model->user_id = $request->user_id;
+        } else {
+            $assignedUserId = $this->leadAssignmentService->getRandomNextUserId();
+            if ($assignedUserId) {
+                $model->user_id = $assignedUserId;
+            }
         }
 
         if (isset($request->notes))
@@ -2445,39 +2458,6 @@ class APIController extends Controller
         return $modelRD->id;
     }
 
-    function getNextUserID()
-    {
-        // obtener el usuario que fue asignado por última vez
-        $lastAssignedUser = User::where('last_assigned', 1)->first();
-
-        // restablecer el estado de asignación del usuario anterior
-        if ($lastAssignedUser) {
-            $lastAssignedUser->last_assigned = 0;
-            $lastAssignedUser->save();
-        }
-
-        // obtener el próximo usuario para asignar
-        $nextUser = User::where('id', '>', $lastAssignedUser->id ?? 0)
-            ->where('status_id', '=', 1)
-            ->where('assignable', '>', 0)
-            ->first();
-
-        // si hemos llegado al final de la lista de usuarios, comenzamos desde el principio
-        if (!$nextUser) {
-            $nextUser = User::where('status_id', '=', 1)
-                ->where('assignable', '>', 0)
-                ->first();
-        }
-
-        // marcar este usuario como el último asignado
-        $nextUser->last_assigned = 1;
-        $nextUser->save();
-
-        
-        // devolver el ID del usuario
-        return $nextUser->id;
-    }
-
     function getStatusRD($data){
         $status = 1;
         if (isset($data["lead_stage"])) {
@@ -2507,53 +2487,6 @@ class APIController extends Controller
             }*/
         }
         return $status;
-    }
-
-    function getRandomNextUserID()
-    {
-        // Obtener todos los usuarios activos y asignables
-        $users = User::where('status_id', '=', 1)
-            ->where('assignable', '>', 0)
-            ->get();
-
-        // Si no hay usuarios, retornar nulo o manejar el caso adecuadamente
-        if ($users->isEmpty()) {
-            return null; // o manejo alternativo
-        }
-
-        // Preparar una lista ponderada basada en 'assignable'
-        $weightedUsers = [];
-        foreach ($users as $user) {
-            $weightedUsers[$user->id] = $user->assignable;
-        }
-
-        // Seleccionar un usuario basado en el peso 'assignable'
-        $selectedUserId = $this->weightedRandomSelection($weightedUsers);
-
-        // Actualizar el estado de asignación de usuarios
-        User::query()->update(['last_assigned' => 0]); // Restablecer todos a no asignados
-        User::where('id', $selectedUserId)->update(['last_assigned' => 1]); // Marcar el seleccionado como asignado
-
-        // Devolver el ID del usuario seleccionado
-        return $selectedUserId;
-    }
-
-    /**
-     * Realiza una selección aleatoria ponderada.
-     * 
-     * @param array $weights Array asociativo de id => peso
-     * @return int El ID seleccionado basado en el peso
-     */
-    function weightedRandomSelection($weights)
-    {
-        $totalWeight = array_sum($weights);
-        $rand = mt_rand(1, $totalWeight);
-        foreach ($weights as $id => $weight) {
-            $rand -= $weight;
-            if ($rand <= 0) {
-                return $id;
-            }
-        }
     }
 
 
@@ -2931,12 +2864,12 @@ class APIController extends Controller
                 $this->updateCustomerHistory($opportunity, $model, $request_model);
             } else {
                 // Verifico si es proyecto
-                $request_model->user_id = $this->getRandomNextUserID();
+                $request_model->user_id = $this->leadAssignmentService->getRandomNextUserId();
                 /*
                 if(isset($request_model->maker) && ($request_model->maker == 0))
                     $request_model->user_id = null; #antes era 92 Estefanía
                 else 
-                    $request_model->user_id = $this->getNextUserID();
+                    $request_model->user_id = $this->leadAssignmentService->getNextUserId();
                 */
                 $request_model->phone = $this->cleanPhoneCharters($request_model->phone);
                 $request_model->phone2 = $this->cleanPhoneCharters($request_model->phone2);
