@@ -3,21 +3,23 @@
 @push('styles')
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <style>
-    .dashboard-wrapper {
-        background: #f4f6fb;
-        border-radius: 18px;
-        padding: 1.5rem;
+    body {
+        background-color: #f5f7fb;
     }
 
+
+
     .time-filter-card {
-        background: linear-gradient(120deg, #ffe9e2, #ffe9f2);
-        border-radius: 18px;
-        padding: 1rem 1.25rem;
-        margin-bottom: 1.25rem;
-        border: 1px solid rgba(249, 115, 22, .2);
+        background: #fff;
+        border-radius: 14px;
+        padding: .5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(17, 19, 34, .1);
         display: flex;
-        flex-direction: column;
-        gap: 1rem;
+        align-items: center;
+        gap: .75rem;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, .05);
+        flex-wrap: wrap;
     }
 
     .quick-range-pills {
@@ -25,51 +27,59 @@
         flex-wrap: wrap;
         gap: .4rem;
         align-items: center;
+        flex: 1 1 auto;
     }
 
     .quick-range-pills .pill {
-        border: none;
-        background: transparent;
+        background: #fff;
         padding: .4rem 1rem;
         border-radius: 999px;
-        font-weight: 600;
-        color: #b45309;
+        font-weight: 500;
+        color: #475467;
         transition: background .2s ease, color .2s ease, box-shadow .2s ease;
     }
 
     .quick-range-pills .pill.active {
+        background: #111322;
+        color: #fff;
+        border-color: #111322;
+        box-shadow: 0 12px 24px rgba(17, 19, 34, .25);
+    }
+
+    .quick-range-pills .pill:not(.active) {
+        border: none;
+    }
+
+    .date-picker-pill {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        border: 1px solid #e4e7ec;
+        border-radius: 999px;
+        padding: .35rem .9rem;
         background: #fff;
-        color: #0f172a;
-        box-shadow: 0 6px 10px rgba(249, 115, 22, .25);
     }
 
-    .time-filter-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: .85rem;
-        align-items: flex-end;
-    }
-
-    .time-filter-input {
-        flex: 1 1 280px;
-    }
-
-    .time-filter-input .input-group {
-        border-radius: 14px;
-        overflow: hidden;
-        box-shadow: 0 10px 25px rgba(15, 23, 42, .08);
-    }
-
-    .time-filter-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: .5rem;
+    .date-picker-pill .form-control {
+        border: none;
+        background: transparent;
+        padding: 0;
+        width: 150px;
     }
 
     .dashboard-header {
         display: flex;
         flex-direction: column;
         gap: .25rem;
+    }
+
+    .dashboard-header h2 {
+        color: #101828;
+        font-weight: 700;
+    }
+
+    .dashboard-header p {
+        color: #667085;
     }
 
     .kpi-grid {
@@ -79,55 +89,34 @@
     }
 
     .kpi-card {
-        border-radius: 16px;
-        padding: 1rem 1.25rem;
+        border-radius: 14px;
+        padding: 1.1rem 1.2rem;
         background: #fff;
-        border: 1px solid rgba(15, 23, 42, .05);
-        box-shadow: 0 10px 25px rgba(15, 23, 42, .05);
-        transition: transform .15s ease, box-shadow .15s ease;
-        min-height: 125px;
-    }
-
-    .kpi-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 30px rgba(15, 23, 42, .08);
-    }
-
-    .kpi-value {
-        font-size: 1.75rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin: 0;
+        border: 1px solid #e4e7ec;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, .05);
     }
 
     .kpi-title {
-        font-size: 1rem;
+        font-size: .9rem;
         font-weight: 600;
-        color: #475569;
-        margin: .25rem 0;
+        color: #667085;
+        margin: 0 0 .35rem;
     }
 
-    .kpi-subtitle,
-    .kpi-accent {
-        font-size: .85rem;
+    .kpi-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #101828;
         margin: 0;
-    }
-
-    .kpi-subtitle {
-        color: #94a3b8;
-    }
-
-    .kpi-accent {
-        font-weight: 600;
     }
 
     .user-breakdown-card {
         margin-top: 2rem;
         background: #fff;
-        border-radius: 18px;
-        padding: 1.5rem;
-        border: 1px solid rgba(15, 23, 42, .05);
-        box-shadow: 0 15px 30px rgba(15, 23, 42, .08);
+        border-radius: 22px;
+        padding: 1.75rem;
+        border: 1px solid #e4e7ec;
+        box-shadow: 0 35px 65px rgba(15, 23, 42, .07);
     }
 
     .user-breakdown-header {
@@ -138,62 +127,25 @@
         margin-bottom: 1rem;
     }
 
-    .user-breakdown-row {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: .65rem 0;
-        border-bottom: 1px solid rgba(15, 23, 42, .06);
+    .user-breakdown-header h4 {
+        font-weight: 700;
+        color: #101828;
     }
 
-    .user-breakdown-row:last-child {
-        border-bottom: none;
-    }
-
-    .user-breakdown-label {
-        width: 200px;
-    }
-
-    .user-breakdown-label strong {
-        display: block;
-        font-size: .95rem;
-        color: #0f172a;
-    }
-
-    .user-breakdown-label span {
-        font-size: .8rem;
-        color: #94a3b8;
-    }
-
-    .user-breakdown-bar {
-        flex: 1;
-        display: flex;
-        height: 34px;
-        border-radius: 999px;
-        overflow: hidden;
-        background: #e2e8f0;
-        box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .05);
-    }
-
-    .user-breakdown-segment {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-size: .75rem;
-        font-weight: 600;
-        text-shadow: 0 1px 2px rgba(15, 23, 42, .3);
+    .user-breakdown-header p,
+    .user-breakdown-header .text-muted {
+        color: #667085 !important;
     }
 
     .user-breakdown-empty {
         text-align: center;
-        color: #94a3b8;
+        color: #98a2b3;
         padding: 1rem 0;
     }
 
     .user-breakdown-chart {
         min-height: 380px;
-        margin-bottom: 1.5rem;
+        flex: 1;
     }
 
     .user-breakdown-chart canvas {
@@ -205,15 +157,90 @@
         .dashboard-header {
             text-align: center;
         }
+
+        .user-breakdown-content {
+            flex-direction: column;
+        }
+
+        .today-customers-list {
+            width: 100%;
+        }
+    }
+
+    .user-breakdown-content {
+        display: flex;
+        gap: 1.5rem;
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+
+    .today-customers-list {
+        flex: 0 0 320px;
+        max-width: 360px;
+        background: #f8fafc;
+        border: 1px solid #e4e7ec;
+        border-radius: 18px;
+        padding: 1rem;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .today-customers-header {
+        margin-bottom: 1rem;
+    }
+
+    .today-customers-header h5 {
+        margin-bottom: .15rem;
+        font-weight: 700;
+        color: #101828;
+    }
+
+    .today-customers-header span {
+        font-size: .85rem;
+        color: #667085;
+    }
+
+    .today-customers-body {
+        display: flex;
+        flex-direction: column;
+        gap: .85rem;
+        max-height: 360px;
+        overflow-y: auto;
+    }
+
+    .today-customer-item {
+        background: #fff;
+        border-radius: 14px;
+        padding: .75rem;
+        border: 1px solid #e4e7ec;
+        box-shadow: 0 6px 15px rgba(15, 23, 42, .05);
+    }
+
+    .today-customer-name {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #101828;
+        font-weight: 600;
+        font-size: .95rem;
+    }
+
+    .today-customer-meta {
+        font-size: .8rem;
+        color: #667085;
     }
 </style>
 @endpush
 
 @section('content')
 @php($metrics = $metrics ?? [])
+@php($todayUserCustomers = $todayUserCustomers ?? collect())
 <div class="container py-4">
     <div class="dashboard-wrapper">
         <form id="dashboard-filter" method="GET" class="time-filter-card">
+            <input type="hidden" name="from_date" value="{{ $fromDate }}">
+            <input type="hidden" name="to_date" value="{{ $toDate }}">
             <div class="quick-range-pills">
                 @foreach ($filterOptions as $value => $label)
                     <button type="submit" name="range" value="{{ $value }}"
@@ -221,23 +248,14 @@
                         {{ $label }}
                     </button>
                 @endforeach
-            </div>
-            <input type="hidden" name="from_date" value="{{ $fromDate }}">
-            <input type="hidden" name="to_date" value="{{ $toDate }}">
-            <div class="time-filter-row">
-                <div class="time-filter-input">
-                    <label for="dashboard_range" class="mb-1 text-muted">Seleccionar rango</label>
-                    <div class="input-group">
-                        <input type="text" id="dashboard_range" class="form-control"
-                            placeholder="Seleccionar rango"
-                            value="{{ (!empty($fromDate) && !empty($toDate)) ? \Carbon\Carbon::parse($fromDate)->format('d-m-Y').' - '.\Carbon\Carbon::parse($toDate)->format('d-m-Y') : '' }}"
-                            autocomplete="off">
-                        <div class="input-group-append">
-                            <span class="input-group-text"><i class="fa fa-calendar"></i></span>
-                        </div>
-                    </div>
+                <div class="date-picker-pill">
+                    <i class="fa fa-calendar text-muted"></i>
+                    <input type="text" id="dashboard_range" class="form-control"
+                        placeholder="Seleccionar rango"
+                        value="{{ (!empty($fromDate) && !empty($toDate)) ? \Carbon\Carbon::parse($fromDate)->format('d-m-Y').' - '.\Carbon\Carbon::parse($toDate)->format('d-m-Y') : '' }}"
+                        autocomplete="off">
                 </div>
-                <div class="time-filter-actions">
+                <div class="time-filter-actions ml-auto">
                     <button type="submit" class="btn btn-dark rounded-pill px-4">Aplicar</button>
                     <button type="button" class="btn btn-link text-dark" id="dashboard_range_clear">
                         Limpiar
@@ -246,10 +264,6 @@
             </div>
         </form>
 
-        <div class="dashboard-header mb-4">
-            <h2 class="mb-0">Panel de control</h2>
-            <p class="text-muted mb-0">Indicadores principales de clientes y oportunidades.</p>
-        </div>
 
         @if (session('status'))
             <div class="alert alert-success">
@@ -257,20 +271,67 @@
             </div>
         @endif
 
-        <div class="kpi-grid">
+            <div class="kpi-grid">
             @forelse ($metrics as $metric)
                 <div class="kpi-card">
-                    <p class="kpi-value">{{ number_format($metric['value'] ?? 0) }}</p>
                     <p class="kpi-title">{{ $metric['title'] ?? '' }}</p>
-                    <p class="kpi-accent" style="color: {{ $metric['accent'] ?? '#2563eb' }}">
-                        {{ $metric['subtitle'] ?? '' }}
-                    </p>
+                    <p class="kpi-value">{{ number_format($metric['value'] ?? 0) }}</p>
                 </div>
             @empty
                 <div class="alert alert-info mb-0">
                     No hay indicadores para mostrar por el momento.
                 </div>
             @endforelse
+        </div>
+
+        @php($totalBreakdownCustomers = $hasUserBreakdown ? array_sum(array_column($userBreakdown, 'total')) : 0)
+        <div class="user-breakdown-card">
+            <div class="user-breakdown-header">
+                <div>
+                    <h4 class="mb-1">Clientes por usuario</h4>
+                    <p class="text-muted mb-0">Comparativo de clientes por ejecutivo y etapa.</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-muted small d-block">Total clientes</span>
+                    <strong class="h5 mb-0">{{ number_format($totalBreakdownCustomers) }}</strong>
+                </div>
+            </div>
+
+            <div class="user-breakdown-content">
+                <div class="user-breakdown-chart">
+                    <canvas id="userBreakdownChart"></canvas>
+                </div>
+                <div class="today-customers-list">
+                    <div class="today-customers-header">
+                        <h5>Clientes creados hoy</h5>
+                        <span>Asignados a ti</span>
+                    </div>
+                    <div class="today-customers-body">
+                        @forelse ($todayUserCustomers as $customer)
+                            <div class="today-customer-item">
+                                <div class="today-customer-name">
+                                    <span>{{ $customer->name ?? 'Sin nombre' }}</span>
+                                    <small class="text-muted">{{ optional($customer->created_at)->format('H:i') }}</small>
+                                </div>
+                                <div class="today-customer-meta">
+                                    {{ $customer->business ?? 'Sin empresa' }}
+                                </div>
+                                @if (! empty($customer->email))
+                                    <div class="today-customer-meta">{{ $customer->email }}</div>
+                                @endif
+                            </div>
+                        @empty
+                            <p class="text-muted mb-0">Hoy no tienes clientes nuevos asignados.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            @unless ($hasUserBreakdown)
+                <p class="user-breakdown-empty mb-0">
+                    No hay clientes con etiquetas asignadas para mostrar.
+                </p>
+            @endunless
         </div>
 
 </div>

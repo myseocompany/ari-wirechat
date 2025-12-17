@@ -72,6 +72,7 @@ class DashboardController extends Controller
         }
 
         $userBreakdown = $this->buildUserBreakdown($tagsById, $tagSlugs, $startDate, $endDate);
+        $todayUserCustomers = $this->customersCreatedTodayForUser($request->user());
 
         return view('dashboard', [
             'metrics' => $metrics,
@@ -82,6 +83,7 @@ class DashboardController extends Controller
             'hasUserBreakdown' => ! empty($userBreakdown),
             'fromDate' => $fromDateValue,
             'toDate' => $toDateValue,
+            'todayUserCustomers' => $todayUserCustomers,
         ]);
     }
 
@@ -101,7 +103,7 @@ class DashboardController extends Controller
 
     private function resolveDateRange(Request $request): array
     {
-        $range = $request->get('range', 'monthly');
+        $range = $request->get('range', 'today');
         $now = now();
         $start = null;
         $end = null;
@@ -236,5 +238,22 @@ class DashboardController extends Controller
             ->sortByDesc('total')
             ->values()
             ->all();
+    }
+
+    private function customersCreatedTodayForUser($user): Collection
+    {
+        if (! $user) {
+            return collect();
+        }
+
+        $start = now()->startOfDay();
+        $end = now()->endOfDay();
+
+        return Customer::query()
+            ->where('user_id', $user->id)
+            ->whereBetween('created_at', [$start, $end])
+            ->latest()
+            ->limit(25)
+            ->get(['id', 'name', 'email', 'business', 'created_at']);
     }
 }
