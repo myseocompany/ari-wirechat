@@ -217,6 +217,12 @@
           padding: 4px 8px;
           font-size: 14px;
         }
+        .action-buttons {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 8px;
+        }
       </style>
 
       @if(!empty($customer->technical_visit))
@@ -225,7 +231,8 @@
     </div>
 
     {{-- BOTONES DE ACCIÓN --}}
-    <div class="mb-4">
+    <div class="mb-4 action-buttons">
+      <a href="{{ route('orders.create', $customer->id) }}" class="btn btn-sm btn-success">Crear orden</a>
       <a href="/customers/{{$customer->id}}/edit" class="btn btn-sm btn-primary">Editar</a>
 
       @if(is_null($customer->user_id) || $customer->user_id == 0)
@@ -241,10 +248,10 @@
         <input type="hidden" name="email" id="email" value="{{ $customer->email }}">
         <input type="hidden" name="country" id="country" value="{{ $customer->country }}">
 
-        <a class="btn btn-sm btn-primary mt-2" onclick="sendToRDStation();">Enviar a RD</a>
+        <a class="btn btn-sm btn-primary" onclick="sendToRDStation();">Enviar a RD</a>
 
         <a href="/optimize/customers/consolidateDuplicates/?query={{ $customer->phone ?? $customer->email }}"
-           class="btn btn-sm btn-primary mt-2">
+           class="btn btn-sm btn-primary">
            Buscar duplicados
         </a>
       @endif
