@@ -1,0 +1,242 @@
+{
+  "name": "MQE_Google_Sheets_WhatsApp",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        -240
+      ],
+      "id": "ff033621-e22e-4e1d-ae05-880d60d4d1b3"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sheetId": "1lrFEVDY0hM726OA1ThtGF8vq2sNQDdb8al5PPnijebE",
+        "range": "dataSheet",
+        "options": {}
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        300,
+        -240
+      ],
+      "id": "1963b0c5-6bc2-4ad9-9dc9-c086c08c531b",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "71jBjK32UojqtZBO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 100,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        480,
+        -240
+      ],
+      "id": "e3110ef6-ff16-46b4-a15e-0ae4863bd1d9",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": "=30"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1360,
+        -220
+      ],
+      "id": "627c1c2b-3c1d-4d34-9600-50c4870ca58b",
+      "name": "Wait",
+      "webhookId": "8467ab45-5778-42ff-9766-c9ec07153fb0"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/331909369994463/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAJfCeNH6EwBPZBIIUZC4PLlEFO1GcgnxZBDeSUS4ZCj7yUEPuHbMN19ubnQ83nuXN92sZCFWfRkbAKVpZADkdQJabzSDQZA74yT5vDIoKMItomGw7REfnvD3vuLpHNZAFc91UMoOUDt9KZC909E8xZBfGBAVuX4nhLAqFw9LuQSAe22scyRQtL19MNfMnMCDwoAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Loop Over Items').item.json.Telefono }}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"crecer_2025_original\",\n    \"language\": {\n      \"code\": \"es\"\n    },\n    \"components\": [\n      {\n          \"type\": \"header\",\n          \"parameters\": [\n            {\n              \"type\": \"image\",\n              \"image\": {\n                \"link\": \"https://maquiempanadas.com/quiz-escalable/img/envivo_dic_2025_11.jpg\"\n              }\n            }\n          ]\n        },\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Loop Over Items').item.json.name }}\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        -220
+      ],
+      "id": "782f149a-4496-4fa0-b01b-c1a4d11ca336",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        740,
+        -380
+      ],
+      "id": "82885723-d2ad-417f-967d-b083a7613b42",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "Telefono",
+        "include": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        740,
+        -220
+      ],
+      "id": "0b5f7eae-f1af-46a7-839f-1f1b6ace7133",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://arichat.co/api/actions/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"customer_id\":\"{{ $('Loop Over Items').item.json.Id }}\",\n\"note\":\"Envío masivo: invitación en vivo 11 de Dic Quiz\",\n\"type_id\":\"14\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1160,
+        -220
+      ],
+      "id": "3ead5b47-b5d1-4178-b2f8-89787739624e",
+      "name": "HTTP Request1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e4ced948-4256-48d4-a7c9-c86f44a1fdc7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "214d3d107d90a37f93970729696a21c6c4484e8739a264cbd219ef20ed05bd59"
+  },
+  "id": "UZ2v6Q0WFUab5HlI",
+  "tags": []
+}

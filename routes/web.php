@@ -27,6 +27,7 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\WhatsAppAPIController;
+use App\Http\Controllers\WhatsAppBroadcastController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\CustomerTagController;
@@ -219,6 +220,14 @@ Route::middleware('auth')->prefix('whatsapp-accounts')->name('whatsapp-accounts.
     Route::put('/{whatsappAccount}', [\App\Http\Controllers\WhatsAppAccountController::class, 'update'])->name('update');
     Route::post('/{whatsappAccount}/sync-templates', [\App\Http\Controllers\WhatsAppAccountController::class, 'syncTemplates'])->name('sync-templates');
 });
+
+Route::middleware('auth')
+    ->prefix('whatsapp-broadcasts')
+    ->name('whatsapp-broadcasts.')
+    ->group(function () {
+        Route::get('/create', [WhatsAppBroadcastController::class, 'create'])->name('create');
+        Route::post('/', [WhatsAppBroadcastController::class, 'store'])->name('store');
+    });
 
 // User Routes
 Route::middleware('auth')->prefix('users')->group(function () {
