@@ -141,6 +141,14 @@ class DashboardController extends Controller
                 $start = $now->copy()->startOfMonth();
                 $end = $now->copy()->endOfMonth();
                 break;
+            case 'last30':
+                $start = $now->copy()->subDays(29)->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
+            case 'last90':
+                $start = $now->copy()->subDays(89)->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
             case 'custom':
                 if ($custom['start'] && $custom['end']) {
                     try {
@@ -168,6 +176,8 @@ class DashboardController extends Controller
             'yesterday' => 'Ayer',
             'weekly' => 'Semana',
             'monthly' => 'Mes',
+            'last30' => 'Últimos 30',
+            'last90' => 'Últimos 90',
             'all' => 'Todo',
         ];
     }
@@ -202,7 +212,7 @@ class DashboardController extends Controller
         }
 
         $rows = $rows
-            ->groupBy('user_id', 'user_name', 'status_id', 'status_name', 'status_color')
+            ->groupBy('user_id', 'user_name', 'status_id', 'status_name', 'status_color', 'status_weight')
             ->get();
 
         if ($rows->isEmpty()) {
