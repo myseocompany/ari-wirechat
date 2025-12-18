@@ -9,6 +9,7 @@
   foreach ($customer->actions as $action) {
       $timeline->push([
           'type' => 'action',
+          'id' => $action->id,
           'date' => $action->created_at,
           'note' => $action->note,
           'creator' => $action->creator->name ?? 'Automático',
@@ -90,6 +91,12 @@
           <div class="text-end small text-muted">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}<br>
             {{ $item['creator'] }}
+            @if(Auth::check() && Auth::user()->role_id == 1 && isset($item['id']))
+              <br>
+              <a href="/actions/{{ $item['id'] }}/destroy" class="text-danger" title="Eliminar acción">
+                <i class="fa fa-trash-o"></i>
+              </a>
+            @endif
           </div>
         </div>
 
