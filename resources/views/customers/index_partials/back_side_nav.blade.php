@@ -102,7 +102,7 @@
                                     @if(Auth::user()->role_id == 2)
                                       <li class="nav-item dropdown">
                                         <a class="nav-link text-dark dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false">
-                                          Cuenta
+                                          {{ Auth::user()->name }}
                                         </a>
                                         <ul class="dropdown-menu" role="menu">
                                           <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">

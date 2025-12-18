@@ -142,7 +142,7 @@
 	section#main-content {
     	margin: 0px 0px 0px 0px !important;
 	}
-	nav.navbar.navbar-expand-md.navbar-white.fixed-top.bg-white.container {
+	nav.navbar.navbar-expand-md.navbar-white.fixed-top.bg-white.container-fluid {
 		/*visibility: hidden;*/
 	}
 	</style>

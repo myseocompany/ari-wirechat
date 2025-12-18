@@ -1,4 +1,4 @@
-     <nav class="navbar navbar-expand-md navbar-white fixed-top bg-white container">
+     <nav class="navbar navbar-expand-md navbar-white fixed-top bg-white container-fluid">
       
     <a class="navbar-brand" href="#"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
       <button class="navbar-toggler d-lg-none collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
@@ -97,7 +97,7 @@
                                     @if(Auth::user()->role_id == 2)
                                       <li class="nav-item dropdown">
                                         <a class="nav-link text-dark dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false">
-                                          Cuenta
+                                          {{ Auth::user()->name }}
                                         </a>
                                         <ul class="dropdown-menu" role="menu">
                                           <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
