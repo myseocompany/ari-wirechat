@@ -910,7 +910,13 @@ class APIController extends Controller
 
     public function isEqualModel($request)
     {
-        //dd($request);
+        if (!empty($request->rd_lead_id)) {
+            $match = Customer::where('rd_lead_id', $request->rd_lead_id)->first();
+            if ($match) {
+                return $match;
+            }
+        }
+
         $model = Customer::where(
             // Búsqueda por...
             function ($query) use ($request) {
@@ -1118,6 +1124,13 @@ class APIController extends Controller
 
     public function getSimilarModel($request)
     {
+        if (!empty($request->rd_lead_id)) {
+            $match = Customer::where('rd_lead_id', $request->rd_lead_id)->first();
+            if ($match) {
+                return $match;
+            }
+        }
+
         $model = Customer::where(function ($query) use ($request) {
             // Verificación y normalización de phone
             if (!empty($request->phone) && $request->phone != 'NA') {
@@ -1994,7 +2007,7 @@ class APIController extends Controller
         return null;
     }
 
-    public function saveLogFromRequest(Request $request)
+    public function saveLogFromRequest(Request $request, ?string $rdLeadId = null): RequestLog
     {
         $model = new RequestLog();
 
@@ -2011,7 +2024,31 @@ class APIController extends Controller
         $model->email = $this->extractEmailFromRequestPayload($requestData);
         $model->phone = $this->extractPhoneFromRequestPayload($requestData);
         $model->facebook_id = $this->extractFacebookIdFromRequestPayload($requestData);
+        $model->rd_lead_id = $rdLeadId;
+        $model->ignored = false;
+        $model->ignore_reason = null;
         $model->save();
+
+        return $model;
+    }
+
+    private function shouldIgnoreDuplicateLead(?string $rdLeadId, RequestLog $currentLog): bool
+    {
+        if (empty($rdLeadId)) {
+            return false;
+        }
+
+        return RequestLog::where('rd_lead_id', $rdLeadId)
+            ->where('id', '!=', $currentLog->id)
+            ->where('created_at', '>=', now()->subMinutes(5))
+            ->exists();
+    }
+
+    private function markRequestLogIgnored(RequestLog $log, string $reason): void
+    {
+        $log->ignored = true;
+        $log->ignore_reason = $reason;
+        $log->save();
     }
 
     public function listRequestLogs(Request $request)
@@ -2227,6 +2264,11 @@ class APIController extends Controller
             }
         }
 
+        $rdLeadId = $this->extractRdLeadId($data);
+        if ($rdLeadId !== null) {
+            $model->rd_lead_id = $rdLeadId;
+        }
+
         if (isset($data['bio'])) {
             $model->notes .= $data['bio'];
         }
@@ -2261,18 +2303,43 @@ class APIController extends Controller
         return null;
     }
 
+    private function extractRdLeadId(array $data): ?string
+    {
+        $paths = [
+            'id',
+            'uuid',
+            'first_conversion.content.id',
+            'first_conversion.content.uuid',
+            'last_conversion.content.id',
+            'last_conversion.content.uuid',
+        ];
+
+        foreach ($paths as $path) {
+            $value = data_get($data, $path);
+            if ($value !== null && $value !== '') {
+                return (string) $value;
+            }
+        }
+
+        return null;
+    }
+
 
     public function updateFromRD(Request $request, MetaConversionsService $metaConversionsService)
     {
-
-
-        $this->saveLogFromRequest($request);
-
         $json = $request->json()->all();
-        
-        $data = "";
-        if (isset($json["leads"]))
-            $data = $json["leads"][0];
+        $data = isset($json["leads"]) ? $json["leads"][0] : [];
+        $rdLeadId = is_array($data) ? $this->extractRdLeadId($data) : null;
+
+        $requestLog = $this->saveLogFromRequest($request, $rdLeadId);
+
+        if ($this->shouldIgnoreDuplicateLead($rdLeadId, $requestLog)) {
+            $this->markRequestLogIgnored($requestLog, 'duplicate_rd_lead_recent');
+            return response()->json([
+                'ignored' => true,
+                'reason' => 'duplicate rd_lead_id within 5 minutes',
+            ]);
+        }
 
         $tags = "";
 
@@ -2807,6 +2874,7 @@ class APIController extends Controller
             if ($similar) {
                 // creo un nuevo registro
                 $model = $similar;
+                $request_model->user_id = $model->user_id;
 
                 if (isset($request_model->rd_public_url)) {
                     $model->rd_public_url = $request_model->rd_public_url;

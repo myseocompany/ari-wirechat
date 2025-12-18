@@ -9,5 +9,15 @@ class RequestLog extends Model
     use HasFactory;
 
     protected $table = 'request_logs';
-    protected $fillable = ['request', 'action', 'user_id', 'phone', 'facebook_id', 'email'];
+    protected $fillable = [
+        'request',
+        'action',
+        'user_id',
+        'phone',
+        'facebook_id',
+        'email',
+        'rd_lead_id',
+        'ignored',
+        'ignore_reason',
+    ];
 }
