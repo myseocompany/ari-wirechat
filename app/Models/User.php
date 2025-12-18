@@ -31,6 +31,7 @@ class User extends Authenticatable
         'password',
         'role_id',
         'channels_id',
+        'image_url',
     ];
 
     // Custom logic for allowing chat creation

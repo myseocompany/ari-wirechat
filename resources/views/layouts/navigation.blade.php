@@ -8,6 +8,25 @@
     }
     $pendingActions = $pendingQuery->count();
   }
+  $navUserAvatar = null;
+  $navUserInitial = null;
+  $menuItems = [];
+  $accountMenu = null;
+  if (Auth::check()) {
+    $navUserAvatar = Auth::user()->image_url;
+    if ($navUserAvatar && !preg_match('#^https?://#i', $navUserAvatar)) {
+      $navUserAvatar = asset(ltrim($navUserAvatar, '/'));
+    }
+    $navUserInitial = strtoupper(mb_substr(Auth::user()->name ?? '', 0, 1, 'UTF-8'));
+
+    foreach(App\Models\Menu::getUserMenu(Auth::user()) as $menuItem) {
+      if (strtolower(trim($menuItem->name)) === 'cuenta') {
+        $accountMenu = $menuItem;
+        continue;
+      }
+      $menuItems[] = $menuItem;
+    }
+  }
 @endphp
 
 <nav class="navbar navbar-expand-md navbar-light fixed-top bg-white container-fluid">
@@ -25,8 +44,11 @@
         <li class="nav-item"><a class="nav-link text-dark" href="{{ route('login') }}">Iniciar sesión</a></li>
         @else
 
-          @foreach(App\Models\Menu::getUserMenu(Auth::user()) as $item)
-              <li class="@if($item->hasChildren()) dropdown @else nav-item @endif">
+          @foreach($menuItems as $item)
+              @php
+                $liClasses = $item->hasChildren() ? 'dropdown' : 'nav-item';
+              @endphp
+              <li class="{{ $liClasses }}">
                   
 
 
@@ -41,16 +63,7 @@
                           </form>
                       @else
                       <a class="nav-link text-dark @if($item->hasChildren()) dropdown-toggle @endif" href="{{$item->url}}" @if($item->hasChildren()) data-toggle="dropdown" role="button" aria-expanded="false" @endif>
-                      
-                          @php
-                            $menuName = $item->name;
-
-                            if (Auth::check() && strtolower(trim($menuName)) === 'cuenta') {
-                              $menuName = Auth::user()->name;
-                            }
-                          @endphp
-                          {{$menuName}} @if($item->hasChildren()) @endif
-                          
+                          {{$item->name}}
                       </a>
                       @endif
                   @if($item->hasChildren())
@@ -120,6 +133,10 @@
 
          @if (!Auth::guest())
           <div class="d-flex align-items-center">
+            <form class="form-inline mt-2 mt-md-0 mr-3" action="/customers" method="GET">
+              <input class="form-control mr-sm-2" type="text" placeholder="Busca o escribe..." aria-label="Cliente" id="name_" name="search" @if (isset($request->search)) value="{{$request->search}}" @endif>
+              <button class="btn btn-primary my-2 my-sm-0" type="submit">Ir</button>
+            </form>
             @php
               $actionsLink = '/actions/?range_type=&filter=&from_date=&from_time=&to_date=&to_time=&pending=true&type_id=&user_id=';
               if (Auth::user()->role_id == 2) {
@@ -137,13 +154,109 @@
                 </span>
               @endif
             </a>
-            <form class="form-inline mt-2 mt-md-0" action="/customers" method="GET">
-              <input class="form-control mr-sm-2" type="text" placeholder="Busca o escribe..." aria-label="Cliente" id="name_" name="search" @if (isset($request->search)) value="{{$request->search}}" @endif>
-              <button class="btn btn-primary my-2 my-sm-0" type="submit">Ir</button>
-            </form>
+            @if($accountMenu)
+              <div class="dropdown d-flex align-items-center mr-3 nav-account-dropdown">
+                <a class="nav-link text-dark dropdown-toggle p-0" href="{{ $accountMenu->url }}" data-toggle="dropdown" role="button" aria-expanded="false">
+                  <span class="nav-user-display">
+                    @if($navUserAvatar)
+                      <span class="nav-user-avatar" style="background-image: url('{{ $navUserAvatar }}');"></span>
+                    @else
+                      <span class="nav-user-avatar nav-user-avatar--placeholder">{{ $navUserInitial }}</span>
+                    @endif
+                    <span>{{ Auth::user()->name }}</span>
+                  </span>
+                </a>
+                @if($accountMenu->hasChildren())
+                  <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                    <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
+                      {{ Auth::user()->name }}
+                    </li>
+                    <li class="dropdown-divider"></li>
+                    @if(Auth::user()->role_id == 2)
+                      <li class="nav-item dropdown">
+                        <a class="nav-link text-dark dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false">
+                          {{ Auth::user()->name }}
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                          <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
+                            {{ Auth::user()->name }}
+                          </li>
+                          <li class="dropdown-divider"></li>
+                          <li class="nav-item">
+                            <a class="nav-link text-dark" href="#"
+                                onclick="event.preventDefault();
+                                         document.getElementById('logout-form').submit();">
+                                Salir
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                {{ csrf_field() }}
+                            </form>
+                          </li>
+                        </ul>
+                      </li>
+                    @else
+                      @foreach($accountMenu->getChildren() as $subitem)
+                        <li class="nav-item">
+                          @if($subitem->url == "/logout")
+                              <a class="nav-link text-dark" href="#"
+                                  onclick="event.preventDefault();
+                                           document.getElementById('logout-form').submit();">
+                                  Salir
+                              </a>
+                              <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                  {{ csrf_field() }}
+                              </form>
+                          @else
+                              <a class="nav-link text-dark" href="{{$subitem->url}}">
+                                  {{$subitem->name}} 
+                              </a>
+                          @endif
+                        </li>
+                      @endforeach
+                    @endif
+                  </ul>
+                @endif
+              </div>
+            @endif
           </div>
         @endif
 
       </div>
   </nav>
   <br>
+
+<style>
+  .navbar-nav .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-user-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    background-color: #e2e8f0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #475569;
+  }
+  .nav-user-avatar--placeholder {
+    background-color: #c7d2fe;
+    color: #312e81;
+  }
+  .nav-account-dropdown .dropdown-toggle::after {
+    vertical-align: middle;
+    position: relative;
+    top: -12px;
+  }
+</style>

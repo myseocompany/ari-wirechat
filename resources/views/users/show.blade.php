@@ -2,6 +2,17 @@
 
 @section('content')
  <h1>{{$user->name}}</h1>
+ @php
+   $avatarUrl = $user->image_url;
+   if ($avatarUrl && !preg_match('#^https?://#i', $avatarUrl)) {
+     $avatarUrl = asset(ltrim($avatarUrl, '/'));
+   }
+ @endphp
+ @if ($avatarUrl)
+   <div class="mb-3">
+     <img src="{{ $avatarUrl }}" alt="Foto de {{ $user->name }}" class="rounded-circle" style="width: 96px; height: 96px; object-fit: cover;">
+   </div>
+ @endif
 
     <form method="POST" action="/users/{{$user->id}}/edit">
     {{ csrf_field() }}

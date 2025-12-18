@@ -2,7 +2,7 @@
 
 @section('content')
 <h1>Edit Users</h1>
-<form method="POST" action="/users/{{$user->id}}/update">
+<form method="POST" action="/users/{{$user->id}}/update" enctype="multipart/form-data">
 {{ csrf_field() }}
   
   <div class="form-group">
@@ -48,12 +48,23 @@
       @endforeach
     </select>
   </div>
-  <!--
   <div class="form-group">
-    <label for="image_url">Foto</label>    
-    <input type="file" id="image_url" name="image_url" placeholder="Foto">
+    <label for="profile_photo">Foto de perfil:</label>
+    @php
+      $currentAvatar = $user->image_url;
+      if ($currentAvatar && !preg_match('#^https?://#i', $currentAvatar)) {
+        $currentAvatar = asset(ltrim($currentAvatar, '/'));
+      }
+    @endphp
+    @if ($currentAvatar)
+      <div class="mb-2">
+        <img src="{{ $currentAvatar }}" alt="Foto de {{ $user->name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+      </div>
+    @endif
+    <input type="file" id="profile_photo" name="profile_photo" class="form-control-file" accept=".jpg,.jpeg,.png,.webp">
+    <small class="form-text text-muted">Sube una nueva imagen para actualizar el perfil.</small>
   </div>
-   -->
+
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 @endsection

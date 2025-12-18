@@ -5,68 +5,59 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
-use DB;
 use App\Models\UserStatus;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    // public function __construct()
-    // {
-    //     $this->middleware('auth');
-    // }
-
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        //
-        $users = User::with(['role', 'status'])->get();
+        $users = User::with(['role', 'status'])
+            ->orderBy('name')
+            ->get();
         $user_statuses = UserStatus::all();
-        
 
         return view('users.index', compact('users', 'user_statuses'));
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function create()
     {
         $roles = Role::all();
         $user_statuses = UserStatus::all();
+
         return view('users.create', compact('roles', 'user_statuses'));
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //
-        $model = new User;
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6'],
+            'status_id' => ['nullable', 'integer', 'exists:user_statuses,id'],
+            'role_id' => ['nullable', 'integer', 'exists:roles,id'],
+            'profile_photo' => ['nullable', 'image', 'max:4096'],
+        ]);
 
-        $model->id = $request->id;
-        $model->name = $request->name;
-        $model->email = $request->email;
-        $model->status_id = $request->status_id;
-        $model->role_id = $request->role_id;
-        $model->password = bcrypt($request->password);
+        $model = new User();
+        $model->name = $validated['name'];
+        $model->email = $validated['email'];
+        $model->status_id = $validated['status_id'] ?? null;
+        $model->role_id = $validated['role_id'] ?? null;
+        $model->password = bcrypt($validated['password']);
+        $model->image_url = $this->handleProfilePhotoUpload($request);
 
-        
         $model->save();
 
         return redirect('/users');
@@ -74,53 +65,51 @@ class UserController extends Controller
 
     /**
      * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
     public function show($id)
     {
-        //
         $user = User::find($id);
-        // $user_statuses = UserStatus::all();
+
         return view('users.show', compact('user'));
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        //
         $user = User::find($id);
         $user_statuses = UserStatus::all();
         $roles = Role::all();
+
         return view('users.edit', compact('user', 'user_statuses', 'roles'));
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
-        //
         $model = User::findOrFail($id);
 
-        $model->name = $request->name;
-        $model->email = $request->email;
-        $model->status_id = $request->status_id;
-        if ($request->filled('password')) {
-            $model->password = bcrypt($request->password);
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($model->id)],
+            'password' => ['nullable', 'string', 'min:6'],
+            'status_id' => ['nullable', 'integer', 'exists:user_statuses,id'],
+            'role_id' => ['nullable', 'integer', 'exists:roles,id'],
+            'profile_photo' => ['nullable', 'image', 'max:4096'],
+        ]);
+
+        $model->name = $validated['name'];
+        $model->email = $validated['email'];
+        $model->status_id = $validated['status_id'] ?? null;
+        if (! empty($validated['password'])) {
+            $model->password = bcrypt($validated['password']);
         }
-        $model->role_id = $request->role_id;
-        
+        $model->role_id = $validated['role_id'] ?? null;
+        $model->image_url = $this->handleProfilePhotoUpload($request, $model->image_url);
+
         $model->save();
 
         return redirect('/users');
@@ -128,12 +117,40 @@ class UserController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {
         //
+    }
+
+    protected function handleProfilePhotoUpload(Request $request, ?string $currentPath = null): ?string
+    {
+        if (! $request->hasFile('profile_photo')) {
+            return $currentPath;
+        }
+
+        if ($currentPath) {
+            $this->deleteStoredProfilePhoto($currentPath);
+        }
+
+        $path = $request->file('profile_photo')->store('public/users');
+
+        return Storage::url($path);
+    }
+
+    protected function deleteStoredProfilePhoto(?string $storedPath): void
+    {
+        if (! $storedPath) {
+            return;
+        }
+
+        $normalized = ltrim($storedPath, '/');
+
+        if (Str::startsWith($normalized, 'storage/')) {
+            $relative = 'public/' . Str::after($normalized, 'storage/');
+            Storage::delete($relative);
+        } elseif (Str::startsWith($normalized, 'public/')) {
+            Storage::delete($normalized);
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 @section('content')
 <h1>Create User</h1>
-<form method="POST" action="/users">
+<form method="POST" action="/users" enctype="multipart/form-data">
 {{ csrf_field() }}
   <div class="form-group">
     <label for="name">Nombre:</label>
@@ -35,6 +35,12 @@
         <option value="{{$item->id}}">{{$item->name}}</option>
       @endforeach
     </select>
+  </div>
+
+  <div class="form-group">
+    <label for="profile_photo">Foto de perfil:</label>
+    <input type="file" class="form-control-file" id="profile_photo" name="profile_photo" accept=".jpg,.jpeg,.png,.webp">
+    <small class="form-text text-muted">Formatos permitidos: JPG, PNG o WebP (máx. 4 MB).</small>
   </div>
   
   <button type="submit" class="btn btn-primary">Crear</button>
