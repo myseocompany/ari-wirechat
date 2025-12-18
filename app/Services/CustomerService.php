@@ -171,8 +171,8 @@ class CustomerService {
 
         // Ordenamiento personalizado
         $sort = $request->get('sort');
-        $allowedSorts = ['recent', 'last_action', 'advisor'];
-        $sortKey = in_array($sort, $allowedSorts, true) ? $sort : 'recent';
+        $allowedSorts = ['recent', 'last_action', 'advisor', 'status'];
+        $sortKey = in_array($sort, $allowedSorts, true) ? $sort : 'status';
 
         if ($sortKey === 'last_action') {
             $query->leftJoin(DB::raw('(SELECT customer_id, MAX(created_at) AS last_action_at FROM actions GROUP BY customer_id) AS last_actions'), 'last_actions.customer_id', '=', 'customers.id')
@@ -182,6 +182,9 @@ class CustomerService {
                 ->orderBy('advisor_sort.name', 'ASC');
         } elseif ($sortKey === 'recent') {
             $query->orderBy('customers.created_at', 'DESC');
+        } elseif ($sortKey === 'status') {
+            $query->orderByRaw('COALESCE(customer_statuses.weight, 9999) ASC')
+                ->orderBy('customers.created_at', 'DESC');
         }
 
         // Ejecutar y medir

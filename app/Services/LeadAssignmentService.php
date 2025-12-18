@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\LeadAssignmentLog;
 use App\Models\User;
 
 class LeadAssignmentService
@@ -41,6 +42,18 @@ class LeadAssignmentService
     }
 
     /**
+     * Returns an assignable user based on the configured mode.
+     */
+    public function getAssignableUserId(?string $mode = null): ?int
+    {
+        $mode = $mode ?: config('lead_assignment.mode', 'sequential');
+
+        return $mode === 'random'
+            ? $this->getRandomNextUserId()
+            : $this->getNextUserId();
+    }
+
+    /**
      * Selects an assignable user randomly but honoring the "assignable" weight.
      */
     public function getRandomNextUserId(): ?int
@@ -68,6 +81,23 @@ class LeadAssignmentService
         User::where('id', $selectedUserId)->update(['last_assigned' => 1]);
 
         return $selectedUserId;
+    }
+
+    /**
+     * Persists a log entry for an assignment event.
+     */
+    public function recordAssignment(?int $userId, ?int $customerId, string $context, array $meta = []): void
+    {
+        if (! $userId) {
+            return;
+        }
+
+        LeadAssignmentLog::create([
+            'user_id' => $userId,
+            'customer_id' => $customerId,
+            'context' => $context,
+            'meta' => $meta ?: null,
+        ]);
     }
 
     /**

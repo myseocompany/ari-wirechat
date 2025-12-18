@@ -85,8 +85,20 @@ class WAToolBoxController extends Controller{
         if (!$sender) {
             $sender = $api->saveAPICustomer($apiRequest);
             if (! $sender->user_id) {
-                $sender->user_id = $this->leadAssignmentService->getRandomNextUserId();
-                $sender->save();
+                $assignedUserId = $this->leadAssignmentService->getAssignableUserId();
+                if ($assignedUserId) {
+                    $sender->user_id = $assignedUserId;
+                    $sender->save();
+
+                    $this->leadAssignmentService->recordAssignment(
+                        $sender->user_id,
+                        $sender->id,
+                        'wa_toolbox',
+                        [
+                            'source_id' => $sender->source_id,
+                        ]
+                    );
+                }
             }
             
             $api->storeActionAPI($apiRequest, $sender->id);

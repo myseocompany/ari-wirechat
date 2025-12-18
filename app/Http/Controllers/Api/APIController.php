@@ -785,10 +785,16 @@ class APIController extends Controller
             $model->status_id = 1;
         }
 
-        if (isset($request->user_id)) {
-            $model->user_id = $request->user_id;
+        $assignmentStrategy = 'manual';
+        $assignedUserId = null;
+        $providedUserId = $request->user_id ?? null;
+
+        if (!empty($providedUserId)) {
+            $model->user_id = $providedUserId;
+            $assignedUserId = (int) $providedUserId;
         } else {
-            $assignedUserId = $this->leadAssignmentService->getRandomNextUserId();
+            $assignmentStrategy = 'auto';
+            $assignedUserId = $this->leadAssignmentService->getAssignableUserId();
             if ($assignedUserId) {
                 $model->user_id = $assignedUserId;
             }
@@ -843,6 +849,16 @@ class APIController extends Controller
 
 
         $model->save();
+
+        $this->leadAssignmentService->recordAssignment(
+            $model->user_id,
+            $model->id,
+            'save_api_customer',
+            [
+                'strategy' => $assignmentStrategy,
+                'source_id' => $model->source_id,
+            ]
+        );
         
         return $model;
     }
@@ -2932,7 +2948,7 @@ class APIController extends Controller
                 $this->updateCustomerHistory($opportunity, $model, $request_model);
             } else {
                 // Verifico si es proyecto
-                $request_model->user_id = $this->leadAssignmentService->getRandomNextUserId();
+                $request_model->user_id = $this->leadAssignmentService->getAssignableUserId();
                 /*
                 if(isset($request_model->maker) && ($request_model->maker == 0))
                     $request_model->user_id = null; #antes era 92 Estefanía
@@ -2945,6 +2961,16 @@ class APIController extends Controller
                 $request_model->save();
 
                 $model = $request_model;
+
+                $this->leadAssignmentService->recordAssignment(
+                    $model->user_id,
+                    $model->id,
+                    'update_from_rd',
+                    [
+                        'rd_lead_id' => $model->rd_lead_id ?? null,
+                        'source_id' => $model->source_id,
+                    ]
+                );
             }
         } else {
             $model = $equal;
