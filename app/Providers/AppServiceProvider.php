@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Listeners\UpdateLastLogin;
 use App\Listeners\WAToolboxListener;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
@@ -30,7 +32,9 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             \Namu\WireChat\Events\MessageCreated::class,
             WAToolboxListener::class,
-          );
+        );
+
+        Event::listen(Login::class, UpdateLastLogin::class);
         Paginator::useBootstrap();
     }
 }

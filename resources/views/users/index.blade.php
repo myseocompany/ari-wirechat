@@ -66,7 +66,7 @@
         <thead>
           <tr>
             <th>Usuario</th>
-            <th>Email</th>
+            <th>Último acceso</th>
             <th>Estado</th>
             <th>Rol</th>
             <th></th>
@@ -92,10 +92,20 @@
                   @endif
                   <div>
                     <strong><a href="/users/{{ $user->id }}">{{ $user->name }}</a></strong>
+                    <div class="users-email text-muted">{{ $user->email }}</div>
                   </div>
                 </div>
               </td>
-              <td class="text-muted">{{ $user->email }}</td>
+              @php
+                $lastLogin = $user->last_login ? \Carbon\Carbon::parse($user->last_login)->format('d M Y H:i') : null;
+              @endphp
+              <td class="text-muted">
+                @if($lastLogin)
+                  {{ $lastLogin }}
+                @else
+                  <span class="text-muted">Sin registro</span>
+                @endif
+              </td>
               <td>
                 @if(isset($user->status_id) && $user->status_id && !is_null($user->status))
                   <span class="badge {{ $isActive ? 'badge-soft-success' : 'badge-soft-warning' }}">{{ $user->status->name }}</span>
@@ -204,6 +214,9 @@
     display: flex;
     align-items: center;
     gap: 12px;
+  }
+  .users-email {
+    font-size: 0.85rem;
   }
   .users-avatar {
     width: 42px;

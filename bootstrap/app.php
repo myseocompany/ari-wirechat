@@ -19,6 +19,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/customers/update'
             
         ]);
+
+        $middleware->alias([
+            'active.user' => \App\Http\Middleware\EnsureUserIsActive::class,
+        ]);
+
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\EnsureUserIsActive::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
