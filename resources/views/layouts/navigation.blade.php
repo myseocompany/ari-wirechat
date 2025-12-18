@@ -68,37 +68,8 @@
                       @endif
                   @if($item->hasChildren())
                     <ul class="dropdown-menu" role="menu">
-                    @if(Auth::check())
-                      <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
-                        {{ Auth::user()->name }}
-                      </li>
-                      <li class="dropdown-divider"></li>
-                      @if(Auth::user()->role_id == 2)
-                        <li class="nav-item dropdown">
-                          <a class="nav-link text-dark dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false">
-                            {{ Auth::user()->name }}
-                          </a>
-                          <ul class="dropdown-menu" role="menu">
-                            <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
-                              {{ Auth::user()->name }}
-                            </li>
-                            <li class="dropdown-divider"></li>
-                            <li class="nav-item">
-                              <a class="nav-link text-dark" href="#"
-                                  onclick="event.preventDefault();
-                                           document.getElementById('logout-form').submit();">
-                                  Salir
-                              </a>
-                              <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                  {{ csrf_field() }}
-                              </form>
-                            </li>
-                          </ul>
-                        </li>
-                      @else
-                        @foreach($item->getChildren() as $subitem)
+                      @foreach($item->getChildren() as $subitem)
                         <li class="nav-item">
-
                           @if($subitem->url == "/logout")
                               <a class="nav-link text-dark" href="#"
                                   onclick="event.preventDefault();
@@ -116,10 +87,7 @@
                           </a>
                           @endif
                         </li>
-
-                        @endforeach
-                      @endif
-                    @endif
+                      @endforeach
                     </ul> 
                   @endif 
               </li>     
@@ -168,20 +136,12 @@
                 </a>
                 @if($accountMenu->hasChildren())
                   <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                    <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
-                      {{ Auth::user()->name }}
-                    </li>
-                    <li class="dropdown-divider"></li>
                     @if(Auth::user()->role_id == 2)
                       <li class="nav-item dropdown">
                         <a class="nav-link text-dark dropdown-toggle" href="#" data-toggle="dropdown" role="button" aria-expanded="false">
                           {{ Auth::user()->name }}
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                          <li class="nav-item px-3 py-1 text-muted" style="font-size: 0.9rem;">
-                            {{ Auth::user()->name }}
-                          </li>
-                          <li class="dropdown-divider"></li>
                           <li class="nav-item">
                             <a class="nav-link text-dark" href="#"
                                 onclick="event.preventDefault();
