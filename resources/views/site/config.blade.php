@@ -42,21 +42,7 @@
         <p>Define las fuentes activas para atribuir cada lead.</p>
         <a href="{{ url('/campaigns') }}" class="btn btn-light btn-sm">Ver campañas</a>
       </article>
-      <article class="config-card">
-        <h3>PQR</h3>
-        <p>Monitorea los casos críticos y asigna responsables.</p>
-        <a href="{{ url('/customers/phase/4') }}" class="btn btn-light btn-sm">Ir a PQR</a>
-      </article>
-      <article class="config-card">
-        <h3>Posventa</h3>
-        <p>Supervisa las etapas posteriores a la venta para cada cliente.</p>
-        <a href="{{ url('/customers/phase/2') }}" class="btn btn-light btn-sm">Ver posventa</a>
-      </article>
-      <article class="config-card">
-        <h3>Satisfacción</h3>
-        <p>Revisa los indicadores de satisfacción y feedback.</p>
-        <a href="{{ url('/satisfaction') }}" class="btn btn-light btn-sm">Abrir módulo</a>
-      </article>
+      
     </div>
   </section>
 
