@@ -134,7 +134,7 @@ class DashboardController extends Controller
 
         switch ($range) {
             case 'today':
-                $start = $now->copy()->startOfDay();
+                $start = $now->copy()->subDay()->setTime(17, 0, 0);
                 $end = $now->copy()->endOfDay();
                 break;
             case 'yesterday':
