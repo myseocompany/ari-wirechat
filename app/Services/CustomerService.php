@@ -249,8 +249,8 @@ class CustomerService {
     public function getDates($request)
     {
         if (empty($request->from_date) && empty($request->to_date) && empty($request->search)) {
-            $from = Carbon\Carbon::today()->subDays(89)->format('Y-m-d');
-            $to   = Carbon\Carbon::today()->endOfDay();
+            $from = Carbon\Carbon::today()->startOfDay()->format('Y-m-d H:i:s');
+            $to   = Carbon\Carbon::today()->endOfDay()->format('Y-m-d H:i:s');
             return [$from, $to];
         }
 
