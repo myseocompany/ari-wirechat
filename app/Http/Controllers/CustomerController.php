@@ -84,6 +84,10 @@ class CustomerController extends Controller
     {
         $menu = $this->customerService->getUserMenu(Auth::user());
 
+        if (! $request->has('user_id') && ! $request->filled('search')) {
+            $request->merge(['user_id' => Auth::id()]);
+        }
+
         $statuses = CustomerStatus::where('status_id', 1)
             ->orderBy('weight', 'asc')
             ->get();
