@@ -769,6 +769,22 @@ body#sidebody nav {
   pointer-events: none;
 }
 
+body.layout-full > .row {
+  min-height: auto;
+}
+body.layout-full nav {
+  max-height: none;
+  overflow: visible;
+  position: static;
+}
+body.layout-full #sidecontent {
+  overflow-y: visible;
+  padding-right: 0;
+}
+body.layout-full #sidecontent-footer {
+  position: static;
+}
+
 /* ===== Filter overlay ===== */
 .filter-overlay {
   position: fixed;
@@ -787,7 +803,7 @@ body#sidebody nav {
 .filter-overlay__panel {
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
   width: min(92vw, 420px);
   height: 100%;
   background: #fff;

@@ -1,4 +1,4 @@
-@extends('layouts.agile')
+@extends('layout')
 
 
 
@@ -9,49 +9,6 @@
 @endif
 
 
-
-@section('list')
-<div class="col-12">
-  Registro <strong>{{ $model->firstItem() }}</strong> a 
-  <strong>{{ $model->lastItem() }}</strong> de 
-  <strong>{{ $model->total() }}</strong>
-</div>
- 
-
- <script type="text/javascript">
-   var ratings = [];
- </script>
- <?php $cont=0; ?>
-
-  @foreach($model as $item)
-    @include('customers.index_partials.card', ['item' => $item])            
-                  
-  @endforeach
-
-  <style>
-    ul.pagination {
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 15px;
-    padding: 10px;
-}
-
-  </style>
-
-
-@endsection
-
-@section('list_footer')
-<div class="row">
-  <div class="col-12 d-flex justify-content-center">
-      {!! $model->appends(request()->input())->links() !!}
-  </div>
-</div>
-@endsection
-
-@section('filter')
- @include('customers.index_partials.side_filter')
-@endsection
 
 @include('customers.partials.notes_script')
 
@@ -73,46 +30,87 @@
 
 
 
-{{-- Alertas --}}
+@section('content')
+  {{-- Alertas --}}
   @if (session('status'))
-          <div class="alert alert-primary alert-dismissible" role="alert">
-          <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
-            {!! html_entity_decode(session('status')) !!}
-        </div>
+    <div class="alert alert-primary alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+      {!! html_entity_decode(session('status')) !!}
+    </div>
   @endif
-    @if (session('statusone'))
-          <div class="alert alert-success alert-dismissible" role="alert">
-          <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
-            {!! html_entity_decode(session('statusone')) !!}
-        </div>
+  @if (session('statusone'))
+    <div class="alert alert-success alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+      {!! html_entity_decode(session('statusone')) !!}
+    </div>
   @endif
   @if (session('statustwo'))
-          <div class="alert alert-danger alert-dismissible" role="alert">
-          <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
-            {!! html_entity_decode(session('statustwo')) !!}
-        </div>
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+      {!! html_entity_decode(session('statustwo')) !!}
+    </div>
   @endif
-@section('content')
+
+  <div class="d-flex flex-wrap align-items-center justify-content-between col-12">
+    <div>
+      Registro <strong>{{ $model->firstItem() }}</strong> a 
+      <strong>{{ $model->lastItem() }}</strong> de 
+      <strong>{{ $model->total() }}</strong>
+    </div>
+    <button class="btn btn-primary btn-sm mt-2 mt-sm-0" type="button" data-filter-open>
+      Filtros
+    </button>
+  </div>
+
   @include('customers.index_partials.groupbar', ['customersGroup' => $customersGroup])
 
+  <div>@if(isset($sum_g)) TOTAL {{$sum_g}} @endif </div>
 
-<div>@if(isset($sum_g)) TOTAL {{$sum_g}} @endif </div>
+  <script type="text/javascript">
+    var ratings = [];
+  </script>
+  <?php $cont=0; ?>
 
-<style>
-@media (max-width: 576px) {
-    .customer_name {
+  @foreach($model as $item)
+    @include('customers.index_partials.card', ['item' => $item])            
+  @endforeach
+
+  @if($model->count() === 0)
+    <div class="alert alert-info mt-3">
+      No se encontraron prospectos con esos filtros.
+    </div>
+  @endif
+
+  <style>
+    ul.pagination {
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 15px;
+      padding: 10px;
+    }
+  </style>
+
+  <style>
+    @media (max-width: 576px) {
+      .customer_name {
         display: flex;
         flex-direction: column;
-    }
-    .customer_description {
+      }
+      .customer_description {
         display: flex;
         flex-direction: column;
+      }
     }
-}
+  </style>
+  <div class="row">
+    <div class="col-12 d-flex justify-content-center">
+      {!! $model->appends(request()->input())->links() !!}
+    </div>
+  </div>
+@endsection
 
-</style>
-
-  @include('customers.index_partials.side_show')
+@section('filter')
+  @include('customers.index_partials.side_filter')
 @endsection
 
 @push('scripts')
@@ -128,6 +126,10 @@
     const url = $(this).data('url');
     if (url) {
       const $side = $('#side_content');
+      if (! $side.length) {
+        window.location.href = url;
+        return;
+      }
       $side.addClass('loading');
       $.get(url, function(resp) {
         const $html = $('<div>').html(resp);

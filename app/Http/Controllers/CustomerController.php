@@ -85,7 +85,9 @@ class CustomerController extends Controller
     {
         $menu = $this->customerService->getUserMenu(Auth::user());
 
-        if (! $request->has('user_id') && ! $request->filled('search')) {
+        $defaultUserFilter = ! $request->has('user_id') && ! $request->filled('search');
+
+        if ($defaultUserFilter) {
             $request->merge(['user_id' => Auth::id()]);
         }
 
@@ -97,6 +99,16 @@ class CustomerController extends Controller
 
         $model = $this->customerService->filterCustomers($request, $statuses, null, false, 10);
         $customersGroup = $this->customerService->filterCustomers($request, $statuses, null, true);
+
+        $usingDefaultDateRange = ! $request->filled('from_date')
+            && ! $request->filled('to_date')
+            && ! $request->filled('search')
+            && ! $request->boolean('no_date');
+
+        if ($defaultUserFilter && $usingDefaultDateRange && method_exists($model, 'total') && $model->total() === 0) {
+            $model = $this->customerService->filterCustomers($request, $statuses, null, false, 10, false);
+            $customersGroup = $this->customerService->filterCustomers($request, $statuses, null, true, 0, false);
+        }
 
         if (! empty($request->search) && method_exists($model, 'total') && $model->total() === 1) {
             $onlyCustomer = $model->first();

@@ -59,6 +59,21 @@
 
   </div> <!-- /container -->
 
+  @hasSection('filter')
+    <div id="filter_overlay" class="filter-overlay" aria-hidden="true">
+      <div class="filter-overlay__backdrop" data-filter-close></div>
+      <div class="filter-overlay__panel" role="dialog" aria-modal="true" aria-labelledby="filter_overlay_title">
+        <div class="filter-overlay__header">
+          <h2 id="filter_overlay_title">Filtros</h2>
+          <button class="filter-overlay__close" type="button" data-filter-close aria-label="Cerrar filtros">&times;</button>
+        </div>
+        <div class="filter-overlay__body">
+          @yield('filter')
+        </div>
+      </div>
+    </div>
+  @endif
+
 <script type="text/javascript">
     $(document).ready(function(){
       $('.listPhone').hide()
@@ -114,6 +129,37 @@ $(document).ready(function(){
           }, 4000); // desaparece después de 4 segundos
         });
       </script>
+      @hasSection('filter')
+        <script>
+          (function () {
+            const overlay = document.getElementById('filter_overlay');
+            const openButtons = Array.from(document.querySelectorAll('[data-filter-open]'));
+            if (!overlay || openButtons.length === 0) {
+              return;
+            }
+            const closeButtons = overlay.querySelectorAll('[data-filter-close]');
+            const openOverlay = function () {
+              overlay.setAttribute('aria-hidden', 'false');
+              document.body.classList.add('filter-overlay-open');
+            };
+            const closeOverlay = function () {
+              overlay.setAttribute('aria-hidden', 'true');
+              document.body.classList.remove('filter-overlay-open');
+            };
+            openButtons.forEach(function (button) {
+              button.addEventListener('click', openOverlay);
+            });
+            closeButtons.forEach(function (button) {
+              button.addEventListener('click', closeOverlay);
+            });
+            document.addEventListener('keydown', function (event) {
+              if (event.key === 'Escape') {
+                closeOverlay();
+              }
+            });
+          })();
+        </script>
+      @endif
       @stack('scripts')
     </body>
     </html>

@@ -24,50 +24,89 @@
 
 
 </head>
-<body id="sidebody">
+<body id="sidebody" class="@hasSection('full_width')layout-full@endhasSection">
   
-<div class="row">
-  <nav class="col-sm-12 col-md-4 " >
-    <div id="sidenav" class="d-flex flex-column h-100">
-      <div id="brand">
-        <a class="navbar-brand" href="/customers/"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
+@hasSection('full_width')
+  <div class="row">
+    <nav class="col-12">
+      <div id="sidenav" class="d-flex flex-column h-100">
+        <div id="brand">
+          <a class="navbar-brand" href="/customers/"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
 
-        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="fas fa-bars"></span>
-      
-      </button>
-      <div class="navbar-collapse collapse" id="navbarsExampleDefault" style="">
-        @include('customers.partials.side_nav')
-      </div>
-
+          <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="fas fa-bars"></span>
         
-      </div>
-      <div>
-        <h1>@yield('title')</h1>
-        @hasSection('filter')
-          <div class="px-2 mb-2">
-            <button id="filter_overlay_toggle" class="btn btn-outline-primary btn-sm" type="button">
+        </button>
+        <div class="navbar-collapse collapse" id="navbarsExampleDefault" style="">
+          @include('customers.partials.side_nav')
+        </div>
+
+          
+        </div>
+        <div>
+          <h1>@yield('title')</h1>
+          @hasSection('filter')
+            <div class="px-2 mb-2">
+            <button id="filter_overlay_toggle" class="btn btn-outline-primary btn-sm" type="button" data-filter-open>
               Filtros
             </button>
-          </div>
-        @endif
+            </div>
+          @endif
+        </div>
+        <div id="sidecontent" class="flex-fill">
+          @yield('list')
+        </div>
+        <div id="sidecontent-footer" class="flex-shrink-0">
+          @yield('list_footer')
+        </div>
       </div>
-      <div id="sidecontent" class="flex-fill">
-        @yield('list')
+    @include('layouts.left_navigation')
+    </nav>
+  </div>
+@else
+  <div class="row">
+    <nav class="col-sm-12 col-md-4 " >
+      <div id="sidenav" class="d-flex flex-column h-100">
+        <div id="brand">
+          <a class="navbar-brand" href="/customers/"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
+
+          <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="fas fa-bars"></span>
+        
+        </button>
+        <div class="navbar-collapse collapse" id="navbarsExampleDefault" style="">
+          @include('customers.partials.side_nav')
+        </div>
+
+          
+        </div>
+        <div>
+          <h1>@yield('title')</h1>
+          @hasSection('filter')
+            <div class="px-2 mb-2">
+              <button id="filter_overlay_toggle" class="btn btn-outline-primary btn-sm" type="button">
+                Filtros
+              </button>
+            </div>
+          @endif
+        </div>
+        <div id="sidecontent" class="flex-fill">
+          @yield('list')
+        </div>
+        <div id="sidecontent-footer" class="flex-shrink-0">
+          @yield('list_footer')
+        </div>
       </div>
-      <div id="sidecontent-footer" class="flex-shrink-0">
-        @yield('list_footer')
-      </div>
-    </div>
-  @include('layouts.left_navigation')
-  </nav>
-  
-  <section id="side_content" class="col-sm-12  col-md-8">
-    <div class="container">
-      @yield('content')
-    </div> 
-  </section>
-</div>
+    @include('layouts.left_navigation')
+    </nav>
+    
+    <section id="side_content" class="col-sm-12  col-md-8">
+      <div class="container">
+        @yield('content')
+      </div> 
+    </section>
+  </div>
+@endif
 
 @hasSection('filter')
   <div id="filter_overlay" class="filter-overlay" aria-hidden="true">
@@ -114,7 +153,11 @@
     (function () {
       const overlay = document.getElementById('filter_overlay');
       const openButton = document.getElementById('filter_overlay_toggle');
-      if (!overlay || !openButton) {
+      const openButtons = Array.from(document.querySelectorAll('[data-filter-open]'));
+      if (openButton && !openButtons.includes(openButton)) {
+        openButtons.push(openButton);
+      }
+      if (!overlay || openButtons.length === 0) {
         return;
       }
       const closeButtons = overlay.querySelectorAll('[data-filter-close]');
@@ -126,7 +169,9 @@
         overlay.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('filter-overlay-open');
       };
-      openButton.addEventListener('click', openOverlay);
+      openButtons.forEach(function (button) {
+        button.addEventListener('click', openOverlay);
+      });
       closeButtons.forEach(function (button) {
         button.addEventListener('click', closeOverlay);
       });
