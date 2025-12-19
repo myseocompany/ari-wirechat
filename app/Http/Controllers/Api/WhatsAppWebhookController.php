@@ -9,6 +9,7 @@ use App\Services\WhatsAppWebhookForwarder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class WhatsAppWebhookController extends Controller
 {
@@ -23,6 +24,7 @@ class WhatsAppWebhookController extends Controller
             'token' => $token,
             'expected_token' => config('whatsapp.verify_token'),
             'challenge' => $challenge,
+            'query' => $request->query(),
         ]);
 
         if ($mode === 'subscribe' && $token === config('whatsapp.verify_token')) {
@@ -39,7 +41,7 @@ class WhatsAppWebhookController extends Controller
     ): Response {
         Log::info('WhatsApp webhook received', [
             'has_entry' => $request->has('entry'),
-            'payload' => $request->all(),
+            'raw' => Str::limit($request->getContent(), 5000),
         ]);
 
         $service->handle($request->all());

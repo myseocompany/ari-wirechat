@@ -36,14 +36,6 @@ class WhatsAppInboundMessageService
     private function storeMessage(array $message): bool
     {
         return DB::transaction(function () use ($message): bool {
-            $exists = WhatsAppMessageMap::where('external_message_id', $message['external_message_id'])
-                ->lockForUpdate()
-                ->exists();
-
-            if ($exists) {
-                return false;
-            }
-
             $customer = Customer::findByPhoneInternational($message['wa_id']);
             if (! $customer) {
                 $customer = Customer::create([
@@ -75,17 +67,25 @@ class WhatsAppInboundMessageService
                 'updated_at' => $timestamp,
             ]);
 
-            $conversation->forceFill(['updated_at' => $timestamp])->save();
-
-            WhatsAppMessageMap::create([
+            $inserted = WhatsAppMessageMap::query()->insertOrIgnore([
                 'external_message_id' => $message['external_message_id'],
                 'wire_message_id' => $wireMessage->id,
                 'wa_id' => $message['wa_id'],
-                'raw_payload' => $message['raw_payload'],
+                'raw_payload' => json_encode($message['raw_payload'], JSON_UNESCAPED_UNICODE),
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
+            if ($inserted === 0) {
+                $wireMessage->delete();
+
+                return false;
+            }
+
+            $conversation->forceFill(['updated_at' => $timestamp])->save();
+
             return true;
-        });
+        }, 3);
     }
 
     private function resolveSystemUser(): ?User
