@@ -101,9 +101,9 @@ $hasAny = !empty($q);
   @endif
 
   {{-- Rango de fechas --}}
-  @if($hasDateInputs || $showDefaultDateRange || $skipDefaultDateRange)
+  @if($hasDateInputs || $showDefaultDateRange || ($skipDefaultDateRange ?? false))
     <span class="badge badge-pill badge-light border text-danger ml-2">
-      @if($skipDefaultDateRange)
+      @if($skipDefaultDateRange ?? false)
         Rango: Todos
         <a class="ml-1 text-danger"
           href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['no_date'])) }}">×</a>

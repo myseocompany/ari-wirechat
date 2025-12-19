@@ -48,6 +48,7 @@ class CustomerService
             $forceOwnCustomers,
             $authUser,
             $applyDefaultDateRange,
+            $skipDefaultDateRange,
             $onlyWithTags,
             $filterTagIds,
             $filteringUnassignedStatus,
