@@ -727,8 +727,8 @@ class APIController extends Controller
         if (isset($request->email)) {
             $model->email = $request->email;
         }
-        if (isset($request->lead_id)) {
-            $model->lead_id = $request->lead_id;
+        if (isset($request->google_lead_id)) {
+            $model->google_lead_id = $request->google_lead_id;
         }
         if (isset($request->country)) {
             $model->country = $request->country;

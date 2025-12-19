@@ -17,7 +17,7 @@ class GoogleAdsLeadMapper
         $columns = $this->extractColumns($payload['user_column_data'] ?? []);
 
         $mapped = [
-            'lead_id' => $this->stringOrNull($payload['lead_id'] ?? null),
+            'google_lead_id' => $this->stringOrNull($payload['lead_id'] ?? null),
             'name' => $columns['standard']['FULL_NAME'] ?? null,
             'phone' => $columns['standard']['PHONE_NUMBER'] ?? null,
             'email' => $columns['standard']['EMAIL'] ?? null,

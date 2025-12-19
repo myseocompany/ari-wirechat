@@ -59,7 +59,7 @@ it('maps google ads leads into customer fields', function () {
     expect($mapped['campaign_name'])->toBe('15923377400');
     expect($mapped['adset_name'])->toBe('20000000000');
     expect($mapped['ad_name'])->toBe('30000000000');
-    expect($mapped['lead_id'])->toBe('TeSter-123-ABCDEFGHIJKLMNOPQRSTUVWXYZ-abcdefghijklmnopqrstuvwxyz-0123456789-AaBb');
+    expect($mapped['google_lead_id'])->toBe('TeSter-123-ABCDEFGHIJKLMNOPQRSTUVWXYZ-abcdefghijklmnopqrstuvwxyz-0123456789-AaBb');
     expect($mapped['notes'])->toContain('Google Ads');
     expect($mapped['notes'])->toContain('lead_id: TeSter-123-ABCDEFGHIJKLMNOPQRSTUVWXYZ-abcdefghijklmnopqrstuvwxyz-0123456789-AaBb');
     expect($mapped['notes'])->toContain('Company Size: 11-50');
