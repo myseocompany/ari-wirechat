@@ -182,7 +182,15 @@
 
 
             <div><span class="lavel"><strong>Email:</strong></span> {{$model->email}}</div>
+            @if(!empty($model->country))
             <div><span class="lavel"><strong>País:</strong></span> {{$model->country}}</div>
+            @endif
+            @if(!empty($model->department))
+            <div><span class="lavel"><strong>Departamento:</strong></span> {{$model->department}}</div>
+            @endif
+            @if(!empty($model->city))
+            <div><span class="lavel"><strong>Ciudad:</strong></span> {{$model->city}}</div>
+            @endif
             <div><span class="lavel"><strong>Estado:</strong></span> @if(isset($model->status)&& !is_null($model->status)&&$model->status!='')
               <span class="badge" style="background-color: @if(isset($model->status) && ($model->status != '')) {{$model->status->color}};@else gray @endif">{{$model->status->name}}</span> @endif
             </div>
@@ -355,8 +363,6 @@
             <p class="card text">
             <div><span class="lavel"><strong>Documento:</strong></span> {{$model->document}}</div>
             <div><span class="lavel"><strong>Dirección:</strong></span> {{$model->address}}</div>
-            <div><span class="lavel"><strong>Departamento:</strong></span> {{$model->department}}</div>
-            <div><span class="lavel"><strong>Ciudad:</strong></span> {{$model->city}}</div>
             <div><span class="lavel"><strong>Usuario actualizador:</strong></span>@if(isset($model->updated_user)){{$model->updated_user->name}}@endif
             </div>
             <div><span class="lavel"><strong>Tamaño de empandas:</strong></span> {{$model->empanadas_size}}</div>

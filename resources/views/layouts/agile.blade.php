@@ -44,9 +44,13 @@
       </div>
       <div>
         <h1>@yield('title')</h1>
-      </div>
-      <div id="sidefilter" class="flex-shrink-0">
-        @yield('filter')
+        @hasSection('filter')
+          <div class="px-2 mb-2">
+            <button id="filter_overlay_toggle" class="btn btn-outline-primary btn-sm" type="button">
+              Filtros
+            </button>
+          </div>
+        @endif
       </div>
       <div id="sidecontent" class="flex-fill">
         @yield('list')
@@ -65,6 +69,20 @@
   </section>
 </div>
 
+@hasSection('filter')
+  <div id="filter_overlay" class="filter-overlay" aria-hidden="true">
+    <div class="filter-overlay__backdrop" data-filter-close></div>
+    <div class="filter-overlay__panel" role="dialog" aria-modal="true" aria-labelledby="filter_overlay_title">
+      <div class="filter-overlay__header">
+        <h2 id="filter_overlay_title">Filtros</h2>
+        <button class="filter-overlay__close" type="button" data-filter-close aria-label="Cerrar filtros">&times;</button>
+      </div>
+      <div class="filter-overlay__body">
+        @yield('filter')
+      </div>
+    </div>
+  </div>
+@endif
 
 
 <!-- jQuery moderno (debe ir primero) -->
@@ -91,5 +109,34 @@
       <script src="/js/scripts.js?id=<?php echo rand(1,10000) ?>"></script> 
 @yield('footer_scripts')
 @stack('scripts')
+@hasSection('filter')
+  <script>
+    (function () {
+      const overlay = document.getElementById('filter_overlay');
+      const openButton = document.getElementById('filter_overlay_toggle');
+      if (!overlay || !openButton) {
+        return;
+      }
+      const closeButtons = overlay.querySelectorAll('[data-filter-close]');
+      const openOverlay = function () {
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('filter-overlay-open');
+      };
+      const closeOverlay = function () {
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('filter-overlay-open');
+      };
+      openButton.addEventListener('click', openOverlay);
+      closeButtons.forEach(function (button) {
+        button.addEventListener('click', closeOverlay);
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          closeOverlay();
+        }
+      });
+    })();
+  </script>
+@endif
     </body>
     </html>
