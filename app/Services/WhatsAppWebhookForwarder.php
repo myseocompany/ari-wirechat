@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class WhatsAppWebhookForwarder
 {
-    public function forward(array $payload): void
+    public function forward(string $rawPayload, ?string $signature): void
     {
         $url = config('whatsapp.sellerchat_webhook_url');
 
@@ -17,7 +17,14 @@ class WhatsAppWebhookForwarder
         }
 
         try {
-            $response = Http::timeout(3)->post($url, $payload);
+            $headers = array_filter([
+                'X-Hub-Signature-256' => $signature,
+            ]);
+
+            $response = Http::withHeaders($headers)
+                ->timeout(3)
+                ->withBody($rawPayload, 'application/json')
+                ->post($url);
 
             if (! $response->successful()) {
                 Log::warning('SellerChat webhook forward failed', [

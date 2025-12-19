@@ -45,7 +45,10 @@ class WhatsAppWebhookController extends Controller
         ]);
 
         $service->handle($request->all());
-        $forwarder->forward($request->all());
+        $forwarder->forward(
+            $request->getContent(),
+            $request->header('X-Hub-Signature-256')
+        );
 
         return response('OK', 200);
     }
