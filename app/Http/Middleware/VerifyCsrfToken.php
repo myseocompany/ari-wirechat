@@ -23,10 +23,11 @@ class VerifyCsrfToken extends Middleware
         'api/customers/save-calculate',
         'api/customers/rd_station',
         'api/customers/saveCustomer',
+        'webhooks/whatsapp',
         'campaigns',
         'campaigns/message/*/update',
         'campaigns/message/*/delete',
         'customers/ajax/update_user',
-        'metadata/*/create/poe/*'
+        'metadata/*/create/poe/*',
     ];
 }

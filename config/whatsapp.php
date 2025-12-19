@@ -1,12 +1,8 @@
 <?php
 
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | WhatsApp Default Channel
-    |--------------------------------------------------------------------------
-    | Define qué proveedor usar por defecto para los envíos salientes.
-    | Opciones soportadas: "watoolbox", "graph".
-    */
-    'default_channel' => env('WHATSAPP_CHANNEL', 'watoolbox'),
+    'verify_token' => env('WHATSAPP_VERIFY_TOKEN'),
+    'app_secret' => env('WHATSAPP_APP_SECRET'),
+    'system_user_id' => env('WHATSAPP_SYSTEM_USER_ID'),
+    'sellerchat_webhook_url' => env('WHATSAPP_SELLERCHAT_WEBHOOK_URL'),
 ];

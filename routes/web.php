@@ -1,56 +1,53 @@
 <?php
-use App\Http\Controllers\RDTestController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\OptimizerController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SiteController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\CustomerStatusController;
+
 use App\Http\Controllers\ActionController;
-use App\Http\Controllers\CustomerFileController;
-use App\Http\Controllers\Api\APIController;
-use App\Http\Controllers\ReferencesController;
-//use App\Http\Controllers\WompiController;
-use App\Http\Controllers\MailController;
-use App\Http\Controllers\EmailController;
-use App\Http\Controllers\JobController;
 use App\Http\Controllers\ActionTypeController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ImportController;
-use App\Http\Controllers\EmmailController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OrderTransactionController;
-use App\Http\Controllers\MetaDataController;
+use App\Http\Controllers\Admin\LeadDistributionController;
+use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\AudienceController;
 use App\Http\Controllers\CampaignController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\WhatsAppAPIController;
-use App\Http\Controllers\WhatsAppBroadcastController;
-use App\Http\Controllers\TagController;
-use App\Http\Controllers\MenuController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerFileController;
+use App\Http\Controllers\CustomerStatusController;
 use App\Http\Controllers\CustomerTagController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\Admin\LeadDistributionController;
+use App\Http\Controllers\EmailController;
+// use App\Http\Controllers\WompiController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImportController;
+use App\Http\Controllers\JobController;
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\Madrid2025Controller;
+use App\Http\Controllers\MailController;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MetaDataController;
+use App\Http\Controllers\OptimizerController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderTransactionController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RDTestController;
+use App\Http\Controllers\ReferencesController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SiteController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\WhatsAppAPIController;
+use App\Http\Controllers\WhatsAppBroadcastController;
+use App\Http\Controllers\WhatsAppWebhookController;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Resend\Laravel\Facades\Resend;
-
-use App\Http\Controllers\LandingController;
-
-
-
-use App\Http\Controllers\Madrid2025Controller;
-
 
 Route::get('/', function () {
     return view('home');
 });
 
+Route::get('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'verify']);
+Route::post('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'receive']);
 
 Route::middleware('auth')->get('/faq', [HomeController::class, 'indexFaq'])->name('faq');
 
@@ -122,7 +119,7 @@ Route::middleware('auth')->prefix('customers')->group(function () {
 // Customer Routes
 Route::middleware('auth')->prefix('customers')->group(function () {
     Route::get('/', [CustomerController::class, 'index'])->name('customers.index');
-    
+
     Route::get('/create', [CustomerController::class, 'create']);
     Route::post('/', [CustomerController::class, 'store']);
     Route::post('/{customer}/tags', [CustomerTagController::class, 'update'])->name('customers.tags.update');
@@ -166,7 +163,6 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     Route::get('/{customer}/actions/createMail/{email}', [ActionController::class, 'trackEmail']);
     Route::get('/{customer}/actions/trackEmail/{email}', [ActionController::class, 'trackEmail']);
 });
-
 
 // Optimizer Routes
 Route::middleware('auth')
@@ -253,9 +249,6 @@ Route::middleware('auth')->prefix('customer_statuses')->group(function () {
     Route::get('/{customer_status}/destroy', [CustomerStatusController::class, 'destroy']);
 });
 
-
-
-
 Route::middleware('auth')
     ->prefix('customer_files')
     ->name('customer_files.')
@@ -264,7 +257,7 @@ Route::middleware('auth')
         Route::get('/', function () {
             return redirect()->route('reports.missing_customer_files');
         })->name('index');
-        
+
         // Crear (subir uno o varios)
         Route::post('/', [CustomerFileController::class, 'store'])
             ->name('store');
@@ -277,17 +270,17 @@ Route::middleware('auth')
         Route::delete('{file}', [CustomerFileController::class, 'destroy'])
             ->name('destroy');
 
-            /*
+        /*
         // Compatibilidad con enlaces antiguos tipo GET
         Route::get('{file}/delete', [CustomerFileController::class, 'destroy'])
-            ->name('delete.legacy');
+        ->name('delete.legacy');
     */
     });
 
 // API Routes
 Route::middleware('auth')->prefix('api')->group(function () {
     Route::post('/customers/saveCustomer', [APIController::class, 'saveApiWatoolbox']);
-    
+
     Route::get('/customers/saveCheckout', [APIController::class, 'saveApiCheckout']);
     Route::get('/products/{id}/get', [APIController::class, 'getProduct']);
     Route::get('/products/get', [APIController::class, 'getProducts']);
@@ -318,7 +311,7 @@ Route::middleware('auth')->prefix('references')->group(function () {
 });
 
 // Wompi Routes
-//Route::get('/wompi_link/{reference}', [WompiController::class, 'getLink']);
+// Route::get('/wompi_link/{reference}', [WompiController::class, 'getLink']);
 
 // Mail Routes
 Route::get('/testMail', [SiteController::class, 'testMail']);
@@ -396,10 +389,9 @@ Route::middleware('auth')->prefix('orders')->group(function () {
     Route::post('/', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/', [OrderController::class, 'index']);
     Route::get('/create/{cid}', [OrderController::class, 'create'])->name('orders.create');
-    
-    
-    //Route::get('/{cid}/quotes/create', [OrderController::class, 'create'])->name('orders.create');
-    //Route::get('/create/sid/{sid}', [OrderController::class, 'create'])->name('orders.create');
+
+    // Route::get('/{cid}/quotes/create', [OrderController::class, 'create'])->name('orders.create');
+    // Route::get('/create/sid/{sid}', [OrderController::class, 'create'])->name('orders.create');
     Route::get('/{oid}/add/product', [OrderController::class, 'addProducts']);
     Route::get('/sid/{sid}', [OrderController::class, 'index']);
     Route::post('/search_customer', [OrderController::class, 'searchCustomer']);
@@ -412,7 +404,7 @@ Route::middleware('auth')->prefix('orders')->group(function () {
     Route::get('/{oid}/proforma_co', [OrderController::class, 'showProformaCO'])->name('orders.showProformaCO');
     Route::get('/sid/{sid}/report', [OrderController::class, 'indexReport']);
     Route::get('/{id}/show', [OrderController::class, 'show']);
-    
+
     Route::get('/{id}/quote', [OrderController::class, 'quote']);
     Route::get('/{id}/edit', [OrderController::class, 'edit']);
     Route::get('/{id}/destroy', [OrderController::class, 'destroy']);
@@ -475,7 +467,6 @@ Route::middleware('auth')->prefix('metadata')->group(function () {
 Route::get('metadata/{id}/create/poe/{cid}', [MetaDataController::class, 'createpoe'])->withoutMiddleware(['auth']);
 Route::post('metadata/{id}/store/poe', [MetaDataController::class, 'storepoe'])->withoutMiddleware(['auth']);
 
-
 // Audience Routes
 Route::middleware('auth')->prefix('audiences')->group(function () {
     Route::get('/', [AudienceController::class, 'index']);
@@ -515,39 +506,35 @@ Route::get('/auth/callback', [APIController::class, 'callBack']);
 // Reports
 Route::get('/reports/fm', [ReportController::class, 'RFM']);
 Route::get('/customer-files/{file}/open', [CustomerFileController::class, 'open'])
-     ->name('customer_files.open'); 
-
+    ->name('customer_files.open');
 
 Route::get('{file}/open', [CustomerFileController::class, 'open'])->name('open');
 
-
-
-
-Route::get('/watoolbox/test', function(){
+Route::get('/watoolbox/test', function () {
 
     return view('test');
 });
 
-
-Route::get('/reset_password', function(){
+Route::get('/reset_password', function () {
     // Generar un hash de prueba
     $hash = Hash::make('myseo2025');
-    echo $hash."<br>";
+    echo $hash.'<br>';
 
-    $contraseñaPlana = "myseo2025"; // La contraseña a verificar
+    $contraseñaPlana = 'myseo2025'; // La contraseña a verificar
     $usuario = User::find(8);
 
-    if (!$usuario) {
-        echo "Usuario con ID 8 no encontrado.";
+    if (! $usuario) {
+        echo 'Usuario con ID 8 no encontrado.';
+
         return;
     }
 
     $hashAlmacenado = $usuario->password;
 
     if (Hash::check($contraseñaPlana, $hashAlmacenado)) {
-        echo "El hash es correcto.";
+        echo 'El hash es correcto.';
     } else {
-        echo "El hash no coincide.";
+        echo 'El hash no coincide.';
     }
 
 });
@@ -555,27 +542,20 @@ Route::get('/reset_password', function(){
 Route::get('/rdtest', [RDTestController::class, 'test']);
 Route::post('/rdtest', [RDTestController::class, 'handleRequest'])->name('rdtest.post');
 
-
-
 // routes/web.php
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/madrid2025',        [Madrid2025Controller::class, 'dashboard'])->name('madrid2025.dashboard');
+    Route::get('/madrid2025', [Madrid2025Controller::class, 'dashboard'])->name('madrid2025.dashboard');
     Route::get('/madrid2025/export', [Madrid2025Controller::class, 'export'])->name('madrid2025.export');
     Route::get('/madrid2025/schedule', [Madrid2025Controller::class, 'schedule'])->name('madrid2025.schedule');
 
 });
 
-
-
-
-
 // routes/web.php
 Route::get('/reportes/madrid', [\App\Http\Controllers\MadridDashboardController::class, 'index'])
     ->name('madrid.dashboard');
 
-
-Route::get('/actions', [ActionController::class, 'index'])->name('actions.index');    
+Route::get('/actions', [ActionController::class, 'index'])->name('actions.index');
 
 Route::put('/roles/{role}/permissions', [RoleController::class, 'updatePermissions'])
     ->name('roles.updatePermissions');
@@ -589,34 +569,32 @@ Route::put('/actions/{action}/reschedule', [ActionController::class, 'reschedule
     ->name('actions.reschedule');
 
 Route::get('/actions/{id}/show', [ActionController::class, 'show'])
-     ->name('actions.show');
+    ->name('actions.show');
 
 Route::get('/test-spaces', function () {
     Storage::disk('spaces')->put('test.txt', 'hola DO Spaces', 'public');
+
     return Storage::disk('spaces')->url('test.txt');
 });
-
 
 Route::get('/reports/missing-customer-files/verify-month', [ReportController::class, 'verifyMonth'])
     ->name('reports.missing_customer_files.verify_month'); // ?year=2025&month=2&user_id=
 
-
- Route::get('/reports/missing-customer-files', [ReportController::class, 'missingCustomerFiles'])
+Route::get('/reports/missing-customer-files', [ReportController::class, 'missingCustomerFiles'])
     ->name('reports.missing_customer_files');
 
 Route::get('/reports/missing-customer-files/verify/{customer}', [ReportController::class, 'verifyCustomerFiles'])
-    ->name('reports.missing_customer_files.verify'); // AJAX   
+    ->name('reports.missing_customer_files.verify'); // AJAX
 
 Route::get(
     '/reports/missing-customer-files/{customer}/verify',
     [ReportController::class, 'verifyCustomer']
 )->name('reports.missing_customer_files.verify');
 
-Route::get('/landing/checkin', [LandingController::class,'checkinForm'])->name('landing.checkin');
-Route::post('/landing/checkin', [LandingController::class,'checkinSubmit'])->name('landing.checkin.submit');
-Route::post('/landing/rebook', [LandingController::class,'rebook'])->name('landing.rebook');
-Route::post('/landing/cancel', [LandingController::class,'cancel'])->name('landing.cancel');
-
+Route::get('/landing/checkin', [LandingController::class, 'checkinForm'])->name('landing.checkin');
+Route::post('/landing/checkin', [LandingController::class, 'checkinSubmit'])->name('landing.checkin.submit');
+Route::post('/landing/rebook', [LandingController::class, 'rebook'])->name('landing.rebook');
+Route::post('/landing/cancel', [LandingController::class, 'cancel'])->name('landing.cancel');
 
 Route::get('/test-email', function () {
     Resend::emails()->send([
@@ -625,6 +603,7 @@ Route::get('/test-email', function () {
         'subject' => 'Test Resend desde Laravel OK',
         'text' => 'Test Resend desde Laravel OK',
     ]);
+
     /*
     Mail::raw('Test Mailtrap desde Laravel OK', function ($m) {
         $m->to('nicolas@myseocompany.co')->subject('Mailtrap funcionando');
