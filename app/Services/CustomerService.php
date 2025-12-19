@@ -148,6 +148,7 @@ class CustomerService {
                                 ->orWhere('customers.document',      'like', $like)
                                 ->orWhere('customers.city',          'like', $like)
                                 ->orWhere('customers.department',    'like', $like)
+                                ->orWhere('customers.country',       'like', $like)
                                 ->orWhere('customers.ad_name',       'like', $like)
                                 ->orWhere('customers.adset_name',    'like', $like)
                                 ->orWhere('customers.campaign_name', 'like', $like)
