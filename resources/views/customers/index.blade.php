@@ -223,6 +223,7 @@
         'Esta semana': [moment().startOf('isoWeek'), moment().endOf('isoWeek')],
         'Semana pasada': [moment().subtract(1,'week').startOf('isoWeek'), moment().subtract(1,'week').endOf('isoWeek')],
         'Este mes': [moment().startOf('month'), moment().endOf('month')],
+        'Este año': [moment().startOf('year'), moment().endOf('year')],
         'Mes anterior': [moment().subtract(1,'month').startOf('month'), moment().subtract(1,'month').endOf('month')],
         'Máximo': [ORIGEN_MAXIMO, moment()]
       }
