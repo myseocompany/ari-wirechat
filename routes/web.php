@@ -35,7 +35,6 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WhatsAppAPIController;
 use App\Http\Controllers\WhatsAppBroadcastController;
-use App\Http\Controllers\WhatsAppWebhookController;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
@@ -45,9 +44,6 @@ use Resend\Laravel\Facades\Resend;
 Route::get('/', function () {
     return view('home');
 });
-
-Route::get('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'verify']);
-Route::post('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'receive']);
 
 Route::middleware('auth')->get('/faq', [HomeController::class, 'indexFaq'])->name('faq');
 

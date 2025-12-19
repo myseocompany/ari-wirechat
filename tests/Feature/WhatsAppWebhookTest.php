@@ -12,7 +12,7 @@ uses(RefreshDatabase::class);
 test('verifies the whatsapp webhook challenge', function () {
     config(['whatsapp.verify_token' => 'test-token']);
 
-    $response = $this->get('/webhooks/whatsapp?hub.mode=subscribe&hub.verify_token=test-token&hub.challenge=12345');
+    $response = $this->get('/api/webhooks/whatsapp?hub.mode=subscribe&hub.verify_token=test-token&hub.challenge=12345');
 
     $response->assertStatus(200);
     $response->assertSeeText('12345');
@@ -58,8 +58,8 @@ test('stores inbound messages and dedupes by external id', function () {
         ],
     ];
 
-    $this->postJson('/webhooks/whatsapp', $payload)->assertStatus(200);
-    $this->postJson('/webhooks/whatsapp', $payload)->assertStatus(200);
+    $this->postJson('/api/webhooks/whatsapp', $payload)->assertStatus(200);
+    $this->postJson('/api/webhooks/whatsapp', $payload)->assertStatus(200);
 
     expect(WhatsAppMessageMap::count())->toBe(1);
     expect(Message::count())->toBe(1);

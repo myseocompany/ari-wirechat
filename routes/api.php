@@ -1,22 +1,20 @@
 <?php
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\WAToolBoxController;
+
 use App\Http\Controllers\Api\APIController;
-use App\Http\Controllers\Api\RetellWebhookController;
 use App\Http\Controllers\Api\CustomerApiController;
 use App\Http\Controllers\Api\QuizController;
+use App\Http\Controllers\Api\WAToolBoxController;
+use App\Http\Controllers\Api\WhatsAppWebhookController;
 use App\Http\Middleware\CheckApiToken;
-
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('api')->group(
     function () {
         Route::get('/customers/saveCustomer', [APIController::class, 'saveApi']);
-        #Route::post('/customers/update', [APIController::class, 'saveApi']);
+        // Route::post('/customers/update', [APIController::class, 'saveApi']);
         Route::post('/customers/update', [APIController::class, 'updateFromRD']);
         Route::get('/request-logs', [APIController::class, 'listRequestLogs']);
         Route::post('/request-logs/{id}/resend', [APIController::class, 'resendRequestLog']);
-        
-        
 
         Route::post('/watoolbox', [WAToolBoxController::class, 'receiveMessage']);
         Route::post('/watoolbox/webhook', [WAToolBoxController::class, 'receiveMessage']);
@@ -33,9 +31,10 @@ Route::middleware('api')->group(
         Route::get('/quizzes/escalable/result/{slug}', [QuizController::class, 'showResult']);
         Route::post('/calculator', [QuizController::class, 'storeCalculator']);
 
+        Route::get('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'verify']);
+        Route::post('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'receive']);
 
-});
-
+    });
 
 Route::middleware([CheckApiToken::class, 'throttle:60,1'])->group(function () {
     Route::get('/customers', [CustomerApiController::class, 'index']);           // filtros
