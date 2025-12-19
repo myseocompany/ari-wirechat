@@ -1,15 +1,10 @@
- @extends('layout')
+@extends('layouts.tailwind')
 <?php function clearWP($str)
 {
   $str = trim($str);
   $str = str_replace("+", "", $str);
   return $str;
 } ?>
-
-
-@push('styles')
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-@endpush
 
 @section('content')
 <div id="customer_show_content">
