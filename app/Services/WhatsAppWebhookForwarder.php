@@ -21,6 +21,11 @@ class WhatsAppWebhookForwarder
             if (! $response->successful()) {
                 Log::warning('SellerChat webhook forward failed', [
                     'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+            } else {
+                Log::info('SellerChat webhook forward ok', [
+                    'status' => $response->status(),
                 ]);
             }
         } catch (\Throwable $exception) {

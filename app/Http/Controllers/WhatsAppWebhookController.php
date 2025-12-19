@@ -7,6 +7,7 @@ use App\Services\WhatsAppInboundMessageService;
 use App\Services\WhatsAppWebhookForwarder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class WhatsAppWebhookController extends Controller
 {
@@ -28,6 +29,11 @@ class WhatsAppWebhookController extends Controller
         WhatsAppInboundMessageService $service,
         WhatsAppWebhookForwarder $forwarder
     ): Response {
+        Log::info('WhatsApp webhook received', [
+            'has_entry' => $request->has('entry'),
+            'payload' => $request->all(),
+        ]);
+
         $service->handle($request->all());
         $forwarder->forward($request->all());
 
