@@ -23,19 +23,14 @@
 
           {{-- Nombre con ícono --}}
           <h2 class="mb-2">
-            @if($customer->isBanned())
-              <i class="fa fa-exclamation-circle text-danger"></i>
-              <span class="text-danger">{{ $customer->name }}</span>
-            @else
-              @if(!$limited)
-                @if($customer->maker == 1) 🥟 @endif
-                @if($customer->maker == 0) 💡 @endif
-                @if($customer->maker == 2) 🍗🥩⚙️ @endif
-              @endif
-              <a href="/customers/{{ $customer->id }}/show" class="text-decoration-none text-dark">
-                {{ $visibleName }}
-              </a>
+            @if(!$limited)
+              @if($customer->maker == 1) 🥟 @endif
+              @if($customer->maker == 0) 💡 @endif
+              @if($customer->maker == 2) 🍗🥩⚙️ @endif
             @endif
+            <a href="/customers/{{ $customer->id }}/show" class="text-decoration-none text-dark">
+              {{ $visibleName }}
+            </a>
           </h2>
 
           {{-- Empresa --}}

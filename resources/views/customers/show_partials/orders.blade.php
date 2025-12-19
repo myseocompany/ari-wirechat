@@ -1,16 +1,18 @@
 @if(isset($model->orders) && $model->orders->count())
-  <div class="card mt-3">
-    <h5 class="card-header">Cotizaciones del cliente</h5>
-    <div class="card-body">
+  <div class="bg-white">
+    <div class="">
+      <h3 class="text-base font-semibold text-slate-900">Cotizaciones del cliente</h3>
+    </div>
+    <div class="space-y-3 text-sm text-slate-700">
       @foreach($model->orders as $index => $order)
-        <div class="mb-3 p-3 border rounded">
-          <strong class="text-warning">Cotización #{{ $index + 1 }}</strong><br>
+        <div class="bg-slate-50 p-3">
+          <strong class="text-amber-600">Cotización #{{ $index + 1 }}</strong><br>
           <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y') }}<br>
 
           {{-- Productos cotizados --}}
           @if($order->productList->count() > 0)
             <strong>Productos:</strong>
-            <ul class="mb-2">
+            <ul class="mt-1 space-y-1">
               @foreach($order->productList as $product)
                 <li>
                   {{ $product->quantity }} × {{ $product->product->name ?? 'Producto eliminado' }}
@@ -24,10 +26,10 @@
 
           <strong>Total:</strong> ${{ number_format($order->getTotal(), 0, ',', '.') }}<br>
           <strong>Estado:</strong>
-            <span class="badge" style="background-color: {{ optional($order->status)->color }}">
+            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold text-white" style="background-color: {{ optional($order->status)->color }}">
               {{ optional($order->status)->name ?? 'Sin estado' }}
             </span><br>
-          <a href="/orders/{{ $order->id }}/show" class="btn btn-outline-primary btn-sm mt-2">Ver cotización</a>
+          <a href="/orders/{{ $order->id }}/show" class="mt-2 inline-flex items-center rounded-md border border-blue-600 px-3 py-1.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-50">Ver cotización</a>
         </div>
       @endforeach
     </div>

@@ -1,31 +1,31 @@
-<h2 class="mt-4">Acciones</h2>
+<h2 class="mt-6 text-lg font-semibold text-slate-900">Acciones</h2>
 
 @php
     $record = isset($customer) ? $customer : $model;
 @endphp
 
-<div class="card shadow-sm p-3 mb-4">
+<div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
     <form action="/customers/{{$customer->id}}/action/store" method="POST" enctype="multipart/form-data">
         @csrf
 
         {{-- Acción programada previa --}}
         @if(isset($actionProgramed))
-            <div class="alert alert-info">
+            <div class="mb-4 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
                 <strong>Acción pendiente:</strong> {{$actionProgramed->note}}
                 <input type="hidden" name="ActionProgrameId" value="{{$actionProgramed->id}}">
             </div>
         @endif
 
         {{-- Nota --}}
-        <div class="form-group mb-3">
-            <textarea name="note" id="note" rows="4" class="form-control" placeholder="Escribe la nota..." required></textarea>
+        <div class="mt-4">
+            <textarea name="note" id="note" rows="4" class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="Escribe la nota..." required></textarea>
         </div>
 
         {{-- Estado y Tipo de Acción --}}
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label for="status_id" class="form-label">Estado</label>
-                <select name="status_id" id="status_id" class="form-control">
+        <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+                <label for="status_id" class="block text-sm font-medium text-slate-700">Estado</label>
+                <select name="status_id" id="status_id" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200">
                     <option value="">Seleccione un estado</option>
                     @foreach($statuses_options as $status_option)
                         <option value="{{ $status_option->id }}" 
@@ -36,47 +36,47 @@
                 </select>
 
                 @include('customers.status_table', ["statuses_options"=>$statuses_options])
-                <button class="btn btn-link p-0" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
-                    <i class="fa fa-question-circle text-primary" id="helpButtonStatus"></i>
+                <button class="mt-2 inline-flex items-center text-blue-600 transition hover:text-blue-700" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
+                    <i class="fa fa-question-circle" id="helpButtonStatus"></i>
                 </button>
             </div>
 
-            <div class="col-md-6">
-                <label for="type_id" class="form-label">Tipo de acción</label>
-                <select name="type_id" id="type_id" class="form-control" required>
+            <div>
+                <label for="type_id" class="block text-sm font-medium text-slate-700">Tipo de acción</label>
+                <select name="type_id" id="type_id" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" required>
                     @foreach($action_options as $action_option)
                         <option value="{{$action_option->id}}">{{$action_option->name}}</option>
                     @endforeach
                 </select>
                 @include('customers.actions_table', ["action_options"=>$action_options])
-                <button class="btn btn-link p-0" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
-                    <i class="fa fa-question-circle text-primary" id="helpButtonAction"></i>
+                <button class="mt-2 inline-flex items-center text-blue-600 transition hover:text-blue-700" type="button" data-toggle="tooltip" data-html="true" data-placement="top">
+                    <i class="fa fa-question-circle" id="helpButtonAction"></i>
                 </button>
             </div>
         </div>
 
         {{-- Archivo (opcional) --}}
-        <div class="form-group mb-3">
-            <input type="file" class="form-control" id="file" name="file">
+        <div class="mt-4">
+            <input type="file" class="block w-full text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200" id="file" name="file">
         </div>
 
         {{-- Toggle programación --}}
-        <div class="form-group mb-3">
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="toggleDate" onclick="toggleDateInput()">
-                <label class="form-check-label" for="toggleDate">Programar acción</label>
+        <div class="mt-4">
+            <div class="flex items-center gap-2">
+                <input class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" type="checkbox" id="toggleDate" onclick="toggleDateInput()">
+                <label class="text-sm text-slate-700" for="toggleDate">Programar acción</label>
             </div>
         </div>
 
         {{-- Campo fecha (inicialmente oculto) --}}
-        <div class="form-group mb-4" id="dateInputContainer" style="display: none;">
-            <label for="example-datetime-local-input" class="form-label">Fecha y hora</label>
-            <input class="form-control" name="date_programed" type="datetime-local" id="example-datetime-local-input">
+        <div class="mt-4 space-y-2" id="dateInputContainer" style="display: none;">
+            <label for="example-datetime-local-input" class="block text-sm font-medium text-slate-700">Fecha y hora</label>
+            <input class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" name="date_programed" type="datetime-local" id="example-datetime-local-input">
         </div>
 
         {{-- Botón submit --}}
-        <div class="text-center">
-            <button type="submit" class="btn btn-primary w-100">Guardar acción</button>
+        <div class="mt-4">
+            <button type="submit" class="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">Guardar acción</button>
         </div>
 
         <input type="hidden" id="customer_id" name="customer_id" value="{{$customer->id}}">

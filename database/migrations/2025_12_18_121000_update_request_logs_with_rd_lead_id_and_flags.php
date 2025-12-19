@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (! Schema::hasTable('request_logs')) {
+            return;
+        }
+
         Schema::table('request_logs', function (Blueprint $table) {
             $table->string('rd_lead_id')->nullable()->after('facebook_id')->index();
             $table->boolean('ignored')->default(false)->after('rd_lead_id')->index();
@@ -23,6 +27,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasTable('request_logs')) {
+            return;
+        }
+
         Schema::table('request_logs', function (Blueprint $table) {
             if (Schema::hasColumn('request_logs', 'rd_lead_id')) {
                 $table->dropIndex(['rd_lead_id']);

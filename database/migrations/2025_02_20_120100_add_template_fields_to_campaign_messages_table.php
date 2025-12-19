@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('campaign_messages')) {
+            return;
+        }
+
         Schema::table('campaign_messages', function (Blueprint $table) {
             $table->string('template_name', 190)->nullable()->after('campaign_id');
             $table->string('template_language', 10)->nullable()->after('template_name');
@@ -21,6 +25,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('campaign_messages')) {
+            return;
+        }
+
         Schema::table('campaign_messages', function (Blueprint $table) {
             $table->dropColumn([
                 'template_name',

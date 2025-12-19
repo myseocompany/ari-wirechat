@@ -3,17 +3,11 @@
   $answers = $calculatorAnswers ?? collect();
 @endphp
 
-<div class="card">
-  <div class="card-header" id="headingCalculator">
-    <h3>
-      <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseCalculator" aria-expanded="false" aria-controls="collapseCalculator">
-        Calculadora
-      </button>
-    </h3>
+<div class="rounded-lg border border-slate-200 bg-white shadow-sm">
+  <div class="border-b border-slate-200 px-4 py-3" id="headingCalculator">
+    <h3 class="text-base font-semibold text-slate-900">Calculadora</h3>
   </div>
-
-  <div id="collapseCalculator" class="collapse" aria-labelledby="headingCalculator">
-    <div class="p-3">
+  <div class="space-y-3 px-4 py-3 text-sm text-slate-700">
       @if($calculatorSummary)
         <div class="mb-3">
           <div><strong>Fecha:</strong> {{ $calculatorSummary->created_at }}</div>
@@ -22,19 +16,19 @@
           @endif
         </div>
       @else
-        <p class="mb-3 text-muted">Sin resultados de calculadora aún.</p>
+        <p class="mb-3 text-slate-500">Sin resultados de calculadora aún.</p>
       @endif
 
       @if($answers->count())
-        <div class="table">
-          <table class="table table-striped">
-            <thead>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-slate-200 text-sm text-slate-700">
+            <thead class="bg-slate-50">
               <tr>
-                <th style="width: 40%;">Preguntas</th>
-                <th>Respuestas</th>
+                <th class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600" style="width: 40%;">Preguntas</th>
+                <th class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Respuestas</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-slate-200 bg-white">
               @foreach($answers as $answer)
                 @php
                   $data = is_array($answer->value) ? $answer->value : json_decode($answer->value, true);
@@ -44,11 +38,11 @@
                   $comment = $data['comment'] ?? null;
                 @endphp
                 <tr>
-                  <th>{{ $questionText }}</th>
-                  <td>
+                  <th class="px-3 py-2 font-semibold text-slate-900">{{ $questionText }}</th>
+                  <td class="px-3 py-2">
                     {{ $answerText }}
                     @if($comment)
-                      <div class="text-muted"><small>{{ $comment }}</small></div>
+                      <div class="text-xs text-slate-500">{{ $comment }}</div>
                     @endif
                   </td>
                 </tr>
@@ -57,6 +51,5 @@
           </table>
         </div>
       @endif
-    </div>
   </div>
 </div>

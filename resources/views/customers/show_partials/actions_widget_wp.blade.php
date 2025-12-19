@@ -1,6 +1,6 @@
 @php use Illuminate\Support\Str; @endphp
 
-<h2 class="mt-4">Línea de tiempo del cliente</h2>
+<h2 class="text-base font-semibold text-slate-900">Línea de tiempo del cliente</h2>
 
 @php
   $timeline = collect();
@@ -54,21 +54,21 @@
   $timeline = $timeline->sortByDesc('date');
 @endphp
 
-<div class="timeline">
+<div class="space-y-3">
   @foreach($timeline as $item)
-    <div class="mb-3 p-3 rounded shadow-sm" style="border-left: 5px solid {{ $item['color'] }}; background: #f8f9fa;">
+    <div class="rounded-lg border border-slate-200 border-l-4 bg-white p-4 shadow-sm" style="border-left-color: {{ $item['color'] }};">
       @if($item['type'] === 'action')
-        <div class="d-flex justify-content-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             {{-- ⏰ Pendiente programado --}}
             @if($item['is_pending'] && $item['due_date'])
-              <span class="text-danger fw-bold small">
+              <span class="text-xs font-semibold text-red-600">
                 ⏰ Programado para: {{ \Carbon\Carbon::parse($item['due_date'])->format('d M Y H:i') }}
               </span><br>
             @endif
 
             {{-- Nota de acción --}}
-            <strong>
+            <strong class="text-sm text-slate-900">
               @if($item['icon'])
                 <i class="fa {{ $item['icon'] }}"></i>
               @endif
@@ -84,16 +84,16 @@
             @endif
 
             {{-- Tipo de acción --}}
-            <span class="text-muted small">
+            <span class="text-xs text-slate-500">
               {{ $item['type_name'] }}
             </span>
           </div>
-          <div class="text-end small text-muted">
+          <div class="text-right text-xs text-slate-500">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}<br>
             {{ $item['creator'] }}
             @if(Auth::check() && Auth::user()->role_id == 1 && isset($item['id']))
               <br>
-              <a href="/actions/{{ $item['id'] }}/destroy" class="text-danger" title="Eliminar acción">
+              <a href="/actions/{{ $item['id'] }}/destroy" class="text-red-600 hover:text-red-700" title="Eliminar acción">
                 <i class="fa fa-trash-o"></i>
               </a>
             @endif
@@ -101,30 +101,30 @@
         </div>
 
       @elseif($item['type'] === 'asignacion')
-        <div class="d-flex justify-content-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <strong class="text-primary">🔁 Reasignación</strong><br>
-            <small class="text-muted">
+            <strong class="text-blue-600">🔁 Reasignación</strong><br>
+            <small class="text-slate-500">
               Cliente reasignado a <strong>{{ $item['assigned_to'] }}</strong><br>
               Modificado por <strong>{{ $item['editor'] }}</strong>
             </small>
           </div>
-          <div class="text-end small text-muted">
+          <div class="text-right text-xs text-slate-500">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}
           </div>
         </div>
 
       @elseif($item['type'] === 'estado')
-        <div class="d-flex justify-content-between">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <strong>📝 Cambio de estado</strong><br>
-            <small class="text-muted">
+            <small class="text-slate-500">
               Nuevo estado: <strong>{{ $item['status'] }}</strong><br>
               Asignado a <strong>{{ $item['assigned_to'] }}</strong><br>
               Modificado por <strong>{{ $item['editor'] }}</strong>
             </small>
           </div>
-          <div class="text-end small text-muted">
+          <div class="text-right text-xs text-slate-500">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}
           </div>
         </div>

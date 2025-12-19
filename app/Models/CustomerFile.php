@@ -10,6 +10,7 @@ class CustomerFile extends Model
     protected $fillable = [
         'customer_id',
         'url',
+        'name',
         'creator_user_id',
         'uuid',
         'filename',
@@ -20,7 +21,7 @@ class CustomerFile extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'creator_user_id')
-                    ->withDefault(['name' => 'Sin usuario']);
+            ->withDefault(['name' => 'Sin usuario']);
     }
 
     /* ====== Helpers internos ====== */
@@ -57,6 +58,7 @@ class CustomerFile extends Model
             // Asume que definiste la route customer_files.download (redirige a temporaryUrl)
             return route('customer_files.download', $this);
         }
+
         return $this->public_url ?? '#';
     }
 
@@ -92,10 +94,17 @@ class CustomerFile extends Model
         } catch (\Throwable $e) {
             return null;
         }
-        if ($bytes === null) return null;
+        if ($bytes === null) {
+            return null;
+        }
 
-        $u = ['B','KB','MB','GB','TB']; $i = 0;
-        while ($bytes >= 1024 && $i < count($u) - 1) { $bytes /= 1024; $i++; }
+        $u = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $i = 0;
+        while ($bytes >= 1024 && $i < count($u) - 1) {
+            $bytes /= 1024;
+            $i++;
+        }
+
         return round($bytes, 2).' '.$u[$i];
     }
 }

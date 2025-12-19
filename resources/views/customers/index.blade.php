@@ -237,6 +237,7 @@
       startDate: getInitialStart(),
       endDate:   getInitialEnd(),
       maxDate: moment(),
+      parentEl: '.filter-overlay__panel',
       opens: 'right',
       autoUpdateInput: false, // nosotros seteamos el input
       locale: {

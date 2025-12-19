@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\CustomerFile;
-
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CustomerFileController extends Controller
 {
@@ -25,8 +25,8 @@ class CustomerFileController extends Controller
     {
         $disk = Storage::disk('spaces');
 
-        $srcKey  = $this->fileKey($file->customer_id, $file->url);
-        $dstKey  = $this->trashKey($file->customer_id, $file->url);
+        $srcKey = $this->fileKey($file->customer_id, $file->url);
+        $dstKey = $this->trashKey($file->customer_id, $file->url);
 
         // En S3/Spaces no hay que "crear carpetas": basta con mover usando prefijos
         if ($disk->exists($srcKey)) {
@@ -40,9 +40,9 @@ class CustomerFileController extends Controller
 
         if ($request->ajax()) {
             return response()->json([
-                'ok'      => true,
+                'ok' => true,
                 'message' => 'Archivo movido a papelera.',
-                'id'      => (int) $file->id,
+                'id' => (int) $file->id,
             ]);
         }
 
@@ -52,9 +52,9 @@ class CustomerFileController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'customer_id' => ['required','exists:customers,id'],
-            'file'        => ['nullable','file'],
-            'files.*'     => ['nullable','file'],
+            'customer_id' => ['required', 'exists:customers,id'],
+            'file' => ['nullable', 'file'],
+            'files.*' => ['nullable', 'file'],
         ]);
 
         $disk = Storage::disk('spaces');
@@ -62,24 +62,53 @@ class CustomerFileController extends Controller
 
         // Normaliza a array de UploadedFile
         $uploads = [];
-        if ($request->hasFile('files'))    $uploads = $request->file('files');
-        elseif ($request->hasFile('file')) $uploads = [$request->file('file')];
+        if ($request->hasFile('files')) {
+            $uploads = $request->file('files');
+        } elseif ($request->hasFile('file')) {
+            $uploads = [$request->file('file')];
+        }
 
+        $createdFiles = [];
         foreach ($uploads as $upload) {
             $original = $upload->getClientOriginalName();
+            $extension = $upload->getClientOriginalExtension();
+            $storedName = (string) Str::uuid();
+            if ($extension !== '') {
+                $storedName .= '.'.$extension;
+            }
 
             // Guarda en Spaces (visibilidad según tu caso)
             // Si quieres todo público:
-            $key = $this->fileKey($customerId, $original);
-            $disk->putFileAs("files/{$customerId}", $upload, $original, [
+            $key = $this->fileKey($customerId, $storedName);
+            $disk->putFileAs("files/{$customerId}", $upload, $storedName, [
                 'visibility' => 'public',                // o 'private'
                 'ContentType' => $upload->getMimeType(), // útil para servir correctamente
             ]);
 
-            CustomerFile::create([
-                'customer_id'     => $customerId,
-                'url'             => $original,
+            $customerFile = CustomerFile::create([
+                'customer_id' => $customerId,
+                'url' => $storedName,
+                'name' => $original,
                 'creator_user_id' => optional(Auth::user())->id,
+            ]);
+
+            $customerFile->loadMissing('creator');
+            $createdFiles[] = [
+                'id' => (int) $customerFile->id,
+                'url' => $customerFile->url,
+                'name' => $customerFile->name,
+                'created_at' => optional($customerFile->created_at)->toDateTimeString(),
+                'creator_name' => $customerFile->creator?->name ?? 'Sin usuario',
+                'status' => $customerFile->status,
+                'open_url' => route('customer_files.open', $customerFile->id),
+                'destroy_url' => route('customer_files.destroy', $customerFile),
+            ];
+        }
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'ok' => true,
+                'files' => $createdFiles,
             ]);
         }
 
@@ -88,7 +117,7 @@ class CustomerFileController extends Controller
 
     public function reupload(Request $request, CustomerFile $file)
     {
-        $request->validate(['file' => ['required','file']]);
+        $request->validate(['file' => ['required', 'file']]);
 
         $disk = Storage::disk('spaces');
         $upload = $request->file('file');
@@ -96,7 +125,7 @@ class CustomerFileController extends Controller
         // Sobrescribe exactamente el mismo nombre/clave
         $key = $this->fileKey($file->customer_id, $file->url);
         $disk->putFileAs("files/{$file->customer_id}", $upload, $file->url, [
-            'visibility'  => 'public',                 // o 'private'
+            'visibility' => 'public',                 // o 'private'
             'ContentType' => $upload->getMimeType(),
         ]);
 
@@ -106,7 +135,6 @@ class CustomerFileController extends Controller
 
         return back()->with('status', "Archivo repuesto: {$file->url}");
     }
-
 
     public function open(CustomerFile $file)
     {

@@ -3,18 +3,18 @@
     <span id="closeStatusSidebar">✖</span>
             
     <div class="box2">
-        <table class="table">
-            <thead class="thead-dark">
+        <table class="min-w-full divide-y divide-slate-200 text-sm text-slate-700">
+            <thead class="bg-slate-800 text-white">
             <tr>
-                <th scope="col">Estado</th>
-                <th scope="col">Descripción</th>
+                <th scope="col" class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide">Estado</th>
+                <th scope="col" class="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide">Descripción</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-slate-200 bg-white">
             @foreach ($statuses_options as $item)
                 <tr>
-                    <th scope="row">{{$item->name}}</th>
-                    <td scope="row">{{$item->description}}</td>
+                    <th scope="row" class="px-3 py-2 font-semibold text-slate-900">{{$item->name}}</th>
+                    <td scope="row" class="px-3 py-2">{{$item->description}}</td>
                 </tr>
             @endforeach
             </tbody>

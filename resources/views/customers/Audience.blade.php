@@ -10,11 +10,7 @@
 
 @if($model != null)
 
-  @if($model->isBanned())
-    <h1 style="color:red;"> <i class="fa fa-exclamation-circle" style="color:gray; "></i> {{$model->name}} <br> </h1>  
-    @else  
-      <h1> {{$model->name}} <br> </h1>  
-  @endif
+  <h1> {{$model->name}} <br> </h1>
 
 {{-- Alertas --}}
 @if (session('status'))

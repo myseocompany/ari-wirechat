@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('campaigns')) {
+            return;
+        }
+
         Schema::table('campaigns', function (Blueprint $table) {
             $table->text('description')->nullable()->after('name');
             $table->json('filters')->nullable()->after('audience_id');
@@ -27,6 +31,10 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('campaigns')) {
+            return;
+        }
+
         Schema::table('campaigns', function (Blueprint $table) {
             $table->dropForeign(['whatsapp_account_id']);
             $table->dropColumn([

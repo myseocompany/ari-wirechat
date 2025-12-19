@@ -541,6 +541,17 @@
         border: 1px solid #ccc;
         border-top: none;
       }
+
+      .customer-tabs .tab-content {
+        display: block;
+      }
+      .customer-tabs .tab-pane {
+        display: none;
+      }
+      .customer-tabs .tab-pane.active,
+      .customer-tabs .tab-pane.show {
+        display: block;
+      }
       
       .txtsurvey{
         width: 100%;
@@ -889,4 +900,16 @@ body.filter-overlay-open {
 }
 body.customer-overlay-open {
   overflow: hidden;
+}
+
+.customer-section-pane {
+  display: none;
+}
+.customer-section-pane.is-active {
+  display: block;
+}
+.customer-section-controls .btn.is-active {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
 }
