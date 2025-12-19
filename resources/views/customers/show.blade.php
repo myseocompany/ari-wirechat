@@ -296,6 +296,16 @@
             <div>
               <span class="lavel"><strong>Campaña:</strong></span> {{$model->campaign_name}}
             </div>
+            @if(!empty($model->ad_name))
+              <div>
+                <span class="lavel"><strong>Anuncio:</strong></span> {{$model->ad_name}}
+              </div>
+            @endif
+            @if(!empty($model->adset_name))
+              <div>
+                <span class="lavel"><strong>Conjunto:</strong></span> {{$model->adset_name}}
+              </div>
+            @endif
 
             <div class="mt-3">
               <h3 class="text-sm font-semibold">Etiquetas</h3>

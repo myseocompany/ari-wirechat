@@ -173,3 +173,4 @@
 [2025-12-19 13:43:33] local.ERROR: Uncaught ReferenceError: moment is not defined http://127.0.0.1:8000/customers 3319 25 ReferenceError moment is not defined ReferenceError: moment is not defined
     at http://127.0.0.1:8000/customers:3319:25
     at http://127.0.0.1:8000/customers:3479:3 {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:43:33.755Z"} 
+[2025-12-19 14:27:50] local.DEBUG: validando Pvq26tPyrMIFw8RV0e04BbZcjCPJqN7WUfTttJY4 {"url":"http://127.0.0.1:8000/customers/669467/show","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T19:27:50.591Z"} 
