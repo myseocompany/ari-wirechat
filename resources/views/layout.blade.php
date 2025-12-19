@@ -27,6 +27,9 @@
 
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script> 
+  <script src="//cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 
 <style>
   fieldset.scheduler-border {
