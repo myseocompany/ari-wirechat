@@ -52,6 +52,7 @@ class WhatsAppWebhookController extends Controller
                 'X-Hub-Signature-256' => $request->header('X-Hub-Signature-256'),
                 'X-Hub-Signature' => $request->header('X-Hub-Signature'),
                 'User-Agent' => $request->header('User-Agent'),
+                'X-Forwarded-For' => $request->header('X-Forwarded-For') ?? $request->ip(),
             ])
         );
 
