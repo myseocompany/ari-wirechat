@@ -1,19 +1,8 @@
 @php
-    $q = request()->query();
-
-    function urlWithoutKeys(array $keys) {
-        $params = request()->query();
-        foreach ($keys as $k) { unset($params[$k]); }
-        // Evitar paginación “pegada” al limpiar
-        unset($params['page']);
-        $query = http_build_query($params);
-        return url()->current() . ($query ? ('?' . $query) : '');
-    }
-@endphp
-@php
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
-$q = request()->query();
+$q = request()->all();
 
 /** Helpers de valor legible */
 $perfil = [
@@ -50,17 +39,21 @@ $sourceName = function($id) use ($sources) {
   return $item->name ?? $id;
 };
 
-/** Util para construir URL sin un parámetro */
-$without = function($key) use ($q) {
-  $new = Arr::except($q, [$key]);
-  $query = http_build_query($new);
-  return url()->current() . ($query ? ('?'.$query) : '');
-};
+$hasDateInputs = !empty($q['from_date'] ?? null) || !empty($q['to_date'] ?? null);
+$showDefaultDateRange = !$hasDateInputs && empty($q['search'] ?? null);
+$defaultFrom = Carbon::today()->subDay()->setTime(17, 0);
+$defaultTo = Carbon::today()->endOfDay();
+$displayFrom = $hasDateInputs
+  ? ($q['from_date'] ?? '1900-01-01')
+  : $defaultFrom->format('Y-m-d H:i');
+$displayTo = $hasDateInputs
+  ? ($q['to_date'] ?? Carbon::today()->format('Y-m-d'))
+  : $defaultTo->format('Y-m-d H:i');
 
 /** ¿Hay algo que mostrar? */
 $hasAny =
   ($q['search'] ?? null) ||
-  ($q['from_date'] ?? null) || ($q['to_date'] ?? null) ||
+  ($q['from_date'] ?? null) || ($q['to_date'] ?? null) || $showDefaultDateRange ||
   ($q['scoring_profile'] ?? null) || ($q['scoring_interest'] ?? null) ||
   ($q['country'] ?? null) || ($q['status_id'] ?? null) ||
   ($q['user_id'] ?? null) || ($q['source_id'] ?? null) || ($q['tag_id'] ?? null) ||
@@ -111,6 +104,26 @@ $hasAny =
       Fecha en: {{ $q['created_updated'] === 'created' ? 'Creado' : 'Actualizado' }}
       <a class="ml-1 text-danger"
          href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['created_updated'])) }}">×</a>
+    </span>
+  @endif
+
+  {{-- Rango de fechas --}}
+  @if($hasDateInputs || $showDefaultDateRange)
+    <span class="badge badge-pill badge-light border text-danger ml-2">
+      Rango: {{ $displayFrom }} - {{ $displayTo }}
+      @if($hasDateInputs)
+        <a class="ml-1 text-danger"
+          href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['from_date', 'to_date'])) }}">×</a>
+      @endif
+    </span>
+  @endif
+
+  {{-- Usuario --}}
+  @if(array_key_exists('user_id', $q) && $q['user_id'] !== null && $q['user_id'] !== '')
+    <span class="badge badge-pill badge-light border text-danger ml-2">
+      Usuario: {{ $userName($q['user_id']) }}
+      <a class="ml-1 text-danger"
+        href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['user_id'])) }}">×</a>
     </span>
   @endif
 
