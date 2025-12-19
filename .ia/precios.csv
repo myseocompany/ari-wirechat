@@ -1,0 +1,44 @@
+REFERENCIA,PRODUCTO,Costo,COLOMBIA,AMERICA,,,ESTADOS UNIDOS,,,,EUROPA EN DOLARES,,,EUROPA -OCEANIA PRECIO EUROS,,,CHILE,,
+REFERENCIA,PRODUCTO,Costo,PRECIO CON IVA,AMERICA  PRECIO  EN DOLARES SIN FLET,FLETE,PRECIO TOTAL EN DOLARES,AMERICA  PRECIO  EN DOLARES SIN FLET,FLETE,ARANCEL,PRECIO TOTAL EN DOLARES,PRECIO EN DOLARES,FLETES,PRECIO EN DOLARES EUROPA,PRECIO EN EUROS CONTINENTE EUROPEO SIN ENVIO,FLETE INERNACIONAL  EUROPA Y OCEANIA,PRECIO EN EUROS  CONTINENTE EUROPEO  CON FLETE ,CHILE  PRECIO  EN DOLARES SIN FLET,PRECIO FLETE,PRECIO TOTAL EN DOLARES
+,1 CUPO ESCUELA DE LA EMPANADA MAIZ 2 HORAS, $ 650.000 , $ 650.000 ,,,, $ 210 , $ -   , $ 21 , $ 231 ,,,, $ 210 ,0,210, $ 210 , $ -   , $ 210 
+,1 CUPO ESCUELA DE LA EMPANADA TRIGO 1 HORAS, $ 450.000 , $ 450.000 ,,,, $ 141 , $ -   , $ 14 , $ 155 ,,,, $ 141 ,0,141, $ 141 , $ -   , $ 141 
+M/LUNACM06B-NACIONAL ACRYLIC_CM06B-INTENAC,ACRILICO GRANDE M 2 DISCOS, $ 207.366 , $ 248.839 ,,,, $ 63 , $ 120 , $ 18 , $ 201 ,,,, $ 63 ,156,219, $ 63 , $ 120 , $ 183 
+,ACTUALIZACION, Previa lista, Previa lista,,,,, $ 120 , $ 12 , $ 132 ,,,, $ -   ,156,156, $ -   , $ 120 ,
+MQARGOLLAS MAQARGOLLA-E,ARGOLLA, $ 21.660 , $ 25.992 ,,,, $ 7 , $ 120 , $ 13 , $ 139 ,,,, $ 7 ,156,163, $ 7 , $ 120 , $ 127 
+BARRIL,BARRIL AZADOR Nuevo, $ 909.500 , $ 850.000 ,,,, $ 276 , $ 120 , $ 40 , $ 435 ,,,, $ 276 ,550,826, $ 276 , $ 350 , $ 626 
+CANASTA,CANASTAS , $ 25.680 , $ 30.816 ,,,, $ 8 , $ 120 , $ 13 , $ 141 ,,,, $ 8 ,156,164, $ 8 , $ 120 , $ 128 
+JUEGOCAN,CANASTAS CON MANGO x 2, $ 129.800 , $ 155.760 ,,,, $ 39 , $ 120 , $ 16 , $ 175 ,,,, $ 39 ,156,195, $ 39 , $ 120 , $ 159 
+CEREAL-CEREALPOLLO,CEREAL BULTO NACIONAL, $ 238.238 , $ 297.798 ,,,,, $ 120 , $ 12 , $ 132 ,,,, $ -   ,156,156, $ -   , $ 120 ,
+,CEREAL BULTO  DESMECHADO  POLLO  5 KILOS NACIONAL, $ 186.000 ,,,,,, $ 120 , $ 12 , $ 132 ,,,,,,, $ -   , $ 120 ,
+,CEREAL BULTO  DESMECHADO  CARNE  15 KILOS NACIONAL, $ 540.000 ,,,,,, $ 120 , $ 12 , $ 132 ,,,,,,, $ -   , $ 120 ,
+1,CILINDRO APLANADOR, $ 499.800 , $ 768.923 ,,,, $ 151 , $ 120 , $ 27 , $ 299 ,,,, $ 151 ,156,307, $ 151 , $ 120 , $ 271 
+MAL32-100 SS,CILINDRO CORTADOR, $ 154.700 , $ 270.000 ,,,, $ 47 , $ 120 , $ 17 , $ 184 ,,,, $ 47 ,156,203, $ 47 , $ 120 , $ 167 
+TN32-100,CILINDRO DE DESPLAZAMIENTO, cotizar, cotizar,,,, cotizar, cotizar, #VALUE!, cotizar,,,, cotizar, cotizar, cotizar, cotizar, cotizar, cotizar
+CM05-N                             CM05-E,CM05S, $ 29.071.900 , $ 34.886.280 , $ 9.085 , $ 800 , $ 9.885 , $ 9.085 , $ 800 , $ 988 , $ 10.873 , $ 9.085 , $ 1.200 , $ 10.285 , $ 8.176 ,1080,9256, $ 9.085 , $ 1.200 , $ 10.285 
+CM06-N                              CM05-E,CM06, $ 10.855.685 , $ 13.026.822 , $ 3.483 , $ 650 , $ 4.133 , $ 3.483 , $ 650 , $ 413 , $ 4.546 , $ 3.483 , $ 766 , $ 4.249 , $ 3.135 ,689,3824, $ 3.483 , $ 900 , $ 4.383 
+CM06B-N                            CM06B-E,CM06B, $ 14.910.000 , $ 17.892.000 , $ 4.784 , $ 650 , $ 5.434 , $ 4.784 , $ 650 , $ 543 , $ 5.977 , $ 4.784 , $ 766 , $ 5.550 , $ 4.306 ,689,4995, $ 4.784 , $ 900 , $ 5.684 
+CM07-N                              CM07-E,CM07, $ 12.875.000 , $ 15.450.000 , $ 4.131 , $ 650 , $ 4.781 , $ 4.131 , $ 650 , $ 478 , $ 5.259 , $ 4.131 , $ 766 , $ 4.897 , $ 3.718 ,689,4407, $ 4.131 , $ 900 , $ 5.031 
+CM08-N                             CM08-E,CM08, $ 16.043.580 , $ 19.252.296 , $ 5.148 , $ 650 , $ 5.798 , $ 5.148 , $ 650 , $ 579 , $ 6.377 , $ 5.148 , $ 766 , $ 5.914 , $ 4.633 ,689,5322, $ 5.148 , $ 900 , $ 6.048 
+CONOS,CONOS, $ 23.540 , $ 28.248 , $ 7 , $ 650 , $ 657 , $ 7 , $ 650 , $ 72 , $ 730 , $ 7 , $ 974 , $ 981 , $ 7 ,1080,1087, $ 7 , $ 650 , $ 657 
+JUEGOCONOS,CONOS MANGO x 3, $ 158.360 , $ 190.032 , $ 49 , $ 650 , $ 699 , $ 49 , $ 650 , $ 77 , $ 776 , $ 49 , $ 1.036 , $ 1.086 , $ 45 ,1080,1125, $ 49 , $ 650 , $ 699 
+,PELAPAPAS,, $ 5.200.000 , $ 1.390 , $ 650 , $ 2.040 , $ 1.390 , $ 650 , $ 204 , $ 2.244 , $ 1.390 , $ 850 , $ 2.240 , $ 1.251 ,765,2016,,,
+CE02-N,LAMINADORA, $ 4.937.408 , $ 5.924.890 , $ 1.584 , $ 550 , $ 2.134 , $ 1.584 , $ 550 , $ 214 , $ 2.348 , $ 1.584 , $ 766 , $ 2.350 , $ 1.426 ,689,2115, $ 1.584 , $ 800 , $ 2.384 
+CE04CV-N,LAMINADORA VARIADOR, $ 8.668.000 , $ 10.401.600 , $ 2.781 , $ 750 , $ 3.531 , $ 2.781 , $ 750 , $ 353 , $ 3.884 , $ 2.781 , $ 827 , $ 3.608 , $ 2.503 ,744,3247, $ 2.781 , $ 1.000 , $ 3.781 
+,MANO DE OBRA MANTENIMIENTO HORA, $ 28.890 ,, $ -   , $ -   , $ -   , $ -   ,, $ -   , $ -   , $ -   , $ -   , $ -   , $ -   ,689,689, $ -   , $ -   , $ -   
+,MANTENIMIENTO, Previa lista,, $ -   , $ -   , $ -   , $ -   ,, $ -   , $ -   , $ -   , $ -   , $ -   , $ -   ,689,689, $ -   , $ -   , $ -   
+,MANTENIMIENTO Y ACTUALIZACION, Previa lista,, $ -   , $ -   , $ -   , $ -   ,, $ -   , $ -   , $ -   , $ -   , $ -   , $ -   ,689,689, $ -   , $ -   , $ -   
+MESA,MESAS, $ 1.316.100 , $ 1.579.320 , $ 411 , $ 750 , $ 1.161 , $ 411 , $ 750 , $ 116 , $ 1.277 , $ 411 , $ 1.705 , $ 2.116 , $ 370 ,689,1060, $ 411 , $ 750 , $ 1.161 
+MEZCLADORA,MEZCLADORA CON VARIADOR, $ 10.734.454 , $ 12.881.345 , $ 3.444 , $ 1.400 , $ 4.844 , $ 3.445 , $ 1.400 , $ 484 , $ 5.329 , $ 3.444 , $ 1.218 , $ 4.662 , $ 3.100 ,1096,4196, $ 3.444 , $ 1.850 , $ 5.294 
+DESMECHADORA DESMECHADORA-E,DESMECHADORA, $ 577.500 , $ 797.000 , $ 213 , $ 75 , $ 288 , $ 213 , $ 75 , $ 33 , $ 321 , $ 213 , $ 85 , $ 298 , $ 192 ,77,268, $ 213 , $ 75 , $ 288 
+TICALOID_1023,GOMA 1 KILO, $ 92.585 , $ 125.100 , $ 33 , $ 50 , $ 83 , $ 33 , $ 50 , $ 8 , $ 91 , $ 33 , $ 121 , $ 154 , $ 29 ,1080,1109, $ 33 , $ 50 , $ 83 
+PROTCM06BEX- PROTCM06EX,GORROS DE REPUESTO, $ 14.000 , $ 40.660 , $ 11 , $ 50 , $ 61 , $ 11 , $ 50 , $ 6 , $ 67 , $ 11 , $ 44 , $ 54 , $ 10 ,1080,1090, $ 11 , $ 50 , $ 61 
+JUEGOHAT,JUEGO DE MOLDE HARINA DE TRIGO 6 MOLDES Y 4 ARGOLLAS 10-14 CMS, $ 946.773 , $ 1.306.600 , $ 349 , $ 50 , $ 399 , $ 349 , $ 50 , $ 40 , $ 439 , $ 349 , $ 65 , $ 414 , $ 314 ,59,373, $ 349 , $ 50 , $ 399 
+JUEGOHAT- NACIONAL   JUEG_MOLD- INTERNACIO,JUEGO DE MOLDE HARINA DE TRIGO RECTANGULAR O TRIANGULAR 1 ARGOLLA 9 CM O MENOS, $ 1.274.584 , $ 1.529.501 , $ 409 , $ 50 , $ 459 , $ 409 , $ 50 , $ 46 , $ 505 , $ 409 , $ 65 , $ 474 , $ 368 ,59,427, $ 409 , $ 50 , $ 459 
+JUEGOHAT- NACIONAL   JUEG_MOLD- INTERNACIO,JUEGO DE MOLDE HARINA DE TRIGO TRADICIONAL SIN ARGOLLA , $ 483.640 , $ 1.100.000 , $ 349 , $ 50 , $ 399 , $ 349 , $ 50 , $ 40 , $ 439 , $ 349 , $ 65 , $ 414 , $ 314 ,59,373, $ 349 , $ 50 , $ 399 
+JUEGOHAT- NACIONAL   JUEG_MOLD- INTERNACIO,JUEGO DE MOLDES HARINA DE TRIGO 12 MOLDES 1 ARGOLLA 9 CM O MENOS, $ 1.234.673 , $ 1.481.608 , $ 396 , $ 50 , $ 446 , $ 396 , $ 50 , $ 45 , $ 491 , $ 396 , $ 65 , $ 461 , $ 357 ,59,415, $ 396 , $ 50 , $ 446 
+JUEGOMOLDES -NACIONA AREPA_E-INTERNACIONA,KIT AREPA RELLENA Y PAPA, $ 560.680 , $ 773.500 , $ 207 , $ 50 , $ 257 , $ 207 , $ 50 , $ 33 , $ 290 , $ 207 , $ 65 , $ 272 , $ 186 ,59,245, $ 207 , $ 50 , $ 257 
+,KIT DE REPUESTOS CM05, $ -   ,, $ -   , $ -   , $ -   , $ -   ,, $ -   , $ -   , $ -   , $ -   , $ -   , $ -   ,1080,1080, $ -   , $ -   , $ -   
+,KIT DE REPUESTOS CM06 - CM06B - CM08, $ -   ,, $ -   , $ -   , $ -   , $ -   ,, $ -   , $ -   , $ -   , $ -   , $ -   , $ -   ,1080,1080, $ -   , $ -   , $ -   
+,KIT DE REPUESTOS CM07,,, $ -   , $ -   , $ -   , $ -   ,, $ -   , $ -   , $ -   , $ -   , $ -   , $ -   ,1080,1080, $ -   , $ -   , $ -   
+MOLDES- NACIONAL                            MOLDS-INTERNACIONA,MOLDE DE MAIZ Y KIT AREPA TELA, $ 288.900 , $ 398.650 , $ 107 , $ 90 , $ 197 , $ 107 , $ 90 , $ 26 , $ 223 , $ 107 , $ 65 , $ 172 , $ 96 ,59,154, $ 107 , $ 90 , $ 197 
+MOLDE.HARI,MOLDE DE TRIGO SOLO PARA TRIGO, $ 167.990 , $ 201.588 , $ 54 , $ 90 , $ 144 , $ 54 , $ 90 , $ 14 , $ 158 , $ 54 , $ 65 , $ 119 , $ 49 ,59,107, $ 54 , $ 90 , $ 144 

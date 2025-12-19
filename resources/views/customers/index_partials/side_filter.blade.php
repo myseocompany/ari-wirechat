@@ -4,6 +4,9 @@
 
 {{-- Buscador rápido --}}
 <form action="/customers" method="GET" id="mini_filter_form" class="mb-3">
+  @if(request()->boolean('no_date'))
+    <input type="hidden" name="no_date" value="1">
+  @endif
   <div class="input-group">
     <input type="text" name="search" id="search" class="form-control" placeholder="Buscar..." value="{{ $request->search ?? '' }}">
     <div class="input-group-append">
@@ -28,6 +31,9 @@
 {{-- Sección de filtros colapsable --}}
 <div class="collapse" id="filterSection">
   <form action="/customers" method="GET" id="filter_form" class="card card-body border shadow-sm">
+    @if(request()->boolean('no_date'))
+      <input type="hidden" name="no_date" value="1">
+    @endif
     <div class="form-group">
   <label for="search_adv" class="mb-1">Buscar</label>
   <input

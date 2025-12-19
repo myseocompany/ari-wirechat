@@ -2,23 +2,21 @@
 
 namespace App\Services;
 
-use DB;
+use App\Models\Customer;
+use App\Models\CustomerStatus;
+use App\Models\Menu;
+use App\Models\RoleProduct;
 use Auth;
 use Carbon;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
-use App\Models\Menu;
-use App\Models\CustomerStatus;
-use App\Models\Customer;
 
-use App\Models\RoleProduct;
-
-class CustomerService {
-
+class CustomerService
+{
     public const STATUS_FILTER_UNASSIGNED = 'sin_estado';
-
 
     public function filterCustomers(Request $request, $statuses, $stage_id, $countOnly = false, $pageSize = 0, bool $applyDefaultDateRange = true, bool $onlyWithTags = false)
     {
@@ -28,6 +26,7 @@ class CustomerService {
         $dates = $this->getDates($request);
         $authUser = Auth::user();
         $forceOwnCustomers = $authUser && ! $authUser->canViewAllCustomers();
+        $skipDefaultDateRange = $request->boolean('no_date');
 
         $query = Customer::query()
             ->with(['user', 'tags', 'status']) // needed for card view (asesor) y etiquetas
@@ -58,17 +57,17 @@ class CustomerService {
                 $query->where('customer_statuses.stage_id', $stage_id);
             }
 
-            if (!empty($request->from_date)) {
-                $column = ($request->created_updated === "created") ? 'created_at' : 'updated_at';
+            if (! empty($request->from_date)) {
+                $column = ($request->created_updated === 'created') ? 'created_at' : 'updated_at';
                 $query->whereBetween("customers.$column", $dates);
-            } elseif ($applyDefaultDateRange && empty($searchTerm)) {
-                $query->whereBetween("customers.created_at", $dates);
+            } elseif ($applyDefaultDateRange && empty($searchTerm) && ! $skipDefaultDateRange) {
+                $query->whereBetween('customers.created_at', $dates);
             }
 
             if ($forceOwnCustomers && empty($searchTerm)) {
                 $query->where('customers.user_id', $authUser->id);
-            } elseif (! $forceOwnCustomers && !empty($request->user_id)) {
-                $query->where('customers.user_id', $request->user_id === "null" ? null : $request->user_id);
+            } elseif (! $forceOwnCustomers && ! empty($request->user_id)) {
+                $query->where('customers.user_id', $request->user_id === 'null' ? null : $request->user_id);
             }
 
             if (isset($request->maker)) {
@@ -77,28 +76,37 @@ class CustomerService {
                     : $query->whereNull('customers.maker');
             }
 
-            if (!empty($request->product_id)) {
+            if (! empty($request->product_id)) {
                 $query->whereIn(
                     'customers.product_id',
                     $request->product_id == 1 ? [1, 6, 7, 8, 9, 10, 11] : [$request->product_id]
                 );
             }
 
-            if (!empty($request->source_id))          $query->where('customers.source_id', $request->source_id);
-            if (!empty($request->country))            $query->where('customers.country', $request->country);
+            if (! empty($request->source_id)) {
+                $query->where('customers.source_id', $request->source_id);
+            }
+            if (! empty($request->country)) {
+                $query->where('customers.country', $request->country);
+            }
             if ($filteringUnassignedStatus) {
                 $query->where(function ($statusQuery) {
                     $statusQuery->whereNull('customers.status_id')
                         ->orWhereNull('customer_statuses.id');
                 });
-            } elseif (!empty($statusFilter)) {
+            } elseif (! empty($statusFilter)) {
                 $query->where('customers.status_id', $statusFilter);
             }
-            if (!empty($request->scoring_interest))   $query->where('customers.scoring_interest', $request->scoring_interest);
-            if (isset($request->scoring_profile) && $request->scoring_profile !== null)
-                                                    $query->where('customers.scoring_profile', $request->scoring_profile);
-            if (!empty($request->inquiry_product_id)) $query->where('customers.inquiry_product_id', $request->inquiry_product_id);
-            if (!empty($filterTagIds)) {
+            if (! empty($request->scoring_interest)) {
+                $query->where('customers.scoring_interest', $request->scoring_interest);
+            }
+            if (isset($request->scoring_profile) && $request->scoring_profile !== null) {
+                $query->where('customers.scoring_profile', $request->scoring_profile);
+            }
+            if (! empty($request->inquiry_product_id)) {
+                $query->where('customers.inquiry_product_id', $request->inquiry_product_id);
+            }
+            if (! empty($filterTagIds)) {
                 $query->whereExists(function ($sub) use ($filterTagIds) {
                     $sub->select(DB::raw(1))
                         ->from('customer_tag')
@@ -114,10 +122,10 @@ class CustomerService {
                 });
             }
 
-            if (!empty($searchTerm)) {
+            if (! empty($searchTerm)) {
                 $query->where(function ($innerQuery) use ($searchTerm) {
 
-                    $digits = preg_replace('/\D/', '', (string)$searchTerm);
+                    $digits = preg_replace('/\D/', '', (string) $searchTerm);
                     $looksPhone = $digits !== '' && preg_match('/^\d{5,}$/', $digits);
 
                     if ($looksPhone) {
@@ -132,28 +140,29 @@ class CustomerService {
                         if (strlen($digits) >= 9) {
                             $last9 = substr($digits, -9);
                             $innerQuery->orWhere('customers.phone_last9', $last9)
-                                    ->orWhere('customers.phone2_last9', $last9)
-                                    ->orWhere('customers.contact_phone2_last9', $last9);
+                                ->orWhere('customers.phone2_last9', $last9)
+                                ->orWhere('customers.contact_phone2_last9', $last9);
                         } else {
-                            $innerQuery->orWhere('customers.phone',          'like', $digits.'%')
-                                    ->orWhere('customers.phone2',         'like', $digits.'%')
-                                    ->orWhere('customers.contact_phone2', 'like', $digits.'%');
+                            $innerQuery->orWhere('customers.phone', 'like', $digits.'%')
+                                ->orWhere('customers.phone2', 'like', $digits.'%')
+                                ->orWhere('customers.contact_phone2', 'like', $digits.'%');
                         }
                     } elseif (filter_var($searchTerm, FILTER_VALIDATE_EMAIL) !== false) {
-                        $innerQuery->orWhere('customers.email',         'like', "%{$searchTerm}%")
-                                ->orWhere('customers.contact_email', 'like', "%{$searchTerm}%");
+                        $innerQuery->orWhere('customers.email', 'like', "%{$searchTerm}%")
+                            ->orWhere('customers.contact_email', 'like', "%{$searchTerm}%");
                     } else {
                         $like = "%{$searchTerm}%";
-                        $innerQuery->orWhere('customers.name',          'like', $like)
-                                ->orWhere('customers.document',      'like', $like)
-                                ->orWhere('customers.city',          'like', $like)
-                                ->orWhere('customers.department',    'like', $like)
-                                ->orWhere('customers.country',       'like', $like)
-                                ->orWhere('customers.ad_name',       'like', $like)
-                                ->orWhere('customers.adset_name',    'like', $like)
-                                ->orWhere('customers.campaign_name', 'like', $like)
-                                ->orWhere('customers.business',      'like', $like)
-                                ->orWhere('customers.notes',         'like', $like);
+                        $innerQuery->orWhere('customers.name', 'like', $like)
+                            ->orWhere('customers.document', 'like', $like)
+                            ->orWhere('customers.city', 'like', $like)
+                            ->orWhere('customers.department', 'like', $like)
+                            ->orWhere('customers.country', 'like', $like)
+                            ->orWhere('customers.ad_name', 'like', $like)
+                            ->orWhere('customers.adset_name', 'like', $like)
+                            ->orWhere('customers.campaign_name', 'like', $like)
+                            ->orWhere('customers.business', 'like', $like)
+                            ->orWhere('customers.notes', 'like', $like)
+                            ->orWhere('customers.contact_name', 'like', $like);
                     }
                 });
             }
@@ -194,12 +203,12 @@ class CustomerService {
             // Evitar ORDER BY con columnas no agregadas en modo only_full_group_by
             $query->getQuery()->orders = null;
             $result = $query->select(
-                    DB::raw('count(distinct(customers.id)) as count'),
-                    'customers.status_id',
-                    DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
-                    DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color'),
-                    DB::raw('customer_statuses.id as status_table_id')
-                )
+                DB::raw('count(distinct(customers.id)) as count'),
+                'customers.status_id',
+                DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
+                DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color'),
+                DB::raw('customer_statuses.id as status_table_id')
+            )
                 ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color', 'customer_statuses.id')
                 ->orderBy(DB::raw('COALESCE(customer_statuses.weight, 999)'), 'ASC')
                 ->get();
@@ -207,7 +216,7 @@ class CustomerService {
             $selectColumns = ['customers.*'];
             $result = $query->select($selectColumns)
                 ->orderBy('customers.created_at', 'DESC')
-                ->when($pageSize > 0, fn($q) => $q->paginate($pageSize), fn($q) => $q->get());
+                ->when($pageSize > 0, fn ($q) => $q->paginate($pageSize), fn ($q) => $q->get());
         }
 
         $t1 = function_exists('hrtime') ? hrtime(true) : (int) (microtime(true) * 1e9);
@@ -215,13 +224,14 @@ class CustomerService {
 
         // ⚠️ Añadir propiedades dinámicas en objetos paginator puede emitir deprecations en PHP 8.2.
         // Si ya añadías "action", seguimos igual por compatibilidad:
-        $result->action = "customers";
+        $result->action = 'customers';
         $result->benchmark_ms = round($elapsedMs, 2);
 
         $annotateAccess = function ($item) use ($authUser) {
             if (method_exists($item, 'hasFullAccess')) {
                 $item->limited_access = ! $item->hasFullAccess($authUser);
             }
+
             return $item;
         };
 
@@ -233,23 +243,19 @@ class CustomerService {
 
         return $result;
     }
-    
-    
- 
-    
 
     public function getUserMenu($user)
     {
         $menu = Menu::select('menus.name', 'menus.url')
-            ->leftJoin("role_menus", "menus.id", "role_menus.menu_id")
-            ->leftJoin("roles", "roles.id", "role_menus.role_id")
-            ->where("roles.id", $user->role_id)
+            ->leftJoin('role_menus', 'menus.id', 'role_menus.menu_id')
+            ->leftJoin('roles', 'roles.id', 'role_menus.role_id')
+            ->where('roles.id', $user->role_id)
             ->whereNotIn('menus.name', ['Posventa', 'Logistica', 'Logística'])
             ->whereNotIn('menus.url', ['/customers/phase/3', '/customers/phase/4'])
             ->get();
+
         return $menu;
     }
-
 
     public function getDates($request)
     {
@@ -259,6 +265,7 @@ class CustomerService {
                 ->setTime(17, 0, 0)
                 ->format('Y-m-d H:i:s');
             $to = Carbon\Carbon::today()->endOfDay()->format('Y-m-d H:i:s');
+
             return [$from, $to];
         }
 
@@ -273,31 +280,30 @@ class CustomerService {
         return [$from->format('Y-m-d'), $to->format('Y-m-d H:i:s')];
     }
 
-    
-
     public function getLead($lead)
     {
-        $str = "";
+        $str = '';
         switch ($lead) {
-            case "7":
-                $str = "lead07";
+            case '7':
+                $str = 'lead07';
                 break;
-            case "14":
-                $str = "lead14";
+            case '14':
+                $str = 'lead14';
                 break;
-            case "21":
-                $str = "lead21";
+            case '21':
+                $str = 'lead21';
                 break;
-            case "28":
-                $str = "lead28";
+            case '28':
+                $str = 'lead28';
                 break;
-            case "total":
-                $str = "has_actions";
+            case 'total':
+                $str = 'has_actions';
                 break;
             default:
-                $str = "lead";
+                $str = 'lead';
                 break;
         }
+
         return $str;
     }
 
@@ -307,10 +313,12 @@ class CustomerService {
         foreach ($role_products_elocuent as $item) {
             $role_product_array[] = $item->product_id;
         }
-        if (isset($role_product_array) && $role_product_array != "")
+        if (isset($role_product_array) && $role_product_array != '') {
             return $role_product_array;
-        else
-            $role_product_array = "";
+        } else {
+            $role_product_array = '';
+        }
+
         return $role_product_array;
     }
 
@@ -346,18 +354,19 @@ class CustomerService {
         return $this->getModelPhase($request, $statuses, null);
     }
 
-    function looksLikePhoneNumber($input)
+    public function looksLikePhoneNumber($input)
     {
         return preg_match('/^\+?\d{1,4}(\s|-)?(\d{1,4}(\s|-)?){1,4}$/', $input);
     }
+
     // Función para normalizar números de teléfono
-    function normalizePhoneNumber($phoneNumber)
+    public function normalizePhoneNumber($phoneNumber)
     {
         return preg_replace('/[^0-9]/', '', $phoneNumber);
     }
-    function looksLikeEmail($input)
+
+    public function looksLikeEmail($input)
     {
         return filter_var($input, FILTER_VALIDATE_EMAIL) !== false;
     }
-
 }

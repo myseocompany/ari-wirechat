@@ -2,7 +2,10 @@
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
-$q = request()->all();
+$q = Arr::where(
+  request()->all(),
+  fn ($value) => $value !== null && $value !== ''
+);
 
 /** Helpers de valor legible */
 $perfil = [
@@ -40,7 +43,8 @@ $sourceName = function($id) use ($sources) {
 };
 
 $hasDateInputs = !empty($q['from_date'] ?? null) || !empty($q['to_date'] ?? null);
-$showDefaultDateRange = !$hasDateInputs && empty($q['search'] ?? null);
+$skipDefaultDateRange = !empty($q['no_date'] ?? null);
+$showDefaultDateRange = !$hasDateInputs && empty($q['search'] ?? null) && ! $skipDefaultDateRange;
 $defaultFrom = Carbon::today()->subDay()->setTime(17, 0);
 $defaultTo = Carbon::today()->endOfDay();
 $displayFrom = $hasDateInputs
@@ -58,20 +62,16 @@ $hasAny =
   ($q['country'] ?? null) || ($q['status_id'] ?? null) ||
   ($q['user_id'] ?? null) || ($q['source_id'] ?? null) || ($q['tag_id'] ?? null) ||
   ($q['maker'] ?? null) || ($q['created_updated'] ?? null) ||
-  ($q['has_quote'] ?? null);
+  ($q['has_quote'] ?? null) || $skipDefaultDateRange;
 @endphp
 
 @if($hasAny)
-@php
-  // Trae la query limpia
-  $q = request()->query();
-@endphp
 
 <div class="mb-2">
   <strong>Filtros activos</strong>
 
   {{-- Perfil --}}
-  @if(array_key_exists('scoring_profile', $q) && $q['scoring_profile'] !== '')
+  @if(array_key_exists('scoring_profile', $q))
     @php $perfil = ['a' => '★★★★','b' => '★★★','c' => '★★','d' => '★']; @endphp
     <span class="badge badge-pill badge-light border text-danger ml-2">
       Perfil: {{ $perfil[$q['scoring_profile']] ?? $q['scoring_profile'] }}
@@ -81,7 +81,7 @@ $hasAny =
   @endif
 
   {{-- Interés (ojo: permitir '0' explícito, pero no mostrar si la clave no existe) --}}
-  @if(array_key_exists('scoring_interest', $q) && $q['scoring_interest'] !== '')
+  @if(array_key_exists('scoring_interest', $q))
     <span class="badge badge-pill badge-light border text-danger ml-2">
       Interés: {{ $q['scoring_interest'] }}
       <a class="ml-1 text-danger"
@@ -90,7 +90,7 @@ $hasAny =
   @endif
 
   {{-- Estado --}}
-  @if(array_key_exists('status_id', $q) && $q['status_id'] !== '')
+  @if(array_key_exists('status_id', $q))
     <span class="badge badge-pill badge-light border text-danger ml-2">
       Estado: {{ $statuses->firstWhere('id', $q['status_id'])->name ?? $q['status_id'] }}
       <a class="ml-1 text-danger"
@@ -99,7 +99,7 @@ $hasAny =
   @endif
 
   {{-- Creado/Actualizado --}}
-  @if(array_key_exists('created_updated', $q) && $q['created_updated'] !== '')
+  @if(array_key_exists('created_updated', $q))
     <span class="badge badge-pill badge-light border text-danger ml-2">
       Fecha en: {{ $q['created_updated'] === 'created' ? 'Creado' : 'Actualizado' }}
       <a class="ml-1 text-danger"
@@ -108,18 +108,26 @@ $hasAny =
   @endif
 
   {{-- Rango de fechas --}}
-  @if($hasDateInputs || $showDefaultDateRange)
+  @if($hasDateInputs || $showDefaultDateRange || $skipDefaultDateRange)
     <span class="badge badge-pill badge-light border text-danger ml-2">
-      Rango: {{ $displayFrom }} - {{ $displayTo }}
-      @if($hasDateInputs)
+      @if($skipDefaultDateRange)
+        Rango: Todos
         <a class="ml-1 text-danger"
-          href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['from_date', 'to_date'])) }}">×</a>
+          href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['no_date'])) }}">×</a>
+      @else
+        Rango: {{ $displayFrom }} - {{ $displayTo }}
+        <a class="ml-1 text-danger"
+          href="{{ url()->current() . '?' . http_build_query(
+            $hasDateInputs
+              ? Arr::except($q, ['from_date', 'to_date', 'no_date'])
+              : array_merge(Arr::except($q, ['from_date', 'to_date']), ['no_date' => 1])
+          ) }}">×</a>
       @endif
     </span>
   @endif
 
   {{-- Usuario --}}
-  @if(array_key_exists('user_id', $q) && $q['user_id'] !== null && $q['user_id'] !== '')
+  @if(array_key_exists('user_id', $q))
     <span class="badge badge-pill badge-light border text-danger ml-2">
       Usuario: {{ $userName($q['user_id']) }}
       <a class="ml-1 text-danger"
@@ -128,7 +136,7 @@ $hasAny =
   @endif
 
   {{-- Etiqueta --}}
-  @if(array_key_exists('tag_id', $q) && $q['tag_id'] !== '')
+  @if(array_key_exists('tag_id', $q))
     <span class="badge badge-pill badge-light border text-danger ml-2">
       Etiqueta: {{ $tagName($q['tag_id']) }}
       <a class="ml-1 text-danger"
