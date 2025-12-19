@@ -34,5 +34,5 @@ it('renders the dashboard above the customers list', function () {
     $response->assertSeeInOrder(['class="groupbar', 'Registro'], false);
     $response->assertDontSee('id="side_content"', false);
     $response->assertSee('data-filter-open', false);
-    $response->assertSee('class="layout-full"', false);
+    $response->assertSee('customer-overlay', false);
 });

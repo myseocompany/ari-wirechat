@@ -141,3 +141,35 @@
 [2025-12-19 13:36:45] local.ERROR: Uncaught ReferenceError: moment is not defined http://127.0.0.1:8000/customers 3268 25 ReferenceError moment is not defined ReferenceError: moment is not defined
     at http://127.0.0.1:8000/customers:3268:25
     at http://127.0.0.1:8000/customers:3428:3 {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:36:45.070Z"} 
+[2025-12-19 13:37:59] local.ERROR: Uncaught ReferenceError: moment is not defined http://127.0.0.1:8000/customers 3268 25 ReferenceError moment is not defined ReferenceError: moment is not defined
+    at http://127.0.0.1:8000/customers:3268:25
+    at http://127.0.0.1:8000/customers:3428:3 {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:37:59.385Z"} 
+[2025-12-19 13:37:59] local.ERROR: Uncaught ReferenceError: moment is not defined http://127.0.0.1:8000/customers 3268 25 ReferenceError moment is not defined ReferenceError: moment is not defined
+    at http://127.0.0.1:8000/customers:3268:25
+    at http://127.0.0.1:8000/customers:3428:3 {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:37:59.385Z"} 
+[2025-12-19 13:38:01] local.DEBUG: validando Pvq26tPyrMIFw8RV0e04BbZcjCPJqN7WUfTttJY4 {"url":"http://127.0.0.1:8000/customers/668230/show","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:38:01.562Z"} 
+[2025-12-19 13:40:40] local.ERROR: Uncaught ReferenceError: moment is not defined http://127.0.0.1:8000/customers 3268 25 ReferenceError moment is not defined ReferenceError: moment is not defined
+    at http://127.0.0.1:8000/customers:3268:25
+    at http://127.0.0.1:8000/customers:3428:3 {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:40:40.811Z"} 
+[2025-12-19 13:40:40] local.ERROR: Uncaught ReferenceError: moment is not defined http://127.0.0.1:8000/customers 3268 25 ReferenceError moment is not defined ReferenceError: moment is not defined
+    at http://127.0.0.1:8000/customers:3268:25
+    at http://127.0.0.1:8000/customers:3428:3 {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:40:40.811Z"} 
+[2025-12-19 13:40:42] local.DEBUG: validando Pvq26tPyrMIFw8RV0e04BbZcjCPJqN7WUfTttJY4 {"url":"http://127.0.0.1:8000/customers/668230/show","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:40:42.324Z"} 
+[2025-12-19 13:40:45] local.ERROR: Uncaught ReferenceError: showEditIcon is not defined http://127.0.0.1:8000/customers 572 202 ReferenceError showEditIcon is not defined ReferenceError: showEditIcon is not defined
+    at HTMLDivElement.onmouseover (http://127.0.0.1:8000/customers:572:202) {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:40:45.201Z"} 
+[2025-12-19 13:40:45] local.ERROR: Uncaught ReferenceError: showEditIcon is not defined http://127.0.0.1:8000/customers 572 202 ReferenceError showEditIcon is not defined ReferenceError: showEditIcon is not defined
+    at HTMLDivElement.onmouseover (http://127.0.0.1:8000/customers:572:202) {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:40:45.201Z"} 
+[2025-12-19 13:40:45] local.ERROR: Uncaught ReferenceError: moment is not defined http://127.0.0.1:8000/customers 3268 25 ReferenceError moment is not defined ReferenceError: moment is not defined
+    at http://127.0.0.1:8000/customers:3268:25
+    at http://127.0.0.1:8000/customers:3428:3 {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:40:45.206Z"} 
+[2025-12-19 13:40:45] local.ERROR: Uncaught ReferenceError: moment is not defined http://127.0.0.1:8000/customers 3268 25 ReferenceError moment is not defined ReferenceError: moment is not defined
+    at http://127.0.0.1:8000/customers:3268:25
+    at http://127.0.0.1:8000/customers:3428:3 {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:40:45.206Z"} 
+[2025-12-19 13:40:46] local.DEBUG: validando Pvq26tPyrMIFw8RV0e04BbZcjCPJqN7WUfTttJY4 {"url":"http://127.0.0.1:8000/customers/668230/show","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:40:46.853Z"} 
+[2025-12-19 13:41:01] local.DEBUG: validando Pvq26tPyrMIFw8RV0e04BbZcjCPJqN7WUfTttJY4 {"url":"http://127.0.0.1:8000/customers/668230/show","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:41:01.859Z"} 
+[2025-12-19 13:43:33] local.ERROR: Uncaught ReferenceError: moment is not defined http://127.0.0.1:8000/customers 3319 25 ReferenceError moment is not defined ReferenceError: moment is not defined
+    at http://127.0.0.1:8000/customers:3319:25
+    at http://127.0.0.1:8000/customers:3479:3 {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:43:33.755Z"} 
+[2025-12-19 13:43:33] local.ERROR: Uncaught ReferenceError: moment is not defined http://127.0.0.1:8000/customers 3319 25 ReferenceError moment is not defined ReferenceError: moment is not defined
+    at http://127.0.0.1:8000/customers:3319:25
+    at http://127.0.0.1:8000/customers:3479:3 {"url":"http://127.0.0.1:8000/customers","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36","timestamp":"2025-12-19T18:43:33.755Z"} 

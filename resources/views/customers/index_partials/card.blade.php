@@ -8,7 +8,7 @@
   $visibleName = $item->getVisibleName($authUser);
 @endphp
 
-@php $cardUrl = request()->fullUrlWithQuery(['customer_id' => $item->id]); @endphp
+@php $cardUrl = route('customers.show', $item->id); @endphp
 <div class="card mb-3 bg-light customer-card" data-url="{{ $cardUrl }}" onmouseover="showEditIcon({{ $item->id }})" onmouseout="hideEditIcon({{ $item->id }})" style="cursor: pointer;">
   <div class="card-body p-2">
     <div class="row no-gutters align-items-center">
@@ -24,7 +24,7 @@
           {{-- Nombre del cliente + estrellas en una sola línea --}}
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <a href="{{ request()->fullUrlWithQuery(['customer_id' => $item->id]) }}" class="font-weight-bold">
+              <a href="{{ $cardUrl }}" class="font-weight-bold customer-overlay-link" data-url="{{ $cardUrl }}">
                 {!! $item->maker === 1 ? '🥟' : ($item->maker === 0 ? '💡' : ($item->maker === 2 ? '🍗🥩⚙️' : '')) !!}
                 &nbsp;{{ Str::limit($visibleName ?? 'Sin nombre', 21) }}
               </a>

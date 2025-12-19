@@ -8,6 +8,7 @@
 
 
 @section('content')
+<div id="customer_show_content">
 <hr>
 @if($model != null)
 
@@ -643,5 +644,6 @@
 
     })();
   </script>
+</div>
 </div>
 @endsection
