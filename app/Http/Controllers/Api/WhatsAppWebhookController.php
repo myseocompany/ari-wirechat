@@ -42,12 +42,17 @@ class WhatsAppWebhookController extends Controller
         Log::info('WhatsApp webhook received', [
             'has_entry' => $request->has('entry'),
             'raw' => Str::limit($request->getContent(), 5000),
+            'signature_present' => $request->hasHeader('X-Hub-Signature-256'),
         ]);
 
         $service->handle($request->all());
         $forwarder->forward(
             $request->getContent(),
-            $request->header('X-Hub-Signature-256')
+            array_filter([
+                'X-Hub-Signature-256' => $request->header('X-Hub-Signature-256'),
+                'X-Hub-Signature' => $request->header('X-Hub-Signature'),
+                'User-Agent' => $request->header('User-Agent'),
+            ])
         );
 
         return response('OK', 200);

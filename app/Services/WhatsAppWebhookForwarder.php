@@ -8,7 +8,10 @@ use Illuminate\Support\Str;
 
 class WhatsAppWebhookForwarder
 {
-    public function forward(string $rawPayload, ?string $signature): void
+    /**
+     * @param  array<string, string>  $headers
+     */
+    public function forward(string $rawPayload, array $headers = []): void
     {
         $url = config('whatsapp.sellerchat_webhook_url');
 
@@ -17,10 +20,6 @@ class WhatsAppWebhookForwarder
         }
 
         try {
-            $headers = array_filter([
-                'X-Hub-Signature-256' => $signature,
-            ]);
-
             $response = Http::withHeaders($headers)
                 ->timeout(3)
                 ->withBody($rawPayload, 'application/json')
@@ -34,6 +33,7 @@ class WhatsAppWebhookForwarder
             } else {
                 Log::info('SellerChat webhook forward ok', [
                     'status' => $response->status(),
+                    'body' => Str::limit($response->body(), 1000),
                 ]);
             }
         } catch (\Throwable $exception) {
