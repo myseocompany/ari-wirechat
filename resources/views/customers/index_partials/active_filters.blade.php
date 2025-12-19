@@ -3,7 +3,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
 $q = Arr::where(
-  request()->all(),
+  Arr::except(request()->all(), ['page']),
   fn ($value) => $value !== null && $value !== ''
 );
 
@@ -44,7 +44,7 @@ $sourceName = function($id) use ($sources) {
 
 $hasDateInputs = !empty($q['from_date'] ?? null) || !empty($q['to_date'] ?? null);
 $skipDefaultDateRange = !empty($q['no_date'] ?? null);
-$showDefaultDateRange = !$hasDateInputs && empty($q['search'] ?? null) && ! $skipDefaultDateRange;
+$showDefaultDateRange = !empty($q) && !$hasDateInputs && empty($q['search'] ?? null) && ! $skipDefaultDateRange;
 $defaultFrom = Carbon::today()->subDay()->setTime(17, 0);
 $defaultTo = Carbon::today()->endOfDay();
 $displayFrom = $hasDateInputs
@@ -55,14 +55,7 @@ $displayTo = $hasDateInputs
   : $defaultTo->format('Y-m-d H:i');
 
 /** ¿Hay algo que mostrar? */
-$hasAny =
-  ($q['search'] ?? null) ||
-  ($q['from_date'] ?? null) || ($q['to_date'] ?? null) || $showDefaultDateRange ||
-  ($q['scoring_profile'] ?? null) || ($q['scoring_interest'] ?? null) ||
-  ($q['country'] ?? null) || ($q['status_id'] ?? null) ||
-  ($q['user_id'] ?? null) || ($q['source_id'] ?? null) || ($q['tag_id'] ?? null) ||
-  ($q['maker'] ?? null) || ($q['created_updated'] ?? null) ||
-  ($q['has_quote'] ?? null) || $skipDefaultDateRange;
+$hasAny = !empty($q);
 @endphp
 
 @if($hasAny)

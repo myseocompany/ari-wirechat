@@ -12,9 +12,7 @@
       <select name="user_id" id="user_id" class="form-control">
         <option value="">Seleccione...</option>
         @foreach ($users as $item)
-          @if($item->status_id == 1)
-            <option value="{{$item->id}}" @selected((string) $selectedUserId === (string) $item->id)>{{$item->name}}</option>
-          @endif
+          <option value="{{$item->id}}" @selected((string) $selectedUserId === (string) $item->id)>{{$item->name}}</option>
         @endforeach
       </select>
     @else

@@ -48,3 +48,17 @@ it('shows full range when default range is disabled', function () {
 
     Carbon::setTestNow();
 });
+
+it('hides active filters when no filters are present', function () {
+    request()->replace([]);
+
+    $html = view('customers.index_partials.active_filters', [
+        'country_options' => collect(),
+        'statuses' => collect(),
+        'users' => collect(),
+        'sources' => collect(),
+        'tags' => collect(),
+    ])->render();
+
+    expect($html)->not->toContain('Filtros activos');
+});
