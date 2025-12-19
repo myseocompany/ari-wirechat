@@ -2,24 +2,6 @@
 {{--  FILTRO COMPLETO CLIENTES  --}}
 {{-- ========================= --}}
 
-{{-- Buscador rápido --}}
-<form action="/customers" method="GET" id="mini_filter_form" class="mb-3">
-  @if(request()->boolean('no_date'))
-    <input type="hidden" name="no_date" value="1">
-  @endif
-  <div class="input-group">
-    <input type="text" name="search" id="search" class="form-control" placeholder="Buscar..." value="{{ $request->search ?? '' }}">
-    <div class="input-group-append">
-      <button class="btn btn-primary" type="submit">Buscar</button>
-    </div>
-  </div>
-</form>
-
-{{-- Botón para mostrar filtros avanzados --}}
-<button class="btn btn-link text-primary mb-2" type="button" data-toggle="collapse" data-target="#filterSection" aria-expanded="false" aria-controls="filterSection">
-  Filtros avanzados
-</button>
-
 @include('customers.index_partials.active_filters', [
   'country_options' => $country_options ?? [],
   'statuses'        => $statuses ?? [],
@@ -28,23 +10,21 @@
   'tags'            => $tags ?? [],
 ])
 
-{{-- Sección de filtros colapsable --}}
-<div class="collapse" id="filterSection">
-  <form action="/customers" method="GET" id="filter_form" class="card card-body border shadow-sm">
+<form action="/customers" method="GET" id="filter_form" class="">
     @if(request()->boolean('no_date'))
       <input type="hidden" name="no_date" value="1">
     @endif
     <div class="form-group">
-  <label for="search_adv" class="mb-1">Buscar</label>
-  <input
-    type="text"
-    id="search_adv"
-    name="search"
-    class="form-control"
-    placeholder="Nombre, email, teléfono, empresa…"
-    value="{{ $request->search ?? '' }}"
-    autocomplete="off">
-</div>
+      <label for="search" class="mb-1">Buscar</label>
+      <input
+        type="text"
+        id="search"
+        name="search"
+        class="form-control"
+        placeholder="Nombre, email, teléfono, empresa…"
+        value="{{ $request->search ?? '' }}"
+        autocomplete="off">
+    </div>
     {{-- HIDDEN para envío real al backend --}}
     <input type="hidden" id="from_date" name="from_date" value="{{ $request->from_date }}">
     <input type="hidden" id="to_date"   name="to_date"   value="{{ $request->to_date }}">
@@ -212,5 +192,4 @@
     </div>
 
     <button type="submit" class="btn btn-primary mt-2">Aplicar filtros</button>
-  </form>
-</div>
+</form>

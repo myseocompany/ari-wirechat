@@ -155,26 +155,15 @@
     // Notas: inicialización unificada se maneja en customers.partials.notes_script
     // ======== CONFIG ========
   const ORIGEN_MAXIMO = moment('1900-01-01', 'YYYY-MM-DD'); // cambia si prefieres 1970-01-01
-  const $quickForm = $('#mini_filter_form');
-  const $advForm   = $('#filter_form');
-  const $qSearch   = $('#search');       // input del buscador rápido
-  const $aSearch   = $('#search_adv');   // input del filtro avanzado
+  const $filterForm = $('#filter_form');
+  const $search     = $('#search');
   const $from      = $('#from_date');
   const $to        = $('#to_date');
   const $inputDR   = $('#reportrange_input');
 
-  // ======== SYNC BUSCADORES ========
-  // 1) Espejar tipeo entre rápido y avanzado
-  $qSearch.on('input', function(){ $aSearch.val(this.value); });
-  $aSearch.on('input', function(){ $qSearch.val(this.value); });
-
-  // 2) Cuando envían el buscador rápido, en realidad enviamos el form avanzado
-  $quickForm.on('submit', function(e){
-    e.preventDefault();
-    // Garantiza que el avanzado lleve el mismo texto
-    $aSearch.val($qSearch.val());
-    $advForm.trigger('submit');
-  });
+  if (! $filterForm.length || ! $search.length) {
+    return;
+  }
 
   // ======== DATE RANGE PICKER ========
   function setHidden(start, end, updateWidget = true) {
