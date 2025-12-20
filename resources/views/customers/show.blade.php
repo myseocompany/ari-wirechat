@@ -48,7 +48,7 @@
 <div class="space-y-4">
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
       <!-- Primera columna -->
-      <div class="lg:col-span-3 space-y-4">
+      <div class="lg:col-span-3 space-y-4 rounded-2xl bg-white p-4">
         @if($model)
           <div class="bg-white text-sm text-slate-700">
             <div class="flex flex-col items-center text-center">
@@ -348,11 +348,11 @@
       <!-- fin columna 1 -->
       <!-- Segunda columna -->
 
-      <div class="lg:col-span-6 space-y-4 rounded-2xl bg-slate-50 p-4">
+      <div class="lg:col-span-6 space-y-4 rounded-2xl bg-slate-100 p-4">
         @include('customers.partials.customer_tabs', ['model' => $model, 'actual' => $actual])
       </div>
       <!-- Tercera columna -->
-      <div class="lg:col-span-3 space-y-4">
+      <div class="lg:col-span-3 space-y-4 rounded-2xl bg-white p-4">
         <div class="bg-white">
           <div class="text-sm text-slate-700">
             <h2 class="mb-2 text-base font-semibold text-slate-900">Interes y Perfil</h2>
