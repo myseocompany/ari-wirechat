@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('layouts.tailwind')
 
 @push('styles')
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
