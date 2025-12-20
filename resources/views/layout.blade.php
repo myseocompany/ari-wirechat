@@ -51,8 +51,8 @@
 @stack('styles')
 </head>
 <body>
-  <div class="container">
-    @include('layouts.navigation')
+  @include('layouts.navigation_tailwind')
+  <div class="container pt-20">
     <div style="background-color:#FFF;">
 
     </div>
@@ -164,6 +164,54 @@ $(document).ready(function(){
           })();
         </script>
       @endif
+      <script>
+        (function () {
+          var navToggle = document.querySelector('[data-nav-toggle]');
+          var navPanel = document.getElementById('mobile_nav');
+          if (navToggle && navPanel) {
+            navToggle.addEventListener('click', function () {
+              var isOpen = navPanel.hasAttribute('hidden') === false;
+              if (isOpen) {
+                navPanel.setAttribute('hidden', '');
+                navToggle.setAttribute('aria-expanded', 'false');
+              } else {
+                navPanel.removeAttribute('hidden');
+                navToggle.setAttribute('aria-expanded', 'true');
+              }
+            });
+          }
+
+          document.addEventListener('click', function (event) {
+            if (event.target.closest('[data-dropdown-trigger]')) {
+              var dropdown = event.target.closest('[data-dropdown]');
+              if (!dropdown) {
+                return;
+              }
+              var menu = dropdown.querySelector('[data-dropdown-menu]');
+              if (menu) {
+                menu.classList.toggle('hidden');
+              }
+              return;
+            }
+
+            if (!event.target.closest('[data-dropdown]')) {
+              document.querySelectorAll('[data-dropdown-menu]').forEach(function (menu) {
+                menu.classList.add('hidden');
+              });
+            }
+          });
+
+          document.querySelectorAll('[data-logout]').forEach(function (button) {
+            button.addEventListener('click', function (event) {
+              event.preventDefault();
+              var form = document.getElementById('logout-form');
+              if (form) {
+                form.submit();
+              }
+            });
+          });
+        })();
+      </script>
       @stack('scripts')
     </body>
     </html>

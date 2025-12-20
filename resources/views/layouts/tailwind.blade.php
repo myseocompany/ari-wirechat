@@ -82,6 +82,40 @@
           }
         });
       });
+
+      document.addEventListener('click', function (event) {
+        if (event.target.closest('[data-filter-open]')) {
+          var overlay = document.getElementById('filter_overlay');
+          if (!overlay) {
+            return;
+          }
+          event.preventDefault();
+          overlay.setAttribute('aria-hidden', 'false');
+          document.body.classList.add('filter-overlay-open');
+          return;
+        }
+
+        if (event.target.closest('[data-filter-close]')) {
+          var overlayToClose = document.getElementById('filter_overlay');
+          if (!overlayToClose) {
+            return;
+          }
+          event.preventDefault();
+          overlayToClose.setAttribute('aria-hidden', 'true');
+          document.body.classList.remove('filter-overlay-open');
+        }
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          var overlay = document.getElementById('filter_overlay');
+          if (!overlay) {
+            return;
+          }
+          overlay.setAttribute('aria-hidden', 'true');
+          document.body.classList.remove('filter-overlay-open');
+        }
+      });
     })();
   </script>
 
