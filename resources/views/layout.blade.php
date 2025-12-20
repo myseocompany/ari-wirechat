@@ -30,6 +30,7 @@
   <script src="//cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 <style>
   fieldset.scheduler-border {

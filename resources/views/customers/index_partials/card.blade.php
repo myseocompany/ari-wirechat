@@ -55,7 +55,7 @@
             {{ \Carbon\Carbon::parse($item->created_at)->format('d-m-Y') }}
 
             @if($item->country && strlen($item->country) === 2)
-              <img src="/img/flags/{{ strtolower($item->country) }}.svg" height="10">
+              <img src="/img/flags/{{ strtolower($item->country) }}.svg" height="10" class="flag-inline">
             @else
               {{ $item->country }}
             @endif
