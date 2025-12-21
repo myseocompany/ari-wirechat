@@ -439,6 +439,31 @@ class Customer extends Authenticatable
         return $this->email ?: null;
     }
 
+    public function getBestEmail(): ?string
+    {
+        $candidates = [
+            $this->email,
+            $this->contact_email,
+            $this->business_email,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (! is_string($candidate)) {
+                continue;
+            }
+
+            $candidate = trim($candidate);
+
+            if ($candidate === '' || ! filter_var($candidate, FILTER_VALIDATE_EMAIL)) {
+                continue;
+            }
+
+            return $candidate;
+        }
+
+        return null;
+    }
+
     public function getVisiblePhone(?User $user): ?string
     {
         if (! $this->hasFullAccess($user)) {

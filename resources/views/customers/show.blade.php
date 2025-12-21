@@ -94,6 +94,11 @@
                     <span class="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700" aria-hidden="true" title="Eliminar">Eliminar</span>
                   </a>
                 @endif
+                @if (Auth::user()->role_id == 1)
+                  <a href="/optimize/customers/consolidateDuplicates/?query={{ $model->getBestPhoneCandidate() ?? $model->getBestEmail() }}">
+                    <span class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700" aria-hidden="true">Buscar duplicados</span>
+                  </a>
+                @endif
                 <button class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700" id="btnCopiar" size="5">POA</button>
 
                 <form method="POST" action="{{ route('customers.send-welcome', $model->id) }}">

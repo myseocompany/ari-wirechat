@@ -26,3 +26,11 @@ it('uses the tailwind layout on the customer show view', function () {
 
     expect($blade)->toContain("@extends('layouts.tailwind')");
 });
+
+it('includes the duplicate search action link', function () {
+    $blade = file_get_contents(resource_path('views/customers/show.blade.php'));
+
+    expect($blade)->toContain('/optimize/customers/consolidateDuplicates/?query=');
+    expect($blade)->toContain('getBestPhoneCandidate');
+    expect($blade)->toContain('getBestEmail');
+});

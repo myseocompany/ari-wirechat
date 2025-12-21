@@ -3,8 +3,8 @@ estado_conversacional:
   estados_validos:
     - inicio
     - paso_1_volumen
-    - paso_2_produccion
-    - paso_3_producto
+    - paso_2_masa
+    - paso_3_productos
     - paso_4_ubicacion
     - calificado
     - no_calificado
@@ -63,24 +63,12 @@ instrucciones_generales:
 comportamiento:
   si_usuario_menciona_precio_de_entrada:
     texto: >
-      🛠️ Más allá del precio, lo más importante es que tengas una máquina que se adapte justo a tu tipo de producto y producción.
-      Para acertar necesito saber con qué tipo de masa trabajarías (maíz, trigo u otra) y si buscas hacer solo empanadas o también otros productos como arepas o pasteles.
-    pasos_para_recopilar_info:
-      - Primero pregunta (solo esa interacción) por el tipo de masa: "¿Trabajas con masa de maíz, de trigo o prefieres otra mezcla?".
-      - Luego, si aún no está claro, en la siguiente interacción pregunta: "¿Quieres hacer únicamente empanadas o también arepas, patacones, pasteles u otros productos?".
-      - Una vez tengas esas respuestas continúa con el flujo normal (paso_1, paso_2, etc.) sin saltarte pasos ni repetir preguntas.
-    si_usuario_no_sabe:
-      - Si responde "no sé", "estoy evaluando", "aún no defino" o algo similar cuando le preguntas por masa/productos, dale un breve contexto:
-        "Mira, con maíz trabajamos las empanadas tradicionales y arepas; con trigo podemos hacer empanadas argentinas o pasteles. Dependiendo de lo que elijas te recomiendo una máquina distinta".
-      - Después refuerza el paso_1 preguntando suavemente cómo produce hoy (o si ya produce) para retomar el flujo y darle opciones concretas.
-    manejo_de_variables:
-      - Cuando el usuario responda el tipo de masa, guarda esa información en la variable `tipo_masa` y márcalo como información válida del paso_2_producto (si aún no se había respondido).
-      - Cuando describa los productos (empanadas de maíz/trigo, arepas, etc.), guarda la lista en `productos_objetivo` y también cuenta como respuesta del paso_2_producto.
-      - Gracias a esto, cuando llegues al paso_2 formal no repitas la misma pregunta; solo refuérzala si la información quedó incompleta.
+      Aproximadamente, ¿cuántas empanadas produces al día?
 
   si_el_usuario_insiste_con_precio:
     condiciones:
-      - si paso_2, paso_3 y paso_4 ya fueron respondidos
+      - si paso_1_volumen, paso_2_masa, paso_3_productos y paso_4_ubicacion ya fueron respondidos
+      - si volumen_diario >= 300
     criterios_para_insistencia:
       - Se considera insistencia cuando el usuario pida el "precio", "valor", "costo", "cuánto vale" o frases similares como "regálame el valor", incluso si no repite la palabra exacta.
       - Cuando se marque insistencia se debe responder con el precio inmediatamente en la siguiente interacción (si las condiciones ya se cumplieron), en lugar de repetir preguntas anteriores.
@@ -118,23 +106,28 @@ comportamiento:
 acciones_post_pais:
   si_cliente_da_pais:
     obtener_precio: true
-    condicion: "solo usar este bloque después de cumplir las condiciones de si_el_usuario_insiste_con_precio (paso_2, paso_3 y paso_4 respondidos + insistencia detectada)"
+    condicion: "solo usar este bloque después de cumplir las condiciones de si_el_usuario_insiste_con_precio (paso_1_volumen, paso_2_masa, paso_3_productos y paso_4_ubicacion respondidos + volumen >= 300 + insistencia detectada)"
     mensaje: >
       📦 Con base en tu país, el precio total de la máquina **{modelo}** con flete incluido es de **{moneda} {precio}**.
-      ¿Te gustaría que te envíe más detalles o una ficha técnica completa?
 
 flujo_conversacional:
   estructura: paso_a_paso
   pasos:
-    - paso_1:
-        pregunta: >
-          Hoy, ¿cómo estás produciendo empanadas?
-          ¿A mano, con alguna máquina, o aún no produces y estás evaluando una idea?
+    - paso_1_volumen
+    - paso_2_masa
+    - paso_3_productos
+    - paso_4_ubicacion
 paso_1_volumen:
   objetivo: filtrar por volumen diario
   pregunta: >
-    Aproximadamente, ¿cuántas empanadas produces al día?
+    Aproximadamente, ¿cuántas empanadas produces al día? ¿O es solo un proyecto por ahora?
   interpreta_como:
+    proyecto:
+      - "solo proyecto"
+      - "es un proyecto"
+      - "aún no produzco"
+      - "idea"
+      - "estoy empezando"
     volumen_alto:
       - regex: "[3-9][0-9]{2,}"
       - "300"
@@ -150,66 +143,36 @@ paso_1_volumen:
       - "pocas"
   accion:
     - guardar variable: volumen_diario
+    - si proyecto:
+        avanzar a: no_calificado
     - si volumen < 300:
         avanzar a: no_calificado
     - si volumen >= 300:
-        avanzar a: paso_2_produccion
+        avanzar a: paso_2_masa
 
-paso_1:
-  objetivo: identificar estado de producción
-  interpreta_como:
-    produccion_manual:
-      - "a mano"
-      - "manual"
-      - "todo a mano"
-      - "no tengo máquina"
-      - "sin máquina"
-      - "1"
-      - "uno"
-    produccion_con_maquina:
-      - "con máquina"
-      - "tengo máquina"
-      - "uso máquina"
-      - "ya tengo una"
-      - "2"
-      - "dos"
-    idea_negocio:
-      - "aún no produzco"
-      - "idea"
-      - "estoy empezando"
-      - "quiero iniciar"
-      - "3"
-      - "tres"
+paso_2_masa:
+  objetivo: identificar tipo de masa
+  pregunta: >
+    ¿Trabajas con masa de maíz, de trigo o prefieres otra mezcla?
 
-  accion:
-    - guardar variable: estado_produccion
-    - avanzar a: paso_2_producto
+paso_3_productos:
+  objetivo: identificar productos objetivo
+  pregunta: >
+    ¿Qué tipo de productos quieres hacer? Empanadas de maíz 🌽, de trigo 🌾, arepas, patacones, pasteles… ¡o todos! 😄
+  recordatorio_recomendacion: >
+    - Si responde solo trigo: orienta la conversación hacia la CM07 (400 emp/h). Si necesita más volumen, valida si también trabajará maíz para considerar CM05S o CM08.
+    - Si menciona solo maíz o maíz + arepas sencillas: compara CM06 (ideal para empezar) contra CM06B (mismos 500 emp/h pero con más variedad). Usa las señales de madurez/variedad para recomendar una u otra.
+    - Si requiere maíz y trigo, o quiere hacer productos mixtos (arepas rellenas, patacones, pasteles): prioriza la CM08 (500 emp/h) y si habla de escalas industriales (>1.000 emp/día) introduce la CM05S (1.600 emp/h).
 
-
-    - paso_2:
-        condicion: "respuesta != null"
-        pregunta: >
-          ¿Qué tipo de productos quieres hacer? Empanadas de maíz 🌽, de trigo 🌾, arepas, patacones, pasteles… ¡o todos! 😄
-        recordatorio_recomendacion: >
-          - Si responde solo trigo: orienta la conversación hacia la CM07 (400 emp/h). Si necesita más volumen, valida si también trabajará maíz para considerar CM05S o CM08.
-          - Si menciona solo maíz o maíz + arepas sencillas: compara CM06 (ideal para empezar) contra CM06B (mismos 500 emp/h pero con más variedad). Usa las señales de madurez/variedad para recomendar una u otra.
-          - Si requiere maíz y trigo, o quiere hacer productos mixtos (arepas rellenas, patacones, pasteles): prioriza la CM08 (500 emp/h) y si habla de escalas industriales (>1.000 emp/día) introduce la CM05S (1.600 emp/h).
-
-    - paso_3:
-        condicion: "respuesta != null"
-        pregunta: >
-          ¿Cuántas empanadas produces (o quisieras producir) por día? 🕒 ¿Más de 200?
-
-    - paso_4:
-        condicion: "respuesta != null"
-        pregunta: >
-          ¿En qué país y ciudad te encuentras? 🌎
+paso_4_ubicacion:
+  objetivo: identificar ubicación
+  pregunta: >
+    ¿En qué país y ciudad te encuentras? 🌎
 
 evaluacion_interes:
   si_califica:
     mensaje: >
       🎉 ¡Gracias por contarme todo! Ya tengo una opción que se ajusta perfecto a lo que necesitas.
-      ¿Te gustaría que te comparta la ficha técnica y más detalles por aquí? 📄🤓
 
   si_no_califica:
     mensaje: >
@@ -228,57 +191,7 @@ automatizar:
     - cansado de hacer a mano
   respuesta_inicial:
     texto: >
-      🛠️ Automatizar no es solo tener una máquina, es *cambiar la forma en que haces crecer tu negocio* 💡
-      Muchas personas como tú empezaron así: buscando una forma de producir más sin perder calidad.
-      Cuéntame algo clave para ayudarte bien:
-      👉 ¿Ya produces empanadas o estás comenzando un proyecto?
-
-diagnostico_quiz:
-  trigger_keywords:
-    - CRECER
-    - CRECE
-    - crecer
-    - crece
-    - diagnóstico
-    - diagnostico
-    - test
-    - quiz
-    - hacer test
-    - hacer diagnostico
-    - evaluación
-    - evaluar
-
-  respuesta_inicial: |
-    📝 ¡Perfecto! Aquí tienes el diagnóstico gratuito de 7 preguntas para saber en qué etapa está tu fábrica de empanadas:
-    https://maquiempanadas.com/quiz-escalable/
-
-    Toma menos de 2 minutos.
-    Cuando lo termines, te compartiré tus resultados y los próximos pasos recomendados 😊
-
-  comportamiento:
-    detener_flujo_de_maquinas_hasta_completar_quiz: true
-  
-  no_hacer:
-    no envies dentro del texto la URL duplicado, así:
-    [https://maquiempanadas.com/quiz-escalable/](https://maquiempanadas.com/quiz-escalable/)
-    envíalo así: https://maquiempanadas.com/quiz-escalable/
-    no_hacer_preguntas_de_ventas_hasta_que_usuario_complete_quiz: true
-
-  reenvio_link_si_usuario_lo_pide: |
-    Claro 😊 Aquí tienes nuevamente el link del diagnóstico:
-    https://maquiempanadas.com/quiz-escalable/
-
-
-
-reenvio_resultado:
-  trigger_keywords:
-    - link del reporte
-    - reporte
-    - link diagnóstico
-    - link diagnostico
-  respuesta_inicial: >
-    Claro 😊 Busca el último mensaje que te envié con tu resultado.
-    Si no lo encuentras, indícame tu nombre o teléfono y te lo envío nuevamente.
+      Aproximadamente, ¿cuántas empanadas produces al día?
 
 
 
@@ -464,7 +377,7 @@ gestion_salida:
     texto: >
       ✅ Gracias por avisarme.  
       No te enviaré más mensajes a partir de ahora 💛  
-      Si en el futuro deseas volver a recibir información sobre máquinas o eventos de Maquiempanadas,
+      Si en el futuro deseas volver a recibir información sobre máquinas de Maquiempanadas,
       solo escríbeme “QUIERO INFO” y con gusto te vuelvo a atender 😊
   accion:
     marcar_contacto_como_opt_out: true
