@@ -1,68 +1,26 @@
 @extends('layouts.tailwind')
 
 @push('styles')
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-    :root {
-        --ds-ink: #0f172a;
-        --ds-navy: #1c2640;
-        --ds-slate: #97a3b6;
-        --ds-cloud: #e9eef7;
-        --ds-coral: #ff5c5c;
-        --ds-rose: #ff8d7a;
-        --ds-blush: #ffd2c9;
-        --ds-mint: #d9f3ee;
-        --ds-lilac: #d8d7ff;
-    }
-
-    .ds-shell {
-        background:
-            radial-gradient(circle at 5% 15%, rgba(255, 92, 92, 0.28), transparent 45%),
-            radial-gradient(circle at 90% 10%, rgba(28, 38, 64, 0.22), transparent 45%),
-            linear-gradient(120deg, #fff3f0 0%, #eef3ff 52%, #ffffff 100%);
-    }
-
-    .ds-body {
-        font-family: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
-        color: var(--ds-ink);
-    }
-
-    .ds-display {
-        font-family: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
-        letter-spacing: -0.02em;
-    }
-
-    .ds-mono {
-        font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-            "Courier New", monospace;
-    }
-
-    .ds-grid {
-        background-image:
-            linear-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(15, 23, 42, 0.05) 1px, transparent 1px);
-        background-size: 32px 32px;
-    }
-</style>
+  <x-design.styles />
 @endpush
 
 @section('content')
 <div class="ds-body relative flex flex-col gap-6">
-    <section class="ds-shell ds-grid relative overflow-hidden rounded-[32px] border border-slate-200 px-6 py-10 shadow-[0_25px_70px_rgba(15,23,42,0.12)] sm:px-10">
-        <div class="pointer-events-none absolute -left-24 -top-10 h-72 w-72 rounded-full bg-[radial-gradient(circle,#ff8d7a,transparent_70%)] opacity-40 blur-3xl"></div>
-        <div class="pointer-events-none absolute -right-20 top-12 h-72 w-72 rounded-full bg-[radial-gradient(circle,#1c2640,transparent_68%)] opacity-25 blur-3xl"></div>
-        <div class="pointer-events-none absolute bottom-6 left-1/2 h-20 w-3/4 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,#ffd2c9,transparent_70%)] opacity-40 blur-2xl"></div>
+    <section class="ds-shell relative overflow-hidden rounded-[32px] border border-slate-200 px-6 py-10 shadow-[0_25px_70px_rgba(15,23,42,0.12)] sm:px-10">
+        <div class="pointer-events-none absolute -left-24 -top-10 h-72 w-72 rounded-full bg-[radial-gradient(circle,var(--ds-coral),transparent_70%)] opacity-35 blur-3xl"></div>
+        <div class="pointer-events-none absolute -right-20 top-12 h-72 w-72 rounded-full bg-[radial-gradient(circle,var(--ds-rose),transparent_68%)] opacity-30 blur-3xl"></div>
+        <div class="pointer-events-none absolute bottom-6 left-1/2 h-20 w-3/4 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--ds-blush),transparent_70%)] opacity-45 blur-2xl"></div>
         <div class="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div class="flex max-w-3xl flex-col gap-4">
                 <x-design.eyebrow>Design system</x-design.eyebrow>
                 <h1 class="ds-display text-4xl font-semibold text-[color:var(--ds-ink)] sm:text-6xl">Wirechat UI Kit</h1>
-                <p class="text-base text-slate-700 sm:text-lg">Una guia visual para mantener consistencia en tipografia, color y componentes clave del producto.</p>
+                <p class="text-base text-slate-700 sm:text-lg">Una guia visual con base azul, acentos verdes y amarillos para mantener consistencia visual.</p>
                 <div class="flex flex-wrap gap-3">
-                    <x-design.badge class="border border-white/60 bg-white/90 text-sm font-medium text-slate-700 shadow-sm">Version 1.0</x-design.badge>
-                    <x-design.badge class="border border-white/60 bg-white/90 text-sm font-medium text-slate-700 shadow-sm">Tailwind v3</x-design.badge>
-                    <x-design.badge class="border border-white/60 bg-white/90 text-sm font-medium text-slate-700 shadow-sm">Livewire ready</x-design.badge>
+                    <x-design.badge class="border border-white/60 bg-white/90 text-sm font-medium text-slate-700 shadow-sm">Version 1.2</x-design.badge>
+                    <x-design.badge tone="cloud" class="text-sm font-medium">Azul base</x-design.badge>
+                    <x-design.badge tone="outline" class="text-sm font-medium">Azul claro</x-design.badge>
+                    <x-design.badge tone="mint" class="text-sm font-medium">Success</x-design.badge>
+                    <x-design.badge tone="blush" class="text-sm font-medium">Sun</x-design.badge>
                 </div>
             </div>
             <div class="flex flex-col gap-3 rounded-2xl border border-white/60 bg-white/80 p-4 text-sm text-slate-700 shadow-sm sm:max-w-xs">
@@ -72,7 +30,7 @@
                 </div>
                 <p class="text-sm font-medium text-[color:var(--ds-ink)]">Componentes listos para nuevas vistas.</p>
                 <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
-                    <div class="h-full w-2/3 rounded-full bg-[linear-gradient(90deg,#ff5c5c,#ff8d7a)]"></div>
+                    <div class="h-full w-2/3 rounded-full bg-[linear-gradient(90deg,var(--ds-coral),var(--ds-rose))]"></div>
                 </div>
             </div>
         </div>
@@ -154,8 +112,8 @@
                     <x-design.badge class="bg-[color:var(--ds-lilac)] text-xs font-semibold text-[color:var(--ds-ink)]">Altura 44px</x-design.badge>
                 </div>
                 <div class="grid gap-3 sm:grid-cols-3">
-                    <button class="rounded-xl bg-[color:var(--ds-coral)] px-4 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Principal</button>
-                    <button class="rounded-xl bg-[color:var(--ds-navy)] px-4 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(28,38,64,0.25)]">Oscuro</button>
+                    <button class="rounded-xl bg-[color:var(--ds-coral)] px-4 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(12,117,188,0.35)]">Principal</button>
+                    <button class="rounded-xl bg-[color:var(--ds-navy)] px-4 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(18,53,89,0.25)]">Oscuro</button>
                     <button class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-[color:var(--ds-ink)]">Neutro</button>
                 </div>
                 <div class="flex flex-wrap gap-3">
@@ -193,13 +151,12 @@
         <x-design.section>
             <div class="flex flex-col gap-6">
                 <x-design.eyebrow>Paleta cromatica</x-design.eyebrow>
-                <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
-                    <x-design.color-swatch name="Ink" hex="#0f172a" />
-                    <x-design.color-swatch name="Navy" hex="#1c2640" />
-                    <x-design.color-swatch name="Slate" hex="#97a3b6" />
-                    <x-design.color-swatch name="Coral" hex="#ff5c5c" />
-                    <x-design.color-swatch name="Rose" hex="#ff8d7a" label-class="text-[color:var(--ds-ink)]/60" value-class="text-[color:var(--ds-ink)]" />
-                    <x-design.color-swatch name="Blush" hex="#ffd2c9" label-class="text-[color:var(--ds-ink)]/60" value-class="text-[color:var(--ds-ink)]" />
+                <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
+                    <x-design.color-swatch name="Ink" hex="#0b1f33" />
+                    <x-design.color-swatch name="Navy" hex="#123559" />
+                    <x-design.color-swatch name="Blue" hex="#3b6cff" />
+                    <x-design.color-swatch name="Blue Light" hex="#6a8bff" />
+                    <x-design.color-swatch name="Sun" hex="#fff1b8" label-class="text-[color:var(--ds-ink)]/60" value-class="text-[color:var(--ds-ink)]" />
                 </div>
                 <div class="grid gap-3 sm:grid-cols-3">
                     <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4">
@@ -207,11 +164,11 @@
                         <p class="text-sm text-slate-600">Superficies y tarjetas.</p>
                     </div>
                     <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-mint)] p-4">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Mint</p>
-                        <p class="text-sm text-slate-600">Estados positivos y badges.</p>
+                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Success</p>
+                        <p class="text-sm text-slate-600">Estados positivos.</p>
                     </div>
                     <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-lilac)] p-4">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Lilac</p>
+                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Accent</p>
                         <p class="text-sm text-slate-600">Acciones secundarias.</p>
                     </div>
                 </div>

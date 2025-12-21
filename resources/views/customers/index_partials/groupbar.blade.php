@@ -1,41 +1,31 @@
-<div class="row mb-2">
-    <div class="col-md-12">
-  @if($customersGroup->count()!=0)
-  <ul class="groupbar bb_hbox">
-  @php
-    $count=0;  
-    $sum_g = 0;  
-  @endphp 
-    @foreach($customersGroup as $item)
- <?php
-  
-  if($item->count>0)
-      $count++;
+@if($customersGroup->count()!=0)
+  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="grid grid-cols-2 gap-3">
+      @php
+        $count = 0;
+        $sum_g = 0;
+      @endphp
+      @foreach($customersGroup as $item)
+        @if($item->count > 0)
+          @php $count++; @endphp
+        @endif
+      @endforeach
 
-  ?>
-  
-  @endforeach
-    @foreach($customersGroup as $item)
-    @if($item->count!=0)
-    <li class="groupBarGroup card border-0" style="background-color: @if( isset($item->status_color) ) {{$item->status_color}}; @else #000000; @endif  width: <?php 
-       
-
-        if($customersGroup->count()!=0){
-          echo 100/$count;
-        }
-     ?>%">
-      <h3>{{$item->count}}</h3>
-     
-      <div><a href="#" onclick="changeStatus({{$item->status_id}})"> @if( isset($item->status_name) ) {{$item->status_name}} @else sin estado @endif </a></div>
-    </li>
-    @php
-      $sum_g += $item->count;
-    @endphp
-    @endif          
-    @endforeach
-  </ul>
-  @else
-    Sin Estados
-  @endif
+      @foreach($customersGroup as $item)
+        @if($item->count!=0)
+          <div class="rounded-2xl p-3 text-white shadow-sm" style="background-color: {{ $item->status_color ?? '#0f172a' }}">
+            <p class="text-lg font-semibold">{{ $item->count }}</p>
+            <a href="#" class="text-xs uppercase tracking-[0.2em] text-white/80 transition hover:text-white" onclick="changeStatus({{ $item->status_id }})">
+              {{ $item->status_name ?? 'sin estado' }}
+            </a>
+          </div>
+          @php $sum_g += $item->count; @endphp
+        @endif
+      @endforeach
+    </div>
   </div>
-</div>
+@else
+  <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4 text-sm text-[color:var(--ds-navy)] shadow-sm">
+    Sin estados
+  </div>
+@endif

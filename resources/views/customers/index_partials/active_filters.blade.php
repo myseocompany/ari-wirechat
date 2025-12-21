@@ -7,14 +7,12 @@ $q = Arr::where(
   fn ($value) => $value !== null && $value !== ''
 );
 
-/** Helpers de valor legible */
 $perfil = [
   'a' => '★★★★', 'b' => '★★★', 'c' => '★★', 'd' => '★'
 ];
 $makerMap = ['empty' => 'Sin clasificar', '0' => 'Proyecto', '1' => 'Hace empanadas'];
 $createdUpdatedMap = ['created' => 'Creado', 'updated' => 'Actualizado'];
 
-/** Lookup helpers (si los pasas desde el controlador a la vista) */
 $countryName = function($iso2) use ($country_options) {
   if (empty($iso2) || empty($country_options)) return $iso2;
   $item = collect($country_options)->firstWhere('iso2', $iso2);
@@ -54,101 +52,82 @@ $displayTo = $hasDateInputs
   ? ($q['to_date'] ?? Carbon::today()->format('Y-m-d'))
   : $defaultTo->format('Y-m-d H:i');
 
-/** ¿Hay algo que mostrar? */
 $hasAny = !empty($q);
 @endphp
 
 @if($hasAny)
+  <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4 shadow-sm">
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Filtros activos</span>
 
-<div class="mb-2">
-  <strong>Filtros activos</strong>
-
-  {{-- Perfil --}}
-  @if(array_key_exists('scoring_profile', $q))
-    @php $perfil = ['a' => '★★★★','b' => '★★★','c' => '★★','d' => '★']; @endphp
-    <span class="badge badge-pill badge-light border text-danger ml-2">
-      Perfil: {{ $perfil[$q['scoring_profile']] ?? $q['scoring_profile'] }}
-      <a class="ml-1 text-danger"
-         href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['scoring_profile'])) }}">×</a>
-    </span>
-  @endif
-
-  {{-- Interés (ojo: permitir '0' explícito, pero no mostrar si la clave no existe) --}}
-  @if(array_key_exists('scoring_interest', $q))
-    <span class="badge badge-pill badge-light border text-danger ml-2">
-      Interés: {{ $q['scoring_interest'] }}
-      <a class="ml-1 text-danger"
-         href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['scoring_interest'])) }}">×</a>
-    </span>
-  @endif
-
-  {{-- Estado --}}
-  @if(array_key_exists('status_id', $q))
-    <span class="badge badge-pill badge-light border text-danger ml-2">
-      Estado: {{ $statuses->firstWhere('id', $q['status_id'])->name ?? $q['status_id'] }}
-      <a class="ml-1 text-danger"
-         href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['status_id'])) }}">×</a>
-    </span>
-  @endif
-
-  {{-- Creado/Actualizado --}}
-  @if(array_key_exists('created_updated', $q))
-    <span class="badge badge-pill badge-light border text-danger ml-2">
-      Fecha en: {{ $q['created_updated'] === 'created' ? 'Creado' : 'Actualizado' }}
-      <a class="ml-1 text-danger"
-         href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['created_updated'])) }}">×</a>
-    </span>
-  @endif
-
-  {{-- Rango de fechas --}}
-  @if($hasDateInputs || $showDefaultDateRange || ($skipDefaultDateRange ?? false))
-    <span class="badge badge-pill badge-light border text-danger ml-2">
-      @if($skipDefaultDateRange ?? false)
-        Rango: Todos
-        <a class="ml-1 text-danger"
-          href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['no_date'])) }}">×</a>
-      @else
-        Rango: {{ $displayFrom }} - {{ $displayTo }}
-        <a class="ml-1 text-danger"
-          href="{{ url()->current() . '?' . http_build_query(
-            $hasDateInputs
-              ? Arr::except($q, ['from_date', 'to_date', 'no_date'])
-              : array_merge(Arr::except($q, ['from_date', 'to_date']), ['no_date' => 1])
-          ) }}">×</a>
+      @if(array_key_exists('scoring_profile', $q))
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.7rem] font-semibold text-slate-600">
+          Perfil: {{ $perfil[$q['scoring_profile']] ?? $q['scoring_profile'] }}
+          <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['scoring_profile'])) }}">×</a>
+        </span>
       @endif
-    </span>
-  @endif
 
-  {{-- Usuario --}}
-  @if(array_key_exists('user_id', $q))
-    <span class="badge badge-pill badge-light border text-danger ml-2">
-      Usuario: {{ $userName($q['user_id']) }}
-      <a class="ml-1 text-danger"
-        href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['user_id'])) }}">×</a>
-    </span>
-  @endif
+      @if(array_key_exists('scoring_interest', $q))
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.7rem] font-semibold text-slate-600">
+          Interés: {{ $q['scoring_interest'] }}
+          <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['scoring_interest'])) }}">×</a>
+        </span>
+      @endif
 
-  {{-- Etiqueta --}}
-  @if(array_key_exists('tag_id', $q))
-    <span class="badge badge-pill badge-light border text-danger ml-2">
-      Etiqueta: {{ $tagName($q['tag_id']) }}
-      <a class="ml-1 text-danger"
-         href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['tag_id'])) }}">×</a>
-    </span>
-  @endif
+      @if(array_key_exists('status_id', $q))
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.7rem] font-semibold text-slate-600">
+          Estado: {{ $statusName($q['status_id']) }}
+          <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['status_id'])) }}">×</a>
+        </span>
+      @endif
 
-  {{-- Cotización --}}
-  @if(array_key_exists('has_quote', $q))
-    <span class="badge badge-pill badge-light border text-danger ml-2">
-      Cotización: {{ $q['has_quote'] === '1' ? 'Sí' : 'No' }}
-      <a class="ml-1 text-danger"
-        href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['has_quote'])) }}">×</a>
-    </span>
-  @endif
+      @if(array_key_exists('created_updated', $q))
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.7rem] font-semibold text-slate-600">
+          Fecha en: {{ $createdUpdatedMap[$q['created_updated']] ?? $q['created_updated'] }}
+          <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['created_updated'])) }}">×</a>
+        </span>
+      @endif
 
-  {{-- Botón limpiar todo si hay algo --}}
-  @if(!empty($q))
-    <a class="btn btn-sm btn-outline-secondary ml-2" href="{{ url()->current() }}">Limpiar todo</a>
-  @endif
-</div>
+      @if($hasDateInputs || $showDefaultDateRange || ($skipDefaultDateRange ?? false))
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.7rem] font-semibold text-slate-600">
+          @if($skipDefaultDateRange ?? false)
+            Rango: Todos
+            <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['no_date'])) }}">×</a>
+          @else
+            Rango: {{ $displayFrom }} - {{ $displayTo }}
+            <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(
+              $hasDateInputs
+                ? Arr::except($q, ['from_date', 'to_date', 'no_date'])
+                : array_merge(Arr::except($q, ['from_date', 'to_date']), ['no_date' => 1])
+            ) }}">×</a>
+          @endif
+        </span>
+      @endif
+
+      @if(array_key_exists('user_id', $q))
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.7rem] font-semibold text-slate-600">
+          Usuario: {{ $userName($q['user_id']) }}
+          <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['user_id'])) }}">×</a>
+        </span>
+      @endif
+
+      @if(array_key_exists('tag_id', $q))
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.7rem] font-semibold text-slate-600">
+          Etiqueta: {{ $tagName($q['tag_id']) }}
+          <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['tag_id'])) }}">×</a>
+        </span>
+      @endif
+
+      @if(array_key_exists('has_quote', $q))
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.7rem] font-semibold text-slate-600">
+          Cotización: {{ $q['has_quote'] === '1' ? 'Sí' : 'No' }}
+          <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['has_quote'])) }}">×</a>
+        </span>
+      @endif
+    </div>
+
+    @if(!empty($q))
+      <a class="mt-3 inline-flex items-center rounded-full border border-white/70 bg-white px-4 py-2 text-xs font-semibold text-[color:var(--ds-navy)] shadow-sm" href="{{ url()->current() }}">Limpiar todo</a>
+    @endif
+  </div>
 @endif

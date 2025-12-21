@@ -1,117 +1,129 @@
 @extends('layouts.tailwind')
 
-
-
 @if(isset($phase))
   @section('title', $phase->name)
 @else
-  @section('title', 'Leads') 
+  @section('title', 'Leads')
 @endif
-
-
 
 @include('customers.partials.notes_script')
 
-
-
-<?php 
+<?php
   function requestToStr($request){
     $str = "?";
     $url = $request->fullUrl();
     $parsedUrl = parse_url($url);
-    
+
     if(isset($parsedUrl['query'] ))
-      $str .= $parsedUrl['query']; 
+      $str .= $parsedUrl['query'];
 
-    return $str; 
+    return $str;
   }
- ?>
+?>
 
-
-
-
-@section('content')
-  {{-- Alertas --}}
-  @if (session('status'))
-    <div class="alert alert-primary alert-dismissible" role="alert">
-      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
-      {!! html_entity_decode(session('status')) !!}
-    </div>
-  @endif
-  @if (session('statusone'))
-    <div class="alert alert-success alert-dismissible" role="alert">
-      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
-      {!! html_entity_decode(session('statusone')) !!}
-    </div>
-  @endif
-  @if (session('statustwo'))
-    <div class="alert alert-danger alert-dismissible" role="alert">
-      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
-      {!! html_entity_decode(session('statustwo')) !!}
-    </div>
-  @endif
-
-  <div class="d-flex flex-wrap align-items-center justify-content-between col-12">
-    <div>
-      Registro <strong>{{ $model->firstItem() }}</strong> a 
-      <strong>{{ $model->lastItem() }}</strong> de 
-      <strong>{{ $model->total() }}</strong>
-    </div>
-  </div>
-
-  <div class="row mt-3">
-    <div class="col-lg-8">
-      @include('customers.index_partials.groupbar', ['customersGroup' => $customersGroup])
-
-      <div>@if(isset($sum_g)) TOTAL {{$sum_g}} @endif </div>
-
-      <script type="text/javascript">
-        var ratings = [];
-      </script>
-      <?php $cont=0; ?>
-
-      @foreach($model as $item)
-        @include('customers.index_partials.card', ['item' => $item])            
-      @endforeach
-
-      @if($model->count() === 0)
-        <div class="alert alert-info mt-3">
-          No se encontraron prospectos con esos filtros.
-        </div>
-      @endif
-    </div>
-    <aside class="col-lg-4 mb-3 mb-lg-0">
-      <div class="card shadow-sm position-sticky" style="top: 90px;">
-        <div class="card-body">
-          @include('customers.index_partials.side_filter')
-        </div>
-      </div>
-    </aside>
-  </div>
-
+@push('styles')
+  <x-design.styles />
   <style>
     ul.pagination {
+      display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      margin-top: 15px;
-      padding: 10px;
+      gap: 0.5rem;
+      padding: 0.75rem;
+    }
+    ul.pagination .page-item a,
+    ul.pagination .page-item span {
+      border-radius: 9999px;
+      padding: 0.4rem 0.85rem;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      color: #1c2640;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    ul.pagination .page-item.active span {
+      background: #ff5c5c;
+      border-color: #ff5c5c;
+      color: #ffffff;
     }
   </style>
+@endpush
 
-  <style>
-    @media (max-width: 576px) {
-      .customer_name {
-        display: flex;
-        flex-direction: column;
-      }
-      .customer_description {
-        display: flex;
-        flex-direction: column;
-      }
-    }
-  </style>
-  <div class="row">
-    <div class="col-12 d-flex justify-content-center">
+@section('content')
+  <div class="ds-body flex flex-col gap-6">
+    @if (session('status'))
+      <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4 text-sm text-[color:var(--ds-navy)] shadow-sm">
+        {!! html_entity_decode(session('status')) !!}
+      </div>
+    @endif
+    @if (session('statusone'))
+      <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-mint)] p-4 text-sm text-[color:var(--ds-navy)] shadow-sm">
+        {!! html_entity_decode(session('statusone')) !!}
+      </div>
+    @endif
+    @if (session('statustwo'))
+      <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-blush)] p-4 text-sm text-[color:var(--ds-coral)] shadow-sm">
+        {!! html_entity_decode(session('statustwo')) !!}
+      </div>
+    @endif
+
+    <x-design.section class="ds-shell border-slate-200">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex flex-col gap-2">
+          <x-design.eyebrow>{{ isset($phase) ? $phase->name : 'Leads' }}</x-design.eyebrow>
+          <p class="text-sm text-slate-700">
+            Registro <span class="font-semibold text-[color:var(--ds-ink)]">{{ $model->firstItem() }}</span> a
+            <span class="font-semibold text-[color:var(--ds-ink)]">{{ $model->lastItem() }}</span> de
+            <span class="font-semibold text-[color:var(--ds-ink)]">{{ $model->total() }}</span>
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <x-design.badge tone="cloud">Total {{ $model->total() }}</x-design.badge>
+          <x-design.badge tone="outline">Activos {{ $model->count() }}</x-design.badge>
+        </div>
+      </div>
+    </x-design.section>
+
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div class="flex flex-col gap-4">
+        <script type="text/javascript">
+          var ratings = [];
+        </script>
+        <?php $cont=0; ?>
+
+        <div class="flex flex-col gap-4">
+          @foreach($model as $item)
+            @include('customers.index_partials.card', ['item' => $item])
+          @endforeach
+
+          @if($model->count() === 0)
+            <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4 text-sm text-[color:var(--ds-navy)] shadow-sm">
+              No se encontraron prospectos con esos filtros.
+            </div>
+          @endif
+        </div>
+      </div>
+
+      <aside class="lg:sticky lg:top-24">
+        <div class="flex flex-col gap-4">
+          @include('customers.index_partials.groupbar', ['customersGroup' => $customersGroup])
+
+          @if(isset($sum_g))
+            <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">
+              Total estados: <span class="font-semibold text-[color:var(--ds-ink)]">{{ $sum_g }}</span>
+            </div>
+          @endif
+        </div>
+
+        <div class="mt-4">
+          <x-design.section class="border-slate-200">
+            @include('customers.index_partials.side_filter')
+          </x-design.section>
+        </div>
+      </aside>
+    </div>
+
+    <div class="flex justify-center">
       {!! $model->appends(request()->input())->links() !!}
     </div>
   </div>
@@ -126,7 +138,6 @@
       <div class="customer-overlay__body" id="customer_overlay_body"></div>
     </div>
   </div>
-
 @endsection
 
 @push('scripts')
