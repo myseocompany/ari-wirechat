@@ -57,29 +57,37 @@
       <strong>{{ $model->lastItem() }}</strong> de 
       <strong>{{ $model->total() }}</strong>
     </div>
-    <button class="btn btn-primary btn-sm mt-2 mt-sm-0" type="button" data-filter-open>
-      Filtros
-    </button>
   </div>
 
-  @include('customers.index_partials.groupbar', ['customersGroup' => $customersGroup])
+  <div class="row mt-3">
+    <div class="col-lg-8">
+      @include('customers.index_partials.groupbar', ['customersGroup' => $customersGroup])
 
-  <div>@if(isset($sum_g)) TOTAL {{$sum_g}} @endif </div>
+      <div>@if(isset($sum_g)) TOTAL {{$sum_g}} @endif </div>
 
-  <script type="text/javascript">
-    var ratings = [];
-  </script>
-  <?php $cont=0; ?>
+      <script type="text/javascript">
+        var ratings = [];
+      </script>
+      <?php $cont=0; ?>
 
-  @foreach($model as $item)
-    @include('customers.index_partials.card', ['item' => $item])            
-  @endforeach
+      @foreach($model as $item)
+        @include('customers.index_partials.card', ['item' => $item])            
+      @endforeach
 
-  @if($model->count() === 0)
-    <div class="alert alert-info mt-3">
-      No se encontraron prospectos con esos filtros.
+      @if($model->count() === 0)
+        <div class="alert alert-info mt-3">
+          No se encontraron prospectos con esos filtros.
+        </div>
+      @endif
     </div>
-  @endif
+    <aside class="col-lg-4 mb-3 mb-lg-0">
+      <div class="card shadow-sm position-sticky" style="top: 90px;">
+        <div class="card-body">
+          @include('customers.index_partials.side_filter')
+        </div>
+      </div>
+    </aside>
+  </div>
 
   <style>
     ul.pagination {
@@ -119,24 +127,6 @@
     </div>
   </div>
 
-  @hasSection('filter')
-    <div id="filter_overlay" class="filter-overlay" aria-hidden="true">
-      <div class="filter-overlay__backdrop" data-filter-close></div>
-      <div class="filter-overlay__panel" role="dialog" aria-modal="true" aria-labelledby="filter_overlay_title">
-        <div class="filter-overlay__header">
-          <h2 id="filter_overlay_title">Filtros</h2>
-          <button class="filter-overlay__close" type="button" data-filter-close aria-label="Cerrar filtros">&times;</button>
-        </div>
-        <div class="filter-overlay__body">
-          @yield('filter')
-        </div>
-      </div>
-    </div>
-  @endif
-@endsection
-
-@section('filter')
-  @include('customers.index_partials.side_filter')
 @endsection
 
 @push('scripts')

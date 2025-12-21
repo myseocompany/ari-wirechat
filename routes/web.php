@@ -45,6 +45,10 @@ Route::get('/', function () {
     return view('home');
 });
 
+Route::middleware('auth')->get('/design-system', function () {
+    return view('design-system');
+})->name('design-system');
+
 Route::middleware('auth')->get('/faq', [HomeController::class, 'indexFaq'])->name('faq');
 
 Route::middleware('auth')->group(function () {
