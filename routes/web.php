@@ -36,13 +36,18 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WhatsAppAPIController;
 use App\Http\Controllers\WhatsAppBroadcastController;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Resend\Laravel\Facades\Resend;
 
 Route::get('/', function () {
-    return view('home');
+    if (Auth::check()) {
+        return redirect()->route('customers.index');
+    }
+
+    return redirect()->route('login');
 });
 
 Route::middleware('auth')->get('/design-system', function () {

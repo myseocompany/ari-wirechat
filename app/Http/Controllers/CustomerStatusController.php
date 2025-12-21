@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\CustomerStatus;
-use DB;
+use Illuminate\Http\Request;
 
 class CustomerStatusController extends Controller
 {
-    
     /**
      * Create a new controller instance.
      *
@@ -31,8 +29,7 @@ class CustomerStatusController extends Controller
         //                         where('customer_statuses.weight')
         //                         ->orderBy('weight','asc')
         //                         ->get();
-        $customer_statuses = CustomerStatus::orderBy('stage_id', 'DESC')
-            ->orderBy('weight', 'ASC')->get();
+        $customer_statuses = CustomerStatus::orderBy('weight', 'ASC')->get();
 
         return view('customer_statuses.index', compact('customer_statuses'));
     }
@@ -46,13 +43,13 @@ class CustomerStatusController extends Controller
     {
         //
         $customer_statuses = CustomerStatus::all();
-        return view('customer_statuses.create', compact( 'customer_statuses'));
+
+        return view('customer_statuses.create', compact('customer_statuses'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -69,7 +66,6 @@ class CustomerStatusController extends Controller
         // $model->created_at = $request->created_at;
         // $model->updated_at = $request->updated_at;
 
-        
         $model->save();
 
         return redirect('/customer_statuses');
@@ -98,8 +94,7 @@ class CustomerStatusController extends Controller
     public function edit($id)
     {
         //
-      $customer_statuses = CustomerStatus::find($id);
-
+        $customer_statuses = CustomerStatus::find($id);
 
         return view('customer_statuses.edit', compact('customer_statuses'));
     }
@@ -107,7 +102,6 @@ class CustomerStatusController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -121,7 +115,7 @@ class CustomerStatusController extends Controller
         $model->weight = $request->weight;
         $model->color = $request->color;
         $model->stage_id = $request->stage_id;
-        
+
         $model->save();
 
         return redirect('/customer_statuses');
@@ -135,10 +129,10 @@ class CustomerStatusController extends Controller
      */
     public function destroy($id)
     {
-         $model = CustomerStatus::find($id);
-         $model->delete();
-      
-            return redirect('customer_statuses'); 
-    
+        $model = CustomerStatus::find($id);
+        $model->delete();
+
+        return redirect('customer_statuses');
+
     }
 }
