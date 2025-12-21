@@ -46,6 +46,10 @@ This application is a Laravel application and its main Laravel ecosystems packag
 ## Documentation Files
 - You must only create documentation files if explicitly requested by the user.
 
+## Frontend Design System
+- Use the design system shown at `/design-system` as the default reference for new frontend work (typography, palette, spacing, radius, shadows, badges, and overall visual language).
+- Reuse existing components before creating new ones; align new UI to the Wirechat UI Kit aesthetic (soft gradients, colored chips, rounded cards, and coral accents).
+
 
 === boost rules ===
 

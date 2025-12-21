@@ -56,19 +56,19 @@
         <div class="pointer-events-none absolute bottom-6 left-1/2 h-20 w-3/4 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,#ffd2c9,transparent_70%)] opacity-40 blur-2xl"></div>
         <div class="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div class="flex max-w-3xl flex-col gap-4">
-                <span class="ds-mono text-xs uppercase tracking-[0.4em] text-[color:var(--ds-coral)]">Design system</span>
+                <x-design.eyebrow>Design system</x-design.eyebrow>
                 <h1 class="ds-display text-4xl font-semibold text-[color:var(--ds-ink)] sm:text-6xl">Wirechat UI Kit</h1>
                 <p class="text-base text-slate-700 sm:text-lg">Una guia visual para mantener consistencia en tipografia, color y componentes clave del producto.</p>
                 <div class="flex flex-wrap gap-3">
-                    <span class="rounded-full border border-white/60 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">Version 1.0</span>
-                    <span class="rounded-full border border-white/60 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">Tailwind v3</span>
-                    <span class="rounded-full border border-white/60 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm">Livewire ready</span>
+                    <x-design.badge class="border border-white/60 bg-white/90 text-sm font-medium text-slate-700 shadow-sm">Version 1.0</x-design.badge>
+                    <x-design.badge class="border border-white/60 bg-white/90 text-sm font-medium text-slate-700 shadow-sm">Tailwind v3</x-design.badge>
+                    <x-design.badge class="border border-white/60 bg-white/90 text-sm font-medium text-slate-700 shadow-sm">Livewire ready</x-design.badge>
                 </div>
             </div>
             <div class="flex flex-col gap-3 rounded-2xl border border-white/60 bg-white/80 p-4 text-sm text-slate-700 shadow-sm sm:max-w-xs">
                 <div class="flex items-center justify-between">
                     <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Estado</span>
-                    <span class="rounded-full bg-[color:var(--ds-blush)] px-3 py-1 text-xs font-semibold text-[color:var(--ds-coral)]">En progreso</span>
+                    <x-design.badge tone="blush">En progreso</x-design.badge>
                 </div>
                 <p class="text-sm font-medium text-[color:var(--ds-ink)]">Componentes listos para nuevas vistas.</p>
                 <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
@@ -79,13 +79,13 @@
     </section>
 
     <div class="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-        <section class="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+        <x-design.section>
             <div class="flex flex-col gap-6">
                 <div class="flex flex-col gap-2">
-                    <span class="ds-mono text-xs uppercase tracking-[0.3em] text-[color:var(--ds-coral)]">Tipografia</span>
+                    <x-design.eyebrow>Tipografia</x-design.eyebrow>
                     <div class="flex flex-wrap items-center gap-4">
                         <h2 class="ds-display text-3xl font-semibold text-[color:var(--ds-ink)]">Space Grotesk</h2>
-                        <span class="rounded-full bg-[color:var(--ds-cloud)] px-3 py-1 text-xs font-semibold text-[color:var(--ds-navy)]">Regular / Semibold</span>
+                        <x-design.badge tone="cloud">Regular / Semibold</x-design.badge>
                     </div>
                     <p class="ds-mono text-sm text-slate-600">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
                     <p class="ds-mono text-sm text-slate-600">abcdefghijklmnopqrstuvwxyz 0123456789</p>
@@ -109,49 +109,49 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </x-design.section>
 
-        <section class="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+        <x-design.section>
             <div class="flex flex-col gap-6">
                 <div class="flex items-center justify-between">
-                    <span class="ds-mono text-xs uppercase tracking-[0.3em] text-[color:var(--ds-coral)]">Iconos</span>
-                    <span class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-500">24px grid</span>
+                    <x-design.eyebrow>Iconos</x-design.eyebrow>
+                    <x-design.badge class="border border-slate-200 bg-white text-xs font-semibold text-slate-500">24px grid</x-design.badge>
                 </div>
-                <div class="grid grid-cols-4 gap-3 text-[color:var(--ds-navy)] sm:grid-cols-4">
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--ds-cloud)] shadow-sm">
+                <div class="grid grid-cols-4 gap-3">
+                    <x-design.icon-tile>
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l9 7h-3v9h-5v-6H11v6H6v-9H3l9-7z"/></svg>
-                    </div>
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--ds-cloud)] shadow-sm">
+                    </x-design.icon-tile>
+                    <x-design.icon-tile>
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7-4.35-9-8.5C1.5 8.5 4.5 6 7.5 6c1.7 0 3.3.8 4.5 2 1.2-1.2 2.8-2 4.5-2 3 0 6 2.5 4.5 6.5-2 4.15-9 8.5-9 8.5z"/></svg>
-                    </div>
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--ds-cloud)] shadow-sm">
+                    </x-design.icon-tile>
+                    <x-design.icon-tile>
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.4 12.9a7.96 7.96 0 0 0 .1-1 7.96 7.96 0 0 0-.1-1l2.1-1.6-2-3.4-2.5 1a8.1 8.1 0 0 0-1.7-1l-.4-2.6h-4l-.4 2.6a8.1 8.1 0 0 0-1.7 1l-2.5-1-2 3.4 2.1 1.6a7.96 7.96 0 0 0-.1 1 7.96 7.96 0 0 0 .1 1L2.5 14.5l2 3.4 2.5-1a8.1 8.1 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8.1 8.1 0 0 0 1.7-1l2.5 1 2-3.4-2.1-1.6zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>
-                    </div>
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--ds-cloud)] shadow-sm">
+                    </x-design.icon-tile>
+                    <x-design.icon-tile>
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 10V8a6 6 0 1 1 12 0v2h2v12H4V10h2zm2 0h8V8a4 4 0 1 0-8 0v2z"/></svg>
-                    </div>
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--ds-blush)] text-[color:var(--ds-coral)] shadow-sm">
+                    </x-design.icon-tile>
+                    <x-design.icon-tile tone="blush">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V6a2 2 0 0 1 2-2z"/></svg>
-                    </div>
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--ds-blush)] text-[color:var(--ds-coral)] shadow-sm">
+                    </x-design.icon-tile>
+                    <x-design.icon-tile tone="blush">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z"/></svg>
-                    </div>
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--ds-blush)] text-[color:var(--ds-coral)] shadow-sm">
+                    </x-design.icon-tile>
+                    <x-design.icon-tile tone="blush">
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 14h4v4h-4v-4zm0-8h4v6h-4V6zm2-4C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/></svg>
-                    </div>
-                    <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--ds-cloud)] shadow-sm">
+                    </x-design.icon-tile>
+                    <x-design.icon-tile>
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 3v6h-6l2.2-2.2A7 7 0 1 0 19 12h2a9 9 0 0 1-18 0z"/></svg>
-                    </div>
+                    </x-design.icon-tile>
                 </div>
                 <p class="text-sm text-slate-600">Iconos monolineales con alto contraste y esquinas redondeadas.</p>
             </div>
-        </section>
+        </x-design.section>
 
-        <section class="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+        <x-design.section>
             <div class="flex flex-col gap-6">
                 <div class="flex items-center justify-between">
-                    <span class="ds-mono text-xs uppercase tracking-[0.3em] text-[color:var(--ds-coral)]">Botones</span>
-                    <span class="rounded-full bg-[color:var(--ds-lilac)] px-3 py-1 text-xs font-semibold text-[color:var(--ds-ink)]">Altura 44px</span>
+                    <x-design.eyebrow>Botones</x-design.eyebrow>
+                    <x-design.badge class="bg-[color:var(--ds-lilac)] text-xs font-semibold text-[color:var(--ds-ink)]">Altura 44px</x-design.badge>
                 </div>
                 <div class="grid gap-3 sm:grid-cols-3">
                     <button class="rounded-xl bg-[color:var(--ds-coral)] px-4 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Principal</button>
@@ -159,16 +159,16 @@
                     <button class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-[color:var(--ds-ink)]">Neutro</button>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                    <button class="rounded-full bg-[color:var(--ds-cloud)] px-4 py-2 text-xs font-semibold text-[color:var(--ds-navy)]">Small</button>
-                    <button class="rounded-full border border-[color:var(--ds-coral)] px-4 py-2 text-xs font-semibold text-[color:var(--ds-coral)]">Outline</button>
-                    <button class="rounded-full bg-[color:var(--ds-mint)] px-4 py-2 text-xs font-semibold text-[color:var(--ds-navy)]">Success</button>
+                    <x-design.badge tone="cloud">Small</x-design.badge>
+                    <x-design.badge tone="outline">Outline</x-design.badge>
+                    <x-design.badge tone="mint">Success</x-design.badge>
                 </div>
             </div>
-        </section>
+        </x-design.section>
 
-        <section class="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+        <x-design.section>
             <div class="flex flex-col gap-6">
-                <span class="ds-mono text-xs uppercase tracking-[0.3em] text-[color:var(--ds-coral)]">Campos de formulario</span>
+                <x-design.eyebrow>Campos de formulario</x-design.eyebrow>
                 <div class="grid gap-4">
                     <label class="flex flex-col gap-2">
                         <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Email</span>
@@ -186,38 +186,20 @@
                     </label>
                 </div>
             </div>
-        </section>
+        </x-design.section>
     </div>
 
     <div class="grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <section class="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+        <x-design.section>
             <div class="flex flex-col gap-6">
-                <span class="ds-mono text-xs uppercase tracking-[0.3em] text-[color:var(--ds-coral)]">Paleta cromatica</span>
+                <x-design.eyebrow>Paleta cromatica</x-design.eyebrow>
                 <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-6">
-                    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-ink)] p-3 text-white shadow-sm">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-white/60">Ink</p>
-                        <p class="ds-mono text-xs">#0f172a</p>
-                    </div>
-                    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-navy)] p-3 text-white shadow-sm">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-white/60">Navy</p>
-                        <p class="ds-mono text-xs">#1c2640</p>
-                    </div>
-                    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-slate)] p-3 text-white shadow-sm">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-white/70">Slate</p>
-                        <p class="ds-mono text-xs">#97a3b6</p>
-                    </div>
-                    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-coral)] p-3 text-white shadow-sm">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-white/70">Coral</p>
-                        <p class="ds-mono text-xs">#ff5c5c</p>
-                    </div>
-                    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-rose)] p-3 text-[color:var(--ds-ink)] shadow-sm">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-[color:var(--ds-ink)]/60">Rose</p>
-                        <p class="ds-mono text-xs">#ff8d7a</p>
-                    </div>
-                    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-blush)] p-3 text-[color:var(--ds-ink)] shadow-sm">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-[color:var(--ds-ink)]/60">Blush</p>
-                        <p class="ds-mono text-xs">#ffd2c9</p>
-                    </div>
+                    <x-design.color-swatch name="Ink" hex="#0f172a" />
+                    <x-design.color-swatch name="Navy" hex="#1c2640" />
+                    <x-design.color-swatch name="Slate" hex="#97a3b6" />
+                    <x-design.color-swatch name="Coral" hex="#ff5c5c" />
+                    <x-design.color-swatch name="Rose" hex="#ff8d7a" label-class="text-[color:var(--ds-ink)]/60" value-class="text-[color:var(--ds-ink)]" />
+                    <x-design.color-swatch name="Blush" hex="#ffd2c9" label-class="text-[color:var(--ds-ink)]/60" value-class="text-[color:var(--ds-ink)]" />
                 </div>
                 <div class="grid gap-3 sm:grid-cols-3">
                     <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4">
@@ -234,33 +216,33 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </x-design.section>
 
-        <section class="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)]">
+        <x-design.section>
             <div class="flex flex-col gap-6">
-                <span class="ds-mono text-xs uppercase tracking-[0.3em] text-[color:var(--ds-coral)]">Avatares</span>
+                <x-design.eyebrow>Avatares</x-design.eyebrow>
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[linear-gradient(135deg,#ff8d7a,#ff5c5c)] text-sm font-semibold text-white">AC</div>
+                        <x-design.avatar initials="AC" variant="coral" />
                         <div>
                             <p class="text-sm font-semibold text-[color:var(--ds-ink)]">Ana Cruz</p>
                             <p class="text-xs text-slate-600">Ventas</p>
                         </div>
-                        <span class="ml-auto rounded-full bg-[color:var(--ds-mint)] px-3 py-1 text-xs font-semibold text-[color:var(--ds-navy)]">Activo</span>
+                        <x-design.badge tone="mint" class="ml-auto">Activo</x-design.badge>
                     </div>
                     <div class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[linear-gradient(135deg,#1c2640,#0f172a)] text-sm font-semibold text-white">MS</div>
+                        <x-design.avatar initials="MS" variant="navy" />
                         <div>
                             <p class="text-sm font-semibold text-[color:var(--ds-ink)]">M. Salazar</p>
                             <p class="text-xs text-slate-600">Soporte</p>
                         </div>
-                        <span class="ml-auto rounded-full bg-[color:var(--ds-blush)] px-3 py-1 text-xs font-semibold text-[color:var(--ds-coral)]">Pendiente</span>
+                        <x-design.badge tone="blush" class="ml-auto">Pendiente</x-design.badge>
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                    <span class="rounded-full bg-[color:var(--ds-cloud)] px-4 py-2 text-xs font-semibold text-[color:var(--ds-navy)]">Activo</span>
-                    <span class="rounded-full bg-[color:var(--ds-blush)] px-4 py-2 text-xs font-semibold text-[color:var(--ds-coral)]">Pendiente</span>
-                    <span class="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600">Archivado</span>
+                    <x-design.badge tone="cloud">Activo</x-design.badge>
+                    <x-design.badge tone="blush">Pendiente</x-design.badge>
+                    <x-design.badge tone="outline">Archivado</x-design.badge>
                 </div>
                 <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4">
                     <div class="flex items-center justify-between gap-4">
@@ -271,14 +253,14 @@
                         <button class="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[color:var(--ds-navy)] shadow-sm">Editar</button>
                     </div>
                     <div class="mt-4 flex flex-wrap gap-3">
-                        <span class="rounded-full bg-[color:var(--ds-ink)] px-4 py-2 text-xs font-semibold text-white">Importante</span>
-                        <span class="rounded-full bg-[color:var(--ds-cloud)] px-4 py-2 text-xs font-semibold text-[color:var(--ds-navy)]">Seguimiento</span>
-                        <span class="rounded-full bg-[color:var(--ds-blush)] px-4 py-2 text-xs font-semibold text-[color:var(--ds-coral)]">Nuevo</span>
-                        <span class="rounded-full border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700">Backlog</span>
+                        <x-design.badge tone="navy">Importante</x-design.badge>
+                        <x-design.badge tone="cloud">Seguimiento</x-design.badge>
+                        <x-design.badge tone="blush">Nuevo</x-design.badge>
+                        <x-design.badge tone="outline">Backlog</x-design.badge>
                     </div>
                 </div>
             </div>
-        </section>
+        </x-design.section>
     </div>
 </div>
 @endsection
