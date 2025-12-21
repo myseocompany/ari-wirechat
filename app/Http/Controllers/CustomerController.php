@@ -98,7 +98,12 @@ class CustomerController extends Controller
         // dd($statuses);
 
         $model = $this->customerService->filterCustomers($request, $statuses, null, false, 10);
-        $customersGroup = $this->customerService->filterCustomers($request, $statuses, null, true);
+        $childGroups = $this->customerService->filterCustomers($request, $statuses, null, true);
+        $parentStatuses = CustomerStatus::query()
+            ->whereIn('name', ['Por contactar', 'Oportunidades', 'Ventas', 'Perdidas'])
+            ->orderBy('weight')
+            ->get();
+        $customersGroup = $this->customerService->groupStatusesByParent($childGroups, $parentStatuses);
 
         $usingDefaultDateRange = ! $request->filled('from_date')
             && ! $request->filled('to_date')
@@ -107,7 +112,8 @@ class CustomerController extends Controller
 
         if ($defaultUserFilter && $usingDefaultDateRange && method_exists($model, 'total') && $model->total() === 0) {
             $model = $this->customerService->filterCustomers($request, $statuses, null, false, 10, false);
-            $customersGroup = $this->customerService->filterCustomers($request, $statuses, null, true, 0, false);
+            $childGroups = $this->customerService->filterCustomers($request, $statuses, null, true, 0, false);
+            $customersGroup = $this->customerService->groupStatusesByParent($childGroups, $parentStatuses);
         }
 
         if (! empty($request->search) && method_exists($model, 'total') && $model->total() === 1) {
@@ -136,6 +142,7 @@ class CustomerController extends Controller
             'statuses' => $statuses,
             'model' => $model,
             'customersGroup' => $customersGroup,
+            'parent_statuses' => $parentStatuses,
             'pending_actions' => $this->getPendingActions(),
             'products' => Product::all(),
             'sources' => CustomerSource::all(),

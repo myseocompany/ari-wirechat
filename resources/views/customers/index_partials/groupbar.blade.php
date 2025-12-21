@@ -1,5 +1,5 @@
 @if($customersGroup->count()!=0)
-  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" data-dashboard="status-summary">
     <div class="grid grid-cols-2 gap-3">
       @php
         $count = 0;
@@ -15,7 +15,7 @@
         @if($item->count!=0)
           <div class="rounded-2xl p-3 text-white shadow-sm" style="background-color: {{ $item->status_color ?? '#0f172a' }}">
             <p class="text-lg font-semibold">{{ $item->count }}</p>
-            <a href="#" class="text-xs uppercase tracking-[0.2em] text-white/80 transition hover:text-white" onclick="changeStatus({{ $item->status_id }})">
+            <a href="#" class="text-xs uppercase tracking-[0.2em] text-white/80 transition hover:text-white" onclick="changeParentStatus({{ $item->status_id }})">
               {{ $item->status_name ?? 'sin estado' }}
             </a>
           </div>

@@ -7,6 +7,8 @@ $q = Arr::where(
   fn ($value) => $value !== null && $value !== ''
 );
 
+$parent_statuses = $parent_statuses ?? collect();
+
 $perfil = [
   'a' => '★★★★', 'b' => '★★★', 'c' => '★★', 'd' => '★'
 ];
@@ -37,6 +39,11 @@ $userName = function($id) use ($users) {
 $sourceName = function($id) use ($sources) {
   if (empty($id) || empty($sources)) return $id;
   $item = collect($sources)->firstWhere('id', (int)$id);
+  return $item->name ?? $id;
+};
+$parentName = function($id) use ($parent_statuses) {
+  if (empty($id) || empty($parent_statuses)) return $id;
+  $item = collect($parent_statuses)->firstWhere('id', (int)$id);
   return $item->name ?? $id;
 };
 
@@ -78,6 +85,13 @@ $hasAny = !empty($q);
         <span class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.7rem] font-semibold text-slate-600">
           Estado: {{ $statusName($q['status_id']) }}
           <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['status_id'])) }}">×</a>
+        </span>
+      @endif
+
+      @if(array_key_exists('parent_status_id', $q))
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-[0.7rem] font-semibold text-slate-600">
+          Macro estado: {{ $parentName($q['parent_status_id']) }}
+          <a class="text-[color:var(--ds-coral)]" href="{{ url()->current() . '?' . http_build_query(Arr::except($q, ['parent_status_id'])) }}">×</a>
         </span>
       @endif
 

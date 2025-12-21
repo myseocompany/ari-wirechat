@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class CustomerService
 {
@@ -38,6 +39,7 @@ class CustomerService
         ));
 
         $statusFilter = $request->status_id;
+        $parentStatusFilter = $request->parent_status_id;
         $filteringUnassignedStatus = ($statusFilter === self::STATUS_FILTER_UNASSIGNED);
 
         $query->where(function ($query) use (
@@ -52,7 +54,8 @@ class CustomerService
             $onlyWithTags,
             $filterTagIds,
             $filteringUnassignedStatus,
-            $statusFilter
+            $statusFilter,
+            $parentStatusFilter
         ) {
             if (! is_null($stage_id)) {
                 $query->where('customer_statuses.stage_id', $stage_id);
@@ -97,6 +100,8 @@ class CustomerService
                 });
             } elseif (! empty($statusFilter)) {
                 $query->where('customers.status_id', $statusFilter);
+            } elseif (! empty($parentStatusFilter)) {
+                $query->where('customer_statuses.parent_id', $parentStatusFilter);
             }
             if (! empty($request->scoring_interest)) {
                 $query->where('customers.scoring_interest', $request->scoring_interest);
@@ -348,6 +353,39 @@ class CustomerService
     public function countFilterCustomers(Request $request, $statuses, $stageId, bool $applyDefaultDateRange = true, bool $onlyWithTags = false)
     {
         return $this->filterCustomers($request, $statuses, $stageId, true, 0, $applyDefaultDateRange, $onlyWithTags);
+    }
+
+    public function groupStatusesByParent(Collection $childGroups, Collection $parentStatuses): Collection
+    {
+        $parentMap = $parentStatuses->keyBy('id');
+        $childIds = $childGroups->pluck('status_table_id')->filter()->all();
+        $childParents = CustomerStatus::query()
+            ->whereIn('id', $childIds)
+            ->pluck('parent_id', 'id');
+
+        $grouped = $parentStatuses->map(function (CustomerStatus $status) {
+            return (object) [
+                'count' => 0,
+                'status_id' => $status->id,
+                'status_name' => $status->name,
+                'status_color' => $status->color ?? '#0f172a',
+            ];
+        })->values();
+
+        $groupedById = $grouped->keyBy('status_id');
+
+        foreach ($childGroups as $childGroup) {
+            $childId = $childGroup->status_table_id ?? null;
+            $parentId = $childId ? ($childParents[$childId] ?? null) : null;
+
+            if (! $parentId || ! $groupedById->has($parentId)) {
+                continue;
+            }
+
+            $groupedById[$parentId]->count += (int) ($childGroup->count ?? 0);
+        }
+
+        return $groupedById->values();
     }
 
     public function filterModel(Request $request, $statuses)

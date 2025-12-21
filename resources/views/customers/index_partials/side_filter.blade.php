@@ -10,6 +10,7 @@
   @if(request()->boolean('no_date'))
     <input type="hidden" name="no_date" value="1">
   @endif
+  <input type="hidden" id="parent_status_id" name="parent_status_id" value="{{ $request->parent_status_id }}">
 
   <div class="flex flex-col gap-2">
     <label for="search" class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Buscar</label>

@@ -25,6 +25,7 @@ use App\Models\RdStation;
 use App\Models\Reference;
 use App\Models\RequestLog;
 use App\Models\User;
+use App\Services\CustomerService;
 use App\Services\GoogleAdsLeadMapper;
 use App\Services\LeadAssignmentService;
 use App\Services\MetaConversionsService;
@@ -78,13 +79,19 @@ class APIController extends Controller
         $statuses = $this->getStatuses($request, 1);
 
         $model = $this->getModel($request, $statuses, 'customers');
-        $customersGroup = $this->countFilterCustomers($request, $statuses);
+        $childGroups = $this->countFilterCustomers($request, $statuses);
+        $parentStatuses = CustomerStatus::query()
+            ->whereIn('name', ['Por contactar', 'Oportunidades', 'Ventas', 'Perdidas'])
+            ->orderBy('weight')
+            ->get();
+        $customersGroup = app(CustomerService::class)->groupStatusesByParent($childGroups, $parentStatuses);
 
         $sources = CustomerSource::all();
 
         $pending_actions = $this->getPendingActions();
 
-        return view('customers.index', compact('model', 'request', 'customer_options', 'customersGroup', 'query', 'users', 'sources', 'pending_actions'));
+        return view('customers.index', compact('model', 'request', 'customer_options', 'customersGroup', 'query', 'users', 'sources', 'pending_actions'))
+            ->with('parent_statuses', $parentStatuses);
     }
 
     public function leads(Request $request)
@@ -93,13 +100,19 @@ class APIController extends Controller
         $customer_options = CustomerStatus::all();
         $statuses = $this->getStatuses($request, 1);
         $model = $this->getModel($request, $statuses, 'leads');
-        $customersGroup = $this->countFilterCustomers($request, $statuses);
+        $childGroups = $this->countFilterCustomers($request, $statuses);
+        $parentStatuses = CustomerStatus::query()
+            ->whereIn('name', ['Por contactar', 'Oportunidades', 'Ventas', 'Perdidas'])
+            ->orderBy('weight')
+            ->get();
+        $customersGroup = app(CustomerService::class)->groupStatusesByParent($childGroups, $parentStatuses);
 
         $pending_actions = $this->getPendingActions();
 
         $sources = CustomerSource::all();
 
-        return view('customers.index', compact('model', 'request', 'customer_options', 'customersGroup', 'query', 'users', 'sources', 'pending_actions'));
+        return view('customers.index', compact('model', 'request', 'customer_options', 'customersGroup', 'query', 'users', 'sources', 'pending_actions'))
+            ->with('parent_statuses', $parentStatuses);
     }
 
     public function getModel(Request $request, $statuses, $action)

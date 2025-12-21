@@ -157,6 +157,16 @@
     }
   });
 
+  window.changeParentStatus = function (id) {
+    var $parentInput = $('#parent_status_id');
+    if (! $parentInput.length) {
+      return;
+    }
+    $parentInput.val(id);
+    $('#status_id').val('');
+    $('#filter_form').submit();
+  };
+
   (function () {
     const overlay = document.getElementById('customer_overlay');
     const overlayBody = document.getElementById('customer_overlay_body');
