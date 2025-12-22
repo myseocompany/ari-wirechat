@@ -1388,17 +1388,7 @@ class APIController extends Controller
                     ]);
                     $this->storeActionAPI($request, $model->id);
                     $created = true;
-
-                    $customerName = trim($model->name ?? '') ?: 'allí';
-                    $components = [
-                        [
-                            'type' => 'body',
-                            'parameters' => [
-                                ['type' => 'text', 'text' => $customerName],
-                            ],
-                        ],
-                    ];
-                    $this->sendWelcomeTemplate($model, $components);
+                    $this->onBoardingCustomer($model);
 
                     if ($model->source_id == 23) {
 
@@ -1518,6 +1508,76 @@ class APIController extends Controller
             'customer_id' => $customer->id,
             'type_id' => 105,
         ]);
+    }
+
+    private function onBoardingCustomer(Customer $customer): void
+    {
+        $customer->loadMissing(['source', 'user']);
+
+        $customerName = trim($customer->name ?? '') ?: 'allí';
+        $components = [
+            [
+                'type' => 'body',
+                'parameters' => [
+                    ['type' => 'text', 'text' => $customerName],
+                ],
+            ],
+        ];
+
+        $this->sendWelcomeTemplate($customer, $components);
+        $this->sendLeadNotificationEmails($customer);
+        $this->updateOnboardingStatus($customer);
+    }
+
+    private function sendLeadNotificationEmails(Customer $customer): void
+    {
+        $subject = 'Nuevo lead recibido';
+        $body = $this->buildLeadNotificationBody($customer);
+
+        Mail::raw($body, function ($message) use ($subject) {
+            $message->subject($subject);
+            $message->to('nicola@myseocompany.co');
+        });
+
+        $assignedUser = $customer->user;
+        if ($assignedUser && ! empty($assignedUser->email)) {
+            Mail::raw($body, function ($message) use ($assignedUser, $subject) {
+                $message->subject($subject);
+                $message->to($assignedUser->email, $assignedUser->name);
+            });
+        }
+    }
+
+    private function buildLeadNotificationBody(Customer $customer): string
+    {
+        $customerName = trim($customer->name ?? '') ?: 'Sin nombre';
+        $customerEmail = trim($customer->email ?? '') ?: 'Sin email';
+        $customerPhone = trim($customer->phone ?? '') ?: 'Sin telefono';
+        $sourceName = optional($customer->source)->name ?: 'Sin fuente';
+        $assignedName = optional($customer->user)->name ?: 'Sin asignar';
+
+        return implode(PHP_EOL, [
+            'Nuevo lead recibido',
+            "ID: {$customer->id}",
+            "Nombre: {$customerName}",
+            "Email: {$customerEmail}",
+            "Telefono: {$customerPhone}",
+            "Fuente: {$sourceName}",
+            "Asignado a: {$assignedName}",
+        ]);
+    }
+
+    private function updateOnboardingStatus(Customer $customer): void
+    {
+        if ((int) $customer->status_id === 20) {
+            return;
+        }
+
+        $history = new CustomerHistory;
+        $history->saveFromModel($customer);
+
+        $customer->status_id = 20;
+        $customer->save();
     }
 
     private function getWelcomeTemplateName(): string
