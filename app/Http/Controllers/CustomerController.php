@@ -54,8 +54,6 @@ class CustomerController extends Controller
 
     protected $customerService;
 
-    private const WELCOME_NOTE = 'Se envió la campaña WhatsApp drip_01 (bot).';
-
     public function __construct(CustomerService $customerService)
     {
         $this->customerService = $customerService;
@@ -1027,8 +1025,10 @@ class CustomerController extends Controller
 
         $calculatorQuestions = CustomerMetaData::whereIn('id', $calculatorQuestionMetaIds)->get()->keyBy('id');
         $allTags = Tag::orderBy('name')->get();
+        $welcomeTemplate = $this->getWelcomeTemplateName();
+        $welcomeNote = $this->getWelcomeTemplateNote($welcomeTemplate);
         $welcomeAlreadySent = Action::where('customer_id', $id)
-            ->where('note', self::WELCOME_NOTE)
+            ->where('note', $welcomeNote)
             ->exists();
 
         return view('customers.show', compact(
@@ -1148,13 +1148,16 @@ class CustomerController extends Controller
     {
         $customer = Customer::findOrFail($customerId);
         $this->ensureCanAccessCustomer($customer);
+        $welcomeTemplate = $this->getWelcomeTemplateName();
+        $welcomeTemplateLanguage = $this->getWelcomeTemplateLanguage();
+        $welcomeNote = $this->getWelcomeTemplateNote($welcomeTemplate);
 
         $alreadySent = Action::where('customer_id', $customerId)
-            ->where('note', self::WELCOME_NOTE)
+            ->where('note', $welcomeNote)
             ->exists();
 
         if ($alreadySent) {
-            return back()->with('statusone', 'Este cliente ya recibió la campaña drip_01.');
+            return back()->with('statusone', "Este cliente ya recibió la campaña {$welcomeTemplate}.");
         }
 
         $customerName = trim($customer->name ?? '') ?: 'allí';
@@ -1168,12 +1171,17 @@ class CustomerController extends Controller
         ];
 
         try {
-            app(WhatsAppService::class)->sendTemplateToCustomer($customer, 'drip_01', $components);
+            app(WhatsAppService::class)->sendTemplateToCustomer(
+                $customer,
+                $welcomeTemplate,
+                $components,
+                $welcomeTemplateLanguage
+            );
 
             Action::create([
                 'customer_id' => $customerId,
                 'type_id' => 105,
-                'note' => self::WELCOME_NOTE,
+                'note' => $welcomeNote,
                 'creator_user_id' => Auth::id() ?? 0,
             ]);
 
@@ -1191,6 +1199,21 @@ class CustomerController extends Controller
 
             return back()->with('statustwo', 'No se pudo enviar el mensaje. Inténtalo más tarde.');
         }
+    }
+
+    private function getWelcomeTemplateName(): string
+    {
+        return (string) config('whatsapp.welcome_template', 'drip_01');
+    }
+
+    private function getWelcomeTemplateNote(string $template): string
+    {
+        return "Se envió la campaña WhatsApp {$template} (bot).";
+    }
+
+    private function getWelcomeTemplateLanguage(): string
+    {
+        return (string) config('whatsapp.welcome_template_language', 'en_US');
     }
 
     public function updateNotes(Request $request, $customerId)

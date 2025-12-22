@@ -1478,14 +1478,16 @@ class APIController extends Controller
 
     private function sendWelcomeTemplate(Customer $customer, array $components): void
     {
-        $note = 'Se envió la campaña WhatsApp drip_01 (bot).';
+        $template = $this->getWelcomeTemplateName();
+        $templateLanguage = $this->getWelcomeTemplateLanguage();
+        $note = $this->getWelcomeTemplateNote($template);
 
         $alreadySent = Action::where('customer_id', $customer->id)
             ->where('note', $note)
             ->exists();
 
         if ($alreadySent) {
-            Log::info('WhatsApp template drip_01 already sent, skipping duplicate send', [
+            Log::info("WhatsApp template {$template} already sent, skipping duplicate send", [
                 'customer_id' => $customer->id,
                 'name' => $customer->name,
             ]);
@@ -1493,12 +1495,17 @@ class APIController extends Controller
             return;
         }
 
-        Log::info('Triggering WhatsApp template drip_01', [
+        Log::info("Triggering WhatsApp template {$template}", [
             'customer_id' => $customer->id,
             'name' => $customer->name,
         ]);
 
-        app(WhatsAppService::class)->sendTemplateToCustomer($customer, 'drip_01', $components);
+        app(WhatsAppService::class)->sendTemplateToCustomer(
+            $customer,
+            $template,
+            $components,
+            $templateLanguage
+        );
 
         Action::create([
             'customer_id' => $customer->id,
@@ -1511,6 +1518,21 @@ class APIController extends Controller
             'customer_id' => $customer->id,
             'type_id' => 105,
         ]);
+    }
+
+    private function getWelcomeTemplateName(): string
+    {
+        return (string) config('whatsapp.welcome_template', 'drip_01');
+    }
+
+    private function getWelcomeTemplateNote(string $template): string
+    {
+        return "Se envió la campaña WhatsApp {$template} (bot).";
+    }
+
+    private function getWelcomeTemplateLanguage(): string
+    {
+        return (string) config('whatsapp.welcome_template_language', 'en_US');
     }
 
     public function saveAPIWatoolbox(Request $request)

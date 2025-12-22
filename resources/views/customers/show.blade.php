@@ -103,7 +103,7 @@
 
                 <form method="POST" action="{{ route('customers.send-welcome', $model->id) }}">
                   @csrf
-                  <button type="submit" class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60" @if($welcomeAlreadySent) disabled @endif title="Enviar mensaje de bienvenida drip_01">
+                  <button type="submit" class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-[11px] font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60" @if($welcomeAlreadySent) disabled @endif title="Enviar mensaje de bienvenida {{ config('whatsapp.welcome_template', 'drip_01') }}">
                     D01
                   </button>
                 </form>
