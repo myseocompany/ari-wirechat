@@ -14,19 +14,11 @@
    
     <input type="text" class="form-control" id="email" name="email" placeholder="email" required="required" value="{{$user->email}}">
   </div>
-  <div class="card mb-3">
-    <div class="card-header p-2">
-      <button class="btn btn-link p-0" type="button" data-toggle="collapse" data-target="#passwordCollapse" aria-expanded="false" aria-controls="passwordCollapse">
-        Cambiar contraseña (opcional)
-      </button>
-    </div>
-    <div id="passwordCollapse" class="collapse">
-      <div class="card-body">
-        <div class="form-group mb-0">
-          <label for="password">Nueva contraseña:</label>
-          <input type="password" class="form-control" id="password" name="password" placeholder="Dejar vacío para no cambiar">
-        </div>
-      </div>
+  <div class="mb-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    <div class="form-group mb-0">
+      <label for="password">Nueva contraseña (opcional):</label>
+      <input type="password" class="form-control" id="password" name="password" placeholder="Dejar vacío para no cambiar">
+      <small class="form-text text-muted">Solo completa este campo si deseas actualizar la contraseña.</small>
     </div>
   </div>
   <div class="form-group">
@@ -61,7 +53,7 @@
         <img src="{{ $currentAvatar }}" alt="Foto de {{ $user->name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
       </div>
     @endif
-    <input type="file" id="profile_photo" name="profile_photo" class="form-control-file" accept=".jpg,.jpeg,.png,.webp">
+    <input type="file" id="profile_photo" name="profile_photo" class="mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 file:mr-4 file:rounded-md file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-700 hover:file:bg-slate-200 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:file:bg-slate-800 dark:file:text-slate-100 dark:hover:file:bg-slate-700" accept=".jpg,.jpeg,.png,.webp">
     <small class="form-text text-muted">Sube una nueva imagen para actualizar el perfil.</small>
   </div>
 
