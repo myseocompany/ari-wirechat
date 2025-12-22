@@ -43,6 +43,7 @@ use Mail;
 use Namu\WireChat\Enums\ConversationType;
 use Namu\WireChat\Enums\ParticipantRole;
 use Namu\WireChat\Models\Conversation;
+use Namu\WireChat\Models\Message;
 
 class CustomerController extends Controller
 {
@@ -1030,10 +1031,39 @@ class CustomerController extends Controller
         $welcomeAlreadySent = Action::where('customer_id', $id)
             ->where('note', $welcomeNote)
             ->exists();
-        $chatConversations = $model->conversations()
-            ->with(['group', 'lastMessage', 'participants.participantable'])
-            ->orderByDesc('updated_at')
-            ->get();
+        $historyOwnerMap = $histories->values()->mapWithKeys(function ($history, int $index) use ($histories) {
+            $next = $histories->get($index + 1);
+
+            return [
+                $history->id => [
+                    'next_owner_id' => $next?->user_id,
+                    'next_owner_name' => $next?->user?->name ?? 'Sin asignar',
+                ],
+            ];
+        });
+        $conversationIds = $model->conversations()->pluck('id');
+        $chatMessages = $conversationIds->isEmpty()
+            ? collect()
+            : Message::query()
+                ->whereIn('conversation_id', $conversationIds)
+                ->with(['sendable', 'conversation.group'])
+                ->orderByDesc('created_at')
+                ->limit(50)
+                ->get();
+
+        $timelineItems = collect($histories)->map(function ($history) {
+            return [
+                'type' => 'history',
+                'date' => $history->updated_at,
+                'model' => $history,
+            ];
+        })->merge($chatMessages->map(function ($message) {
+            return [
+                'type' => 'chat',
+                'date' => $message->created_at,
+                'model' => $message,
+            ];
+        }))->sortByDesc('date')->values();
 
         return view('customers.show', compact(
             'model',
@@ -1057,7 +1087,8 @@ class CustomerController extends Controller
             'calculatorQuestions',
             'allTags',
             'welcomeAlreadySent',
-            'chatConversations'
+            'timelineItems',
+            'historyOwnerMap'
         ));
     }
 
