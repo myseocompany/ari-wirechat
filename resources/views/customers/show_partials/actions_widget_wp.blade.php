@@ -153,7 +153,7 @@
               {{ \Illuminate\Support\Str::limit($item['note'], 160) }}
             </div>
             <small class="text-slate-500">
-              {{ $item['direction'] }} · {{ $item['conversation'] }} · {{ $item['creator'] }}
+              {{ $item['direction'] }}
             </small>
             <div class="text-xs text-slate-400">SellerChat</div>
           </div>
