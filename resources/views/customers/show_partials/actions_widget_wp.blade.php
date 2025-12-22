@@ -4,6 +4,7 @@
 
 @php
   $timeline = collect();
+  $chatMessages = $chatMessages ?? collect();
 
   // Agregamos acciones
   foreach ($customer->actions as $action) {
@@ -49,6 +50,23 @@
       ]);
 
       $prevUserId = $currentUserId;
+  }
+
+  foreach ($chatMessages as $message) {
+      $conversationName = optional($message->conversation->group)->name ?: 'Chat '.$message->conversation_id;
+      $senderName = $message->sendable?->name ?? 'Sistema';
+      $isCustomerMessage = $message->sendable_id === $customer->id;
+
+      $timeline->push([
+          'type' => 'chat',
+          'date' => $message->created_at,
+          'note' => $message->body ?: 'Mensaje sin texto',
+          'creator' => $senderName,
+          'conversation' => $conversationName,
+          'direction' => $isCustomerMessage ? 'Entrante' : 'Saliente',
+          'color' => $isCustomerMessage ? '#10b981' : '#334155',
+          'url' => url('/chats/'.$message->conversation_id),
+      ]);
   }
 
   $timeline = $timeline->sortByDesc('date');
@@ -123,6 +141,21 @@
               Asignado a <strong>{{ $item['assigned_to'] }}</strong><br>
               Modificado por <strong>{{ $item['editor'] }}</strong>
             </small>
+          </div>
+          <div class="text-right text-xs text-slate-500">
+            {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}
+          </div>
+        </div>
+      @elseif($item['type'] === 'chat')
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <strong class="text-slate-900">💬 SellerChat</strong><br>
+            <small class="text-slate-500">
+              {{ $item['direction'] }} · {{ $item['conversation'] }} · {{ $item['creator'] }}
+            </small>
+            <div class="mt-2 text-sm text-slate-700">
+              {{ \Illuminate\Support\Str::limit($item['note'], 160) }}
+            </div>
           </div>
           <div class="text-right text-xs text-slate-500">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}

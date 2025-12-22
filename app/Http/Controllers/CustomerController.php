@@ -1041,38 +1041,19 @@ class CustomerController extends Controller
                 ],
             ];
         });
-        $conversationTable = (new Conversation)->getTable();
-        $conversationIds = $model->conversations()->pluck("{$conversationTable}.id");
-        $chatMessagesQuery = Message::query()
+        $chatMessages = Message::withoutGlobalScope(\Namu\WireChat\Models\Scopes\WithoutRemovedMessages::class)
             ->with(['sendable', 'conversation.group'])
-            ->where(function ($query) use ($conversationIds, $model) {
-                if ($conversationIds->isNotEmpty()) {
-                    $query->whereIn('conversation_id', $conversationIds);
-                }
-
-                $query->orWhere(function ($subQuery) use ($model) {
-                    $subQuery->where('sendable_type', $model->getMorphClass())
-                        ->where('sendable_id', $model->id);
-                });
-            })
+            ->where('sendable_id', $model->id)
+            ->where('sendable_type', $model->getMorphClass())
             ->orderByDesc('created_at')
-            ->limit(50);
+            ->limit(50)
+            ->get();
 
-        $chatMessages = $chatMessagesQuery->get();
-
-        $timelineItems = collect($histories)->map(function ($history) {
-            return [
-                'type' => 'history',
-                'date' => $history->updated_at,
-                'model' => $history,
-            ];
-        })->merge($chatMessages->map(function ($message) {
-            return [
-                'type' => 'chat',
-                'date' => $message->created_at,
-                'model' => $message,
-            ];
-        }))->sortByDesc('date')->values();
+        Logger::info('Customer show WireChat messages', [
+            'customer_id' => $model->id,
+            'message_count' => $chatMessages->count(),
+            'message_ids' => $chatMessages->pluck('id')->all(),
+        ]);
 
         return view('customers.show', compact(
             'model',
@@ -1096,8 +1077,8 @@ class CustomerController extends Controller
             'calculatorQuestions',
             'allTags',
             'welcomeAlreadySent',
-            'timelineItems',
-            'historyOwnerMap'
+            'historyOwnerMap',
+            'chatMessages'
         ));
     }
 

@@ -35,8 +35,8 @@ it('includes the duplicate search action link', function () {
     expect($blade)->toContain('getBestEmail');
 });
 
-it('includes wirechat messages in the timeline partial', function () {
-    $historyBlade = file_get_contents(resource_path('views/customers/show_partials/history.blade.php'));
+it('includes sellerchat messages in the customer timeline', function () {
+    $timelineBlade = file_get_contents(resource_path('views/customers/show_partials/actions_widget_wp.blade.php'));
 
-    expect($historyBlade)->toContain('WireChat');
+    expect($timelineBlade)->toContain('SellerChat');
 });
