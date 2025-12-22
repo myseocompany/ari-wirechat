@@ -15,12 +15,6 @@ return [
     'user_model' => \App\Models\User::class,
 
     /**
-     * Simulated User ID:
-     * If set, all Wirechat requests will act as this user.
-     */
-    'simulated_user_id' => env('WIRECHAT_SIMULATED_USER_ID', 1),
-
-    /**
      * Broadcasting:
      * Configuration for message and notification queues.
      */
@@ -47,7 +41,7 @@ return [
      */
     'routes' => [
         'prefix' => '/chats',
-        'middleware' => ['web', 'auth', \App\Http\Middleware\SimulateWirechatUser::class],
+        'middleware' => ['web', 'auth'],
     ],
 
     /**
