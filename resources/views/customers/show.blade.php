@@ -354,7 +354,7 @@
       <!-- Segunda columna -->
 
       <div class="lg:col-span-6 space-y-4 rounded-2xl bg-slate-100 p-4">
-        @include('customers.partials.customer_tabs', ['model' => $model, 'actual' => $actual])
+        @include('customers.partials.customer_tabs', ['model' => $model, 'actual' => $actual, 'chatConversations' => $chatConversations])
       </div>
       <!-- Tercera columna -->
       <div class="lg:col-span-3 space-y-4 rounded-2xl bg-white p-4">

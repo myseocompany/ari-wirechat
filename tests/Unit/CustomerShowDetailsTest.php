@@ -34,3 +34,10 @@ it('includes the duplicate search action link', function () {
     expect($blade)->toContain('getBestPhoneCandidate');
     expect($blade)->toContain('getBestEmail');
 });
+
+it('includes the wirechat chats tab on the customer tabs', function () {
+    $tabsBlade = file_get_contents(resource_path('views/customers/partials/customer_tabs.blade.php'));
+
+    expect($tabsBlade)->toContain('customer-chats');
+    expect($tabsBlade)->toContain('Chats');
+});

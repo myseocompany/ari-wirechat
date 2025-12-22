@@ -1030,6 +1030,10 @@ class CustomerController extends Controller
         $welcomeAlreadySent = Action::where('customer_id', $id)
             ->where('note', $welcomeNote)
             ->exists();
+        $chatConversations = $model->conversations()
+            ->with(['group', 'lastMessage', 'participants.participantable'])
+            ->orderByDesc('updated_at')
+            ->get();
 
         return view('customers.show', compact(
             'model',
@@ -1052,7 +1056,8 @@ class CustomerController extends Controller
             'calculatorAnswers',
             'calculatorQuestions',
             'allTags',
-            'welcomeAlreadySent'
+            'welcomeAlreadySent',
+            'chatConversations'
         ));
     }
 
