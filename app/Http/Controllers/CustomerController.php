@@ -1043,14 +1043,22 @@ class CustomerController extends Controller
         });
         $conversationTable = (new Conversation)->getTable();
         $conversationIds = $model->conversations()->pluck("{$conversationTable}.id");
-        $chatMessages = $conversationIds->isEmpty()
-            ? collect()
-            : Message::query()
-                ->whereIn('conversation_id', $conversationIds)
-                ->with(['sendable', 'conversation.group'])
-                ->orderByDesc('created_at')
-                ->limit(50)
-                ->get();
+        $chatMessagesQuery = Message::query()
+            ->with(['sendable', 'conversation.group'])
+            ->where(function ($query) use ($conversationIds, $model) {
+                if ($conversationIds->isNotEmpty()) {
+                    $query->whereIn('conversation_id', $conversationIds);
+                }
+
+                $query->orWhere(function ($subQuery) use ($model) {
+                    $subQuery->where('sendable_type', $model->getMorphClass())
+                        ->where('sendable_id', $model->id);
+                });
+            })
+            ->orderByDesc('created_at')
+            ->limit(50);
+
+        $chatMessages = $chatMessagesQuery->get();
 
         $timelineItems = collect($histories)->map(function ($history) {
             return [
