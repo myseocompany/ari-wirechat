@@ -149,11 +149,11 @@
       @elseif($item['type'] === 'chat')
         <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <strong class="text-slate-900">💬 SellerChat</strong><br>
+            <div class="text-xs text-slate-400">SellerChat</div>
             <small class="text-slate-500">
               {{ $item['direction'] }} · {{ $item['conversation'] }} · {{ $item['creator'] }}
             </small>
-            <div class="mt-2 text-sm text-slate-700">
+            <div class="mt-2 text-base font-semibold text-slate-900">
               {{ \Illuminate\Support\Str::limit($item['note'], 160) }}
             </div>
           </div>
