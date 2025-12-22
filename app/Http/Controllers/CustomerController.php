@@ -1041,7 +1041,8 @@ class CustomerController extends Controller
                 ],
             ];
         });
-        $conversationIds = $model->conversations()->pluck('id');
+        $conversationTable = (new Conversation)->getTable();
+        $conversationIds = $model->conversations()->pluck("{$conversationTable}.id");
         $chatMessages = $conversationIds->isEmpty()
             ? collect()
             : Message::query()
