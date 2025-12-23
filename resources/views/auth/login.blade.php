@@ -52,7 +52,21 @@
 
           <div class="space-y-2">
             <label for="password" class="text-sm font-medium text-slate-700">Contraseña</label>
-            <input id="password" type="password" name="password" required class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 transition focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-100">
+            <div class="relative">
+              <input id="password" type="password" name="password" required class="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 pr-12 text-sm text-slate-700 transition focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-100">
+              <button type="button" id="password_toggle" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-700" aria-label="Mostrar contraseña" aria-pressed="false">
+                <svg class="h-5 w-5" data-password-icon="show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg class="hidden h-5 w-5" data-password-icon="hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 3l18 18"></path>
+                  <path d="M10.58 10.58a3 3 0 004.24 4.24"></path>
+                  <path d="M9.88 5.09A9.94 9.94 0 0112 5c6.5 0 10 7 10 7a18.5 18.5 0 01-2.7 3.61"></path>
+                  <path d="M6.61 6.61A18.6 18.6 0 002 12s3.5 7 10 7a9.82 9.82 0 005.39-1.61"></path>
+                </svg>
+              </button>
+            </div>
             @if ($errors->has('password'))
               <p class="text-xs text-red-600">{{ $errors->first('password') }}</p>
             @endif
@@ -78,4 +92,26 @@
     </section>
   </div>
 </div>
+<script>
+  (function () {
+    var toggleButton = document.getElementById('password_toggle');
+    var passwordInput = document.getElementById('password');
+    if (!toggleButton || !passwordInput) {
+      return;
+    }
+    var showIcon = toggleButton.querySelector('[data-password-icon="show"]');
+    var hideIcon = toggleButton.querySelector('[data-password-icon="hide"]');
+
+    toggleButton.addEventListener('click', function () {
+      var isHidden = passwordInput.type === 'password';
+      passwordInput.type = isHidden ? 'text' : 'password';
+      toggleButton.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+      toggleButton.setAttribute('aria-label', isHidden ? 'Ocultar contraseña' : 'Mostrar contraseña');
+      if (showIcon && hideIcon) {
+        showIcon.classList.toggle('hidden', isHidden);
+        hideIcon.classList.toggle('hidden', !isHidden);
+      }
+    });
+  })();
+</script>
 @endsection

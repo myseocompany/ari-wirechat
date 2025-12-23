@@ -46,6 +46,56 @@
       border-color: #ff5c5c;
       color: #ffffff;
     }
+    .time-filter-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: .5rem;
+      border: 1px solid rgba(17, 19, 34, .1);
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      box-shadow: 0 20px 45px rgba(15, 23, 42, .05);
+      flex-wrap: wrap;
+    }
+    .quick-range-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      align-items: center;
+      flex: 1 1 auto;
+    }
+    .quick-range-pills .pill {
+      background: #fff;
+      padding: .4rem 1rem;
+      border-radius: 999px;
+      font-weight: 500;
+      color: #475467;
+      transition: background .2s ease, color .2s ease, box-shadow .2s ease;
+    }
+    .quick-range-pills .pill.active {
+      background: #111322;
+      color: #fff;
+      border-color: #111322;
+      box-shadow: 0 12px 24px rgba(17, 19, 34, .25);
+    }
+    .quick-range-pills .pill:not(.active) {
+      border: none;
+    }
+    .date-picker-pill {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      border: 1px solid #e4e7ec;
+      border-radius: 999px;
+      padding: .35rem .9rem;
+      background: #fff;
+    }
+    .date-picker-pill .form-control {
+      border: none;
+      background: transparent;
+      padding: 0;
+      width: 150px;
+    }
   </style>
 @endpush
 
@@ -66,6 +116,26 @@
         {!! html_entity_decode(session('statustwo')) !!}
       </div>
     @endif
+
+    <div class="time-filter-card">
+      <div class="quick-range-pills">
+        <button type="button" class="pill quick-range-button" data-range="today">Hoy</button>
+        <button type="button" class="pill quick-range-button" data-range="yesterday">Ayer</button>
+        <button type="button" class="pill quick-range-button" data-range="weekly">Semana</button>
+        <button type="button" class="pill quick-range-button" data-range="monthly">Mes</button>
+        <button type="button" class="pill quick-range-button" data-range="last30">Últimos 30</button>
+        <button type="button" class="pill quick-range-button" data-range="last90">Últimos 90</button>
+        <button type="button" class="pill quick-range-button" data-range="all">Todo</button>
+        <div class="date-picker-pill">
+          <i class="fa fa-calendar text-muted"></i>
+          <input type="text" id="customers_range" class="form-control" placeholder="Seleccionar rango" autocomplete="off">
+        </div>
+        <div class="time-filter-actions ml-auto">
+          <button type="button" class="btn btn-dark rounded-pill px-4" id="customers_range_apply">Aplicar</button>
+          <button type="button" class="btn btn-link text-dark" id="customers_range_clear">Limpiar</button>
+        </div>
+      </div>
+    </div>
 
     <x-design.section class="ds-shell border-slate-200">
       <div class="flex flex-wrap items-center justify-between gap-4">
@@ -230,22 +300,40 @@
   const $from      = $('#from_date');
   const $to        = $('#to_date');
   const $inputDR   = $('#reportrange_input');
+  const $topInput  = $('#customers_range');
+  const $applyBtn  = $('#customers_range_apply');
+  const $clearBtn  = $('#customers_range_clear');
+  const $quickButtons = $('.quick-range-button');
 
   if (! $filterForm.length || ! $search.length) {
     return;
   }
 
+  function setActiveQuickButton(value) {
+    $quickButtons.removeClass('active');
+    if (value) {
+      $quickButtons.filter('[data-range="' + value + '"]').addClass('active');
+    }
+  }
+
   // ======== DATE RANGE PICKER ========
+  function updateInput($input, start, end, updateWidget = true) {
+    if (! $input.length) {
+      return;
+    }
+    $input.val(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
+    if (updateWidget && $input.data('daterangepicker')) {
+      $input.data('daterangepicker').setStartDate(start);
+      $input.data('daterangepicker').setEndDate(end);
+    }
+  }
+
   function setHidden(start, end, updateWidget = true) {
     // Backend: YYYY-MM-DD
     $from.val(start.format('YYYY-MM-DD'));
     $to.val(end.format('YYYY-MM-DD'));
-    // Visible: DD-MM-YYYY
-    $inputDR.val(start.format('DD-MM-YYYY') + ' - ' + end.format('DD-MM-YYYY'));
-    if (updateWidget && $inputDR.data('daterangepicker')) {
-      $inputDR.data('daterangepicker').setStartDate(start);
-      $inputDR.data('daterangepicker').setEndDate(end);
-    }
+    updateInput($inputDR, start, end, updateWidget);
+    updateInput($topInput, start, end, updateWidget);
   }
 
   function getInitialStart(){
@@ -257,15 +345,17 @@
     return td ? moment(td, 'YYYY-MM-DD') : moment();
   }
 
-  // Inicializa el DRP sobre el INPUT editable
-  if ($inputDR.length) {
-    $inputDR.daterangepicker({
+  function initDateRangePicker($input, parentEl) {
+    if (! $input.length) {
+      return;
+    }
+    $input.daterangepicker({
       startDate: getInitialStart(),
-      endDate:   getInitialEnd(),
+      endDate: getInitialEnd(),
       maxDate: moment(),
-      parentEl: '.filter-overlay__panel',
+      parentEl: parentEl,
       opens: 'right',
-      autoUpdateInput: false, // nosotros seteamos el input
+      autoUpdateInput: false,
       locale: {
         format: 'DD-MM-YYYY',
         applyLabel: "Aplicar",
@@ -277,7 +367,7 @@
       ranges: {
         'Hoy': [moment(), moment()],
         'Ayer': [moment().subtract(1,'day'), moment().subtract(1,'day')],
-        'Últimos 7 días': [moment().subtract(6,'days'), moment()],   // incluye hoy
+        'Últimos 7 días': [moment().subtract(6,'days'), moment()],
         'Últimos 10 días': [moment().subtract(9,'days'), moment()],
         'Últimos 30 días': [moment().subtract(29,'days'), moment()],
         'Esta semana': [moment().startOf('isoWeek'), moment().endOf('isoWeek')],
@@ -289,44 +379,54 @@
       }
     }, function(start, end){
       setHidden(start, end, false);
-      // Opcional: enviar al aplicar
-      // $advForm.trigger('submit');
     })
     .on('apply.daterangepicker', function(ev, picker){
       setHidden(picker.startDate, picker.endDate, false);
-      // $advForm.trigger('submit');
     })
     .on('cancel.daterangepicker', function(){
       clearRange();
     });
-
-    // Si venía con rango del request, puebla el input visible
-    if ($from.val() && $to.val()) {
-      setHidden(moment($from.val(),'YYYY-MM-DD'), moment($to.val(),'YYYY-MM-DD'));
-    }
   }
 
-  // Soporta edición manual: "DD-MM-YYYY - DD-MM-YYYY"
-  $inputDR.on('blur keydown', function(e){
-    if (e.type==='blur' || e.key==='Enter') {
-      const val = $(this).val().trim();
-      const parts = val.split(' - ');
-      if (parts.length === 2) {
-        const s = moment(parts[0], 'DD-MM-YYYY', true);
-        const en = moment(parts[1], 'DD-MM-YYYY', true);
-        if (s.isValid() && en.isValid() && !en.isBefore(s)) {
-          setHidden(s, en);
-        }
-      }
-      if (e.key==='Enter') e.preventDefault();
+  function bindManualInput($input) {
+    if (! $input.length) {
+      return;
     }
-  });
+    $input.on('blur keydown', function(e){
+      if (e.type==='blur' || e.key==='Enter') {
+        const val = $(this).val().trim();
+        const parts = val.split(' - ');
+        if (parts.length === 2) {
+          const s = moment(parts[0], 'DD-MM-YYYY', true);
+          const en = moment(parts[1], 'DD-MM-YYYY', true);
+          if (s.isValid() && en.isValid() && !en.isBefore(s)) {
+            setHidden(s, en);
+          }
+        }
+        if (e.key==='Enter') e.preventDefault();
+      }
+    });
+  }
+
+  initDateRangePicker($inputDR, '.filter-overlay__panel');
+  initDateRangePicker($topInput);
+  bindManualInput($inputDR);
+  bindManualInput($topInput);
+
+  if ($from.val() && $to.val()) {
+    setHidden(moment($from.val(),'YYYY-MM-DD'), moment($to.val(),'YYYY-MM-DD'));
+  }
 
   // ======== Enlaces rápidos (externos) ========
   window.setRange = function(days) {
     const end = moment();
     const start = moment().subtract(days-1,'days'); // inclusivo
     setHidden(start, end);
+    return false;
+  };
+  window.setYesterday = function() {
+    const day = moment().subtract(1,'day');
+    setHidden(day, day);
     return false;
   };
   window.setThisWeek = function() {
@@ -353,8 +453,44 @@
     $from.val('');
     $to.val('');
     $inputDR.val('');
+    $topInput.val('');
+    setActiveQuickButton(null);
     return false;
   };
+
+  if ($applyBtn.length) {
+    $applyBtn.on('click', function () {
+      $filterForm.trigger('submit');
+    });
+  }
+
+  if ($clearBtn.length) {
+    $clearBtn.on('click', function () {
+      clearRange();
+    });
+  }
+
+  if ($quickButtons.length) {
+    $quickButtons.on('click', function () {
+      const range = $(this).data('range');
+      if (range === 'today') {
+        setRange(1);
+      } else if (range === 'yesterday') {
+        setYesterday();
+      } else if (range === 'weekly') {
+        setThisWeek();
+      } else if (range === 'monthly') {
+        setCurrentMonth();
+      } else if (range === 'last30') {
+        setRange(30);
+      } else if (range === 'last90') {
+        setRange(90);
+      } else if (range === 'all') {
+        setMaximo();
+      }
+      setActiveQuickButton(range);
+    });
+  }
 
   function copyPhoneToClipboard(phone, onSuccess, onError) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
