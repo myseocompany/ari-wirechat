@@ -1270,7 +1270,7 @@ class CustomerController extends Controller
         $this->ensureCanAccessCustomer($model);
         $allTags = Tag::orderBy('name')->get();
         $actions = Action::where('customer_id', '=', $id)->orderby('created_at', 'DESC')->get();
-        $action_options = ActionType::all();
+        $action_options = ActionType::orderBy('weigth')->get();
         $histories = CustomerHistory::where('customer_id', '=', $id)->get();
         $email_options = Email::all();
         $statuses_options = CustomerStatus::orderBy('weight', 'ASC')->get();
@@ -1302,7 +1302,7 @@ class CustomerController extends Controller
         $model = CustomerHistory::find($id);
         $allTags = collect();
         $actions = Action::where('customer_id', '=', $id)->orderby('created_at', 'DESC')->get();
-        $action_options = ActionType::all();
+        $action_options = ActionType::orderBy('weigth')->get();
         $histories = null;
         $email_options = Email::all();
         $statuses_options = CustomerStatus::orderBy('weight', 'ASC')->get();

@@ -3,22 +3,25 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
     :root {
-        --ds-ink: #0b1f33;
-        --ds-navy: #123559;
-        --ds-slate: #7b8fa6;
-        --ds-cloud: #edf3fa;
-        --ds-coral: #3b6cff;
-        --ds-rose: #6a8bff;
-        --ds-blush: #fff1b8;
-        --ds-mint: #2fc677;
-        --ds-lilac: #dfe9ff;
-    }
-
-    .ds-shell {
-        background:
-            radial-gradient(circle at 5% 15%, rgba(59, 108, 255, 0.2), transparent 45%),
-            radial-gradient(circle at 90% 10%, rgba(106, 139, 255, 0.2), transparent 45%),
-            linear-gradient(120deg, #f2f7ff 0%, #eef5ff 52%, #ffffff 100%);
+        --ds-ink: #1f2937;
+        --ds-navy: #1f2a44;
+        --ds-slate: #94a3b8;
+        --ds-cloud: #f3f5f8;
+        --ds-coral: #4f6cf7;
+        --ds-rose: #7c8dfc;
+        --ds-blush: #f6d365;
+        --ds-mint: #2fbf6a;
+        --ds-lilac: #e4e9ff;
+        --ds-primary: #4f6cf7;
+        --ds-primary-soft: #b9c4ff;
+        --ds-emerald: #2fbf6a;
+        --ds-emerald-soft: #c8efd8;
+        --ds-orange: #f28c4b;
+        --ds-orange-soft: #f9d2bb;
+        --ds-red: #f26a7a;
+        --ds-red-soft: #f7c1c8;
+        --ds-secondary: #0f6ef2;
+        --ds-secondary-soft: #89b3f9;
     }
 
     .ds-body {

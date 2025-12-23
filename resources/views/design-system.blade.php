@@ -5,219 +5,208 @@
 @endpush
 
 @section('content')
-<div class="ds-body relative flex flex-col gap-6">
-    <section class="ds-shell relative overflow-hidden rounded-[32px] border border-slate-200 px-6 py-10 shadow-[0_25px_70px_rgba(15,23,42,0.12)] sm:px-10">
-        <div class="pointer-events-none absolute -left-24 -top-10 h-72 w-72 rounded-full bg-[radial-gradient(circle,var(--ds-coral),transparent_70%)] opacity-35 blur-3xl"></div>
-        <div class="pointer-events-none absolute -right-20 top-12 h-72 w-72 rounded-full bg-[radial-gradient(circle,var(--ds-rose),transparent_68%)] opacity-30 blur-3xl"></div>
-        <div class="pointer-events-none absolute bottom-6 left-1/2 h-20 w-3/4 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--ds-blush),transparent_70%)] opacity-45 blur-2xl"></div>
-        <div class="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div class="flex max-w-3xl flex-col gap-4">
-                <x-design.eyebrow>Design system</x-design.eyebrow>
-                <h1 class="ds-display text-4xl font-semibold text-[color:var(--ds-ink)] sm:text-6xl">Wirechat UI Kit</h1>
-                <p class="text-base text-slate-700 sm:text-lg">Una guia visual con base azul, acentos verdes y amarillos para mantener consistencia visual.</p>
-                <div class="flex flex-wrap gap-3">
-                    <x-design.badge class="border border-white/60 bg-white/90 text-sm font-medium text-slate-700 shadow-sm">Version 1.2</x-design.badge>
-                    <x-design.badge tone="cloud" class="text-sm font-medium">Azul base</x-design.badge>
-                    <x-design.badge tone="outline" class="text-sm font-medium">Azul claro</x-design.badge>
-                    <x-design.badge tone="mint" class="text-sm font-medium">Success</x-design.badge>
-                    <x-design.badge tone="blush" class="text-sm font-medium">Sun</x-design.badge>
+<div class="ds-body min-h-screen bg-[color:var(--ds-cloud)]">
+    <div class="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 lg:px-8">
+        <div class="flex flex-col gap-3">
+            <x-design.eyebrow>Design system</x-design.eyebrow>
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <h1 class="ds-display text-3xl font-semibold text-[color:var(--ds-ink)] sm:text-4xl">Wirechat UI Kit</h1>
+                <div class="flex items-center gap-2">
+                    <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-400">v2</span>
+                    <x-design.badge class="border border-slate-200 bg-white text-xs font-semibold text-slate-600">Layouts + palette</x-design.badge>
                 </div>
             </div>
-            <div class="flex flex-col gap-3 rounded-2xl border border-white/60 bg-white/80 p-4 text-sm text-slate-700 shadow-sm sm:max-w-xs">
-                <div class="flex items-center justify-between">
-                    <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Estado</span>
-                    <x-design.badge tone="blush">En progreso</x-design.badge>
-                </div>
-                <p class="text-sm font-medium text-[color:var(--ds-ink)]">Componentes listos para nuevas vistas.</p>
-                <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
-                    <div class="h-full w-2/3 rounded-full bg-[linear-gradient(90deg,var(--ds-coral),var(--ds-rose))]"></div>
-                </div>
-            </div>
+            <p class="max-w-2xl text-sm text-slate-600">Componentes redondeados, chips de estado y sombras suaves con base clara.</p>
         </div>
-    </section>
 
-    <div class="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-        <x-design.section>
-            <div class="flex flex-col gap-6">
-                <div class="flex flex-col gap-2">
-                    <x-design.eyebrow>Tipografia</x-design.eyebrow>
-                    <div class="flex flex-wrap items-center gap-4">
-                        <h2 class="ds-display text-3xl font-semibold text-[color:var(--ds-ink)]">Space Grotesk</h2>
-                        <x-design.badge tone="cloud">Regular / Semibold</x-design.badge>
+        <section class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+            <div class="flex items-center gap-4">
+                <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-400">Palette</span>
+                <span class="h-px flex-1 bg-slate-200"></span>
+            </div>
+            <div class="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+                <div class="flex flex-col gap-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Primary</p>
+                    <div class="flex gap-2">
+                        <span class="h-10 w-10 rounded-xl bg-[color:var(--ds-primary)]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[color:var(--ds-primary-soft)]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#d7ddff]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#ecefff]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#f6f7ff]"></span>
                     </div>
-                    <p class="ds-mono text-sm text-slate-600">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
-                    <p class="ds-mono text-sm text-slate-600">abcdefghijklmnopqrstuvwxyz 0123456789</p>
                 </div>
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4">
-                        <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Heading 1</span>
-                        <p class="ds-display text-4xl font-semibold">Wirechat UI</p>
+                <div class="flex flex-col gap-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Emerald</p>
+                    <div class="flex gap-2">
+                        <span class="h-10 w-10 rounded-xl bg-[color:var(--ds-emerald)]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#6bd18f]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#a9e6c1]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[color:var(--ds-emerald-soft)]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#eefbf4]"></span>
                     </div>
-                    <div class="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Heading 2</span>
-                        <p class="ds-display text-3xl font-semibold">Wirechat UI</p>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Orange</p>
+                    <div class="flex gap-2">
+                        <span class="h-10 w-10 rounded-xl bg-[color:var(--ds-orange)]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#f6a56f]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#f8c9a8]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[color:var(--ds-orange-soft)]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#fdf1e8]"></span>
                     </div>
-                    <div class="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Heading 3</span>
-                        <p class="ds-display text-2xl font-semibold">Wirechat UI</p>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Red</p>
+                    <div class="flex gap-2">
+                        <span class="h-10 w-10 rounded-xl bg-[color:var(--ds-red)]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#f58ea0]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#f7b6c0]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[color:var(--ds-red-soft)]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#fde9ec]"></span>
                     </div>
-                    <div class="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-[color:var(--ds-blush)] p-4">
-                        <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-600">Body</span>
-                        <p class="text-base text-slate-700">Conversaciones claras, seguimiento organizado y acciones que no se pierden.</p>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Secondary</p>
+                    <div class="flex gap-2">
+                        <span class="h-10 w-10 rounded-xl bg-[color:var(--ds-secondary)]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[color:var(--ds-secondary-soft)]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#ee7ab4]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#27b0e5]"></span>
+                        <span class="h-10 w-10 rounded-xl bg-[#a3a3a3]"></span>
                     </div>
                 </div>
             </div>
-        </x-design.section>
+        </section>
 
-        <x-design.section>
-            <div class="flex flex-col gap-6">
+        <div class="grid gap-6 lg:grid-cols-3">
+            <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_16px_32px_rgba(15,23,42,0.06)]">
+                <div class="flex items-center justify-between text-xs font-semibold text-slate-400">
+                    <span>Created by</span>
+                    <span>Replies</span>
+                    <span>Status</span>
+                </div>
+                <div class="mt-4 flex flex-col gap-3">
+                    <div class="flex items-center justify-between rounded-2xl border border-slate-100 bg-[color:var(--ds-cloud)] px-3 py-2">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--ds-primary)] text-xs font-semibold text-white">AQ</span>
+                            <span class="text-sm font-medium text-slate-700">Adrian Q.</span>
+                        </div>
+                        <span class="text-xs text-slate-500">1</span>
+                        <span class="rounded-full bg-[color:var(--ds-emerald-soft)] px-2 py-1 text-[11px] font-semibold text-[color:var(--ds-emerald)]">Replied</span>
+                    </div>
+                    <div class="flex items-center justify-between rounded-2xl border border-slate-100 bg-white px-3 py-2">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--ds-secondary)] text-xs font-semibold text-white">VR</span>
+                            <span class="text-sm font-medium text-slate-700">Vicenza R.</span>
+                        </div>
+                        <span class="text-xs text-slate-500">0</span>
+                        <span class="rounded-full bg-[color:var(--ds-orange-soft)] px-2 py-1 text-[11px] font-semibold text-[color:var(--ds-orange)]">Open</span>
+                    </div>
+                    <div class="flex items-center justify-between rounded-2xl border border-slate-100 bg-white px-3 py-2">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--ds-red)] text-xs font-semibold text-white">PS</span>
+                            <span class="text-sm font-medium text-slate-700">Philip Smith</span>
+                        </div>
+                        <span class="text-xs text-slate-500">4</span>
+                        <span class="rounded-full bg-[color:var(--ds-red-soft)] px-2 py-1 text-[11px] font-semibold text-[color:var(--ds-red)]">Closed</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_16px_32px_rgba(15,23,42,0.06)]">
                 <div class="flex items-center justify-between">
-                    <x-design.eyebrow>Iconos</x-design.eyebrow>
-                    <x-design.badge class="border border-slate-200 bg-white text-xs font-semibold text-slate-500">24px grid</x-design.badge>
+                    <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-400">Buttons</span>
+                    <span class="text-xs font-semibold text-slate-400">Rounded</span>
                 </div>
-                <div class="grid grid-cols-4 gap-3">
-                    <x-design.icon-tile>
-                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l9 7h-3v9h-5v-6H11v6H6v-9H3l9-7z"/></svg>
-                    </x-design.icon-tile>
-                    <x-design.icon-tile>
-                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7-4.35-9-8.5C1.5 8.5 4.5 6 7.5 6c1.7 0 3.3.8 4.5 2 1.2-1.2 2.8-2 4.5-2 3 0 6 2.5 4.5 6.5-2 4.15-9 8.5-9 8.5z"/></svg>
-                    </x-design.icon-tile>
-                    <x-design.icon-tile>
-                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.4 12.9a7.96 7.96 0 0 0 .1-1 7.96 7.96 0 0 0-.1-1l2.1-1.6-2-3.4-2.5 1a8.1 8.1 0 0 0-1.7-1l-.4-2.6h-4l-.4 2.6a8.1 8.1 0 0 0-1.7 1l-2.5-1-2 3.4 2.1 1.6a7.96 7.96 0 0 0-.1 1 7.96 7.96 0 0 0 .1 1L2.5 14.5l2 3.4 2.5-1a8.1 8.1 0 0 0 1.7 1l.4 2.6h4l.4-2.6a8.1 8.1 0 0 0 1.7-1l2.5 1 2-3.4-2.1-1.6zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/></svg>
-                    </x-design.icon-tile>
-                    <x-design.icon-tile>
-                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 10V8a6 6 0 1 1 12 0v2h2v12H4V10h2zm2 0h8V8a4 4 0 1 0-8 0v2z"/></svg>
-                    </x-design.icon-tile>
-                    <x-design.icon-tile tone="blush">
-                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V6a2 2 0 0 1 2-2z"/></svg>
-                    </x-design.icon-tile>
-                    <x-design.icon-tile tone="blush">
-                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z"/></svg>
-                    </x-design.icon-tile>
-                    <x-design.icon-tile tone="blush">
-                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 14h4v4h-4v-4zm0-8h4v6h-4V6zm2-4C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z"/></svg>
-                    </x-design.icon-tile>
-                    <x-design.icon-tile>
-                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15-6.7L21 3v6h-6l2.2-2.2A7 7 0 1 0 19 12h2a9 9 0 0 1-18 0z"/></svg>
-                    </x-design.icon-tile>
+                <div class="mt-4 grid gap-3">
+                    <button class="rounded-full bg-[color:var(--ds-primary)] px-4 py-3 text-sm font-semibold text-white">Large Button</button>
+                    <button class="rounded-full bg-[color:var(--ds-secondary)] px-4 py-2 text-sm font-semibold text-white">Medium Button</button>
+                    <button class="rounded-full bg-[color:var(--ds-primary-soft)] px-3 py-2 text-xs font-semibold text-[color:var(--ds-ink)]">Small Button</button>
+                    <button class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500">Tiny Button</button>
                 </div>
-                <p class="text-sm text-slate-600">Iconos monolineales con alto contraste y esquinas redondeadas.</p>
-            </div>
-        </x-design.section>
+                <div class="mt-4 rounded-2xl border border-slate-100 bg-[color:var(--ds-cloud)] px-3 py-2 text-xs text-slate-500">
+                    Invite to Conversation
+                    <div class="mt-2 flex items-center gap-2 rounded-full bg-white px-3 py-2">
+                        <span class="text-xs font-semibold text-slate-600">Philip Smith</span>
+                        <span class="text-xs text-slate-400">x</span>
+                    </div>
+                </div>
+            </section>
 
-        <x-design.section>
-            <div class="flex flex-col gap-6">
+            <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_16px_32px_rgba(15,23,42,0.06)]">
                 <div class="flex items-center justify-between">
-                    <x-design.eyebrow>Botones</x-design.eyebrow>
-                    <x-design.badge class="bg-[color:var(--ds-lilac)] text-xs font-semibold text-[color:var(--ds-ink)]">Altura 44px</x-design.badge>
+                    <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-400">Tags</span>
+                    <span class="text-xs text-slate-400">Status chips</span>
                 </div>
-                <div class="grid gap-3 sm:grid-cols-3">
-                    <button class="rounded-xl bg-[color:var(--ds-coral)] px-4 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(12,117,188,0.35)]">Principal</button>
-                    <button class="rounded-xl bg-[color:var(--ds-navy)] px-4 py-3 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(18,53,89,0.25)]">Oscuro</button>
-                    <button class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-[color:var(--ds-ink)]">Neutro</button>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="rounded-full bg-[color:var(--ds-orange-soft)] px-3 py-1 text-xs font-semibold text-[color:var(--ds-orange)]">Pending</span>
+                    <span class="rounded-full bg-[color:var(--ds-emerald-soft)] px-3 py-1 text-xs font-semibold text-[color:var(--ds-emerald)]">Confirmed</span>
+                    <span class="rounded-full bg-[color:var(--ds-red-soft)] px-3 py-1 text-xs font-semibold text-[color:var(--ds-red)]">Alert</span>
+                    <span class="rounded-full bg-[color:var(--ds-primary-soft)] px-3 py-1 text-xs font-semibold text-[color:var(--ds-ink)]">Active</span>
+                    <span class="rounded-full bg-[#f3f4f6] px-3 py-1 text-xs font-semibold text-slate-500">Closed</span>
                 </div>
-                <div class="flex flex-wrap gap-3">
-                    <x-design.badge tone="cloud">Small</x-design.badge>
-                    <x-design.badge tone="outline">Outline</x-design.badge>
-                    <x-design.badge tone="mint">Success</x-design.badge>
+                <div class="mt-5 rounded-2xl border border-slate-100 bg-[color:var(--ds-cloud)] p-3 text-xs text-slate-500">
+                    This booking has not yet been confirmed.
+                    <span class="ml-2 rounded-full bg-[#fff3db] px-2 py-1 text-[11px] font-semibold text-[#b96a2f]">Waiting</span>
                 </div>
-            </div>
-        </x-design.section>
+            </section>
 
-        <x-design.section>
-            <div class="flex flex-col gap-6">
-                <x-design.eyebrow>Campos de formulario</x-design.eyebrow>
-                <div class="grid gap-4">
-                    <label class="flex flex-col gap-2">
-                        <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Email</span>
-                        <input type="email" placeholder="correo@wirechat.co" class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-[color:var(--ds-coral)] focus:outline-none focus:ring-2 focus:ring-[color:var(--ds-blush)]" />
-                    </label>
-                    <label class="flex flex-col gap-2">
-                        <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Busqueda</span>
-                        <div class="flex items-center gap-3 rounded-xl border border-slate-300 px-4 py-3 shadow-sm">
-                            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-[color:var(--ds-cloud)] text-[color:var(--ds-navy)]">
-                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10 2a8 8 0 1 0 4.9 14.3l4.4 4.4 1.4-1.4-4.4-4.4A8 8 0 0 0 10 2zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/></svg>
-                            </span>
-                            <input type="text" placeholder="Busca conversaciones" class="w-full text-sm text-slate-700 focus:outline-none" />
-                            <span class="rounded-full bg-[color:var(--ds-lilac)] px-3 py-1 text-xs font-semibold text-[color:var(--ds-ink)]">/</span>
-                        </div>
-                    </label>
+            <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_16px_32px_rgba(15,23,42,0.06)]">
+                <div class="flex items-center justify-between">
+                    <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-400">Benefits</span>
+                    <span class="text-xs text-slate-400">View all</span>
                 </div>
-            </div>
-        </x-design.section>
-    </div>
+                <div class="mt-4 flex flex-col gap-4 text-sm text-slate-600">
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+                            <span>All day pass</span>
+                            <span>6/10</span>
+                        </div>
+                        <div class="h-2 w-full rounded-full bg-slate-100">
+                            <div class="h-full w-3/5 rounded-full bg-[color:var(--ds-primary)]"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+                            <span>Booking credits</span>
+                            <span>8/20</span>
+                        </div>
+                        <div class="h-2 w-full rounded-full bg-slate-100">
+                            <div class="h-full w-2/5 rounded-full bg-[color:var(--ds-secondary)]"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="mt-5 rounded-full bg-[color:var(--ds-primary)] px-4 py-2 text-xs font-semibold text-white">Join a Plan</button>
+            </section>
 
-    <div class="grid gap-6 lg:grid-cols-[1fr_1fr]">
-        <x-design.section>
-            <div class="flex flex-col gap-6">
-                <x-design.eyebrow>Paleta cromatica</x-design.eyebrow>
-                <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
-                    <x-design.color-swatch name="Ink" hex="#0b1f33" />
-                    <x-design.color-swatch name="Navy" hex="#123559" />
-                    <x-design.color-swatch name="Blue" hex="#3b6cff" />
-                    <x-design.color-swatch name="Blue Light" hex="#6a8bff" />
-                    <x-design.color-swatch name="Sun" hex="#fff1b8" label-class="text-[color:var(--ds-ink)]/60" value-class="text-[color:var(--ds-ink)]" />
+            <section class="rounded-3xl border border-dashed border-slate-200 bg-white p-5 text-center shadow-[0_16px_32px_rgba(15,23,42,0.06)]">
+                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[color:var(--ds-cloud)] text-slate-400">
+                    <span class="text-lg">+</span>
                 </div>
-                <div class="grid gap-3 sm:grid-cols-3">
-                    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Cloud</p>
-                        <p class="text-sm text-slate-600">Superficies y tarjetas.</p>
-                    </div>
-                    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-mint)] p-4">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Success</p>
-                        <p class="text-sm text-slate-600">Estados positivos.</p>
-                    </div>
-                    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-lilac)] p-4">
-                        <p class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Accent</p>
-                        <p class="text-sm text-slate-600">Acciones secundarias.</p>
-                    </div>
-                </div>
-            </div>
-        </x-design.section>
+                <p class="mt-3 text-sm font-semibold text-slate-700">No messages yet</p>
+                <p class="mt-1 text-xs text-slate-500">Start a new conversation to fill this space.</p>
+                <button class="mt-4 rounded-full bg-[color:var(--ds-primary)] px-4 py-2 text-xs font-semibold text-white">Start Conversation</button>
+            </section>
 
-        <x-design.section>
-            <div class="flex flex-col gap-6">
-                <x-design.eyebrow>Avatares</x-design.eyebrow>
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4">
-                        <x-design.avatar initials="AC" variant="coral" />
-                        <div>
-                            <p class="text-sm font-semibold text-[color:var(--ds-ink)]">Ana Cruz</p>
-                            <p class="text-xs text-slate-600">Ventas</p>
-                        </div>
-                        <x-design.badge tone="mint" class="ml-auto">Activo</x-design.badge>
-                    </div>
-                    <div class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <x-design.avatar initials="MS" variant="navy" />
-                        <div>
-                            <p class="text-sm font-semibold text-[color:var(--ds-ink)]">M. Salazar</p>
-                            <p class="text-xs text-slate-600">Soporte</p>
-                        </div>
-                        <x-design.badge tone="blush" class="ml-auto">Pendiente</x-design.badge>
-                    </div>
+            <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_16px_32px_rgba(15,23,42,0.06)]">
+                <div class="flex items-center justify-between">
+                    <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-400">Quick actions</span>
+                    <span class="text-xs text-slate-400">Desk 8</span>
                 </div>
-                <div class="flex flex-wrap gap-3">
-                    <x-design.badge tone="cloud">Activo</x-design.badge>
-                    <x-design.badge tone="blush">Pendiente</x-design.badge>
-                    <x-design.badge tone="outline">Archivado</x-design.badge>
-                </div>
-                <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4">
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="flex flex-col gap-1">
-                            <span class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Etiquetas</span>
-                            <p class="text-sm font-medium text-[color:var(--ds-navy)]">Filtra conversaciones por estado y prioridad.</p>
-                        </div>
-                        <button class="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[color:var(--ds-navy)] shadow-sm">Editar</button>
+                <div class="mt-4 rounded-2xl border border-slate-100 bg-[color:var(--ds-cloud)] p-3 text-xs text-slate-500">
+                    <div class="flex items-center justify-between">
+                        <span class="font-semibold text-slate-700">Apple Calendar</span>
+                        <span class="rounded-full bg-[color:var(--ds-emerald-soft)] px-2 py-1 text-[11px] font-semibold text-[color:var(--ds-emerald)]">Active</span>
                     </div>
-                    <div class="mt-4 flex flex-wrap gap-3">
-                        <x-design.badge tone="navy">Importante</x-design.badge>
-                        <x-design.badge tone="cloud">Seguimiento</x-design.badge>
-                        <x-design.badge tone="blush">Nuevo</x-design.badge>
-                        <x-design.badge tone="outline">Backlog</x-design.badge>
-                    </div>
+                    <p class="mt-1 text-[11px]">Manage bookings directly from your calendar.</p>
                 </div>
-            </div>
-        </x-design.section>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <button class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500">Make a Booking</button>
+                    <button class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500">Book an Event</button>
+                    <button class="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-500">Buy a Product</button>
+                </div>
+            </section>
+        </div>
     </div>
 </div>
 @endsection

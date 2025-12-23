@@ -91,21 +91,18 @@ function requestToStr($request)
   $todayLabel = \Carbon\Carbon::now()->format('d M Y');
 @endphp
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <div>
+<div class="mb-3 flex flex-wrap items-center justify-between gap-4">
+  <div class="flex flex-col gap-1">
     <h1 class="mb-1">Seguimientos</h1>
     <div class="text-muted small">Actualiza estados, agenda acciones o etiquetas. Hoy: {{ $todayLabel }}.</div>
     <div class="font-weight-bold">{{ $totalCount }} clientes</div>
   </div>
-  <div class="d-flex align-items-center gap-2">
-    <a href="/customers/create" class="btn btn-primary btn-sm mr-2">Crear</a>
-    <button type="button" class="btn btn-outline-secondary btn-sm" data-toggle="collapse" data-target="#daily-filter" aria-expanded="false">Filtros</button>
+  <div class="flex items-center gap-2">
+    <a href="/customers/create" class="inline-flex items-center rounded-xl bg-[color:var(--ds-coral)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Crear</a>
+    <button type="button" class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600" data-filter-open>Filtros</button>
   </div>
 </div>
 
-<div id="daily-filter" class="collapse mb-3">
-  @include('customers.filter_daily')
-</div>
 
 @php
   $mqlTag = isset($allTags) ? $allTags->firstWhere('name', 'MQL') : null;
@@ -623,4 +620,8 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
     });
   })();
 </script>
+@endsection
+
+@section('filter')
+  @include('customers.filter_daily')
 @endsection
