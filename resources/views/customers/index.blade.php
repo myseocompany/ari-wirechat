@@ -176,7 +176,11 @@
 
       <aside class="lg:sticky lg:top-24">
         <div class="flex flex-col gap-4">
-          @include('customers.index_partials.groupbar', ['customersGroup' => $customersGroup])
+          @include('customers.index_partials.groupbar', [
+            'customersGroup' => $customersGroup,
+            'parent_statuses' => $parent_statuses,
+            'statusGroups' => $statusGroups,
+          ])
 
           @if(isset($sum_g))
             <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">

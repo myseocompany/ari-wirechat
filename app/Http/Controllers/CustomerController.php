@@ -134,6 +134,22 @@ class CustomerController extends Controller
             $customer->load('tags');
         }
 
+        $childStatusIds = $childGroups->pluck('status_table_id')->filter()->unique()->values();
+        $statusParentMap = $childStatusIds->isNotEmpty()
+            ? CustomerStatus::query()->whereIn('id', $childStatusIds)->pluck('parent_id', 'id')
+            : collect();
+        $statusGroups = $childGroups->map(function ($childGroup) use ($statusParentMap) {
+            $statusId = $childGroup->status_table_id ?? null;
+
+            return (object) [
+                'count' => (int) ($childGroup->count ?? 0),
+                'status_id' => $statusId,
+                'status_name' => $childGroup->status_name,
+                'status_color' => $childGroup->status_color,
+                'parent_id' => $statusId ? $statusParentMap->get($statusId) : null,
+            ];
+        });
+
         return view('customers.index', [
             'request' => $request,
             'menu' => $menu,
@@ -142,6 +158,7 @@ class CustomerController extends Controller
             'model' => $model,
             'customersGroup' => $customersGroup,
             'parent_statuses' => $parentStatuses,
+            'statusGroups' => $statusGroups,
             'pending_actions' => $this->getPendingActions(),
             'products' => Product::all(),
             'sources' => CustomerSource::all(),

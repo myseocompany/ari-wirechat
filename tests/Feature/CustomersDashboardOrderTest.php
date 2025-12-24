@@ -112,3 +112,56 @@ it('filters customers by parent status', function () {
     $response->assertSee('Cliente Contacto');
     $response->assertDontSee('Cliente Venta');
 });
+
+it('shows the breakdown of child statuses when a parent is selected', function () {
+    $user = User::factory()->create([
+        'role_id' => 1,
+    ]);
+
+    $parentContact = new CustomerStatus;
+    $parentContact->name = 'Por contactar';
+    $parentContact->color = '#111111';
+    $parentContact->weight = 1;
+    $parentContact->status_id = 1;
+    $parentContact->save();
+
+    $statusNuevo = new CustomerStatus;
+    $statusNuevo->name = 'Nuevo';
+    $statusNuevo->color = '#222222';
+    $statusNuevo->weight = 2;
+    $statusNuevo->status_id = 1;
+    $statusNuevo->parent_id = $parentContact->id;
+    $statusNuevo->save();
+
+    $customerOne = new Customer([
+        'name' => 'Cliente Uno',
+        'email' => 'uno@example.com',
+        'phone' => '3000000001',
+        'country' => 'CO',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $customerOne->status_id = $statusNuevo->id;
+    $customerOne->user_id = $user->id;
+    $customerOne->save();
+
+    $customerTwo = new Customer([
+        'name' => 'Cliente Dos',
+        'email' => 'dos@example.com',
+        'phone' => '3000000002',
+        'country' => 'CO',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $customerTwo->status_id = $statusNuevo->id;
+    $customerTwo->user_id = $user->id;
+    $customerTwo->save();
+
+    $response = $this->actingAs($user)->get(route('customers.index', [
+        'parent_status_id' => $parentContact->id,
+    ]));
+
+    $response->assertOk();
+    $response->assertSee('Subestados de Por contactar');
+    $response->assertSee('Nuevo');
+});
