@@ -1,3 +1,7 @@
+@php
+use App\Services\CustomerService;
+@endphp
+
 @include('customers.index_partials.active_filters', [
   'country_options' => $country_options ?? [],
   'statuses'        => $statuses ?? [],
@@ -93,6 +97,7 @@
       <label for="status_id" class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Estado</label>
       <select name="status_id" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-[color:var(--ds-coral)] focus:outline-none focus:ring-2 focus:ring-[color:var(--ds-blush)]" id="status_id">
         <option value="">Todos</option>
+        <option value="{{ CustomerService::STATUS_FILTER_UNASSIGNED }}" @selected($request->status_id === CustomerService::STATUS_FILTER_UNASSIGNED)>Sin estado</option>
         @foreach($statuses as $item)
           <option value="{{ $item->id }}" @selected($request->status_id == $item->id)>{{ $item->name }}</option>
         @endforeach

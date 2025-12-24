@@ -1,4 +1,5 @@
 @php
+use App\Services\CustomerService;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 
@@ -26,6 +27,9 @@ $tagName = function($id) use ($tags) {
   return $item->name ?? $id;
 };
 $statusName = function($id) use ($statuses) {
+  if ($id === CustomerService::STATUS_FILTER_UNASSIGNED) {
+    return 'Sin estado';
+  }
   if (empty($id) || empty($statuses)) return $id;
   $item = collect($statuses)->firstWhere('id', (int)$id);
   return $item->name ?? $id;

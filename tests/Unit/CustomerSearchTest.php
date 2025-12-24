@@ -9,7 +9,8 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
-it('searches customers by contact name', function () {
+function prepareCustomerSchema(): void
+{
     config([
         'database.default' => 'sqlite',
         'database.connections.sqlite.database' => ':memory:',
@@ -80,6 +81,10 @@ it('searches customers by contact name', function () {
         $table->unsignedBigInteger('inquiry_product_id')->nullable();
         $table->timestamps();
     });
+}
+
+it('searches customers by contact name', function () {
+    prepareCustomerSchema();
 
     DB::table('customers')->insert([
         'name' => 'Empresa Demo',
@@ -95,4 +100,41 @@ it('searches customers by contact name', function () {
 
     expect($results)->toHaveCount(1);
     expect($results->first()->contact_name)->toBe('Carlos Gomez');
+});
+
+it('filters customers without a status when sin_estado is selected', function () {
+    prepareCustomerSchema();
+
+    DB::table('customer_statuses')->insert([
+        'id' => 1,
+        'name' => 'Activo',
+        'weight' => 1,
+        'color' => '#ffffff',
+    ]);
+
+    DB::table('customers')->insert([
+        [
+            'name' => 'Cliente asignado',
+            'status_id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ],
+        [
+            'name' => 'Cliente sin estado',
+            'status_id' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ],
+    ]);
+
+    $service = new CustomerService;
+    $request = Request::create('/customers', 'GET', [
+        'status_id' => CustomerService::STATUS_FILTER_UNASSIGNED,
+    ]);
+
+    $results = $service->filterCustomers($request, collect(), null, false, 0, true);
+
+    expect($results)->toHaveCount(1);
+    expect($results->first()->name)->toBe('Cliente sin estado');
+    expect($results->first()->status_id)->toBeNull();
 });
