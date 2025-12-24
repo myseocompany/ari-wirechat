@@ -8,12 +8,14 @@
 		<tr>
 			<th>Id</th>
 			<th>Nombre</th>
+			<th>Detalle</th>
 			<th>Editar</th>
 		</tr>
 		@foreach($model as $item)
 		<tr>
 			<td>{{$item->id}}</td>
 			<td>{{$item->name}}</td>
+			<td><a href="/campaigns/{{$item->id}}/show" class="btn btn-primary">Ver</a></td>
 			<td><a href="/campaigns/{{$item->id}}/edit" class="btn btn-success">Editar</a></td>
 		</tr>
 		@endforeach

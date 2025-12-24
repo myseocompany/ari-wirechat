@@ -1,41 +1,41 @@
 @extends('layout')
 @section('content')
-<h2>Ver audiencia</h2>
-<?php 
-function sendMessage($cel, $msg){
-	$url = "https://api.whatsapp.com/send/?phone=";
-	$url .= $cel;
-	$url .= "/";
-	$url .= "&text=".$msg;
+<h2>Detalle de campaña: {{ $campaign->name }}</h2>
 
-	return $url;
-}
- ?>
-
-	<table class="table">
-		<tr>
-			<td>GUARDAR ACCION</td>
-			@foreach($messages as $key => $value)
-				<td>
-					<?php echo "MENSAJE " . ($key + 1); ?>	
-				</td>
-			@endforeach
-		</tr>
-		@foreach($model as $item)
-		@if($item->hasAValidPhone())
-		<tr>
-			<td>
-				<?php $str = 'Encuesta de satisfacción.';?>
-				<?php $str = 'http://trujillo.quirky.com.co/track_send/'.$item->id.'/1/14/'.urlencode($str); ?>
-				<a target="_blank" href="{{$str}}">Acción <?php echo $item->id ?></a>
-			</td>
-			@foreach($messages as $message)
-			<td>
-				<a target="_blank" href="{{ sendMessage($item->getPhone(), $message->name ) }}">{{$message->name}}</a>	
-			</td>
-			@endforeach
-		</tr>
-		@endif
-		@endforeach
-	</table>
+@if($questions->isEmpty())
+	<p>Esta campaña no tiene preguntas configuradas.</p>
+@elseif($responsesByCustomer->isEmpty())
+	<p>No hay respuestas registradas para esta campaña.</p>
+@else
+	<p>Clientes que respondieron: {{ $responsesByCustomer->count() }}</p>
+	<div class="table-responsive-sm">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Cliente</th>
+					<th>Teléfono</th>
+					@foreach($questions as $question)
+						<th>{{ $question->value }}</th>
+					@endforeach
+				</tr>
+			</thead>
+			<tbody>
+				@foreach($responsesByCustomer as $response)
+					<tr>
+						<td>
+							<a href="{{ route('customers.show', $response['customer']->customer_id) }}">
+								{{ $response['customer']->name ?? 'Sin nombre' }}
+							</a>
+						</td>
+						<td>{{ $response['customer']->phone ?: $response['customer']->phone2 }}</td>
+						@foreach($questions as $question)
+							@php($answer = $response['answers']->get($question->id))
+							<td>{{ $answer?->value ?? '-' }}</td>
+						@endforeach
+					</tr>
+				@endforeach
+			</tbody>
+		</table>
+	</div>
+@endif
 @endsection
