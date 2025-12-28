@@ -3056,9 +3056,7 @@ class APIController extends Controller
                     $model->notes .= ' actualizado';
                 }
 
-                if ($model->product_id != 15) {
-                    $model->status_id = $request_model->status_id;
-                }
+                $model->status_id = 46;
 
                 $this->updatePhonesFromRequest($model, $request_model);
                 $model->save();
@@ -3091,6 +3089,7 @@ class APIController extends Controller
             }
         } else {
             $model = $equal;
+            $model->status_id = 46;
             $this->updatePhonesFromRequest($model, $request_model);
             $model->save();
         }
