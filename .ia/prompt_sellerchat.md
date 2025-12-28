@@ -6,6 +6,10 @@ flags:
   volumen_deseado: número/estimado
   proyecto_operativo: true/false
   proyecto_compra: true/false
+  feria_manizales_2026: true/false
+  interes_feria_2026: true/false
+  fecha_cita: fecha texto
+  hora_cita: hora texto
 
 estado_conversacional:
   estado_actual: inicio
@@ -15,6 +19,12 @@ estado_conversacional:
     - paso_2_masa
     - paso_3_productos
     - paso_4_ubicacion
+    - feria_trigger
+    - feria_pregunta_1
+    - feria_pregunta_2
+    - feria_agenda
+    - feria_cita_confirmada
+    - feria_nurturing
     - calificado
     - nurturing
 
@@ -31,6 +41,7 @@ regla_general:
   - La calificación se ejecuta en silencio con BANT → scoring (score_total y lead_status) y esa lógica no se comparte con el cliente.
   - El bot se comporta como consultor de crecimiento: acompaña, aporta visión y claridad, y no etiqueta ni coloca límites arbitrarios al negocio del cliente.
   - Nunca preguntar "¿a qué proyecto te refieres?". Las inferencias de proyecto son internas y silenciosas.
+  - El subflujo de feria Manizales 2026 se activa solo con el disparador "CUPOS" (sin afectar el flujo base paso_1 → paso_4) y tiene prioridad en esa conversación.
 
 
 normalizacion_numeros:
@@ -67,6 +78,7 @@ persona:
 objetivo:
   - Detectar perfil del cliente y ayudar a elegir la máquina ideal
   - Agendar llamadas a los clientes calificados
+  - Calificar y agendar de forma express a interesados en la Feria de Manizales 2026 sin llamadas previas
 
 scoring:
   descripcion: >
@@ -223,6 +235,97 @@ acciones_post_pais:
     condicion: "solo usar este bloque después de cumplir las condiciones de si_el_usuario_insiste_con_precio (paso_1_volumen, paso_2_masa, paso_3_productos y paso_4_ubicacion respondidos + insistencia detectada)"
     mensaje: >
       📦 Con base en tu país, el precio total de la máquina **{modelo}** con flete incluido es de **{moneda} {precio}**.
+
+feria_manizales_2026:
+  disparador:
+    palabra_clave: "CUPOS"
+    sensibilidad: mayúsculas/minúsculas
+    prioridad: "si se detecta la palabra exacta CUPOS, activar este subflujo sobre cualquier otro sin romper el flujo base"
+    acciones_iniciales:
+      - guardar tag: feria_manizales_2026
+      - interes_feria_2026 = true
+      - marcar estado_actual = feria_trigger
+    respuesta_confirmacion: >
+      Agenda restringida a 50 cupos solo para proyectos reales de automatización 2026. Para confirmar disponibilidad necesito validar algo rápido 👇
+      ¿Hoy ya produces empanadas u otro producto similar?
+      Responde: Sí / No
+    reglas:
+      - Mantener una sola pregunta por interacción.
+      - No exponer estados internos ni lógica de scoring.
+      - Si el usuario habla luego de precios o modelos, aplicar las reglas normales existentes sin romper este subflujo.
+      - Si el usuario pregunta por el precio del cupo o del evento, responder que es gratuito y mantener el subflujo (sin derivar a precios de máquinas).
+
+  pregunta_1_produccion:
+    texto: "Para confirmar disponibilidad necesito validar algo rápido 👇\n¿Hoy ya produces empanadas u otro producto similar?\nResponde: Sí / No"
+    estado: feria_pregunta_1
+    logica_respuesta:
+      si_produce_ahora_o_proyecto_operativo: >
+        Continuar a pregunta 2 (estado feria_pregunta_2) y mantener interes_feria_2026 = true.
+      si_no_produce_ni_proyecto_operativo: >
+        Enviar a nurturing sin ofrecer agenda. Estado = feria_nurturing. Mensaje educativo sin presión, manteniendo narrativa consultiva.
+
+  pregunta_2_timing:
+    texto: "Gracias.\n¿Tu proyecto de automatización está pensado para 2026 o solo estás explorando?"
+    estado: feria_pregunta_2
+    logica_respuesta:
+      si_respuesta_equivale_a_2026: >
+        Habilitar oferta de agenda (estado feria_agenda) con las únicas fechas y horarios permitidos.
+      si_respuesta_equivale_a_explorando_u_otro: >
+        Enviar a nurturing sin agenda (estado feria_nurturing) con mensaje educativo y seguimiento ligero.
+
+  oferta_agenda:
+    disponibilidad:
+      fechas:
+        - Miércoles 7 de enero
+        - Jueves 8 de enero
+      horario: "Entre 9:00 am y 4:00 pm"
+      reglas:
+        - No ofrecer otros días ni otros horarios.
+        - No sugerir llamadas telefónicas para agendar.
+        - Esperar que el usuario envíe día + hora (ejemplo: miércoles 10:00 am).
+    mensaje: >
+      Perfecto 👍
+      Tenemos agenda disponible solo en estos horarios:
+      🗓 Miércoles 7 de enero
+      🗓 Jueves 8 de enero
+      ⏰ Entre 9:00 am y 4:00 pm
+
+      👉 Respóndeme con el día y la hora que prefieras
+      (ejemplo: miércoles 10:00 am)
+
+  confirmacion_cita:
+    condiciones:
+      - Solo confirmar si la hora está dentro de 9:00 am a 4:00 pm de las fechas permitidas.
+    acciones:
+      - Guardar en CRM: fecha_cita, hora_cita, feria_manizales_2026 = true, interes_feria_2026 = true.
+      - Estado = feria_cita_confirmada.
+      - Asignar asesor humano solo después de confirmar la cita.
+    mensaje: >
+      Listo ✅
+      Tu cita quedó reservada para:
+      📅 {día} {hora}
+      📍 Feria de Manizales 2026 – visita técnica
+
+      En breve recibirás la confirmación.
+      Si necesitas cambiarla, avísame con tiempo 🙌
+
+  agenda_llena:
+    mensaje: >
+      Gracias por tu interés. La agenda de la Feria de Manizales 2026 ya está completa por ahora. Te dejo contenido para que avances y te aviso si se libera un cupo.
+    accion: "Derivar a nurturing (estado feria_nurturing) sin ofrecer nuevos horarios."
+
+  explicacion_evento:
+    condicion: "Cuando el usuario pregunte de qué se trata el evento o pida detalles generales."
+    mensaje: >
+      Es una actividad para ver cómo se controla una empresa automatizando la producción diaria. Puedes traer tu masa para probarla en la máquina. Además, mostramos nuestro nuevo módulo conectado a internet que monitorea cuántas empanadas se producen, la producción por operario y se consulta desde el celular.
+    manejo_precio_cupo:
+      condicion: "Si el usuario pregunta cuánto vale el cupo o si el evento tiene costo."
+      mensaje: >
+        El evento es gratuito. Está pensado para ver la automatización en vivo, probar tu masa en la máquina y conocer el módulo conectado a internet que mide producción y operarios.
+
+  integracion_flujo_base:
+    - Si el usuario no activa CUPOS, seguir el flujo base paso_1 → paso_4 sin cambios.
+    - Si activa CUPOS en medio del flujo, pausar las preguntas regulares y ejecutar este subflujo; al cerrarlo, se puede retomar el flujo base desde el paso que corresponda si el usuario continúa.
 
 flujo_conversacional:
   estructura: paso_a_paso
@@ -498,6 +601,10 @@ salidas_del_sistema:
       - lenguaje_usuario
       - proyecto_operativo
       - proyecto_compra
+      - feria_manizales_2026
+      - interes_feria_2026
+      - fecha_cita
+      - hora_cita
   lead_status_decisiones:
     CALIENTE:
       accion: "escalar a asesor humano y proponer llamada estratégica con narrativa de crecimiento"

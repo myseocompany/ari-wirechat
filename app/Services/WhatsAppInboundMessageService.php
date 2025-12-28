@@ -14,7 +14,10 @@ use Namu\WireChat\Models\Message;
 
 class WhatsAppInboundMessageService
 {
-    public function __construct(private readonly WhatsAppWebhookParser $parser) {}
+    public function __construct(
+        private readonly WhatsAppWebhookParser $parser,
+        private readonly LeadAssignmentService $leadAssignmentService
+    ) {}
 
     public function handle(array $payload): int
     {
@@ -39,9 +42,28 @@ class WhatsAppInboundMessageService
             $customer = Customer::findByPhoneInternational($message['wa_id']);
             if (! $customer) {
                 $customer = Customer::create([
-                    'name' => 'WhatsApp '.$message['wa_id'],
+                    'name' => 'WhatsApp SellerChat '.$message['wa_id'],
                     'phone' => $message['wa_id'],
                 ]);
+
+                $assignedUserId = $this->leadAssignmentService->getAssignableUserId();
+                $customer->forceFill([
+                    'status_id' => 1,
+                    'source_id' => 79,
+                    'user_id' => $assignedUserId,
+                ])->save();
+
+                if ($assignedUserId) {
+                    $this->leadAssignmentService->recordAssignment(
+                        $assignedUserId,
+                        $customer->id,
+                        'whatsapp_webhook',
+                        [
+                            'strategy' => 'auto',
+                            'source_id' => 79,
+                        ]
+                    );
+                }
             }
 
             $systemUser = $this->resolveSystemUser();
