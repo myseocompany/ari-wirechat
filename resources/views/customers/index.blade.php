@@ -137,22 +137,15 @@
       </div>
     </div>
 
-    <x-design.section class="ds-shell border-slate-200">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <div class="flex flex-col gap-2">
-          <x-design.eyebrow>{{ isset($phase) ? $phase->name : 'Leads' }}</x-design.eyebrow>
-          <p class="text-sm text-slate-700">
-            Registro <span class="font-semibold text-[color:var(--ds-ink)]">{{ $model->firstItem() }}</span> a
-            <span class="font-semibold text-[color:var(--ds-ink)]">{{ $model->lastItem() }}</span> de
-            <span class="font-semibold text-[color:var(--ds-ink)]">{{ $model->total() }}</span>
-          </p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <x-design.badge tone="cloud">Total {{ $model->total() }}</x-design.badge>
-          <x-design.badge tone="outline">Activos {{ $model->count() }}</x-design.badge>
-        </div>
-      </div>
-    </x-design.section>
+    <div class="flex flex-col gap-3">
+      @include('customers.index_partials.groupbar', [
+        'customersGroup' => $customersGroup,
+        'parent_statuses' => $parent_statuses,
+        'statusGroups' => $statusGroups,
+        'showParents' => false,
+        'showChildren' => true,
+      ])
+    </div>
 
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div class="flex flex-col gap-4">
@@ -180,16 +173,16 @@
             'customersGroup' => $customersGroup,
             'parent_statuses' => $parent_statuses,
             'statusGroups' => $statusGroups,
+            'showParents' => true,
+            'showChildren' => false,
+            'parentHeader' => isset($phase) ? $phase->name : 'Leads',
+            'parentSummary' => 'Registro '
+              .$model->firstItem().' a '
+              .$model->lastItem().' de '
+              .$model->total().' · Activos '
+              .$model->count(),
           ])
 
-          @if(isset($sum_g))
-            <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm">
-              Total estados: <span class="font-semibold text-[color:var(--ds-ink)]">{{ $sum_g }}</span>
-            </div>
-          @endif
-        </div>
-
-        <div class="mt-4">
           <x-design.section class="border-slate-200">
             @include('customers.index_partials.side_filter')
           </x-design.section>

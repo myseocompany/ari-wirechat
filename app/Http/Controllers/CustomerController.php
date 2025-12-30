@@ -100,7 +100,7 @@ class CustomerController extends Controller
         $model = $this->customerService->filterCustomers($request, $statuses, null, false, 10);
         $childGroups = $this->customerService->filterCustomers($request, $statuses, null, true);
         $parentStatuses = CustomerStatus::query()
-            ->whereIn('name', ['Por contactar', 'Oportunidades', 'Ventas', 'Perdidas'])
+            ->whereNull('parent_id')
             ->orderBy('weight')
             ->get();
         $customersGroup = $this->customerService->groupStatusesByParent($childGroups, $parentStatuses);
@@ -136,20 +136,25 @@ class CustomerController extends Controller
         }
 
         $childStatusIds = $childGroups->pluck('status_table_id')->filter()->unique()->values();
-        $statusParentMap = $childStatusIds->isNotEmpty()
-            ? CustomerStatus::query()->whereIn('id', $childStatusIds)->pluck('parent_id', 'id')
+        $childStatusMeta = $childStatusIds->isNotEmpty()
+            ? CustomerStatus::query()
+                ->whereIn('id', $childStatusIds)
+                ->get(['id', 'parent_id', 'weight'])
+                ->keyBy('id')
             : collect();
-        $statusGroups = $childGroups->map(function ($childGroup) use ($statusParentMap) {
+        $statusGroups = $childGroups->map(function ($childGroup) use ($childStatusMeta) {
             $statusId = $childGroup->status_table_id ?? null;
+            $meta = $statusId ? $childStatusMeta->get($statusId) : null;
 
             return (object) [
                 'count' => (int) ($childGroup->count ?? 0),
                 'status_id' => $statusId,
                 'status_name' => $childGroup->status_name,
                 'status_color' => $childGroup->status_color,
-                'parent_id' => $statusId ? $statusParentMap->get($statusId) : null,
+                'parent_id' => $meta?->parent_id,
+                'weight' => $meta?->weight ?? 9999,
             ];
-        });
+        })->sortBy('weight')->values();
 
         return view('customers.index', [
             'request' => $request,

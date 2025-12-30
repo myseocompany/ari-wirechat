@@ -82,25 +82,30 @@ class APIController extends Controller
         $model = $this->getModel($request, $statuses, 'customers');
         $childGroups = $this->countFilterCustomers($request, $statuses);
         $parentStatuses = CustomerStatus::query()
-            ->whereIn('name', ['Por contactar', 'Oportunidades', 'Ventas', 'Perdidas'])
+            ->whereNull('parent_id')
             ->orderBy('weight')
             ->get();
         $customersGroup = app(CustomerService::class)->groupStatusesByParent($childGroups, $parentStatuses);
         $childStatusIds = $childGroups->pluck('status_table_id')->filter()->unique()->values();
-        $statusParentMap = $childStatusIds->isNotEmpty()
-            ? CustomerStatus::query()->whereIn('id', $childStatusIds)->pluck('parent_id', 'id')
+        $childStatusMeta = $childStatusIds->isNotEmpty()
+            ? CustomerStatus::query()
+                ->whereIn('id', $childStatusIds)
+                ->get(['id', 'parent_id', 'weight'])
+                ->keyBy('id')
             : collect();
-        $statusGroups = $childGroups->map(function ($childGroup) use ($statusParentMap) {
+        $statusGroups = $childGroups->map(function ($childGroup) use ($childStatusMeta) {
             $statusId = $childGroup->status_table_id ?? null;
+            $meta = $statusId ? $childStatusMeta->get($statusId) : null;
 
             return (object) [
                 'count' => (int) ($childGroup->count ?? 0),
                 'status_id' => $statusId,
                 'status_name' => $childGroup->status_name,
                 'status_color' => $childGroup->status_color,
-                'parent_id' => $statusId ? $statusParentMap->get($statusId) : null,
+                'parent_id' => $meta?->parent_id,
+                'weight' => $meta?->weight ?? 9999,
             ];
-        });
+        })->sortBy('weight')->values();
 
         $sources = CustomerSource::all();
 
@@ -129,25 +134,30 @@ class APIController extends Controller
         $model = $this->getModel($request, $statuses, 'leads');
         $childGroups = $this->countFilterCustomers($request, $statuses);
         $parentStatuses = CustomerStatus::query()
-            ->whereIn('name', ['Por contactar', 'Oportunidades', 'Ventas', 'Perdidas'])
+            ->whereNull('parent_id')
             ->orderBy('weight')
             ->get();
         $customersGroup = app(CustomerService::class)->groupStatusesByParent($childGroups, $parentStatuses);
         $childStatusIds = $childGroups->pluck('status_table_id')->filter()->unique()->values();
-        $statusParentMap = $childStatusIds->isNotEmpty()
-            ? CustomerStatus::query()->whereIn('id', $childStatusIds)->pluck('parent_id', 'id')
+        $childStatusMeta = $childStatusIds->isNotEmpty()
+            ? CustomerStatus::query()
+                ->whereIn('id', $childStatusIds)
+                ->get(['id', 'parent_id', 'weight'])
+                ->keyBy('id')
             : collect();
-        $statusGroups = $childGroups->map(function ($childGroup) use ($statusParentMap) {
+        $statusGroups = $childGroups->map(function ($childGroup) use ($childStatusMeta) {
             $statusId = $childGroup->status_table_id ?? null;
+            $meta = $statusId ? $childStatusMeta->get($statusId) : null;
 
             return (object) [
                 'count' => (int) ($childGroup->count ?? 0),
                 'status_id' => $statusId,
                 'status_name' => $childGroup->status_name,
                 'status_color' => $childGroup->status_color,
-                'parent_id' => $statusId ? $statusParentMap->get($statusId) : null,
+                'parent_id' => $meta?->parent_id,
+                'weight' => $meta?->weight ?? 9999,
             ];
-        });
+        })->sortBy('weight')->values();
 
         $pending_actions = $this->getPendingActions();
 
