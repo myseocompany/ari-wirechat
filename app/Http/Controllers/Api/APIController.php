@@ -77,6 +77,7 @@ class APIController extends Controller
         $users = $this->getUsers();
         $customer_options = CustomerStatus::all();
         $statuses = $this->getStatuses($request, 1);
+        $query = $request->input('search');
 
         $model = $this->getModel($request, $statuses, 'customers');
         $childGroups = $this->countFilterCustomers($request, $statuses);
@@ -85,13 +86,38 @@ class APIController extends Controller
             ->orderBy('weight')
             ->get();
         $customersGroup = app(CustomerService::class)->groupStatusesByParent($childGroups, $parentStatuses);
+        $childStatusIds = $childGroups->pluck('status_table_id')->filter()->unique()->values();
+        $statusParentMap = $childStatusIds->isNotEmpty()
+            ? CustomerStatus::query()->whereIn('id', $childStatusIds)->pluck('parent_id', 'id')
+            : collect();
+        $statusGroups = $childGroups->map(function ($childGroup) use ($statusParentMap) {
+            $statusId = $childGroup->status_table_id ?? null;
+
+            return (object) [
+                'count' => (int) ($childGroup->count ?? 0),
+                'status_id' => $statusId,
+                'status_name' => $childGroup->status_name,
+                'status_color' => $childGroup->status_color,
+                'parent_id' => $statusId ? $statusParentMap->get($statusId) : null,
+            ];
+        });
 
         $sources = CustomerSource::all();
 
         $pending_actions = $this->getPendingActions();
 
-        return view('customers.index', compact('model', 'request', 'customer_options', 'customersGroup', 'query', 'users', 'sources', 'pending_actions'))
-            ->with('parent_statuses', $parentStatuses);
+        return view('customers.index', [
+            'model' => $model,
+            'request' => $request,
+            'customer_options' => $customer_options,
+            'customersGroup' => $customersGroup,
+            'query' => $query,
+            'users' => $users,
+            'sources' => $sources,
+            'pending_actions' => $pending_actions,
+            'parent_statuses' => $parentStatuses,
+            'statusGroups' => $statusGroups,
+        ]);
     }
 
     public function leads(Request $request)
@@ -99,6 +125,7 @@ class APIController extends Controller
         $users = $this->getUsers();
         $customer_options = CustomerStatus::all();
         $statuses = $this->getStatuses($request, 1);
+        $query = $request->input('search');
         $model = $this->getModel($request, $statuses, 'leads');
         $childGroups = $this->countFilterCustomers($request, $statuses);
         $parentStatuses = CustomerStatus::query()
@@ -106,13 +133,38 @@ class APIController extends Controller
             ->orderBy('weight')
             ->get();
         $customersGroup = app(CustomerService::class)->groupStatusesByParent($childGroups, $parentStatuses);
+        $childStatusIds = $childGroups->pluck('status_table_id')->filter()->unique()->values();
+        $statusParentMap = $childStatusIds->isNotEmpty()
+            ? CustomerStatus::query()->whereIn('id', $childStatusIds)->pluck('parent_id', 'id')
+            : collect();
+        $statusGroups = $childGroups->map(function ($childGroup) use ($statusParentMap) {
+            $statusId = $childGroup->status_table_id ?? null;
+
+            return (object) [
+                'count' => (int) ($childGroup->count ?? 0),
+                'status_id' => $statusId,
+                'status_name' => $childGroup->status_name,
+                'status_color' => $childGroup->status_color,
+                'parent_id' => $statusId ? $statusParentMap->get($statusId) : null,
+            ];
+        });
 
         $pending_actions = $this->getPendingActions();
 
         $sources = CustomerSource::all();
 
-        return view('customers.index', compact('model', 'request', 'customer_options', 'customersGroup', 'query', 'users', 'sources', 'pending_actions'))
-            ->with('parent_statuses', $parentStatuses);
+        return view('customers.index', [
+            'model' => $model,
+            'request' => $request,
+            'customer_options' => $customer_options,
+            'customersGroup' => $customersGroup,
+            'query' => $query,
+            'users' => $users,
+            'sources' => $sources,
+            'pending_actions' => $pending_actions,
+            'parent_statuses' => $parentStatuses,
+            'statusGroups' => $statusGroups,
+        ]);
     }
 
     public function getModel(Request $request, $statuses, $action)

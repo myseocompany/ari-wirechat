@@ -1,8 +1,11 @@
 @php
+  $customersGroup = collect($customersGroup ?? []);
   $parentStatuses = collect($parent_statuses ?? []);
+  $statusGroups = collect($statusGroups ?? []);
   $groupedParents = $customersGroup->keyBy('status_id');
   $parentSummary = $parentStatuses->map(function ($status) use ($groupedParents) {
       $summary = $groupedParents->get($status->id);
+
       return (object) [
           'status_id' => $status->id,
           'status_name' => $status->name,
@@ -10,19 +13,28 @@
           'count' => (int) ($summary->count ?? 0),
       ];
   })->values();
-  $sum_g = $parentSummary->sum('count');
-  $activeParentId = (int) ($request->parent_status_id ?? 0);
-  $selectedParent = $parentStatuses->firstWhere('id', $activeParentId);
-  $childGroupsByParent = collect($statusGroups ?? [])
-      ->filter(function ($item) use ($activeParentId) {
-          return isset($item->parent_id) && (int) $item->parent_id === $activeParentId;
+  $totalParentCount = $parentSummary->sum('count');
+  $sum_g = $totalParentCount;
+  $statusSummary = $statusGroups
+      ->map(function ($item) {
+          return (object) [
+              'status_id' => $item->status_id ?? null,
+              'status_name' => $item->status_name ?? 'Sin estado',
+              'status_color' => $item->status_color ?? '#0f172a',
+              'count' => (int) ($item->count ?? 0),
+          ];
       })
+      ->filter(fn ($item) => $item->count > 0)
       ->sortByDesc('count')
       ->values();
 @endphp
 
-@if($parentSummary->isNotEmpty())
-  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" data-dashboard="status-summary">
+<div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" data-dashboard="status-summary">
+  <div class="mb-3 flex items-center justify-between text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
+    <span>Estados principales</span>
+    <span class="text-[color:var(--ds-navy)]">{{ number_format($totalParentCount) }}</span>
+  </div>
+  @if($parentSummary->isNotEmpty())
     <div class="grid gap-3 sm:grid-cols-2">
       @foreach($parentSummary as $item)
         <div class="rounded-2xl p-3 text-white shadow-sm" style="background-color: {{ $item->status_color }}">
@@ -33,28 +45,36 @@
         </div>
       @endforeach
     </div>
-  </div>
-@else
-  <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4 text-sm text-[color:var(--ds-navy)] shadow-sm">
-    Sin estados
-  </div>
-@endif
-
-@if($selectedParent && $childGroupsByParent->isNotEmpty())
-  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-    <div class="mb-3 flex items-center justify-between text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
-      <span>Subestados de {{ $selectedParent->name }}</span>
-      <span class="text-[color:var(--ds-navy)]">{{ number_format($childGroupsByParent->sum('count')) }}</span>
+  @else
+    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4 text-sm text-[color:var(--ds-navy)] shadow-sm">
+      Sin estados
     </div>
+  @endif
+</div>
+
+<div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" data-dashboard="status-summary-children">
+  <div class="mb-3 flex items-center justify-between text-[0.7rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
+    <span>Estados filtrados</span>
+    <span class="text-[color:var(--ds-navy)]">{{ number_format($statusSummary->sum('count')) }}</span>
+  </div>
+
+  @if($statusSummary->isNotEmpty())
     <div class="flex flex-col gap-2">
-      @foreach($childGroupsByParent as $child)
+      @foreach($statusSummary as $child)
         <button type="button"
           class="flex w-full items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] px-3 py-2 text-sm font-semibold text-slate-700 transition hover:border-[color:var(--ds-coral)] hover:text-[color:var(--ds-coral)]"
           onclick="changeStatus({{ $child->status_id }})">
-          <span>{{ $child->status_name }}</span>
+          <span class="flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full" style="background-color: {{ $child->status_color }}"></span>
+            <span>{{ $child->status_name }}</span>
+          </span>
           <span>{{ number_format($child->count) }}</span>
         </button>
       @endforeach
     </div>
-  </div>
-@endif
+  @else
+    <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4 text-sm text-[color:var(--ds-navy)] shadow-sm">
+      Sin estados filtrados
+    </div>
+  @endif
+</div>

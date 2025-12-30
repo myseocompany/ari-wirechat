@@ -95,6 +95,7 @@ class CustomerController extends Controller
             ->get();
 
         // dd($statuses);
+        $query = $request->input('search');
 
         $model = $this->customerService->filterCustomers($request, $statuses, null, false, 10);
         $childGroups = $this->customerService->filterCustomers($request, $statuses, null, true);
