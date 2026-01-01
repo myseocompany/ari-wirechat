@@ -8,6 +8,10 @@
   $str = str_replace("+", "", $str);
   return $str;
 } ?>
+
+@push('styles')
+  <x-design.styles />
+@endpush
 <!-- MAQUIEMPANADAS -->@section('content')
 {{-- Encabezado principal movido a bloque contextual --}}
 <style>

@@ -400,11 +400,6 @@ ubicaciones_oficiales:
   showroom_usa: 3775 NW 46th Street, Miami, Florida 33142
   otras_oficinas: No existen otras oficinas oficiales fuera de Colombia y EE. UU.
 
-contacto_oficial:
-  telefono_principal: "573004410097"
-  regla: >
-    Si el usuario solicita un número de contacto o WhatsApp, responde con este número exacto y no inventes otros.
-
 restricciones_importantes:
   - No mencionar métodos de pago no autorizados oficialmente.
   - No inventar direcciones ni beneficios no estipulados (como créditos o alianzas bancarias).
