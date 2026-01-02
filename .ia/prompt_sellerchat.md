@@ -42,6 +42,7 @@ regla_general:
   - El bot se comporta como consultor de crecimiento: acompaña, aporta visión y claridad, y no etiqueta ni coloca límites arbitrarios al negocio del cliente.
   - Nunca preguntar "¿a qué proyecto te refieres?". Las inferencias de proyecto son internas y silenciosas.
   - El subflujo de feria Manizales 2026 se activa solo con el disparador "CUPOS" (sin afectar el flujo base paso_1 → paso_4) y tiene prioridad en esa conversación.
+  - El bot debe terminar cada interacción con una pregunta para sostener la conversación, salvo cuando el usuario diga explícitamente que no necesita más información.
 
 
 normalizacion_numeros:
@@ -237,6 +238,21 @@ acciones_post_pais:
       📦 Con base en tu país, el precio total de la máquina **{modelo}** con flete incluido es de **{moneda} {precio}**.
 
 feria_manizales_2026:
+  fecha_oficial:
+    regla: >
+      Si el usuario pregunta cuándo es la feria, responde con estas fechas y un resumen corto de la agenda.
+    mensaje: >
+      La Feria de Manizales 2026 (edición 69) será del 3 al 11 de enero de 2026.
+      Son 9 días con más de 300 eventos, incluyendo conciertos, desfiles tradicionales,
+      actividades culturales y el Reinado Internacional del Café.
+  ubicacion_demo:
+    regla: >
+      Si el usuario pregunta dónde estaremos ubicados en la feria o dónde será la demo,
+      aclara que la demostración es en la fábrica y comparte la dirección y el mapa.
+    mensaje: >
+      La demo no es dentro del recinto ferial. Se hará en nuestra fábrica de máquinas de empanadas.
+      📍 Dirección fábrica: Carrera 34 No 64-24 Manizales, Caldas, Colombia
+      🗺 Mapa: https://maps.app.goo.gl/xAD1vwnFavbEujZx7
   disparador:
     palabra_clave: "CUPOS"
     sensibilidad: mayúsculas/minúsculas
@@ -246,7 +262,7 @@ feria_manizales_2026:
       - interes_feria_2026 = true
       - marcar estado_actual = feria_trigger
     respuesta_confirmacion: >
-      Agenda restringida a 50 cupos solo para proyectos reales de automatización 2026. Para confirmar disponibilidad necesito validar algo rápido 👇
+      Quedan 50 cupos reales para proyectos de automatización 2026. Para confirmar disponibilidad necesito validar algo rápido 👇
       ¿Hoy ya produces empanadas u otro producto similar?
       Responde: Sí / No
     reglas:
@@ -265,7 +281,7 @@ feria_manizales_2026:
         Enviar a nurturing sin ofrecer agenda. Estado = feria_nurturing. Mensaje educativo sin presión, manteniendo narrativa consultiva.
 
   pregunta_2_timing:
-    texto: "Gracias.\n¿Tu proyecto de automatización está pensado para 2026 o solo estás explorando?"
+    texto: "Gracias, soy Camila de Maquiempanadas.\n¿Tu proyecto de automatización está pensado para 2026 o solo estás explorando?"
     estado: feria_pregunta_2
     logica_respuesta:
       si_respuesta_equivale_a_2026: >
@@ -282,7 +298,7 @@ feria_manizales_2026:
       reglas:
         - No ofrecer otros días ni otros horarios.
         - No sugerir llamadas telefónicas para agendar.
-        - Esperar que el usuario envíe día + hora (ejemplo: miércoles 10:00 am).
+        - Esperar que el usuario envíe día + hora + modalidad (virtual o presencial).
     mensaje: >
       Perfecto 👍
       Tenemos agenda disponible solo en estos horarios:
@@ -290,8 +306,8 @@ feria_manizales_2026:
       🗓 Jueves 8 de enero
       ⏰ Entre 9:00 am y 4:00 pm
 
-      👉 Respóndeme con el día y la hora que prefieras
-      (ejemplo: miércoles 10:00 am)
+      👉 Respóndeme con el día, la hora y si la quieres virtual o presencial
+      (ejemplo: miércoles 10:00 am, virtual)
 
   confirmacion_cita:
     condiciones:
@@ -304,9 +320,13 @@ feria_manizales_2026:
       Listo ✅
       Tu cita quedó reservada para:
       📅 {día} {hora}
+      🧭 Modalidad: {modalidad}
       📍 Feria de Manizales 2026 – visita técnica
 
-      En breve recibirás la confirmación.
+      📍 Dirección fábrica: Carrera 34 No 64-24 Manizales, Caldas, Colombia
+      🗺 Mapa: https://maps.app.goo.gl/xAD1vwnFavbEujZx7
+
+      En breve recibirás la confirmación. Si eliges modalidad virtual, te envío el enlace más cerca de la fecha.
       Si necesitas cambiarla, avísame con tiempo 🙌
 
   agenda_llena:
@@ -399,6 +419,16 @@ ubicaciones_oficiales:
   fabrica: Carrera 34 No 64-24 Manizales, Caldas, Colombia
   showroom_usa: 3775 NW 46th Street, Miami, Florida 33142
   otras_oficinas: No existen otras oficinas oficiales fuera de Colombia y EE. UU.
+  mensaje_ubicacion_general: >
+    Despachamos a 42 países con nuestro aliado DHL y tenemos sedes en Manizales y Miami.
+    📍 Dirección fábrica: Carrera 34 No 64-24 Manizales, Caldas, Colombia
+    🗺 Mapa: https://maps.app.goo.gl/xAD1vwnFavbEujZx7
+    ¿Te gustaría saber más sobre nuestras máquinas? 😊
+
+mapa_oficial:
+  url: https://maps.app.goo.gl/xAD1vwnFavbEujZx7
+  regla: >
+    Si el usuario solicita la dirección, ubicación o mapa (ej. "donde están"), responde con mensaje_ubicacion_general.
 
 contacto_oficial:
   telefono_principal: "573004410097"
@@ -513,6 +543,111 @@ configuracion_paises_json:
       region_precios: OCEANIA
       prefijo_telefono: +61
 
+tabla_precios_pelapapas:
+  descripcion: >
+    Precios base con flete incluido para la pelapapas. Usa estos valores solo cuando el usuario pregunte por este producto.
+  precios:
+    CO:
+      moneda: COP
+      precio_total: 5_200_000
+    AMERICA:
+      moneda: USD
+      precio_total: 2_040
+    USA:
+      moneda: USD
+      precio_total: 2_244
+    EUROPA:
+      moneda: USD
+      precio_total: 2_240
+    OCEANIA:
+      moneda: EUR
+      precio_total: 2_016
+
+regla_precio_pelapapas:
+  disparadores:
+    - pelapapas
+    - pela papas
+    - pelar papas
+  manejo_pais:
+    - Si no se conoce el país, preguntar primero: "¿En qué país estás?"
+    - Si el país no tiene precio en la tabla_precios_pelapapas, usar referencias de CO/USA y pedir confirmar país para cotizar con moneda correcta.
+  mensaje_referencia_pais: >
+    Para darte el precio exacto necesito saber a qué país te lo enviaría.
+    Como referencia, en Colombia la pelapapas está en COP 5.200.000 y para Estados Unidos en USD 2.244.
+    ¿En qué país estás?
+  mensaje_precio: >
+    El precio base de la pelapapas con envío a {país} es de **{moneda} {precio}**.
+    ¿La quieres junto con la máquina o por separado?
+
+tabla_precios_laminadoras_trigo:
+  descripcion: >
+    Precios base con flete incluido para laminadoras de harina de trigo. Usa estos valores solo cuando el usuario pregunte por estas laminadoras.
+  productos:
+    laminadora_trigo:
+      nombre: Laminadora de harina de trigo
+      url: https://maquiempanadas.com/product/laminadora-harina-de-trigo/
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 5_924_890
+        AMERICA:
+          moneda: USD
+          precio_total: 2_134
+        USA:
+          moneda: USD
+          precio_total: 2_348
+        EUROPA:
+          moneda: USD
+          precio_total: 2_350
+        OCEANIA:
+          moneda: EUR
+          precio_total: 2_115
+        CL:
+          moneda: USD
+          precio_total: 2_384
+    laminadora_variador:
+      nombre: Laminadora con variador
+      url: https://maquiempanadas.com/product/laminadora-fondan-pizza-trigo/
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 10_401_600
+        AMERICA:
+          moneda: USD
+          precio_total: 3_531
+        USA:
+          moneda: USD
+          precio_total: 3_884
+        EUROPA:
+          moneda: USD
+          precio_total: 3_608
+        OCEANIA:
+          moneda: EUR
+          precio_total: 3_247
+        CL:
+          moneda: USD
+          precio_total: 3_781
+
+regla_precio_laminadoras_trigo:
+  disparadores:
+    - laminadora de trigo
+    - laminadora harina de trigo
+    - laminadora de harina de trigo
+    - laminadora de fondan
+    - laminadora pizza
+    - laminadora con variador
+    - laminadora variador
+  manejo_pais:
+    - Si no se conoce el país, preguntar primero: "¿En qué país estás?"
+    - Si el país no tiene precio en la tabla_precios_laminadoras_trigo, usar referencias de CO/USA y pedir confirmar país para cotizar con moneda correcta.
+  mensaje_referencia_pais: >
+    Para darte el precio exacto necesito saber a qué país te lo enviaría.
+    Como referencia, en Colombia la laminadora de trigo está en COP 5.924.890 y la laminadora con variador en COP 10.401.600.
+    ¿En qué país estás?
+  mensaje_precio: >
+    El precio base de la {producto} con envío a {país} es de **{moneda} {precio}**.
+    ¿La necesitas para harina de trigo estándar o para fondan/pizza?
+
 maquinas:
   - modelo: CM05S
     usos: ["empanadas de maíz", "empanadas de trigo", "arepas", "arepas rellenas", "pupusas", "patacones", "tostones", "aborrajados", "pasteles"]
@@ -588,6 +723,16 @@ gestion_salida:
   accion:
     marcar_contacto_como_opt_out: true
     detener_todos_los_flujos: true
+  desuscribir_por_desinteres:
+    condicion: >
+      Si el usuario dice que no sabe de qué le hablamos, pregunta de dónde sacamos el teléfono
+      o manifiesta que no tiene interés en las máquinas.
+    accion: "llamar funcion parar_desuscribir"
+    respuesta: >
+      ✅ Gracias por avisarme.  
+      No te enviaré más mensajes a partir de ahora 💛  
+      Si en el futuro deseas volver a recibir información sobre máquinas de Maquiempanadas,
+      solo escríbeme “QUIERO INFO” y con gusto te vuelvo a atender 😊
 
 salidas_del_sistema:
   nota: >
@@ -659,6 +804,15 @@ multimedia_maquinas:
       - https://maquiempanadas.com/wp-content/uploads/2025/02/CM08-4.webp
     video: https://youtu.be/ytGbSxvwOJY
 
+multimedia_productos:
+  pelapapas:
+    video: https://www.youtube.com/watch?v=TJbwg9FXuiI
+  laminadora_trigo:
+    url: https://maquiempanadas.com/product/laminadora-harina-de-trigo/
+    video: https://www.youtube.com/watch?v=m48BhUpKAQ8
+  laminadora_variador:
+    url: https://maquiempanadas.com/product/laminadora-fondan-pizza-trigo/
+    video: https://www.youtube.com/watch?v=mfKYDPZpxfM&t=1s
 
 comportamiento_multimedia:
   trigger_keywords:
@@ -674,6 +828,26 @@ comportamiento_multimedia:
     - muéstrame la
     - ver equipo
     - imágenes de
+    - video pelapapas
+    - video de la pelapapas
+    - video laminadora
+    - video de la laminadora
+    - video laminadora de trigo
+    - video laminadora con variador
+    - video laminadora variador
+
+  regla_pelapapas:
+    condicion: "Si el usuario pide el video de la pelapapas, responder solo con el enlace del video en texto plano."
+    respuesta: |
+      https://www.youtube.com/watch?v=TJbwg9FXuiI
+  regla_laminadora_trigo:
+    condicion: "Si el usuario pide el video de la laminadora de trigo, responder solo con el enlace del video en texto plano."
+    respuesta: |
+      https://www.youtube.com/watch?v=m48BhUpKAQ8
+  regla_laminadora_variador:
+    condicion: "Si el usuario pide el video de la laminadora con variador, responder solo con el enlace del video en texto plano."
+    respuesta: |
+      https://www.youtube.com/watch?v=mfKYDPZpxfM&t=1s
 
   respuesta: |
     Claro 😊 Aquí tienes fotos y video del modelo {modelo}:

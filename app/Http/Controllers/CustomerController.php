@@ -38,6 +38,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log as Logger;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Mail;
 use Namu\WireChat\Enums\ConversationType;
@@ -1831,15 +1832,26 @@ class CustomerController extends Controller
             }
             $customer->save();
         }
-        if (! is_null($request->file)) {
-            $file = $request->file('file');
-            $path = $file->getClientOriginalName();
-            $destinationPath = 'public/files/'.$request->customer_id;
-            $file->move($destinationPath, $path);
-            $model = new CustomerFile;
-            $model->customer_id = $request->customer_id;
-            $model->url = $path;
-            $model->save();
+        if ($request->hasFile('file')) {
+            $upload = $request->file('file');
+            $original = $upload->getClientOriginalName();
+            $extension = $upload->getClientOriginalExtension();
+            $storedName = (string) Str::uuid();
+            if ($extension !== '') {
+                $storedName .= '.'.$extension;
+            }
+
+            Storage::disk('spaces')->putFileAs("files/{$request->customer_id}", $upload, $storedName, [
+                'visibility' => 'public',
+                'ContentType' => $upload->getMimeType(),
+            ]);
+
+            CustomerFile::create([
+                'customer_id' => $request->customer_id,
+                'url' => $storedName,
+                'name' => $original,
+                'creator_user_id' => Auth::id(),
+            ]);
 
             return back();
         }
