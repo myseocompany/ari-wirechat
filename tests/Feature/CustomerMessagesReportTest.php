@@ -65,6 +65,27 @@ it('orders customers by message count', function () {
 
     Message::create([
         'conversation_id' => $highConversation->id,
+        'sendable_type' => $highVolumeCustomer->getMorphClass(),
+        'sendable_id' => $highVolumeCustomer->id,
+        'body' => 'Mensaje 4',
+    ]);
+
+    Message::create([
+        'conversation_id' => $highConversation->id,
+        'sendable_type' => $highVolumeCustomer->getMorphClass(),
+        'sendable_id' => $highVolumeCustomer->id,
+        'body' => 'Mensaje 5',
+    ]);
+
+    Message::create([
+        'conversation_id' => $highConversation->id,
+        'sendable_type' => $highVolumeCustomer->getMorphClass(),
+        'sendable_id' => $highVolumeCustomer->id,
+        'body' => 'Mensaje 6',
+    ]);
+
+    Message::create([
+        'conversation_id' => $highConversation->id,
         'sendable_type' => $user->getMorphClass(),
         'sendable_id' => $user->id,
         'body' => 'Mensaje asesor',
@@ -80,5 +101,6 @@ it('orders customers by message count', function () {
 
     $this->actingAs($user)
         ->get('/reports/views/customers_messages_count')
-        ->assertSee('Nuevo');
+        ->assertSee('Nuevo')
+        ->assertSee('Mensaje 6');
 });
