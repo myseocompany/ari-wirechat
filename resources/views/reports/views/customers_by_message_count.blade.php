@@ -35,6 +35,16 @@
       <label for="message_search" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Buscar mensaje</label>
       <input class="w-64 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="message_search" name="message_search" value="{{ $request->message_search }}">
     </div>
+    <div class="flex flex-col gap-1">
+      <label for="status_ids" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estados</label>
+      <select id="status_ids" name="status_ids[]" multiple class="min-w-[14rem] rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
+        @foreach ($statuses as $status)
+          <option value="{{ $status->id }}" @if (collect($request->status_ids)->contains($status->id)) selected @endif>
+            {{ $status->name }}
+          </option>
+        @endforeach
+      </select>
+    </div>
     <button type="submit" class="inline-flex items-center rounded-xl bg-[color:var(--ds-coral)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Filtrar</button>
   </form>
 </div>

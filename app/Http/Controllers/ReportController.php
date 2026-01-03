@@ -705,6 +705,9 @@ class ReportController extends Controller
             ->leftJoin('users', 'users.id', '=', 'customers.user_id')
             ->leftJoin('customer_statuses', 'customer_statuses.id', '=', 'customers.status_id')
             ->whereExists($messagesExistQuery)
+            ->when($request->filled('status_ids'), function ($query) use ($request) {
+                $query->whereIn('customers.status_id', $request->input('status_ids', []));
+            })
             ->when($request->filled('messages_min'), function ($query) use ($request) {
                 $query->having('messages_count', '>=', (int) $request->input('messages_min'));
             })
@@ -716,7 +719,9 @@ class ReportController extends Controller
             ->paginate(50)
             ->withQueryString();
 
-        return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request'));
+        $statuses = CustomerStatus::orderBy('weight')->get();
+
+        return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses'));
     }
 
     public function scrollActive(Request $request)

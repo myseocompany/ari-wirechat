@@ -17,12 +17,16 @@ it('orders customers by message count', function () {
         'name' => 'Nuevo',
         'stage_id' => 1,
     ]);
+    $statusTwo = CustomerStatus::create([
+        'name' => 'Calificado',
+        'stage_id' => 1,
+    ]);
 
     $lowVolumeCustomer = Customer::create([
         'name' => 'Cliente Poco Mensajes',
         'phone' => '+57 300 0000001',
         'user_id' => $user->id,
-        'status_id' => $status->id,
+        'status_id' => $statusTwo->id,
     ]);
 
     $highVolumeCustomer = Customer::create([
@@ -153,5 +157,10 @@ it('orders customers by message count', function () {
     $this->actingAs($user)
         ->get('/reports/views/customers_messages_count?message_search=Palabra')
         ->assertSee('Cliente Filtrado')
+        ->assertDontSee('Cliente Poco Mensajes');
+
+    $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count?status_ids[]='.$status->id)
+        ->assertSee('Cliente Muchos Mensajes')
         ->assertDontSee('Cliente Poco Mensajes');
 });
