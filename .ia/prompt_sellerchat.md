@@ -830,6 +830,10 @@ comportamiento_multimedia:
     - imágenes de
     - video pelapapas
     - video de la pelapapas
+    - video pela papas
+    - video de la pela papas
+    - video pelar papas
+    - video de pelar papas
     - video laminadora
     - video de la laminadora
     - video laminadora de trigo
@@ -837,7 +841,7 @@ comportamiento_multimedia:
     - video laminadora variador
 
   regla_pelapapas:
-    condicion: "Si el usuario pide el video de la pelapapas, responder solo con el enlace del video en texto plano."
+    condicion: "Solo responder con el video de la pelapapas si el usuario menciona explícitamente pelapapas/pela papas/pelar papas. Si está hablando de máquinas de empanadas, no enviar este video."
     respuesta: |
       https://www.youtube.com/watch?v=TJbwg9FXuiI
   regla_laminadora_trigo:
