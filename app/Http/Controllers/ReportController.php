@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CustomerMessagesReportRequest;
 use App\Models\Action;
 use App\Models\ActionType;
 use App\Models\Customer;
@@ -650,7 +651,7 @@ class ReportController extends Controller
         return view('reports.views.ViewCustomersFollowups', compact('model'));
     }
 
-    public function customersByMessageCount(Request $request): View
+    public function customersByMessageCount(CustomerMessagesReportRequest $request): View
     {
         $fromDate = null;
         $toDate = null;
@@ -684,6 +685,11 @@ class ReportController extends Controller
             $messagesExistQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
         }
 
+        if ($request->filled('message_search')) {
+            $searchTerm = '%'.$request->input('message_search').'%';
+            $messagesExistQuery->where('wire_messages.body', 'like', $searchTerm);
+        }
+
         $model = Customer::query()
             ->select(
                 'customers.id',
@@ -699,9 +705,16 @@ class ReportController extends Controller
             ->leftJoin('users', 'users.id', '=', 'customers.user_id')
             ->leftJoin('customer_statuses', 'customer_statuses.id', '=', 'customers.status_id')
             ->whereExists($messagesExistQuery)
+            ->when($request->filled('messages_min'), function ($query) use ($request) {
+                $query->having('messages_count', '>=', (int) $request->input('messages_min'));
+            })
+            ->when($request->filled('messages_max'), function ($query) use ($request) {
+                $query->having('messages_count', '<=', (int) $request->input('messages_max'));
+            })
             ->orderByDesc('messages_count')
             ->orderByDesc('last_message_at')
-            ->get();
+            ->paginate(50)
+            ->withQueryString();
 
         return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request'));
     }

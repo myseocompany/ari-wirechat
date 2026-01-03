@@ -99,6 +99,36 @@ it('orders customers by message count', function () {
         'type' => 'image',
     ]);
 
+    $filteredCustomer = Customer::create([
+        'name' => 'Cliente Filtrado',
+        'phone' => '+57 300 0000003',
+        'user_id' => $user->id,
+        'status_id' => $status->id,
+    ]);
+
+    $filteredConversation = $user->createConversationWith($filteredCustomer);
+
+    Message::create([
+        'conversation_id' => $filteredConversation->id,
+        'sendable_type' => $filteredCustomer->getMorphClass(),
+        'sendable_id' => $filteredCustomer->id,
+        'body' => 'Mensaje filtrado 1',
+    ]);
+
+    Message::create([
+        'conversation_id' => $filteredConversation->id,
+        'sendable_type' => $filteredCustomer->getMorphClass(),
+        'sendable_id' => $filteredCustomer->id,
+        'body' => 'Mensaje filtrado 2',
+    ]);
+
+    Message::create([
+        'conversation_id' => $filteredConversation->id,
+        'sendable_type' => $filteredCustomer->getMorphClass(),
+        'sendable_id' => $filteredCustomer->id,
+        'body' => 'Palabra clave',
+    ]);
+
     $this->actingAs($user)
         ->get('/reports/views/customers_messages_count')
         ->assertSuccessful()
@@ -114,4 +144,14 @@ it('orders customers by message count', function () {
         ->assertSee('[image]')
         ->assertSee('Mensaje asesor')
         ->assertSee('Mensaje 6');
+
+    $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count?messages_min=3')
+        ->assertSee('Cliente Muchos Mensajes')
+        ->assertDontSee('Cliente Filtrado');
+
+    $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count?message_search=Palabra')
+        ->assertSee('Cliente Filtrado')
+        ->assertDontSee('Cliente Poco Mensajes');
 });

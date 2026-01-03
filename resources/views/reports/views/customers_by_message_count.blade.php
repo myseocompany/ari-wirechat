@@ -9,6 +9,7 @@
   <div class="flex flex-col gap-1">
     <h1 class="mb-1">Mensajes por cliente</h1>
     <div class="text-muted text-sm">Ordenado por la cantidad de mensajes en WireChat.</div>
+    <div class="text-xs text-slate-500">{{ $model->total() }} clientes</div>
   </div>
 </div>
 
@@ -21,6 +22,18 @@
     <div class="flex flex-col gap-1">
       <label for="to_date" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Hasta</label>
       <input class="w-48 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="date" id="to_date" name="to_date" value="{{ $toDate?->format('Y-m-d') ?? $request->to_date }}">
+    </div>
+    <div class="flex flex-col gap-1">
+      <label for="messages_min" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Min mensajes</label>
+      <input class="w-40 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="0" id="messages_min" name="messages_min" value="{{ $request->messages_min }}">
+    </div>
+    <div class="flex flex-col gap-1">
+      <label for="messages_max" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Max mensajes</label>
+      <input class="w-40 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="0" id="messages_max" name="messages_max" value="{{ $request->messages_max }}">
+    </div>
+    <div class="flex flex-col gap-1">
+      <label for="message_search" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Buscar mensaje</label>
+      <input class="w-64 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="message_search" name="message_search" value="{{ $request->message_search }}">
     </div>
     <button type="submit" class="inline-flex items-center rounded-xl bg-[color:var(--ds-coral)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Filtrar</button>
   </form>
@@ -63,6 +76,10 @@
       </tbody>
     </table>
   </div>
+</div>
+
+<div class="mt-4">
+  {{ $model->onEachSide(1)->links() }}
 </div>
 
 @endsection
