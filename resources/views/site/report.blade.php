@@ -22,6 +22,9 @@
 	<a href="/reports/views/customers_followup" class="list-group-item">Reporte de seguimientos</a>
 </div>
 <div class="list-group">
+	<a href="/reports/views/customers_messages_count" class="list-group-item">Reporte de mensajes por cliente</a>
+</div>
+<div class="list-group">
 	<a href="https://lookerstudio.google.com/u/0/reporting/04988fbd-8e80-4f63-bfc8-a3b6f4c004d9/page/uIHMD" 
 	class="list-group-item" target="_blank">Reporte satisfacción</a>
 </div>
