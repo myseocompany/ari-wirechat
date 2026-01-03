@@ -102,5 +102,6 @@ it('orders customers by message count', function () {
     $this->actingAs($user)
         ->get('/reports/views/customers_messages_count')
         ->assertSee('Nuevo')
+        ->assertSee($user->name)
         ->assertSee('Mensaje 6');
 });
