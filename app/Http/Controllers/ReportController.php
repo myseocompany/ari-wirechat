@@ -692,7 +692,7 @@ class ReportController extends Controller
                 'users.name as user_name',
                 'customer_statuses.name as status_name',
                 'customer_statuses.color as status_color',
-                DB::raw("(select group_concat(case when nullif(trim(wm.body), '') is null then concat('[', coalesce(wm.type, 'mensaje'), ']') else wm.body end order by wm.created_at desc separator '\n') from (select wire_messages.body, wire_messages.type, wire_messages.created_at from wire_messages where wire_messages.conversation_id in (select wp.conversation_id from wire_participants as wp where wp.participantable_type = '{$customerMorph}' and wp.participantable_id = customers.id) order by wire_messages.created_at desc limit 5) as wm) as last_messages_body")
+                DB::raw("(select group_concat(case when nullif(trim(wm.body), '') is null then concat('[', coalesce(wm.type, 'mensaje'), ']') else wm.body end order by wm.created_at desc separator '\n') from (select wire_messages.body, wire_messages.type, wire_messages.created_at from wire_messages where wire_messages.sendable_id = customers.id order by wire_messages.created_at desc limit 5) as wm) as last_messages_body")
             )
             ->selectSub($messagesCountQuery, 'messages_count')
             ->selectSub($lastMessageAtQuery, 'last_message_at')
