@@ -667,6 +667,7 @@ class ReportController extends Controller
                 'customers.id',
                 'customers.name',
                 'customers.phone',
+                'customer_statuses.name as status_name',
                 DB::raw('count(wire_messages.id) as messages_count'),
                 DB::raw('max(wire_messages.created_at) as last_message_at')
             )
@@ -674,10 +675,11 @@ class ReportController extends Controller
                 $join->on('wire_messages.sendable_id', '=', 'customers.id')
                     ->where('wire_messages.sendable_type', '=', $customerMorph);
             })
+            ->leftJoin('customer_statuses', 'customer_statuses.id', '=', 'customers.status_id')
             ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
                 $query->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
             })
-            ->groupBy('customers.id', 'customers.name', 'customers.phone')
+            ->groupBy('customers.id', 'customers.name', 'customers.phone', 'customer_statuses.name')
             ->orderByDesc('messages_count')
             ->orderByDesc('last_message_at')
             ->get();

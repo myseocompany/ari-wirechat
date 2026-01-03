@@ -25,6 +25,7 @@
         <tr>
             <th>Cliente</th>
             <th>Telefono</th>
+            <th>Estado</th>
             <th>Mensajes</th>
             <th>Ultimo mensaje</th>
         </tr>
@@ -36,6 +37,7 @@
                     <a href="{{ route('customers.show', $item->id) }}">{{ $item->name }}</a>
                 </td>
                 <td>{{ $item->phone }}</td>
+                <td>{{ $item->status_name ?? 'Sin estado' }}</td>
                 <td>{{ $item->messages_count }}</td>
                 <td>{{ $item->last_message_at }}</td>
             </tr>

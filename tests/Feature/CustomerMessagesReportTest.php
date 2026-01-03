@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Customer;
+use App\Models\CustomerStatus;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Namu\WireChat\Models\Message;
@@ -12,16 +13,23 @@ it('orders customers by message count', function () {
         'role_id' => 1,
     ]);
 
+    $status = CustomerStatus::create([
+        'name' => 'Nuevo',
+        'stage_id' => 1,
+    ]);
+
     $lowVolumeCustomer = Customer::create([
         'name' => 'Cliente Poco Mensajes',
         'phone' => '+57 300 0000001',
         'user_id' => $user->id,
+        'status_id' => $status->id,
     ]);
 
     $highVolumeCustomer = Customer::create([
         'name' => 'Cliente Muchos Mensajes',
         'phone' => '+57 300 0000002',
         'user_id' => $user->id,
+        'status_id' => $status->id,
     ]);
 
     $lowConversation = $user->createConversationWith($lowVolumeCustomer);
@@ -69,4 +77,8 @@ it('orders customers by message count', function () {
             'Cliente Muchos Mensajes',
             'Cliente Poco Mensajes',
         ]);
+
+    $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count')
+        ->assertSee('Nuevo');
 });
