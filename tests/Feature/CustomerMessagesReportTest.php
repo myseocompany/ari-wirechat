@@ -91,6 +91,14 @@ it('orders customers by message count', function () {
         'body' => 'Mensaje asesor',
     ]);
 
+    Message::create([
+        'conversation_id' => $highConversation->id,
+        'sendable_type' => $user->getMorphClass(),
+        'sendable_id' => $user->id,
+        'body' => null,
+        'type' => 'image',
+    ]);
+
     $this->actingAs($user)
         ->get('/reports/views/customers_messages_count')
         ->assertSuccessful()
@@ -103,5 +111,7 @@ it('orders customers by message count', function () {
         ->get('/reports/views/customers_messages_count')
         ->assertSee('Nuevo')
         ->assertSee($user->name)
+        ->assertSee('[image]')
+        ->assertSee('Mensaje asesor')
         ->assertSee('Mensaje 6');
 });

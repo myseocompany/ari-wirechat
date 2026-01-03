@@ -661,6 +661,28 @@ class ReportController extends Controller
         }
 
         $customerMorph = (new Customer)->getMorphClass();
+        $conversationIdsQuery = DB::table('wire_participants as wp')
+            ->select('wp.conversation_id')
+            ->whereColumn('wp.participantable_id', 'customers.id')
+            ->where('wp.participantable_type', $customerMorph);
+
+        $messagesCountQuery = DB::table('wire_messages')
+            ->selectRaw('count(*)')
+            ->whereIn('wire_messages.conversation_id', $conversationIdsQuery);
+
+        $lastMessageAtQuery = DB::table('wire_messages')
+            ->selectRaw('max(wire_messages.created_at)')
+            ->whereIn('wire_messages.conversation_id', $conversationIdsQuery);
+
+        $messagesExistQuery = DB::table('wire_messages')
+            ->selectRaw('1')
+            ->whereIn('wire_messages.conversation_id', $conversationIdsQuery);
+
+        if ($fromDate && $toDate) {
+            $messagesCountQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
+            $lastMessageAtQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
+            $messagesExistQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
+        }
 
         $model = Customer::query()
             ->select(
@@ -670,20 +692,13 @@ class ReportController extends Controller
                 'users.name as user_name',
                 'customer_statuses.name as status_name',
                 'customer_statuses.color as status_color',
-                DB::raw("(select group_concat(case when wm.body is null or wm.body = '' then concat('[', wm.type, ']') else wm.body end order by wm.created_at desc separator '\n') from (select wire_messages.body, wire_messages.type, wire_messages.created_at from wire_messages where wire_messages.sendable_type = '{$customerMorph}' and wire_messages.sendable_id = customers.id order by wire_messages.created_at desc limit 5) as wm) as last_messages_body"),
-                DB::raw('count(wire_messages.id) as messages_count'),
-                DB::raw('max(wire_messages.created_at) as last_message_at')
+                DB::raw("(select group_concat(case when nullif(trim(wm.body), '') is null then concat('[', coalesce(wm.type, 'mensaje'), ']') else wm.body end order by wm.created_at desc separator '\n') from (select wire_messages.body, wire_messages.type, wire_messages.created_at from wire_messages where wire_messages.conversation_id in (select wp.conversation_id from wire_participants as wp where wp.participantable_type = '{$customerMorph}' and wp.participantable_id = customers.id) order by wire_messages.created_at desc limit 5) as wm) as last_messages_body")
             )
-            ->join('wire_messages', function ($join) use ($customerMorph) {
-                $join->on('wire_messages.sendable_id', '=', 'customers.id')
-                    ->where('wire_messages.sendable_type', '=', $customerMorph);
-            })
+            ->selectSub($messagesCountQuery, 'messages_count')
+            ->selectSub($lastMessageAtQuery, 'last_message_at')
             ->leftJoin('users', 'users.id', '=', 'customers.user_id')
             ->leftJoin('customer_statuses', 'customer_statuses.id', '=', 'customers.status_id')
-            ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
-                $query->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
-            })
-            ->groupBy('customers.id', 'customers.name', 'customers.phone', 'users.name', 'customer_statuses.name', 'customer_statuses.color')
+            ->whereExists($messagesExistQuery)
             ->orderByDesc('messages_count')
             ->orderByDesc('last_message_at')
             ->get();

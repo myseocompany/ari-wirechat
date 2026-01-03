@@ -49,7 +49,7 @@
             <td class="px-4 py-3">{{ $item->phone }}</td>
             <td class="px-4 py-3 text-sm text-slate-600">{{ $item->user_name ?? 'Sin asignar' }}</td>
             <td class="px-4 py-3">
-              <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+              <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white" style="background-color: {{ $item->status_color ?? '#94a3b8' }};">
                 {{ $item->status_name ?? 'Sin estado' }}
               </span>
             </td>
