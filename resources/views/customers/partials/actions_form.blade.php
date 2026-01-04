@@ -98,6 +98,7 @@ function toggleDateInput(element) {
     if (!element) {
         return;
     }
+    console.log('Programar acción: click en checkbox', element);
     const form = element.closest('form');
     if (!form) {
         return;
