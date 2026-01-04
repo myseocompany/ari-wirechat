@@ -106,6 +106,55 @@
         window.location.href = url;
       });
     });
+
+    const copyToClipboard = function (text) {
+      if (!text) {
+        return Promise.reject();
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+      return new Promise(function (resolve, reject) {
+        const $tmp = document.createElement('textarea');
+        $tmp.value = text;
+        $tmp.setAttribute('readonly', '');
+        $tmp.style.position = 'absolute';
+        $tmp.style.left = '-9999px';
+        document.body.appendChild($tmp);
+        $tmp.select();
+        try {
+          document.execCommand('copy');
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+        document.body.removeChild($tmp);
+      });
+    };
+
+    document.addEventListener('click', function (event) {
+      const phoneTrigger = event.target.closest('.copy-phone');
+      if (phoneTrigger && overlay.contains(phoneTrigger)) {
+        const phone = phoneTrigger.getAttribute('data-phone') || '';
+        copyToClipboard(phone.toString()).then(function () {
+          console.log('Telefono copiado al portapapeles.');
+        }).catch(function () {
+          console.log('No se pudo copiar el telefono.');
+        });
+        return;
+      }
+
+      const textTrigger = event.target.closest('[data-copy-text]');
+      if (!textTrigger || !overlay.contains(textTrigger)) {
+        return;
+      }
+      const text = textTrigger.getAttribute('data-copy-text') || '';
+      copyToClipboard(text.toString()).then(function () {
+        console.log('POA copiado al portapapeles.');
+      }).catch(function () {
+        console.log('No se pudo copiar el POA.');
+      });
+    }, true);
   })();
 </script>
 @endpush
