@@ -99,7 +99,7 @@
                     <span class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700" aria-hidden="true">Buscar duplicados</span>
                   </a>
                 @endif
-                <button class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700" id="btnCopiar" size="5">POA</button>
+                <button class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700" data-copy-text="https://arichat.co/metadata/{{$model->id}}/create/poe/40" size="5">POA</button>
 
                 <form method="POST" action="{{ route('customers.send-welcome', $model->id) }}">
                   @csrf
@@ -481,28 +481,21 @@
   </div>
 
   <script>
-    document.getElementById("btnCopiar").addEventListener("click", function() {
-      var textoCopiar = "https://arichat.co/metadata/{{$model->id}}/create/poe/40";
-
-      var elementoInput = document.createElement("input");
-      elementoInput.value = textoCopiar;
-      document.body.appendChild(elementoInput);
-
-      elementoInput.select();
-      document.execCommand("copy");
-
-      document.body.removeChild(elementoInput);
-      alert("¡URL copiada al portapapeles!");
-    });
-
     (function() {
       function copyToClipboard(text, onSuccess, onError) {
+        if (!text) {
+          onError();
+          return;
+        }
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(text).then(onSuccess).catch(onError);
           return;
         }
         var $tmp = document.createElement('textarea');
         $tmp.value = text;
+        $tmp.setAttribute('readonly', '');
+        $tmp.style.position = 'absolute';
+        $tmp.style.left = '-9999px';
         document.body.appendChild($tmp);
         $tmp.select();
         try {
@@ -515,16 +508,26 @@
       }
 
       document.addEventListener('click', function (event) {
-        var trigger = event.target.closest('.copy-phone');
-        if (!trigger) return;
-        var phone = trigger.getAttribute('data-phone');
-        if (!phone) return;
-        copyToClipboard(phone.toString(), function () {
-          alert('Teléfono copiado');
+        var phoneTrigger = event.target.closest('.copy-phone');
+        if (phoneTrigger) {
+          var phone = phoneTrigger.getAttribute('data-phone');
+          copyToClipboard(phone ? phone.toString() : '', function () {
+            alert('Teléfono copiado');
+          }, function () {
+            alert('No se pudo copiar el teléfono');
+          });
+          return;
+        }
+
+        var textTrigger = event.target.closest('[data-copy-text]');
+        if (!textTrigger) return;
+        var text = textTrigger.getAttribute('data-copy-text');
+        copyToClipboard(text ? text.toString() : '', function () {
+          alert('¡URL copiada al portapapeles!');
         }, function () {
-          alert('No se pudo copiar el teléfono');
+          alert('No se pudo copiar la URL');
         });
-      });
+      }, true);
     })();
 
     (function() {

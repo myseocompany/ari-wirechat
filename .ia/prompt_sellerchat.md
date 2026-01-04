@@ -334,7 +334,7 @@ feria_manizales_2026:
 
   agenda_llena:
     mensaje: >
-      Gracias por tu interés. La agenda de la Feria de Manizales 2026 ya está completa por ahora. Te dejo contenido para que avances y te aviso si se libera un cupo.
+      Gracias por tu interés. Te dejo contenido para que avances y, si más adelante se abre un espacio para tu perfil, te aviso.
     accion: "Derivar a nurturing (estado feria_nurturing) sin ofrecer nuevos horarios."
 
   explicacion_evento:
