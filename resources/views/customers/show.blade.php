@@ -512,6 +512,7 @@
         if (phoneTrigger) {
           var phone = phoneTrigger.getAttribute('data-phone');
           copyToClipboard(phone ? phone.toString() : '', function () {
+            console.log('Telefono copiado al portapapeles.');
             alert('Teléfono copiado');
           }, function () {
             alert('No se pudo copiar el teléfono');
@@ -523,6 +524,7 @@
         if (!textTrigger) return;
         var text = textTrigger.getAttribute('data-copy-text');
         copyToClipboard(text ? text.toString() : '', function () {
+          console.log('POA copiado al portapapeles.');
           alert('¡URL copiada al portapapeles!');
         }, function () {
           alert('No se pudo copiar la URL');
