@@ -480,155 +480,157 @@
     </div>
   </div>
 
-  <script>
-    (function() {
-      function copyToClipboard(text, onSuccess, onError) {
-        if (!text) {
-          onError();
-          return;
-        }
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(onSuccess).catch(onError);
-          return;
-        }
-        var $tmp = document.createElement('textarea');
-        $tmp.value = text;
-        $tmp.setAttribute('readonly', '');
-        $tmp.style.position = 'absolute';
-        $tmp.style.left = '-9999px';
-        document.body.appendChild($tmp);
-        $tmp.select();
-        try {
-          document.execCommand('copy');
-          onSuccess();
-        } catch (e) {
-          onError();
-        }
-        document.body.removeChild($tmp);
-      }
-
-      document.addEventListener('click', function (event) {
-        var phoneTrigger = event.target.closest('.copy-phone');
-        if (phoneTrigger) {
-          var phone = phoneTrigger.getAttribute('data-phone');
-          copyToClipboard(phone ? phone.toString() : '', function () {
-            console.log('Telefono copiado al portapapeles.');
-            alert('Teléfono copiado');
-          }, function () {
-            alert('No se pudo copiar el teléfono');
-          });
-          return;
+  @push('scripts')
+    <script>
+      (function() {
+        function copyToClipboard(text, onSuccess, onError) {
+          if (!text) {
+            onError();
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(onSuccess).catch(onError);
+            return;
+          }
+          var $tmp = document.createElement('textarea');
+          $tmp.value = text;
+          $tmp.setAttribute('readonly', '');
+          $tmp.style.position = 'absolute';
+          $tmp.style.left = '-9999px';
+          document.body.appendChild($tmp);
+          $tmp.select();
+          try {
+            document.execCommand('copy');
+            onSuccess();
+          } catch (e) {
+            onError();
+          }
+          document.body.removeChild($tmp);
         }
 
-        var textTrigger = event.target.closest('[data-copy-text]');
-        if (!textTrigger) return;
-        var text = textTrigger.getAttribute('data-copy-text');
-        copyToClipboard(text ? text.toString() : '', function () {
-          console.log('POA copiado al portapapeles.');
-          alert('¡URL copiada al portapapeles!');
-        }, function () {
-          alert('No se pudo copiar la URL');
-        });
-      }, true);
-    })();
-
-    (function() {
-      var $modal = $('#metaPayloadModal');
-      var content = document.getElementById('metaPayloadContent');
-      var responseBox = document.getElementById('metaPayloadResponse');
-      var endpoint = document.getElementById('metaPayloadEndpoint');
-      var errorBox = document.getElementById('metaPayloadError');
-      var copyBtn = document.getElementById('btnMetaPayloadCopy');
-      var csrfToken = '';
-      var csrfMeta = document.querySelector('meta[name="csrf-token"]');
-      if (csrfMeta) {
-        csrfToken = csrfMeta.getAttribute('content') || '';
-      }
-
-      function stringify(value) {
-        if (value === null || typeof value === 'undefined') {
-          return '';
-        }
-        if (typeof value === 'string') {
-          return value;
-        }
-        try {
-          return JSON.stringify(value, null, 2);
-        } catch (e) {
-          return String(value);
-        }
-      }
-
-      function showPayload(data, expectsResponse) {
-        endpoint.textContent = data.endpoint || 'N/D';
-        content.textContent = stringify(data.payload || {});
-        responseBox.textContent = expectsResponse
-          ? stringify(data.server_response ?? 'Sin respuesta')
-          : 'Solo vista previa. No se envió al API.';
-        copyBtn.disabled = !content.textContent;
-      }
-
-      function handleError(message) {
-        content.textContent = '';
-        responseBox.textContent = '';
-        copyBtn.disabled = true;
-        errorBox.textContent = message || 'No se pudo procesar la solicitud';
-        errorBox.classList.remove('hidden');
-      }
-
-      function performAction(config) {
-        if (!config.button) {
-          return;
-        }
-
-        config.button.addEventListener('click', function() {
-          errorBox.classList.add('hidden');
-          errorBox.textContent = '';
-          content.textContent = 'Procesando...';
-          responseBox.textContent = config.expectsResponse ? 'Esperando respuesta del servidor...' : '';
-          endpoint.textContent = '';
-          copyBtn.disabled = true;
-          $modal.modal('show');
-
-          var options = {
-            method: config.method,
-            headers: { 'Accept': 'application/json' }
-          };
-
-          if (config.method !== 'GET') {
-            options.headers['Content-Type'] = 'application/json';
-            if (csrfToken) {
-              options.headers['X-CSRF-TOKEN'] = csrfToken;
-            }
-            options.body = JSON.stringify({});
+        document.addEventListener('click', function (event) {
+          var phoneTrigger = event.target.closest('.copy-phone');
+          if (phoneTrigger) {
+            var phone = phoneTrigger.getAttribute('data-phone');
+            copyToClipboard(phone ? phone.toString() : '', function () {
+              console.log('Telefono copiado al portapapeles.');
+              alert('Teléfono copiado');
+            }, function () {
+              alert('No se pudo copiar el teléfono');
+            });
+            return;
           }
 
-          fetch(config.url, options)
-            .then(function(response) {
-              if (!response.ok) {
-                return response.json()
-                  .catch(function() { return { message: 'Error ' + response.status }; })
-                  .then(function(json) {
-                    var message = json && json.message ? json.message : ('Error ' + response.status);
-                    throw new Error(message);
-                  });
-              }
-              return response.json();
-            })
-            .then(function(data) {
-              if (!data || data.ok !== true) {
-                throw new Error(data && data.message ? data.message : 'Respuesta inválida');
-              }
-              showPayload(data, config.expectsResponse);
-            })
-            .catch(function(error) {
-              handleError(error.message);
-            });
-        });
-      }
+          var textTrigger = event.target.closest('[data-copy-text]');
+          if (!textTrigger) return;
+          var text = textTrigger.getAttribute('data-copy-text');
+          copyToClipboard(text ? text.toString() : '', function () {
+            console.log('POA copiado al portapapeles.');
+            alert('¡URL copiada al portapapeles!');
+          }, function () {
+            alert('No se pudo copiar la URL');
+          });
+        }, true);
+      })();
 
-    })();
-  </script>
+      (function() {
+        var $modal = $('#metaPayloadModal');
+        var content = document.getElementById('metaPayloadContent');
+        var responseBox = document.getElementById('metaPayloadResponse');
+        var endpoint = document.getElementById('metaPayloadEndpoint');
+        var errorBox = document.getElementById('metaPayloadError');
+        var copyBtn = document.getElementById('btnMetaPayloadCopy');
+        var csrfToken = '';
+        var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (csrfMeta) {
+          csrfToken = csrfMeta.getAttribute('content') || '';
+        }
+
+        function stringify(value) {
+          if (value === null || typeof value === 'undefined') {
+            return '';
+          }
+          if (typeof value === 'string') {
+            return value;
+          }
+          try {
+            return JSON.stringify(value, null, 2);
+          } catch (e) {
+            return String(value);
+          }
+        }
+
+        function showPayload(data, expectsResponse) {
+          endpoint.textContent = data.endpoint || 'N/D';
+          content.textContent = stringify(data.payload || {});
+          responseBox.textContent = expectsResponse
+            ? stringify(data.server_response ?? 'Sin respuesta')
+            : 'Solo vista previa. No se envió al API.';
+          copyBtn.disabled = !content.textContent;
+        }
+
+        function handleError(message) {
+          content.textContent = '';
+          responseBox.textContent = '';
+          copyBtn.disabled = true;
+          errorBox.textContent = message || 'No se pudo procesar la solicitud';
+          errorBox.classList.remove('hidden');
+        }
+
+        function performAction(config) {
+          if (!config.button) {
+            return;
+          }
+
+          config.button.addEventListener('click', function() {
+            errorBox.classList.add('hidden');
+            errorBox.textContent = '';
+            content.textContent = 'Procesando...';
+            responseBox.textContent = config.expectsResponse ? 'Esperando respuesta del servidor...' : '';
+            endpoint.textContent = '';
+            copyBtn.disabled = true;
+            $modal.modal('show');
+
+            var options = {
+              method: config.method,
+              headers: { 'Accept': 'application/json' }
+            };
+
+            if (config.method !== 'GET') {
+              options.headers['Content-Type'] = 'application/json';
+              if (csrfToken) {
+                options.headers['X-CSRF-TOKEN'] = csrfToken;
+              }
+              options.body = JSON.stringify({});
+            }
+
+            fetch(config.url, options)
+              .then(function(response) {
+                if (!response.ok) {
+                  return response.json()
+                    .catch(function() { return { message: 'Error ' + response.status }; })
+                    .then(function(json) {
+                      var message = json && json.message ? json.message : ('Error ' + response.status);
+                      throw new Error(message);
+                    });
+                }
+                return response.json();
+              })
+              .then(function(data) {
+                if (!data || data.ok !== true) {
+                  throw new Error(data && data.message ? data.message : 'Respuesta inválida');
+                }
+                showPayload(data, config.expectsResponse);
+              })
+              .catch(function(error) {
+                handleError(error.message);
+              });
+          });
+        }
+
+      })();
+    </script>
+  @endpush
 @else
   <div class="rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">El prospecto no existe</div>
 @endif
