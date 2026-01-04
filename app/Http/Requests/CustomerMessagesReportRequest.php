@@ -21,6 +21,9 @@ class CustomerMessagesReportRequest extends FormRequest
             'message_search' => ['nullable', 'string', 'max:200'],
             'status_ids' => ['nullable', 'array'],
             'status_ids.*' => ['integer', 'exists:customer_statuses,id'],
+            'tag_ids' => ['nullable', 'array'],
+            'tag_ids.*' => ['integer', 'exists:tags,id'],
+            'tag_none' => ['nullable', 'boolean'],
         ];
     }
 

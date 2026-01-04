@@ -8,6 +8,7 @@ use App\Models\ActionType;
 use App\Models\Customer;
 use App\Models\CustomerStatus;
 use App\Models\Project;
+use App\Models\Tag;
 use App\Models\User;
 use Carbon\Carbon;
 use DB;
@@ -698,13 +699,30 @@ class ReportController extends Controller
                 'users.name as user_name',
                 'customer_statuses.name as status_name',
                 'customer_statuses.color as status_color',
-                DB::raw("(select group_concat(case when nullif(trim(wm.body), '') is null then concat('[', coalesce(wm.type, 'mensaje'), ']') else wm.body end order by wm.created_at desc separator '\n') from (select wire_messages.body, wire_messages.type, wire_messages.created_at from wire_messages where wire_messages.sendable_id = customers.id order by wire_messages.created_at desc limit 5) as wm) as last_messages_body")
+                DB::raw("(select group_concat(case when nullif(trim(wm.body), '') is null then concat('[', coalesce(wm.type, 'mensaje'), ']') else wm.body end order by wm.created_at desc separator '\n') from (select wire_messages.body, wire_messages.type, wire_messages.created_at from wire_messages where wire_messages.sendable_id = customers.id order by wire_messages.created_at desc limit 5) as wm) as last_messages_body"),
+                DB::raw("(select group_concat(tags.name order by tags.name separator '||') from customer_tag as ct join tags on tags.id = ct.tag_id where ct.customer_id = customers.id) as tag_names")
             )
             ->selectSub($messagesCountQuery, 'messages_count')
             ->selectSub($lastMessageAtQuery, 'last_message_at')
             ->leftJoin('users', 'users.id', '=', 'customers.user_id')
             ->leftJoin('customer_statuses', 'customer_statuses.id', '=', 'customers.status_id')
             ->whereExists($messagesExistQuery)
+            ->when($request->boolean('tag_none'), function ($query) {
+                $query->whereNotExists(function ($subQuery) {
+                    $subQuery->selectRaw('1')
+                        ->from('customer_tag as ct')
+                        ->whereColumn('ct.customer_id', 'customers.id');
+                });
+            })
+            ->when($request->filled('tag_ids') && ! $request->boolean('tag_none'), function ($query) use ($request) {
+                $tagIds = $request->input('tag_ids', []);
+                $query->whereExists(function ($subQuery) use ($tagIds) {
+                    $subQuery->selectRaw('1')
+                        ->from('customer_tag as ct')
+                        ->whereColumn('ct.customer_id', 'customers.id')
+                        ->whereIn('ct.tag_id', $tagIds);
+                });
+            })
             ->when($request->filled('status_ids'), function ($query) use ($request) {
                 $query->whereIn('customers.status_id', $request->input('status_ids', []));
             })
@@ -721,7 +739,9 @@ class ReportController extends Controller
 
         $statuses = CustomerStatus::orderBy('weight')->get();
 
-        return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses'));
+        $tags = Tag::orderBy('name')->get();
+
+        return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags'));
     }
 
     public function scrollActive(Request $request)

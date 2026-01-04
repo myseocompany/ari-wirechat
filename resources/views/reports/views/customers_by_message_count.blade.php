@@ -45,6 +45,20 @@
         @endforeach
       </select>
     </div>
+    <div class="flex flex-col gap-1">
+      <label for="tag_ids" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Etiquetas</label>
+      <select id="tag_ids" name="tag_ids[]" multiple class="min-w-[14rem] rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
+        @foreach ($tags as $tag)
+          <option value="{{ $tag->id }}" @if (collect($request->tag_ids)->contains($tag->id)) selected @endif>
+            {{ $tag->name }}
+          </option>
+        @endforeach
+      </select>
+    </div>
+    <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+      <input type="checkbox" name="tag_none" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('tag_none')) checked @endif>
+      Sin etiqueta
+    </label>
     <button type="submit" class="inline-flex items-center rounded-xl bg-[color:var(--ds-coral)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Filtrar</button>
   </form>
 </div>
@@ -58,6 +72,7 @@
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Telefono</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Asesor</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estado</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Etiquetas</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Mensajes</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultimo mensaje</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultimos 5 mensajes</th>
@@ -65,6 +80,9 @@
       </thead>
       <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
         @foreach ($model as $item)
+          @php
+            $tagNames = $item->tag_names ? explode('||', $item->tag_names) : [];
+          @endphp
           <tr class="hover:bg-slate-50">
             <td class="px-4 py-3 font-semibold">
               <a href="{{ route('customers.show', $item->id) }}" class="text-slate-900 hover:underline">{{ $item->name }}</a>
@@ -75,6 +93,19 @@
               <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white" style="background-color: {{ $item->status_color ?? '#94a3b8' }};">
                 {{ $item->status_name ?? 'Sin estado' }}
               </span>
+            </td>
+            <td class="px-4 py-3">
+              @if (count($tagNames))
+                <div class="flex flex-wrap gap-2">
+                  @foreach ($tagNames as $tagName)
+                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">
+                      {{ $tagName }}
+                    </span>
+                  @endforeach
+                </div>
+              @else
+                <span class="text-xs text-slate-400">Sin etiqueta</span>
+              @endif
             </td>
             <td class="px-4 py-3 font-semibold text-slate-900">{{ $item->messages_count }}</td>
             <td class="px-4 py-3">{{ $item->last_message_at }}</td>

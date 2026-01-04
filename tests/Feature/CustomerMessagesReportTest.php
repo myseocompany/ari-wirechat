@@ -2,6 +2,7 @@
 
 use App\Models\Customer;
 use App\Models\CustomerStatus;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Namu\WireChat\Models\Message;
@@ -38,6 +39,12 @@ it('orders customers by message count', function () {
 
     $lowConversation = $user->createConversationWith($lowVolumeCustomer);
     $highConversation = $user->createConversationWith($highVolumeCustomer);
+
+    $tag = Tag::create([
+        'name' => 'VIP',
+    ]);
+
+    $highVolumeCustomer->tags()->attach($tag->id);
 
     Message::create([
         'conversation_id' => $lowConversation->id,
@@ -163,4 +170,14 @@ it('orders customers by message count', function () {
         ->get('/reports/views/customers_messages_count?status_ids[]='.$status->id)
         ->assertSee('Cliente Muchos Mensajes')
         ->assertDontSee('Cliente Poco Mensajes');
+
+    $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count?tag_ids[]='.$tag->id)
+        ->assertSee('Cliente Muchos Mensajes')
+        ->assertDontSee('Cliente Poco Mensajes');
+
+    $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count?tag_none=1')
+        ->assertSee('Cliente Poco Mensajes')
+        ->assertDontSee('Cliente Muchos Mensajes');
 });
