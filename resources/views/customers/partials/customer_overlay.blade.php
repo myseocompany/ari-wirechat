@@ -62,6 +62,9 @@
           if (window.initNotesEditors) {
             window.initNotesEditors($('#customer_overlay_body'));
           }
+          if (window.initActionDateToggle) {
+            window.initActionDateToggle($('#customer_overlay_body'));
+          }
         } else {
           window.location.href = url;
         }

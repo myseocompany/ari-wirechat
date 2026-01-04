@@ -63,7 +63,7 @@
         {{-- Toggle programación --}}
         <div class="mt-4">
             <div class="flex items-center gap-2">
-                <input class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" type="checkbox" id="toggleDate" onclick="toggleDateInput(this)">
+                <input class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" type="checkbox" id="toggleDate" data-date-toggle onclick="toggleDateInput(this)">
                 <label class="text-sm text-slate-700" for="toggleDate">Programar acción</label>
             </div>
         </div>
@@ -84,6 +84,16 @@
 </div>
 
 <script>
+if (!window.initActionDateToggle) {
+    window.initActionDateToggle = function(scope) {
+        var $scope = scope ? $(scope) : $(document);
+        $scope.find('[data-date-toggle]').each(function() {
+            var checkbox = this;
+            toggleDateInput(checkbox);
+        });
+    };
+}
+
 function toggleDateInput(element) {
     if (!element) {
         return;
@@ -100,9 +110,15 @@ function toggleDateInput(element) {
     if (element.checked) {
         dateContainer.style.display = 'block';
         dateInput.disabled = false;
-    } else {
-        dateContainer.style.display = 'none';
-        dateInput.disabled = true;
+        return;
     }
+    dateContainer.style.display = 'none';
+    dateInput.disabled = true;
 }
+
+$(function() {
+    if (window.initActionDateToggle) {
+        window.initActionDateToggle();
+    }
+});
 </script>
