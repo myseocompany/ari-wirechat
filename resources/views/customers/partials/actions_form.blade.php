@@ -84,40 +84,41 @@
 </div>
 
 <script>
+if (!window.toggleDateInput) {
+    window.toggleDateInput = function(element) {
+        if (!element) {
+            return;
+        }
+        console.log('Programar acción: click en checkbox', element);
+        const form = element.closest('form');
+        if (!form) {
+            return;
+        }
+        const dateContainer = form.querySelector('[data-date-container]');
+        const dateInput = form.querySelector('input[name="date_programed"]');
+        if (!dateContainer || !dateInput) {
+            return;
+        }
+        if (element.checked) {
+            dateContainer.style.display = 'block';
+            dateInput.disabled = false;
+            return;
+        }
+        dateContainer.style.display = 'none';
+        dateInput.disabled = true;
+    };
+}
+
 if (!window.initActionDateToggle) {
     window.initActionDateToggle = function(scope) {
-        var $scope = scope ? $(scope) : $(document);
-        $scope.find('[data-date-toggle]').each(function() {
-            var checkbox = this;
-            toggleDateInput(checkbox);
+        const root = scope instanceof Element ? scope : document;
+        root.querySelectorAll('[data-date-toggle]').forEach(function(checkbox) {
+            window.toggleDateInput(checkbox);
         });
     };
 }
 
-function toggleDateInput(element) {
-    if (!element) {
-        return;
-    }
-    console.log('Programar acción: click en checkbox', element);
-    const form = element.closest('form');
-    if (!form) {
-        return;
-    }
-    const dateContainer = form.querySelector('[data-date-container]');
-    const dateInput = form.querySelector('input[name="date_programed"]');
-    if (!dateContainer || !dateInput) {
-        return;
-    }
-    if (element.checked) {
-        dateContainer.style.display = 'block';
-        dateInput.disabled = false;
-        return;
-    }
-    dateContainer.style.display = 'none';
-    dateInput.disabled = true;
-}
-
-$(function() {
+document.addEventListener('DOMContentLoaded', function() {
     if (window.initActionDateToggle) {
         window.initActionDateToggle();
     }
