@@ -88,7 +88,7 @@
           @endphp
           <tr class="hover:bg-slate-50">
             <td class="px-4 py-3 font-semibold">
-              <a href="{{ route('customers.show', $item->id) }}" class="text-slate-900 hover:underline">{{ $item->name }}</a>
+              <a href="{{ route('customers.show', $item->id) }}" class="customer-overlay-link text-slate-900 hover:underline" data-url="{{ route('customers.show', $item->id) }}">{{ $item->name }}</a>
             </td>
             <td class="px-4 py-3">{{ $item->phone }}</td>
             <td class="px-4 py-3 text-sm text-slate-600">{{ $item->user_name ?? 'Sin asignar' }}</td>
@@ -125,5 +125,7 @@
 <div class="mt-4">
   {{ $model->onEachSide(1)->links() }}
 </div>
+
+@include('customers.partials.customer_overlay')
 
 @endsection
