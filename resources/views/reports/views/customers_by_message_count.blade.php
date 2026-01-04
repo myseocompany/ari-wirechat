@@ -8,58 +8,61 @@
 <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
   <div class="flex flex-col gap-1">
     <h1 class="mb-1">Mensajes por cliente</h1>
-    <div class="text-muted text-sm">Ordenado por la cantidad de mensajes en WireChat.</div>
     <div class="text-xs text-slate-500">{{ $model->total() }} clientes</div>
   </div>
 </div>
 
 <div class="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-  <form action="/reports/views/customers_messages_count" method="GET" class="flex flex-wrap items-end gap-4">
-    <div class="flex flex-col gap-1">
-      <label for="from_date" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Desde</label>
-      <input class="w-48 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="date" id="from_date" name="from_date" value="{{ $fromDate?->format('Y-m-d') ?? $request->from_date }}">
+  <form action="/reports/views/customers_messages_count" method="GET" class="flex flex-col gap-4">
+    <div class="grid gap-4 lg:grid-cols-[repeat(12,minmax(0,1fr))]">
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-3">
+        <label for="from_date" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Desde</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="date" id="from_date" name="from_date" value="{{ $fromDate?->format('Y-m-d') ?? $request->from_date }}">
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-3">
+        <label for="to_date" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Hasta</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="date" id="to_date" name="to_date" value="{{ $toDate?->format('Y-m-d') ?? $request->to_date }}">
+      </div>
+      <div class="col-span-6 flex flex-col gap-1 lg:col-span-2">
+        <label for="messages_min" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Min mensajes</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="0" id="messages_min" name="messages_min" value="{{ $request->messages_min }}">
+      </div>
+      <div class="col-span-6 flex flex-col gap-1 lg:col-span-2">
+        <label for="messages_max" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Max mensajes</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="0" id="messages_max" name="messages_max" value="{{ $request->messages_max }}">
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-4">
+        <label for="message_search" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Buscar mensaje</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="message_search" name="message_search" value="{{ $request->message_search }}">
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-4">
+        <label for="status_ids" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estados</label>
+        <select id="status_ids" name="status_ids[]" multiple class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
+          @foreach ($statuses as $status)
+            <option value="{{ $status->id }}" @if (collect($request->status_ids)->contains($status->id)) selected @endif>
+              {{ $status->name }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-4">
+        <label for="tag_ids" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Etiquetas</label>
+        <select id="tag_ids" name="tag_ids[]" multiple class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
+          @foreach ($tags as $tag)
+            <option value="{{ $tag->id }}" @if (collect($request->tag_ids)->contains($tag->id)) selected @endif>
+              {{ $tag->name }}
+            </option>
+          @endforeach
+        </select>
+      </div>
     </div>
-    <div class="flex flex-col gap-1">
-      <label for="to_date" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Hasta</label>
-      <input class="w-48 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="date" id="to_date" name="to_date" value="{{ $toDate?->format('Y-m-d') ?? $request->to_date }}">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+        <input type="checkbox" name="tag_none" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('tag_none')) checked @endif>
+        Sin etiqueta
+      </label>
+      <button type="submit" class="inline-flex items-center rounded-xl bg-[color:var(--ds-coral)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Filtrar</button>
     </div>
-    <div class="flex flex-col gap-1">
-      <label for="messages_min" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Min mensajes</label>
-      <input class="w-40 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="0" id="messages_min" name="messages_min" value="{{ $request->messages_min }}">
-    </div>
-    <div class="flex flex-col gap-1">
-      <label for="messages_max" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Max mensajes</label>
-      <input class="w-40 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="0" id="messages_max" name="messages_max" value="{{ $request->messages_max }}">
-    </div>
-    <div class="flex flex-col gap-1">
-      <label for="message_search" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Buscar mensaje</label>
-      <input class="w-64 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="message_search" name="message_search" value="{{ $request->message_search }}">
-    </div>
-    <div class="flex flex-col gap-1">
-      <label for="status_ids" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estados</label>
-      <select id="status_ids" name="status_ids[]" multiple class="min-w-[14rem] rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
-        @foreach ($statuses as $status)
-          <option value="{{ $status->id }}" @if (collect($request->status_ids)->contains($status->id)) selected @endif>
-            {{ $status->name }}
-          </option>
-        @endforeach
-      </select>
-    </div>
-    <div class="flex flex-col gap-1">
-      <label for="tag_ids" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Etiquetas</label>
-      <select id="tag_ids" name="tag_ids[]" multiple class="min-w-[14rem] rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
-        @foreach ($tags as $tag)
-          <option value="{{ $tag->id }}" @if (collect($request->tag_ids)->contains($tag->id)) selected @endif>
-            {{ $tag->name }}
-          </option>
-        @endforeach
-      </select>
-    </div>
-    <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-      <input type="checkbox" name="tag_none" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('tag_none')) checked @endif>
-      Sin etiqueta
-    </label>
-    <button type="submit" class="inline-flex items-center rounded-xl bg-[color:var(--ds-coral)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Filtrar</button>
   </form>
 </div>
 
