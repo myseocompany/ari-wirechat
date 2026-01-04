@@ -15,6 +15,40 @@
 @push('scripts')
 <script>
   (function () {
+    if (!window.toggleDateInput) {
+      window.toggleDateInput = function (element) {
+        if (!element) {
+          return;
+        }
+        console.log('Programar acción: click en checkbox', element);
+        const form = element.closest('form');
+        if (!form) {
+          return;
+        }
+        const dateContainer = form.querySelector('[data-date-container]');
+        const dateInput = form.querySelector('input[name="date_programed"]');
+        if (!dateContainer || !dateInput) {
+          return;
+        }
+        if (element.checked) {
+          dateContainer.style.display = 'block';
+          dateInput.disabled = false;
+          return;
+        }
+        dateContainer.style.display = 'none';
+        dateInput.disabled = true;
+      };
+    }
+
+    if (!window.initActionDateToggle) {
+      window.initActionDateToggle = function (scope) {
+        const $scope = scope ? $(scope) : $(document);
+        $scope.find('[data-date-toggle]').each(function () {
+          window.toggleDateInput(this);
+        });
+      };
+    }
+
     const overlay = document.getElementById('customer_overlay');
     const overlayBody = document.getElementById('customer_overlay_body');
     if (!overlay || !overlayBody) {
