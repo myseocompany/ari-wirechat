@@ -63,15 +63,15 @@
         {{-- Toggle programación --}}
         <div class="mt-4">
             <div class="flex items-center gap-2">
-                <input class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" type="checkbox" id="toggleDate" onclick="toggleDateInput()">
+                <input class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" type="checkbox" id="toggleDate" onclick="toggleDateInput(this)">
                 <label class="text-sm text-slate-700" for="toggleDate">Programar acción</label>
             </div>
         </div>
 
         {{-- Campo fecha (inicialmente oculto) --}}
-        <div class="mt-4 space-y-2" id="dateInputContainer" style="display: none;">
+        <div class="mt-4 space-y-2" id="dateInputContainer" data-date-container style="display: none;">
             <label for="example-datetime-local-input" class="block text-sm font-medium text-slate-700">Fecha y hora</label>
-            <input class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" name="date_programed" type="datetime-local" id="example-datetime-local-input">
+            <input class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" name="date_programed" type="datetime-local" id="date_programed" disabled>
         </div>
 
         {{-- Botón submit --}}
@@ -84,12 +84,20 @@
 </div>
 
 <script>
-function toggleDateInput() {
-    const checkbox = document.getElementById('toggleDate');
-    const dateInput = document.getElementById('date_programed');
-    const dateContainer = document.getElementById('dateInputContainer');
-    
-    if (checkbox.checked) {
+function toggleDateInput(element) {
+    if (!element) {
+        return;
+    }
+    const form = element.closest('form');
+    if (!form) {
+        return;
+    }
+    const dateContainer = form.querySelector('[data-date-container]');
+    const dateInput = form.querySelector('input[name="date_programed"]');
+    if (!dateContainer || !dateInput) {
+        return;
+    }
+    if (element.checked) {
         dateContainer.style.display = 'block';
         dateInput.disabled = false;
     } else {
@@ -97,5 +105,4 @@ function toggleDateInput() {
         dateInput.disabled = true;
     }
 }
-
 </script>
