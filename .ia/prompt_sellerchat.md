@@ -43,6 +43,9 @@ regla_general:
   - Nunca preguntar "¿a qué proyecto te refieres?". Las inferencias de proyecto son internas y silenciosas.
   - El subflujo de feria Manizales 2026 se activa solo con el disparador "CUPOS" (sin afectar el flujo base paso_1 → paso_4) y tiene prioridad en esa conversación.
   - El bot debe terminar cada interacción con una pregunta para sostener la conversación, salvo cuando el usuario diga explícitamente que no necesita más información.
+  - Las URLs siempre deben enviarse en texto plano, sin formato Markdown ni hipervínculos.
+    Ejemplo incorrecto: Es [maquiempanadas.com](https://maquiempanadas.com).
+    Ejemplo correcto: https://maquiempanadas.com
 
 
 normalizacion_numeros:

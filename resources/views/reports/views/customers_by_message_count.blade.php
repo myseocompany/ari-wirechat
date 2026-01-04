@@ -86,9 +86,12 @@
           @php
             $tagNames = $item->tag_names ? explode('||', $item->tag_names) : [];
           @endphp
-          <tr class="hover:bg-slate-50">
+          <tr class="customer-overlay-link hover:bg-slate-50" data-url="{{ route('customers.show', $item->id) }}">
             <td class="px-4 py-3 font-semibold">
-              <a href="{{ route('customers.show', $item->id) }}" class="customer-overlay-link text-slate-900 hover:underline" data-url="{{ route('customers.show', $item->id) }}">{{ $item->name }}</a>
+              <div class="flex items-center gap-2">
+                <a href="{{ route('customers.show', $item->id) }}" class="customer-overlay-link text-slate-900 hover:underline" data-url="{{ route('customers.show', $item->id) }}">{{ $item->name }}</a>
+                <a href="{{ route('customers.show', $item->id) }}" class="text-xs font-semibold text-slate-500 hover:text-slate-700" data-customer-overlay-ignore>Ver</a>
+              </div>
             </td>
             <td class="px-4 py-3">{{ $item->phone }}</td>
             <td class="px-4 py-3 text-sm text-slate-600">{{ $item->user_name ?? 'Sin asignar' }}</td>

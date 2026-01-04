@@ -9,6 +9,9 @@
   </div>
 </div>
 
+@include('customers.partials.tags_script')
+@include('customers.partials.notes_script')
+
 @push('scripts')
 <script>
   (function () {
@@ -37,6 +40,9 @@
       }
     });
     $(document).on('click', '.customer-overlay-link', function (event) {
+      if ($(event.target).closest('[data-customer-overlay-ignore]').length > 0) {
+        return;
+      }
       event.preventDefault();
       event.stopPropagation();
       const url = $(this).data('url') || $(this).attr('href');
