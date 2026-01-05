@@ -227,8 +227,8 @@ class ActionController extends Controller
 
         $model->save();
 
-        return back();
-    }
+        return redirect('/actions/'.$model->id.'/show');
+    } 
 
     public function destroy($id)
     {

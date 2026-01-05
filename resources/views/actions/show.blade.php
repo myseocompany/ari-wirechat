@@ -10,6 +10,14 @@
       <div class="col-md-6">
         {{-- Fecha --}}
             <div class="row"><div class="col-md-6"><span class="lavel"><strong>Fecha:</strong></span></div> <div class="col-md-6">{{$model->created_at}}</div></div>
+        {{-- Due date --}}
+            <div class="row"><div class="col-md-6"><span class="lavel"><strong>Due date:</strong></span></div> <div class="col-md-6">
+              @if($model->due_date)
+                {{ \Carbon\Carbon::parse($model->due_date)->format('d M Y H:i') }}
+              @else
+                <span class="text-muted">Sin fecha</span>
+              @endif
+            </div></div>
         {{-- Creado --}}
             <div class="row"><div class="col-md-6"><span class="lavel"><strong>Creado por:</strong></span></div> <div class="col-md-6">{{$model->getCreatorName()}}</div></div>
         {{-- Cliente --}}
