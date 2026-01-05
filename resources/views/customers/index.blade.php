@@ -101,6 +101,9 @@
 
 @section('content')
   <div class="ds-body flex flex-col gap-6">
+    @php
+      $pageTitle = isset($phase) ? $phase->name : 'Leads';
+    @endphp
     @if (session('status'))
       <div class="rounded-2xl border border-slate-200 bg-[color:var(--ds-cloud)] p-4 text-sm text-[color:var(--ds-navy)] shadow-sm">
         {!! html_entity_decode(session('status')) !!}
@@ -116,6 +119,13 @@
         {!! html_entity_decode(session('statustwo')) !!}
       </div>
     @endif
+
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <h1 class="mb-1">{{ $pageTitle }}</h1>
+      @if (Auth::check() && Auth::user()->role_id == 1)
+        <a href="/customers/create" class="inline-flex items-center rounded-xl bg-[color:var(--ds-coral)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Crear</a>
+      @endif
+    </div>
 
     <div class="time-filter-card">
       <div class="quick-range-pills">

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use App\Models\UserStatus;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -45,14 +45,16 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:6'],
+            'channels_id' => ['nullable', 'integer'],
             'status_id' => ['nullable', 'integer', 'exists:user_statuses,id'],
             'role_id' => ['nullable', 'integer', 'exists:roles,id'],
             'profile_photo' => ['nullable', 'image', 'max:4096'],
         ]);
 
-        $model = new User();
+        $model = new User;
         $model->name = $validated['name'];
         $model->email = $validated['email'];
+        $model->channels_id = $validated['channels_id'] ?? null;
         $model->status_id = $validated['status_id'] ?? null;
         $model->role_id = $validated['role_id'] ?? null;
         $model->password = bcrypt($validated['password']);
@@ -96,6 +98,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($model->id)],
             'password' => ['nullable', 'string', 'min:6'],
+            'channels_id' => ['nullable', 'integer'],
             'status_id' => ['nullable', 'integer', 'exists:user_statuses,id'],
             'role_id' => ['nullable', 'integer', 'exists:roles,id'],
             'profile_photo' => ['nullable', 'image', 'max:4096'],
@@ -103,6 +106,7 @@ class UserController extends Controller
 
         $model->name = $validated['name'];
         $model->email = $validated['email'];
+        $model->channels_id = $validated['channels_id'] ?? null;
         $model->status_id = $validated['status_id'] ?? null;
         if (! empty($validated['password'])) {
             $model->password = bcrypt($validated['password']);
@@ -147,7 +151,7 @@ class UserController extends Controller
         $normalized = ltrim($storedPath, '/');
 
         if (Str::startsWith($normalized, 'storage/')) {
-            $relative = 'public/' . Str::after($normalized, 'storage/');
+            $relative = 'public/'.Str::after($normalized, 'storage/');
             Storage::delete($relative);
         } elseif (Str::startsWith($normalized, 'public/')) {
             Storage::delete($normalized);
