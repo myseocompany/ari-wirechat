@@ -17,6 +17,14 @@
         <div class="text-lg font-bold text-gray-800 mt-1">
           {{ $action->note }}
         </div>
+        @if($action->isPending() && $action->next_action_created_at)
+          <div class="mt-1 text-xs text-slate-500">
+            Última acción: {{ \Carbon\Carbon::parse($action->next_action_created_at)->format('d M Y H:i') }}
+            @if($action->next_action_note)
+              · {{ $action->next_action_note }}
+            @endif
+          </div>
+        @endif
 
         {{-- Info acción --}}
         <div class="text-sm text-gray-600">
