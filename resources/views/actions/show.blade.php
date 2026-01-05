@@ -13,7 +13,7 @@
         {{-- Creado --}}
             <div class="row"><div class="col-md-6"><span class="lavel"><strong>Creado por:</strong></span></div> <div class="col-md-6">{{$model->getCreatorName()}}</div></div>
         {{-- Cliente --}}
-            <div class="row"><div class="col-md-6"><span class="lavel"><strong>Cliente:</strong></span></div> <div class="col-md-6">{{$model->getCustomerName()}}</div></div>
+            <div class="row"><div class="col-md-6"><span class="lavel"><strong>Cliente:</strong></span></div> <div class="col-md-6"><a href="/customers/{{ $model->customer_id }}/show">{{$model->getCustomerName()}}</a></div></div>
        {{-- Nota --}}
             <div class="row"><div class="col-md-6"><span class="lavel"><strong>Nota:</strong></span></div> <div class="col-md-6">{{$model->note}}</div></div>
        {{-- Tipo --}}

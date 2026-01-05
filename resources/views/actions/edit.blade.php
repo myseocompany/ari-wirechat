@@ -12,6 +12,13 @@
             <div class="row"><div class="col-md-6"><span class="lavel"><strong>Fecha:</strong></span></div> <div class="col-md-6">
               {{$model->created_at}}
             </div></div>
+        {{-- Fecha de vencimiento --}}
+            <div class="row"><div class="col-md-6"><span class="lavel"><strong>Due date:</strong></span></div> <div class="col-md-6">
+              @php
+                $dueDateValue = $model->due_date ? \Carbon\Carbon::parse($model->due_date)->format('Y-m-d\TH:i') : '';
+              @endphp
+              <input type="datetime-local" name="due_date" id="due_date" class="form-control" value="{{ $dueDateValue }}">
+            </div></div>
         {{-- Creado --}}
             <div class="row"><div class="col-md-6"><span class="lavel"><strong>Creado por:</strong></span></div> <div class="col-md-6">
               {{$model->getCreatorName()}}
