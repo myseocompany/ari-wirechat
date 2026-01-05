@@ -8,6 +8,8 @@ class ChannelsWebhookLog extends Model
 {
     protected $fillable = [
         'payload',
+        'phone',
+        'agent_id',
         'payload_raw',
         'headers',
         'ip',

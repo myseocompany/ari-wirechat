@@ -3647,10 +3647,26 @@ class APIController extends Controller
 
         $payloadRaw = $request->getContent();
         $payloadDecoded = json_decode($payloadRaw, true);
+        $payloadData = is_array($payloadDecoded) && array_key_exists(0, $payloadDecoded)
+            ? $payloadDecoded[0]
+            : $payloadDecoded;
+        if (is_array($payloadData) && isset($payloadData['body']) && is_array($payloadData['body'])) {
+            $payloadData = $payloadData['body'];
+        }
+        $phone = is_array($payloadData)
+            ? ($payloadData['msisdn']
+                ?? ($payloadData['contact']['msisdns'][0] ?? null)
+                ?? $payloadData['phoneNumber']
+                ?? $payloadData['contactMsisdn']
+                ?? null)
+            : null;
+        $agentId = is_array($payloadData) ? ($payloadData['agentId'] ?? null) : null;
 
         try {
             ChannelsWebhookLog::create([
                 'payload' => is_array($payloadDecoded) ? $payloadDecoded : null,
+                'phone' => $phone,
+                'agent_id' => is_numeric($agentId) ? (int) $agentId : null,
                 'payload_raw' => $payloadRaw,
                 'headers' => $request->headers->all(),
                 'ip' => $request->ip(),
