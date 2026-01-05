@@ -11,13 +11,14 @@ use App\Models\Action;
 use App\Models\ActionType;
 use App\Models\AudienceCustomer;
 use App\Models\Campaign;
+use App\Models\ChannelsWebhookLog;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\CustomerHistory;
 use App\Models\CustomerSource;
-use App\Models\CustomerStatus;
 // use App\Models\EmployeeStatus;
 // use App\Models\Mail;
+use App\Models\CustomerStatus;
 use App\Models\Email;
 use App\Models\Order;
 use App\Models\Product;
@@ -3644,6 +3645,25 @@ class APIController extends Controller
             fastcgi_finish_request(); // PHP-FPM libera al cliente
         }
 
+        $payloadRaw = $request->getContent();
+        $payloadDecoded = json_decode($payloadRaw, true);
+
+        try {
+            ChannelsWebhookLog::create([
+                'payload' => is_array($payloadDecoded) ? $payloadDecoded : null,
+                'payload_raw' => $payloadRaw,
+                'headers' => $request->headers->all(),
+                'ip' => $request->ip(),
+                'method' => $request->method(),
+                'route' => $request->path(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('No se pudo guardar el webhook de Channels', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         // --- 2) (Opcional) Autenticación simple por header ----------------
         // Usa un secreto propio para evitar ruido; no devuelvas 403 a Channels.
         try {
@@ -3661,8 +3681,7 @@ class APIController extends Controller
 
         // --- 3) Procesamiento asíncrono / en background -------------------
         try {
-            $payloadRaw = $request->getContent();
-            $raw = json_decode($payloadRaw, true) ?? [];
+            $raw = is_array($payloadDecoded) ? $payloadDecoded : [];
 
             // Normalizar forma del payload (a veces viene envuelto)
             $data = is_array($raw) && array_key_exists(0, $raw) ? $raw[0] : $raw;
