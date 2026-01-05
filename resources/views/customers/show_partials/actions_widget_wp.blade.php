@@ -20,6 +20,9 @@
           'type_name' => $action->getTypeName() ?? 'Acción',
           'is_pending' => $action->isPending(),
           'due_date' => $action->due_date,
+          'type_id' => $action->type_id,
+          'status_id' => $customer->status_id,
+          'customer_name' => $customer->name,
       ]);
   }
 
@@ -109,6 +112,22 @@
           <div class="text-right text-xs text-slate-500">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}<br>
             {{ $item['creator'] }}
+            @if($item['is_pending'])
+              <div class="mt-2">
+                <button
+                  type="button"
+                  data-toggle="modal"
+                  data-id="{{ $item['id'] }}"
+                  data-note="{{ $item['note'] }}"
+                  data-type-id="{{ $item['type_id'] }}"
+                  data-status-id="{{ $item['status_id'] }}"
+                  data-customer-name="{{ $item['customer_name'] }}"
+                  class="inline-flex items-center rounded-md border border-blue-600 px-2 py-1 text-[11px] font-semibold text-blue-600 transition hover:bg-blue-50"
+                >
+                  Completar
+                </button>
+              </div>
+            @endif
             @if(Auth::check() && Auth::user()->role_id == 1 && isset($item['id']))
               <br>
               <a href="/actions/{{ $item['id'] }}/destroy" class="text-red-600 hover:text-red-700" title="Eliminar acción">
@@ -165,3 +184,28 @@
     </div>
   @endforeach
 </div>
+
+@include('actions.modal_pending', [
+  'action_options' => $action_options,
+  'statuses_options' => $statuses_options
+])
+
+@push('scripts')
+  <script>
+    function senForm(){ document.getElementById('complete_action_form').submit(); }
+    function closeModal(){ document.getElementById('pendingActionModal').classList.add('hidden'); }
+    function openModal(){ document.getElementById('pendingActionModal').classList.remove('hidden'); }
+
+    $(function(){
+      $('[data-toggle="modal"]').on('click', function(){
+        var b = $(this), m = $('#pendingActionModal');
+        m.find('#action_id').val(b.data('id'));
+        m.find('#pending_note').text(b.data('note'));
+        m.find('#type_id').val(b.data('type-id'));
+        m.find('#status_id').val(b.data('status-id'));
+        m.find('#customer_name').text(b.data('customer-name'));
+        openModal();
+      });
+    });
+  </script>
+@endpush
