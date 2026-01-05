@@ -393,6 +393,7 @@ Route::get('/dashboard/scroll_inactive_without_user', [ReportController::class, 
 Route::middleware('auth')->prefix('orders')->group(function () {
     Route::post('/{id}/update', [OrderController::class, 'update']);
     Route::post('/', [OrderController::class, 'store'])->name('orders.store');
+    Route::post('/quick', [OrderController::class, 'storeQuick'])->name('orders.quick');
     Route::get('/', [OrderController::class, 'index']);
     Route::get('/create/{cid}', [OrderController::class, 'create'])->name('orders.create');
 

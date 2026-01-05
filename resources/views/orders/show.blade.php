@@ -113,7 +113,9 @@
 					<div class="row">
 						<label class="col-6">Nombre:</label>
 						<div readonly id="" name="" class="col-6" value="{{$model->name}}">
-							<input type="text" value="{{$model->customer->name}}" id="name" name="name" class="form-control borderless readonly" readonly>
+							<a href="/customers/{{ $model->customer->id }}/show">
+								<input type="text" value="{{$model->customer->name}}" id="name" name="name" class="form-control borderless readonly" readonly>
+							</a>
 							<input type="hidden" value="{{$model->customer->id}}" id="customer_id" name="customer_id" class="form-control borderless readonly" readonly>
 							
 					</div>

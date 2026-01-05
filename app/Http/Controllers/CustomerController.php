@@ -1079,6 +1079,27 @@ class CustomerController extends Controller
             'message_ids' => $chatMessages->pluck('id')->all(),
         ]);
 
+        $productsByCountry = Product::query()
+            ->where('status_id', 1)
+            ->whereNotNull('country')
+            ->orderBy('name')
+            ->get(['id', 'name', 'country', 'total', 'price', 'coin'])
+            ->groupBy('country')
+            ->map(function (Collection $products) {
+                return $products->map(function (Product $product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'price' => $product->total ?? $product->price,
+                        'coin' => $product->coin,
+                    ];
+                })->values()->all();
+            })
+            ->toArray();
+
+        $productCountries = array_keys($productsByCountry);
+        sort($productCountries);
+
         return view('customers.show', compact(
             'model',
             'histories',
@@ -1102,7 +1123,9 @@ class CustomerController extends Controller
             'allTags',
             'welcomeAlreadySent',
             'historyOwnerMap',
-            'chatMessages'
+            'chatMessages',
+            'productsByCountry',
+            'productCountries'
         ));
     }
 
