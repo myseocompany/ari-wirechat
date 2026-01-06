@@ -641,7 +641,7 @@ class OrderController extends Controller
         $orderProduct->total = $price;
         $orderProduct->save();
 
-        return redirect('/orders/'.$order->id.'/show')
+        return redirect('/customers/'.$customer->id.'/show')
             ->with('status', 'La orden rápida fue creada con éxito.');
     }
 
