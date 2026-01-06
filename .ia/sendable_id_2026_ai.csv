@@ -1,0 +1,239 @@
+sendable_id,pidio_reunion,reason
+135344,true,dio fecha y hora
+136057,false,no agenda
+141101,false,no agenda
+144587,false,no agenda
+145690,false,no agenda
+146362,true,pidio reunión
+146864,false,no agenda
+147143,false,no agenda
+149047,false,no agenda
+149896,false,no agenda
+150214,false,no agenda
+150303,false,no agenda
+151520,false,no agenda
+151807,false,no agenda
+154749,false,no agenda
+159605,false,no agenda
+159729,false,no agenda
+162558,false,no agenda
+163222,false,no agenda
+164351,true,pidio llamada para mañana
+169037,false,no agenda
+174984,false,no agenda
+175286,false,no agenda
+178785,false,no agenda
+181076,false,no agenda
+184608,false,no agenda
+186383,false,no agenda
+190095,false,no agenda
+190479,true,dio fecha y hora
+198536,true,mencionó llamada más tarde
+204866,false,no agenda
+402952,false,no agenda
+406615,false,no agenda
+410529,true,pidio llamada y dio hora
+411948,false,no agenda
+414862,false,no agenda
+414902,false,no agenda
+420115,false,no agenda
+420779,true,pidio llamada
+422451,false,no agenda
+428207,false,no agenda
+428567,false,no agenda
+429357,false,no agenda
+431552,false,no agenda
+443039,false,no agenda
+443890,false,no agenda
+461725,false,no agenda
+527972,false,no agenda
+528176,false,no agenda
+569405,false,no agenda
+571078,false,no agenda
+573227,false,no agenda
+580023,true,pidio llamada y menciono 'hoy'
+647549,false,no agenda
+654744,false,no agenda
+660325,false,no agenda
+660431,false,no agenda
+661290,false,no agenda
+667765,false,no agenda
+668656,false,no agenda
+669347,false,no agenda
+669419,false,no agenda
+669685,false,no agenda
+670796,false,no agenda
+671203,false,no agenda
+672792,false,no agenda
+673224,true,dio fecha y hora
+673524,false,no agenda
+673589,false,no agenda
+673650,false,no agenda
+673668,true,dio fecha y hora
+673742,true,dio fecha y hora
+673840,false,no agenda
+673847,true,dio fecha y hora
+673852,true,override fecha y hora detectadas
+673861,false,no agenda
+673863,false,no agenda
+673945,false,no agenda
+673947,false,no agenda
+673948,false,no agenda
+673950,false,no agenda
+673955,false,no agenda
+673956,true,pidio cita
+673962,false,no agenda
+673967,false,no agenda
+673970,false,no agenda
+673978,false,no agenda
+673984,false,no agenda
+673985,false,no agenda
+673987,false,no agenda
+673996,false,no agenda
+673997,false,no agenda
+674004,false,no agenda
+674008,true,pidio cita para mañana en la mañana
+674010,false,no agenda
+674013,false,no agenda
+674015,false,no agenda
+674024,false,no agenda
+674028,false,no agenda
+674033,false,no agenda
+674034,false,no agenda
+674038,false,no agenda
+674040,false,no agenda
+674042,false,no agenda
+674043,false,no agenda
+674044,false,no agenda
+674049,false,no agenda
+674053,false,no agenda
+674055,false,no agenda
+674057,false,no agenda
+674059,false,no agenda
+674061,false,no agenda
+674064,false,no agenda
+674068,false,no agenda
+674071,false,no agenda
+674076,false,no agenda
+674078,false,no agenda
+674084,false,no agenda
+674089,false,no agenda
+674091,false,no agenda
+674093,false,no agenda
+674095,false,no agenda
+674096,false,no agenda
+674099,false,no agenda
+674101,false,no agenda
+674103,false,no agenda
+674105,false,no agenda
+674115,false,no agenda
+674118,false,no agenda
+674124,false,no agenda
+674132,false,no agenda
+674133,false,no agenda
+674134,false,no agenda
+674136,false,no agenda
+674141,false,no agenda
+674144,false,no agenda
+674147,false,no agenda
+674154,false,no agenda
+674155,false,no agenda
+674168,false,no agenda
+674176,false,no agenda
+674181,false,no agenda
+674184,false,no agenda
+674185,false,no agenda
+674188,false,no agenda
+674191,false,no agenda
+674194,false,no agenda
+674198,false,no agenda
+674199,false,no agenda
+674201,false,no agenda
+674203,false,no agenda
+674204,false,no agenda
+674207,false,no agenda
+674208,false,no agenda
+674212,true,dio fecha para asistir
+674213,false,no agenda
+674214,false,no agenda
+674224,false,no agenda
+674237,false,no agenda
+674238,false,no agenda
+674244,false,no agenda
+674247,true,pidio llamada y dio fecha y hora
+674254,false,no agenda
+674256,false,no agenda
+674257,false,no agenda
+674258,false,no agenda
+674271,false,no agenda
+674275,false,no agenda
+674281,true,mencionó miércoles
+674283,false,no agenda
+674285,false,no agenda
+674288,false,no agenda
+674292,false,no agenda
+674296,false,no agenda
+674297,false,no agenda
+674308,false,no agenda
+674310,false,no agenda
+674314,false,no agenda
+674318,false,no agenda
+674321,false,no agenda
+674322,false,no agenda
+674332,false,no agenda
+674333,false,no agenda
+674345,false,no agenda
+674347,false,no agenda
+674350,false,no agenda
+674361,false,no agenda
+674373,false,no agenda
+674375,false,no agenda
+674378,true,dio fecha y hora
+674379,false,no agenda
+674380,false,no agenda
+674383,false,no agenda
+674388,false,no agenda
+674390,false,no agenda
+674403,false,no agenda
+674411,false,no agenda
+674413,true,dio fecha y hora
+674420,false,no agenda
+674423,false,no agenda
+674425,false,no agenda
+674427,false,no agenda
+674428,false,no agenda
+674437,false,no agenda
+674438,false,no agenda
+674442,true,pidio videollamada
+674452,false,no agenda
+674453,false,no agenda
+674460,true,dio fecha y hora
+674465,false,no agenda
+674467,false,no agenda
+674469,false,no agenda
+674476,true,dio hora
+674477,false,no agenda
+674479,false,no agenda
+674480,true,dio fecha y hora
+674481,false,no agenda
+674483,false,no agenda
+674486,false,no agenda
+674494,false,no agenda
+674497,false,no agenda
+674503,false,no agenda
+674504,false,no agenda
+674505,false,no agenda
+674515,true,dio fecha y hora
+674519,true,dio fecha y hora
+674521,false,no agenda
+674524,false,no agenda
+674525,false,no agenda
+674529,true,dio fecha y hora
+674533,true,dio fecha y hora
+674534,false,no agenda
+674542,false,no agenda
+674545,false,no agenda
+674547,false,no agenda
+674558,true,dio fecha y hora
+674560,false,sin mensajes
+674562,false,sin mensajes
