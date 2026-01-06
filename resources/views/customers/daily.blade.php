@@ -551,7 +551,7 @@ Registro <strong>{{ $model->currentPage()*$model->perPage() - ( $model->perPage(
               data-toggle="modal" data-target="#addActionModal-{{$item->id}}" aria-label="Agregar seguimiento">
               +
             </button>
-            @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 10)
+            @if (Auth::check() && (int) Auth::user()->role_id === 1)
               <a href="customers/{{ $item->id }}/destroy" class="btn btn-sm btn-danger" title="Eliminar">
                 <span class="fa fa-trash-o" aria-hidden="true"></span>
               </a>

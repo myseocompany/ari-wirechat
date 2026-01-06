@@ -9,6 +9,7 @@ use App\Http\Requests\GoogleAdsLeadRequest;
 use App\Jobs\RetellProcessCall;
 use App\Models\Action;
 use App\Models\ActionType;
+use App\Models\ActivityLog;
 use App\Models\AudienceCustomer;
 use App\Models\Campaign;
 use App\Models\ChannelsWebhookLog;
@@ -745,8 +746,25 @@ class APIController extends Controller
      */
     public function destroy($id)
     {
+        $user = Auth::user();
+        if (! $user || (int) $user->role_id !== 1) {
+            abort(403);
+        }
+
         $model = Customer::find($id);
         if ($model->delete()) {
+            ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'customer.deleted',
+                'subject_type' => Customer::class,
+                'subject_id' => $model->id,
+                'meta' => [
+                    'name' => $model->name,
+                ],
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+
             return redirect('customers')->with('statustwo', 'El Cliente <strong>'.$model->name.'</strong> fué eliminado con éxito!');
         }
     }

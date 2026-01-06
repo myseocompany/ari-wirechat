@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Action;
 use App\Models\ActionType;
+use App\Models\ActivityLog;
 use App\Models\Audience;
 use App\Models\AudienceCustomer;
 use App\Models\CampaignMessage;
@@ -66,6 +67,30 @@ class CustomerController extends Controller
         if (! $customer->hasFullAccess(Auth::user())) {
             abort(403);
         }
+    }
+
+    private function ensureCanDeleteCustomer(): void
+    {
+        $user = Auth::user();
+
+        if (! $user || (int) $user->role_id !== 1) {
+            abort(403);
+        }
+    }
+
+    private function logCustomerDeletion(Customer $customer): void
+    {
+        ActivityLog::create([
+            'user_id' => Auth::id(),
+            'action' => 'customer.deleted',
+            'subject_type' => Customer::class,
+            'subject_id' => $customer->id,
+            'meta' => [
+                'name' => $customer->name,
+            ],
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
     }
 
     private function normalizeUserId($value): ?int
@@ -1603,7 +1628,10 @@ class CustomerController extends Controller
     {
         $model = Customer::findOrFail($id);
         $this->ensureCanAccessCustomer($model);
+        $this->ensureCanDeleteCustomer();
         if ($model->delete()) {
+            $this->logCustomerDeletion($model);
+
             return redirect('customers')->with('statustwo', 'El Cliente <strong>'.$model->name.'</strong> fué eliminado con éxito!');
         }
     }

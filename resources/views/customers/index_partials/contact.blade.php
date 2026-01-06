@@ -239,9 +239,11 @@
         <a href="/customers/{{$customer->id}}/assignMe" class="btn btn-sm btn-primary">Asignarme</a>
       @endif
 
-      @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 10 || Auth::user()->role_id == 14 || Auth::user()->role_id == 12)
+      @if (Auth::check() && (int) Auth::user()->role_id === 1)
         <a href="/customers/{{ $customer->id }}/destroy" class="btn btn-sm btn-danger" title="Eliminar">Eliminar</a>
+      @endif
 
+      @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 10 || Auth::user()->role_id == 14 || Auth::user()->role_id == 12)
         {{-- Datos para RD --}}
         <input type="hidden" name="name" id="name" value="{{ $customer->name }}">
         <input type="hidden" name="phone" id="phone" value="{{ $customer->phone }}">

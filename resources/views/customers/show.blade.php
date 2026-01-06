@@ -89,7 +89,7 @@
                 </a>
                 @endif
 
-                @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 10)
+                @if (Auth::check() && (int) Auth::user()->role_id === 1)
                   <a href="/customers/{{ $model->id }}/destroy">
                     <span class="inline-flex items-center rounded-md bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700" aria-hidden="true" title="Eliminar">Eliminar</span>
                   </a>
