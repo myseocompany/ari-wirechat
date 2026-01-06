@@ -20,6 +20,7 @@ use App\Models\CustomerMetaData;
 use App\Models\CustomerSource;
 use App\Models\CustomerStatus;
 use App\Models\CustomerStatusPhase;
+use App\Models\DeletedCustomer;
 use App\Models\Email;
 use App\Models\Log;
 use App\Models\Product;
@@ -90,6 +91,16 @@ class CustomerController extends Controller
             ],
             'ip' => request()->ip(),
             'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    private function storeDeletedCustomer(Customer $customer): void
+    {
+        DeletedCustomer::create([
+            'customer_id' => $customer->id,
+            'deleted_by_user_id' => Auth::id(),
+            'payload' => $customer->getAttributes(),
+            'deleted_at' => now(),
         ]);
     }
 
@@ -1630,6 +1641,7 @@ class CustomerController extends Controller
         $this->ensureCanAccessCustomer($model);
         $this->ensureCanDeleteCustomer();
         if ($model->delete()) {
+            $this->storeDeletedCustomer($model);
             $this->logCustomerDeletion($model);
 
             return redirect('customers')->with('statustwo', 'El Cliente <strong>'.$model->name.'</strong> fué eliminado con éxito!');

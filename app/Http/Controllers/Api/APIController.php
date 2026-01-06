@@ -17,9 +17,10 @@ use App\Models\Country;
 use App\Models\Customer;
 use App\Models\CustomerHistory;
 use App\Models\CustomerSource;
+use App\Models\CustomerStatus;
 // use App\Models\EmployeeStatus;
 // use App\Models\Mail;
-use App\Models\CustomerStatus;
+use App\Models\DeletedCustomer;
 use App\Models\Email;
 use App\Models\Order;
 use App\Models\Product;
@@ -752,7 +753,13 @@ class APIController extends Controller
         }
 
         $model = Customer::find($id);
-        if ($model->delete()) {
+        if ($model && $model->delete()) {
+            DeletedCustomer::create([
+                'customer_id' => $model->id,
+                'deleted_by_user_id' => $user->id,
+                'payload' => $model->getAttributes(),
+                'deleted_at' => now(),
+            ]);
             ActivityLog::create([
                 'user_id' => $user->id,
                 'action' => 'customer.deleted',
