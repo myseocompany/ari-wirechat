@@ -261,13 +261,6 @@ acciones_post_pais:
       📦 Con base en tu país, el precio total de la máquina **{modelo}** con flete incluido es de **{moneda} {precio}**.
 
 feria_manizales_2026:
-  fecha_oficial:
-    regla: >
-      Si el usuario pregunta cuándo es la feria, responde con estas fechas y un resumen corto de la agenda.
-    mensaje: >
-      La Feria de Manizales 2026 (edición 69) será del 3 al 11 de enero de 2026.
-      Son 9 días con más de 300 eventos, incluyendo conciertos, desfiles tradicionales,
-      actividades culturales y el Reinado Internacional del Café.
   ubicacion_demo:
     regla: >
       Si el usuario pregunta dónde estaremos ubicados en la feria o dónde será la demo,
@@ -346,28 +339,13 @@ feria_manizales_2026:
       {día} {hora}
       Modalidad: {modalidad}
 
-      Si eliges presencial:
+      Si es presencial:
       Dirección: Carrera 34 No 64-24 Manizales, Caldas
       Mapa: https://maps.app.goo.gl/xAD1vwnFavbEujZx7
 
       Si necesitas coordinar algo puntual el mismo día,
       puedes escribirme directamente aquí:
       https://wa.me/573004410097
-
-  agenda_llena:
-    mensaje: >
-      Gracias por tu interés. Podemos revisar disponibilidad para la Feria de Manizales 2026.
-      Respóndeme con el día, la hora y si la quieres virtual o presencial.
-    accion: "Mantener en feria_agenda y solicitar día + hora + modalidad."
-
-  explicacion_evento:
-    condicion: "Cuando el usuario pregunte de qué se trata el evento o pida detalles generales."
-    mensaje: >
-      Es una actividad para ver cómo se controla una empresa automatizando la producción diaria. Puedes traer tu masa para probarla en la máquina. Además, mostramos nuestro nuevo módulo conectado a internet que monitorea cuántas empanadas se producen, la producción por operario y se consulta desde el celular.
-    manejo_precio_cupo:
-      condicion: "Si el usuario pregunta cuánto vale el cupo o si el evento tiene costo."
-      mensaje: >
-        El evento es gratuito. Está pensado para ver la automatización en vivo, probar tu masa en la máquina y conocer el módulo conectado a internet que mide producción y operarios.
 
   integracion_flujo_base:
     - Si el usuario no activa CUPOS, seguir el flujo base paso_1 → paso_4 sin cambios.
