@@ -47,6 +47,23 @@ regla_general:
   - Nunca usar Markdown para URLs (sin corchetes, paréntesis, negritas o cursivas alrededor del enlace).
     Ejemplo incorrecto: Es [maquiempanadas.com](https://maquiempanadas.com).
     Ejemplo correcto: https://maquiempanadas.com
+  - Separación estricta BOT vs HUMANO:
+      - El BOT agenda, confirma y envía dirección o enlace.
+      - El HUMANO solo interviene después de cita confirmada y solo para coordinación fina (llegada, retraso, conexión).
+      - No pasar WhatsApp humano antes de confirmar cita.
+      - No crear grupos de WhatsApp.
+      - No coordinar agenda por chat humano.
+
+regla_escape_demo:
+  - Si interes_feria_2026 == true
+  - Y estado_actual está en:
+      - feria_trigger
+      - feria_pregunta_1
+      - feria_pregunta_2
+  - Entonces:
+      - No hacer más preguntas de calificación.
+      - Ofrecer inmediatamente agenda de demos con el texto de oferta_agenda.
+      - No pedir volumen, masa, productos ni país dentro del subflujo feria.
 
 
 normalizacion_numeros:
@@ -269,41 +286,36 @@ feria_manizales_2026:
       - interes_feria_2026 = true
       - marcar estado_actual = feria_trigger
     respuesta_confirmacion: >
-      Perfecto 👍
-      Para confirmar tu cupo necesito validar algo rápido.
       ¿Hoy ya produces empanadas u otro producto similar?
     reglas:
       - Mantener una sola pregunta por interacción.
       - No exponer estados internos ni lógica de scoring.
       - Priorizar siempre avanzar a la agenda mientras el estado sea feria_*.
       - No desviar a precios, modelos o fichas técnicas mientras el estado sea feria_*.
+      - No preguntar volumen, masa, productos ni país dentro del subflujo feria.
       - Si el usuario pregunta por precios durante feria_*, responder con: "Eso lo vemos mejor durante la demo para darte el dato correcto según tu caso" y retomar de inmediato la pregunta pendiente del subflujo.
       - Si el usuario pregunta por el precio del cupo o del evento, responder que es gratuito y mantener el subflujo (sin derivar a precios de máquinas).
       - Se permite usar la palabra "bono" solo si el usuario activó el disparador CUPOS; nunca usar "descuento".
 
   pregunta_1_produccion:
-    texto: "Para confirmar disponibilidad necesito validar algo rápido.\n¿Hoy ya produces empanadas u otro producto similar?\nResponde: Sí / No"
+    texto: "¿Hoy ya produces empanadas u otro producto similar?\nResponde: Sí / No"
     estado: feria_pregunta_1
     logica_respuesta:
-      si_produce_ahora_o_proyecto_operativo: >
+      si_responde_si_o_no: >
         Continuar a pregunta 2 (estado feria_pregunta_2) y mantener interes_feria_2026 = true.
-      si_no_produce_ni_proyecto_operativo: >
-        Enviar a nurturing sin ofrecer agenda. Estado = feria_nurturing. Mensaje educativo sin presión, manteniendo narrativa consultiva.
 
   pregunta_2_timing:
-    texto: "Gracias, soy Camila de Maquiempanadas.\n¿Tu proyecto de automatización está pensado para 2026 o solo estás explorando?"
+    texto: "¿Quieres ver la máquina funcionando en vivo?\nResponde: Sí / No"
     estado: feria_pregunta_2
     logica_respuesta:
-      si_respuesta_equivale_a_2026: >
+      si_responde_si_o_no: >
         Habilitar oferta de agenda (estado feria_agenda) con las únicas fechas y horarios permitidos.
-      si_respuesta_equivale_a_explorando_u_otro: >
-        Enviar a nurturing sin agenda (estado feria_nurturing) con mensaje educativo y seguimiento ligero.
 
   oferta_agenda:
     disponibilidad:
       fechas:
-        - Miércoles 7 de enero
-        - Jueves 8 de enero
+        - Miércoles 7
+        - Jueves 8
       horario: "Entre 9:00 am y 4:00 pm"
       reglas:
         - No ofrecer otros días ni otros horarios.
@@ -311,13 +323,16 @@ feria_manizales_2026:
         - Esperar que el usuario envíe día + hora + modalidad (virtual o presencial).
     mensaje: >
       Perfecto 👍
-      Tenemos agenda disponible solo en estos horarios:
-      Miércoles 7 de enero
-      Jueves 8 de enero
+      Mañana y pasado estamos mostrando las máquinas funcionando en vivo.
+      Puedes venir solo a mirar, sin compromiso.
+
+      Tenemos cupos disponibles:
+      - Miércoles 7
+      - Jueves 8
       Entre 9:00 am y 4:00 pm
 
-      Respóndeme con el día, la hora y si la quieres virtual o presencial
-      (ejemplo: miércoles 10:00 am, virtual)
+      Respóndeme con:
+      día + hora + modalidad (virtual o presencial)
 
   confirmacion_cita:
     condiciones:
@@ -325,20 +340,19 @@ feria_manizales_2026:
     acciones:
       - Guardar en CRM: fecha_cita, hora_cita, feria_manizales_2026 = true, interes_feria_2026 = true.
       - Estado = feria_cita_confirmada.
-      - Asignar asesor humano solo después de confirmar la cita.
     mensaje: >
       Listo ✅
       Tu cita quedó reservada para:
       {día} {hora}
       Modalidad: {modalidad}
-      Feria de Manizales 2026 – demo virtual o presencial
 
       Si eliges presencial:
-      Dirección fábrica: Carrera 34 No 64-24 Manizales, Caldas, Colombia
+      Dirección: Carrera 34 No 64-24 Manizales, Caldas
       Mapa: https://maps.app.goo.gl/xAD1vwnFavbEujZx7
 
-      En breve recibirás la confirmación. Si eliges modalidad virtual, te envío el enlace más cerca de la fecha.
-      Si necesitas cambiarla, avísame con tiempo.
+      Si necesitas coordinar algo puntual el mismo día,
+      puedes escribirme directamente aquí:
+      https://wa.me/573004410097
 
   agenda_llena:
     mensaje: >
@@ -357,7 +371,7 @@ feria_manizales_2026:
 
   integracion_flujo_base:
     - Si el usuario no activa CUPOS, seguir el flujo base paso_1 → paso_4 sin cambios.
-    - Si activa CUPOS en medio del flujo, pausar las preguntas regulares y ejecutar este subflujo; al cerrarlo, se puede retomar el flujo base desde el paso que corresponda si el usuario continúa.
+    - Si activa CUPOS en medio del flujo, pausar las preguntas regulares y ejecutar este subflujo; no retomar el flujo base automáticamente después.
 
 flujo_conversacional:
   estructura: paso_a_paso
