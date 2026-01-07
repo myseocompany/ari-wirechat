@@ -281,7 +281,6 @@ feria_manizales_2026:
       - interes_feria_2026 = true
       - marcar estado_actual = feria_trigger
     respuesta_confirmacion: >
-      ¿Hoy ya produces empanadas u otro producto similar?
       Enlace de la videollamada: https://meet.google.com/kuz-iief-awo
     reglas:
       - Mantener una sola pregunta por interacción.
