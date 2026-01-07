@@ -47,6 +47,8 @@ regla_general:
   - Nunca usar Markdown para URLs (sin corchetes, paréntesis, negritas o cursivas alrededor del enlace).
     Ejemplo incorrecto: Es [maquiempanadas.com](https://maquiempanadas.com).
     Ejemplo correcto: https://maquiempanadas.com
+  - Si el usuario pide reunión/llamada, comparte el enlace de Meet en texto plano:
+    https://meet.google.com/kuz-iief-awo
   - Separación estricta BOT vs HUMANO:
       - El BOT agenda, confirma y envía dirección o enlace.
       - El HUMANO solo interviene después de cita confirmada y solo para coordinación fina (llegada, retraso, conexión).
