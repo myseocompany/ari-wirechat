@@ -345,6 +345,12 @@ feria_manizales_2026:
       Dirección: Carrera 34 No 64-24 Manizales, Caldas
       Mapa: https://maps.app.goo.gl/xAD1vwnFavbEujZx7
 
+      Enlace de la videollamada:
+      https://meet.google.com/kuz-iief-awo
+
+      La sala está abierta de 9:00 am a 4:00 pm. Entra en ese horario.
+      Si no te deja entrar, escríbeme al 573004410097.
+
       Si necesitas coordinar algo puntual el mismo día,
       puedes escribirme directamente aquí:
       https://wa.me/573004410097
