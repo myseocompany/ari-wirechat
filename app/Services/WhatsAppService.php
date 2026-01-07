@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Action;
 use App\Models\Campaign;
 use App\Models\Customer;
 use App\Models\MessageSource;
@@ -12,14 +13,14 @@ use Illuminate\Support\Facades\Log;
 class WhatsAppService
 {
     public const CHANNEL_WATOOLBOX = 'watoolbox';
+
     public const CHANNEL_GRAPH = 'graph';
 
     private ?WAToolboxService $toolboxService = null;
+
     private ?MessageSource $messageSource = null;
 
-    public function __construct(private readonly WhatsAppGraphService $graphService)
-    {
-    }
+    public function __construct(private readonly WhatsAppGraphService $graphService) {}
 
     public function sendCampaignMessages(
         ?Campaign $campaign,
@@ -28,7 +29,7 @@ class WhatsAppService
         ?MessageSource $messageSource = null,
         ?WhatsAppAccount $account = null
     ): void {
-        if (!$campaign || !$customer) {
+        if (! $campaign || ! $customer) {
             return;
         }
 
@@ -36,6 +37,7 @@ class WhatsAppService
 
         if ($channel === self::CHANNEL_GRAPH) {
             $this->sendCampaignViaGraph($campaign, $customer, $account);
+
             return;
         }
 
@@ -57,11 +59,12 @@ class WhatsAppService
 
         if ($channel === self::CHANNEL_GRAPH) {
             $this->sendTextViaGraph($phone, $message, $account);
+
             return;
         }
 
         $toolbox = $this->getWAToolboxService($messageSource);
-        if (!$toolbox) {
+        if (! $toolbox) {
             return;
         }
 
@@ -79,11 +82,12 @@ class WhatsAppService
         ?MessageSource $messageSource = null
     ): void {
         $toolbox = $this->getWAToolboxService($messageSource);
-        if (!$toolbox) {
+        if (! $toolbox) {
             Log::warning('WhatsAppService skipped sendCampaignMessages: no default message source', [
                 'campaign_id' => $campaign->id,
                 'customer_id' => $customer->id,
             ]);
+
             return;
         }
 
@@ -93,6 +97,7 @@ class WhatsAppService
                 'campaign_id' => $campaign->id,
                 'customer_id' => $customer->id,
             ]);
+
             return;
         }
 
@@ -129,11 +134,12 @@ class WhatsAppService
         ?WhatsAppAccount $account = null
     ): void {
         $account = $account ?: $this->getDefaultWhatsAppAccount();
-        if (!$account) {
+        if (! $account) {
             Log::warning('WhatsAppService skipped Graph campaign: no WA account configured', [
                 'campaign_id' => $campaign->id,
                 'customer_id' => $customer->id,
             ]);
+
             return;
         }
 
@@ -143,6 +149,7 @@ class WhatsAppService
                 'campaign_id' => $campaign->id,
                 'customer_id' => $customer->id,
             ]);
+
             return;
         }
 
@@ -170,8 +177,9 @@ class WhatsAppService
     private function sendTextViaGraph(string $phone, string $message, ?WhatsAppAccount $account = null): void
     {
         $account = $account ?: $this->getDefaultWhatsAppAccount();
-        if (!$account) {
+        if (! $account) {
             Log::warning('WhatsAppService skipped Graph text: no WA account configured');
+
             return;
         }
 
@@ -195,11 +203,12 @@ class WhatsAppService
         ?WhatsAppAccount $account = null
     ): void {
         $phone = $customer->getPhone();
-        if (!$phone) {
+        if (! $phone) {
             Log::info('WhatsAppService skipped template: missing phone', [
                 'customer_id' => $customer->id,
                 'template' => $templateName,
             ]);
+
             return;
         }
 
@@ -212,11 +221,12 @@ class WhatsAppService
         $account = $account ?: $this->getDefaultWhatsAppAccount();
         $language = $language ?: 'en_US';
 
-        if (!$account) {
+        if (! $account) {
             Log::warning('WhatsAppService skipped template: no account configured', [
                 'customer_id' => $customer->id,
                 'template' => $templateName,
             ]);
+
             return;
         }
 
@@ -227,10 +237,18 @@ class WhatsAppService
                 'template' => $templateName,
                 'response' => $response,
             ]);
+            $this->logTemplateAction($customer, $templateName, [
+                'status' => 'sent',
+                'response' => $response,
+            ]);
         } catch (\Throwable $e) {
             Log::error('WhatsAppService sendTemplateToCustomer failed', [
                 'customer_id' => $customer->id,
                 'template' => $templateName,
+                'error' => $e->getMessage(),
+            ]);
+            $this->logTemplateAction($customer, $templateName, [
+                'status' => 'failed',
                 'error' => $e->getMessage(),
             ]);
         }
@@ -239,11 +257,11 @@ class WhatsAppService
     private function getWAToolboxService(?MessageSource $messageSource = null): ?WAToolboxService
     {
         $source = $messageSource ?: $this->messageSource ?: MessageSource::getDefaultMessageSource();
-        if (!$source) {
+        if (! $source) {
             return null;
         }
 
-        if (!$this->toolboxService || $this->messageSource?->id !== $source->id) {
+        if (! $this->toolboxService || $this->messageSource?->id !== $source->id) {
             $this->messageSource = $source;
             $this->toolboxService = new WAToolboxService($source);
         }
@@ -258,5 +276,20 @@ class WhatsAppService
         return in_array($channel, [self::CHANNEL_WATOOLBOX, self::CHANNEL_GRAPH], true)
             ? $channel
             : self::CHANNEL_WATOOLBOX;
+    }
+
+    private function logTemplateAction(Customer $customer, string $templateName, array $payload): void
+    {
+        $note = json_encode([
+            'template' => $templateName,
+            'payload' => $payload,
+        ], JSON_UNESCAPED_SLASHES);
+
+        Action::create([
+            'customer_id' => $customer->id,
+            'type_id' => 16,
+            'note' => $note,
+            'creator_user_id' => 0,
+        ]);
     }
 }

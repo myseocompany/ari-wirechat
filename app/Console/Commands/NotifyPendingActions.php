@@ -2,11 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Mail\ActionReminderMail;
 use App\Models\Action;
+use App\Services\WhatsAppService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Resend\Laravel\Facades\Resend;
 
@@ -22,13 +21,12 @@ class NotifyPendingActions extends Command
 
         if ($windowMinutes <= 0) {
             $this->warn('followup_default_minutes no configurado o en 0; no se enviarán recordatorios.');
+
             return self::SUCCESS;
         }
 
         $now = now();
         $windowEnd = $now->copy()->addMinutes($windowMinutes);
-
-
 
         $sent = 0;
         $skippedNoEmail = 0;
@@ -47,10 +45,19 @@ class NotifyPendingActions extends Command
                     $customer = $action->customer;
                     $user = optional($customer)->user;
                     $email = $user->email ?? null;
+                    $whatsAppNotified = false;
+
+                    if ((int) $action->type_id === 9) {
+                        $whatsAppNotified = $this->sendMeetingReminderWhatsApp($action);
+                    }
 
                     if (! $email) {
                         $skippedNoEmail++;
                         Log::info('actions:notify skip no email', ['action_id' => $action->id, 'customer_id' => $action->customer_id]);
+                        if ($whatsAppNotified) {
+                            $action->forceFill(['notified_at' => now()])->save();
+                        }
+
                         continue;
                     }
 
@@ -76,7 +83,6 @@ TXT;
                         'text' => $body,
                     ]);
 
-
                     $action->forceFill(['notified_at' => now()])->save();
                     $sent++;
                 }
@@ -95,5 +101,46 @@ TXT;
         $this->info("actions:notify sent={$sent} skipped_no_email={$skippedNoEmail} total_found={$total} window_start={$now} window_end={$windowEnd} system_now=".now());
 
         return self::SUCCESS;
+    }
+
+    private function sendMeetingReminderWhatsApp(Action $action): bool
+    {
+        $customer = $action->customer;
+        if (! $customer) {
+            Log::info('actions:notify skip whatsapp missing customer', ['action_id' => $action->id]);
+
+            return false;
+        }
+
+        $url = trim((string) $action->url);
+        if ($url === '') {
+            Log::info('actions:notify skip whatsapp missing url', ['action_id' => $action->id, 'customer_id' => $action->customer_id]);
+
+            return false;
+        }
+
+        $phone = $customer->getPhone();
+        if ($phone === '') {
+            Log::info('actions:notify skip whatsapp missing phone', ['action_id' => $action->id, 'customer_id' => $action->customer_id]);
+
+            return false;
+        }
+
+        $components = [
+            [
+                'type' => 'body',
+                'parameters' => [
+                    ['type' => 'text', 'text' => $url],
+                ],
+            ],
+        ];
+
+        app(WhatsAppService::class)->sendTemplateToCustomer(
+            $customer,
+            (string) config('whatsapp.meeting_reminder_template', '2026_feria_falta_1hora'),
+            $components
+        );
+
+        return true;
     }
 }
