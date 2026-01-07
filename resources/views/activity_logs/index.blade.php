@@ -67,8 +67,19 @@
             <div style="flex:2; min-width: 220px;">
                 <input type="text" name="q" value="{{ $search }}" placeholder="Buscar en acción, sujeto o meta...">
             </div>
-            <div style="flex:1; min-width: 160px;">
-                <input type="text" name="action" value="{{ $action }}" placeholder="Acción exacta">
+            <div style="flex:1; min-width: 180px;">
+                <select name="action" class="form-control form-control-sm">
+                    <option value="">Todas las acciones</option>
+                    @foreach($actions as $actionOption)
+                        <option value="{{ $actionOption }}" @selected($actionOption === $action)>{{ $actionOption }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div style="flex:1; min-width: 170px;">
+                <input type="date" name="from_date" value="{{ $fromDate }}" placeholder="Desde">
+            </div>
+            <div style="flex:1; min-width: 170px;">
+                <input type="date" name="to_date" value="{{ $toDate }}" placeholder="Hasta">
             </div>
             <div style="flex:1; min-width: 140px;">
                 <input type="number" name="user_id" value="{{ $userId }}" placeholder="User ID">

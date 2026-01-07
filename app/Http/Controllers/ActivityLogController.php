@@ -6,6 +6,7 @@ use App\Models\ActivityLog;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class ActivityLogController extends Controller
@@ -28,6 +29,8 @@ class ActivityLogController extends Controller
         $search = trim((string) $request->get('q'));
         $action = trim((string) $request->get('action'));
         $userId = $request->get('user_id');
+        $fromDate = $request->get('from_date');
+        $toDate = $request->get('to_date');
 
         $query = ActivityLog::with('user')->orderByDesc('id');
 
@@ -48,14 +51,27 @@ class ActivityLogController extends Controller
             $query->where('user_id', (int) $userId);
         }
 
+        if ($fromDate) {
+            $query->whereDate('created_at', '>=', $fromDate);
+        }
+
+        if ($toDate) {
+            $query->whereDate('created_at', '<=', $toDate);
+        }
+
+        $actions = $this->getAvailableActions();
+
         $logs = $query->paginate($perPage)->withQueryString();
 
         return view('activity_logs.index', [
             'logs' => $logs,
+            'actions' => $actions,
             'search' => $search,
             'perPage' => $perPage,
             'action' => $action,
             'userId' => $userId,
+            'fromDate' => $fromDate,
+            'toDate' => $toDate,
         ]);
     }
 
@@ -75,5 +91,14 @@ class ActivityLogController extends Controller
             'log' => $log,
             'payloadPretty' => $payloadPretty,
         ]);
+    }
+
+    private function getAvailableActions(): Collection
+    {
+        return ActivityLog::query()
+            ->select('action')
+            ->distinct()
+            ->orderBy('action')
+            ->pluck('action');
     }
 }
