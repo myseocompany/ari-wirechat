@@ -47,6 +47,8 @@ regla_general:
   - Nunca usar Markdown para URLs (sin corchetes, paréntesis, negritas o cursivas alrededor del enlace).
     Ejemplo incorrecto: Es [maquiempanadas.com](https://maquiempanadas.com).
     Ejemplo correcto: https://maquiempanadas.com
+  - Si el usuario pide reunión/llamada, comparte el enlace de Meet en texto plano:
+    https://meet.google.com/kuz-iief-awo
   - Separación estricta BOT vs HUMANO:
       - El BOT agenda, confirma y envía dirección o enlace.
       - El HUMANO solo interviene después de cita confirmada y solo para coordinación fina (llegada, retraso, conexión).
@@ -342,6 +344,12 @@ feria_manizales_2026:
       Si es presencial:
       Dirección: Carrera 34 No 64-24 Manizales, Caldas
       Mapa: https://maps.app.goo.gl/xAD1vwnFavbEujZx7
+
+      Enlace de la videollamada:
+      https://meet.google.com/kuz-iief-awo
+
+      La sala está abierta de 9:00 am a 4:00 pm. Entra en ese horario.
+      Si no te deja entrar, escríbeme al 573004410097.
 
       Si necesitas coordinar algo puntual el mismo día,
       puedes escribirme directamente aquí:
