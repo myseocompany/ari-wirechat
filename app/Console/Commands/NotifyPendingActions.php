@@ -87,18 +87,10 @@ class NotifyPendingActions extends Command
                     $customer = $action->customer;
                     $user = optional($customer)->user;
                     $email = $user->email ?? null;
-                    $whatsAppNotified = false;
-
-                    if ((int) $action->type_id === 9) {
-                        $whatsAppNotified = $this->sendMeetingReminderWhatsApp($action);
-                    }
 
                     if (! $email) {
                         $skippedNoEmail++;
                         Log::info('actions:notify skip no email', ['action_id' => $action->id, 'customer_id' => $action->customer_id]);
-                        if ($whatsAppNotified) {
-                            $action->forceFill(['notified_at' => now()])->save();
-                        }
 
                         continue;
                     }
