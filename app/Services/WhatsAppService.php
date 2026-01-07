@@ -200,7 +200,8 @@ class WhatsAppService
         string $templateName,
         array $components = [],
         ?string $language = null,
-        ?WhatsAppAccount $account = null
+        ?WhatsAppAccount $account = null,
+        array $context = []
     ): void {
         $phone = $customer->getPhone();
         if (! $phone) {
@@ -240,7 +241,7 @@ class WhatsAppService
             $this->logTemplateAction($customer, $templateName, [
                 'status' => 'sent',
                 'response' => $response,
-            ]);
+            ], $context);
         } catch (\Throwable $e) {
             Log::error('WhatsAppService sendTemplateToCustomer failed', [
                 'customer_id' => $customer->id,
@@ -250,7 +251,7 @@ class WhatsAppService
             $this->logTemplateAction($customer, $templateName, [
                 'status' => 'failed',
                 'error' => $e->getMessage(),
-            ]);
+            ], $context);
         }
     }
 
@@ -278,17 +279,21 @@ class WhatsAppService
             : self::CHANNEL_WATOOLBOX;
     }
 
-    private function logTemplateAction(Customer $customer, string $templateName, array $payload): void
+    private function logTemplateAction(Customer $customer, string $templateName, array $payload, array $context = []): void
     {
         $note = json_encode([
             'template' => $templateName,
             'payload' => $payload,
+            'context' => $context,
         ], JSON_UNESCAPED_SLASHES);
+
+        $actionId = $context['action_id'] ?? null;
 
         Action::create([
             'customer_id' => $customer->id,
             'type_id' => 16,
             'note' => $note,
+            'object_id' => is_numeric($actionId) ? (int) $actionId : null,
             'creator_user_id' => 0,
         ]);
     }

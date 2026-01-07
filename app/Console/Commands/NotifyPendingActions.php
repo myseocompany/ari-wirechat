@@ -11,13 +11,27 @@ use Resend\Laravel\Facades\Resend;
 
 class NotifyPendingActions extends Command
 {
+    private const WHATSAPP_REMINDER_TYPE_60 = '60';
+
+    private const WHATSAPP_REMINDER_TYPE_10 = '10';
+
+    private const WHATSAPP_REMINDER_TYPE_MORNING = 'morning';
+
     protected $signature = 'actions:notify';
 
     protected $description = 'Envía notificaciones por email para acciones próximas a vencer.';
 
     public function handle(): int
     {
+        $debugEmail = trim((string) app_config('actions_notify_debug_email', ''));
+
         $windowMinutes = (int) app_config('followup_default_minutes', 0);
+        $meetingTemplate60 = trim((string) app_config('whatsapp_meeting_reminder_60_template', ''));
+        $meetingTemplate10 = trim((string) app_config('whatsapp_meeting_reminder_10_template', ''));
+        $meetingTemplateMorning = trim((string) app_config('whatsapp_meeting_reminder_morning_template', ''));
+        $meetingWindow60 = (int) app_config('whatsapp_meeting_reminder_60_minutes', 60);
+        $meetingWindow10 = (int) app_config('whatsapp_meeting_reminder_10_minutes', 10);
+        $meetingMorningTime = trim((string) app_config('whatsapp_meeting_reminder_morning_time', '08:00'));
 
         if ($windowMinutes <= 0) {
             $this->warn('followup_default_minutes no configurado o en 0; no se enviarán recordatorios.');
@@ -31,6 +45,34 @@ class NotifyPendingActions extends Command
         $sent = 0;
         $skippedNoEmail = 0;
         $total = 0;
+
+        if ($debugEmail !== '') {
+            $this->sendDebugEmail(
+                $debugEmail,
+                'actions:notify started',
+                "Inicio de ejecución actions:notify. Ventana={$windowMinutes} minutos. Ahora={$now->toDateTimeString()}."
+            );
+        }
+
+        if ($meetingWindow60 > 0 && $meetingTemplate60 !== '') {
+            $this->sendMeetingReminders(
+                $meetingTemplate60,
+                $meetingWindow60,
+                self::WHATSAPP_REMINDER_TYPE_60
+            );
+        }
+
+        if ($meetingWindow10 > 0 && $meetingTemplate10 !== '') {
+            $this->sendMeetingReminders(
+                $meetingTemplate10,
+                $meetingWindow10,
+                self::WHATSAPP_REMINDER_TYPE_10
+            );
+        }
+
+        if ($meetingTemplateMorning !== '' && $meetingMorningTime !== '') {
+            $this->sendMeetingMorningReminders($meetingTemplateMorning, $meetingMorningTime);
+        }
 
         Action::query()
             ->whereNull('delivery_date')
@@ -100,10 +142,70 @@ TXT;
 
         $this->info("actions:notify sent={$sent} skipped_no_email={$skippedNoEmail} total_found={$total} window_start={$now} window_end={$windowEnd} system_now=".now());
 
+        if ($debugEmail !== '') {
+            $this->sendDebugEmail(
+                $debugEmail,
+                'actions:notify finished',
+                "Fin de ejecución actions:notify. sent={$sent} skipped_no_email={$skippedNoEmail} total_found={$total} window_start={$now->toDateTimeString()} window_end={$windowEnd->toDateTimeString()}."
+            );
+        }
+
         return self::SUCCESS;
     }
 
-    private function sendMeetingReminderWhatsApp(Action $action): bool
+    private function sendMeetingReminders(string $template, int $minutes, string $reminderType): void
+    {
+        $now = now();
+        $windowEnd = $now->copy()->addMinutes($minutes);
+
+        Action::query()
+            ->whereNull('delivery_date')
+            ->whereNotNull('due_date')
+            ->whereBetween('due_date', [$now, $windowEnd])
+            ->where('type_id', 9)
+            ->with('customer')
+            ->orderBy('id')
+            ->chunkById(200, function ($actions) use ($template, $reminderType) {
+                foreach ($actions as $action) {
+                    if ($this->hasMeetingReminderBeenSent($action->id, $reminderType)) {
+                        continue;
+                    }
+
+                    $this->sendMeetingReminderWhatsAppWithTemplate($action, $template, $reminderType);
+                }
+            });
+    }
+
+    private function sendMeetingMorningReminders(string $template, string $time): void
+    {
+        $now = now();
+        $today = $now->toDateString();
+        $morningStart = $now->copy()->setTimeFromTimeString($time);
+        $morningEnd = $morningStart->copy()->addMinute();
+
+        if (! $now->between($morningStart, $morningEnd)) {
+            return;
+        }
+
+        Action::query()
+            ->whereNull('delivery_date')
+            ->whereNotNull('due_date')
+            ->whereDate('due_date', $today)
+            ->where('type_id', 9)
+            ->with('customer')
+            ->orderBy('id')
+            ->chunkById(200, function ($actions) use ($template) {
+                foreach ($actions as $action) {
+                    if ($this->hasMeetingReminderBeenSent($action->id, self::WHATSAPP_REMINDER_TYPE_MORNING)) {
+                        continue;
+                    }
+
+                    $this->sendMeetingReminderWhatsAppWithTemplate($action, $template, self::WHATSAPP_REMINDER_TYPE_MORNING);
+                }
+            });
+    }
+
+    private function sendMeetingReminderWhatsAppWithTemplate(Action $action, string $template, string $reminderType): bool
     {
         $customer = $action->customer;
         if (! $customer) {
@@ -137,10 +239,45 @@ TXT;
 
         app(WhatsAppService::class)->sendTemplateToCustomer(
             $customer,
-            (string) config('whatsapp.meeting_reminder_template', '2026_feria_falta_1hora'),
-            $components
+            $template,
+            $components,
+            null,
+            null,
+            [
+                'reminder_type' => $reminderType,
+                'action_id' => $action->id,
+                'due_date' => $action->due_date?->toDateTimeString(),
+            ]
         );
 
         return true;
+    }
+
+    private function hasMeetingReminderBeenSent(int $actionId, string $reminderType): bool
+    {
+        return Action::query()
+            ->where('type_id', 16)
+            ->where('object_id', $actionId)
+            ->where('note', 'like', '%"reminder_type":"'.$reminderType.'"%')
+            ->exists();
+    }
+
+    private function sendDebugEmail(string $to, string $subject, string $body): void
+    {
+        try {
+            $resend = new Resend(env('RESEND_KEY'));
+
+            $resend->emails()->send([
+                'from' => 'Maquiempanadas <marketing@maquiempanadas.com>',
+                'to' => $to,
+                'subject' => $subject,
+                'text' => $body,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('actions:notify debug email failed', [
+                'to' => $to,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }
