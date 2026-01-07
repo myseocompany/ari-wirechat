@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActionController;
 use App\Http\Controllers\ActionTypeController;
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Admin\LeadDistributionController;
 use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\AudienceController;
@@ -303,6 +304,8 @@ Route::get('api/customers/saveCustomer', [APIController::class, 'saveApi'])->wit
 Route::middleware('auth')->get('/request-logs', [APIController::class, 'requestLogsView'])->name('request_logs.index');
 Route::middleware('auth')->get('/request-logs/{id}', [APIController::class, 'showRequestLog'])->name('request_logs.show');
 Route::middleware('auth')->match(['get', 'post'], '/request-logs/{id}/resend', [APIController::class, 'resendRequestLogWeb'])->name('request_logs.resend');
+Route::middleware('auth')->get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity_logs.index');
+Route::middleware('auth')->get('/activity-logs/{id}', [ActivityLogController::class, 'show'])->name('activity_logs.show');
 
 // References Routes
 Route::middleware('auth')->prefix('references')->group(function () {
