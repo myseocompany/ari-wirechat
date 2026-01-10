@@ -23,8 +23,6 @@ class NotifyPendingActions extends Command
 
     public function handle(): int
     {
-        $debugEmail = trim((string) app_config('actions_notify_debug_email', ''));
-
         $windowMinutes = (int) app_config('followup_default_minutes', 0);
         $meetingTemplate60 = trim((string) app_config('whatsapp_meeting_reminder_60_template', ''));
         $meetingTemplate10 = trim((string) app_config('whatsapp_meeting_reminder_10_template', ''));
@@ -45,14 +43,6 @@ class NotifyPendingActions extends Command
         $sent = 0;
         $skippedNoEmail = 0;
         $total = 0;
-
-        if ($debugEmail !== '') {
-            $this->sendDebugEmail(
-                $debugEmail,
-                'actions:notify started',
-                "Inicio de ejecución actions:notify. Ventana={$windowMinutes} minutos. Ahora={$now->toDateTimeString()}."
-            );
-        }
 
         if ($meetingWindow60 > 0 && $meetingTemplate60 !== '') {
             $this->sendMeetingReminders(
@@ -133,14 +123,6 @@ TXT;
         ]);
 
         $this->info("actions:notify sent={$sent} skipped_no_email={$skippedNoEmail} total_found={$total} window_start={$now} window_end={$windowEnd} system_now=".now());
-
-        if ($debugEmail !== '') {
-            $this->sendDebugEmail(
-                $debugEmail,
-                'actions:notify finished',
-                "Fin de ejecución actions:notify. sent={$sent} skipped_no_email={$skippedNoEmail} total_found={$total} window_start={$now->toDateTimeString()} window_end={$windowEnd->toDateTimeString()}."
-            );
-        }
 
         return self::SUCCESS;
     }
@@ -252,24 +234,5 @@ TXT;
             ->where('object_id', $actionId)
             ->where('note', 'like', '%"reminder_type":"'.$reminderType.'"%')
             ->exists();
-    }
-
-    private function sendDebugEmail(string $to, string $subject, string $body): void
-    {
-        try {
-            $resend = new Resend(env('RESEND_KEY'));
-
-            $resend->emails()->send([
-                'from' => 'Maquiempanadas <marketing@maquiempanadas.com>',
-                'to' => $to,
-                'subject' => $subject,
-                'text' => $body,
-            ]);
-        } catch (\Throwable $e) {
-            Log::warning('actions:notify debug email failed', [
-                'to' => $to,
-                'error' => $e->getMessage(),
-            ]);
-        }
     }
 }
