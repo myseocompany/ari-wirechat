@@ -283,7 +283,7 @@ class WhatsAppService
     {
         $note = json_encode([
             'template' => $templateName,
-            'payload' => $payload,
+            'status' => $payload['status'] ?? null,
             'context' => $context,
         ], JSON_UNESCAPED_SLASHES);
 
