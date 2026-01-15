@@ -926,7 +926,9 @@ class CustomerController extends Controller
         $model->bought_products = $request->bought_products;
         $model->total_sold = $request->total_sold;
         $model->purchase_date = $request->purchase_date;
-        $model->status_id = $request->status_id;
+        if ($request->filled('status_id')) {
+            $model->status_id = $request->status_id;
+        }
         $model->user_id = $assignedUserId;
         $model->source_id = $request->source_id;
         $model->technical_visit = $request->technical_visit;
