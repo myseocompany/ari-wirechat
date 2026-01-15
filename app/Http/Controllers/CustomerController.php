@@ -1001,7 +1001,7 @@ class CustomerController extends Controller
     public function show($id)
     {
         $model = Customer::findOrFail($id);
-        $model->loadMissing(['user', 'status']);
+        $model->loadMissing(['user', 'status', 'customer_files.creator']);
         $fullAccess = $model->hasFullAccess(Auth::user());
 
         if (! $fullAccess) {
