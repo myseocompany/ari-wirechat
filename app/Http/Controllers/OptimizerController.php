@@ -15,6 +15,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Namu\WireChat\Models\Message;
 use Namu\WireChat\Models\Participant;
 
@@ -186,7 +188,31 @@ class OptimizerController extends Controller
             // Mover relaciones
             $others = array_values(array_diff($ids, [$winnerId]));
 
+            $filesToMove = [];
+
             if (! empty($others)) {
+                $filesQuery = CustomerFile::query();
+                if (! empty($data['file_all'] ?? [])) {
+                    $filesQuery->whereIn('id', $data['file_all']);
+                } else {
+                    $filesQuery->whereIn('customer_id', $others);
+                }
+
+                $filesToMove = $filesQuery
+                    ->get(['id', 'customer_id', 'url'])
+                    ->filter(function (CustomerFile $file) use ($winnerId) {
+                        return $file->customer_id !== $winnerId;
+                    })
+                    ->map(function (CustomerFile $file) {
+                        return [
+                            'id' => $file->id,
+                            'from_customer_id' => $file->customer_id,
+                            'filename' => $file->url,
+                        ];
+                    })
+                    ->values()
+                    ->all();
+
                 // Actions
                 if (! empty($data['action_all'] ?? [])) {
                     Action::whereIn('id', $data['action_all'])->update(['customer_id' => $winnerId]);
@@ -241,6 +267,34 @@ class OptimizerController extends Controller
 
                 // Borrar duplicados
                 Customer::whereIn('id', $others)->delete();
+            }
+
+            if (! empty($filesToMove)) {
+                DB::afterCommit(function () use ($filesToMove, $winnerId) {
+                    $disk = Storage::disk('spaces');
+
+                    foreach ($filesToMove as $fileMove) {
+                        $srcKey = "files/{$fileMove['from_customer_id']}/{$fileMove['filename']}";
+                        $dstKey = "files/{$winnerId}/{$fileMove['filename']}";
+
+                        if ($srcKey === $dstKey) {
+                            continue;
+                        }
+
+                        if ($disk->exists($srcKey)) {
+                            $disk->move($srcKey, $dstKey);
+
+                            continue;
+                        }
+
+                        Log::warning('Archivo no encontrado para mover en fusión de duplicados.', [
+                            'file_id' => $fileMove['id'],
+                            'from_customer_id' => $fileMove['from_customer_id'],
+                            'to_customer_id' => $winnerId,
+                            'source_key' => $srcKey,
+                        ]);
+                    }
+                });
             }
 
             // ===== Crear la acción de auditoría de fusión =====

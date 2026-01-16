@@ -95,7 +95,7 @@
               clip-path: {{ $clipPath }};
               margin-left: {{ $isFirst ? '0' : "-{$overlap}px" }};
               border-radius: {{ $borderRadius }};
-              z-index: {{ 100 - $loop->index }};
+              z-index: {{ 40 - $loop->index }};
               text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
             "
             onclick="changeStatus({{ $child->status_id }})">
