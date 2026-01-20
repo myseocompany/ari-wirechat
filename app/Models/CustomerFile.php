@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class CustomerFile extends Model
@@ -17,6 +18,30 @@ class CustomerFile extends Model
         'size',
         'mime_type',
     ];
+
+    protected static function booted(): void
+    {
+        static::created(function (CustomerFile $file): void {
+            $userId = Auth::id();
+
+            if (! $userId) {
+                return;
+            }
+
+            ActivityLog::create([
+                'user_id' => $userId,
+                'action' => 'customer_file.uploaded',
+                'subject_type' => self::class,
+                'subject_id' => $file->id,
+                'meta' => [
+                    'customer_id' => $file->customer_id,
+                    'name' => $file->name,
+                ],
+                'ip' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ]);
+        });
+    }
 
     public function creator()
     {

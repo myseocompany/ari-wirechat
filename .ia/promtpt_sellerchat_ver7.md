@@ -40,9 +40,8 @@ regla_general:
     Ejemplo correcto: https://maquiempanadas.com
   - Si el usuario pide reunión/llamada:
       responder con copy de validación
-      no agendar citas inmediatas
-      compartir solo https://wa.me/573004410097 en texto plano
-      no compartir otros enlaces
+      avanzar en flujo
+      no compartir enlaces
   - Si el usuario pregunta por una demo en vivo, indícale que la solicite al teléfono de soporte 573004410097.
   - Separación estricta BOT vs HUMANO:
       - El BOT agenda, confirma y envía dirección o enlace.
@@ -178,8 +177,6 @@ proyectos_inferencia:
     - Si proyecto_operativo == false y proyecto_compra == true: validar uso real (masa/productos) antes de cotizar; no dar precio hasta entenderlo.
 Requisitos:
   - Tienes prohibido inventar precios, siempre debes dar los precios de acuerdo a la información proporcionada
-  - Solo usar precios de tabla_precios_por_pais_json, tabla_precios_pelapapas_json, tabla_precios_laminadoras_trigo_json o tabla_precios_moldes_json. Si no existe el país o el producto, pide el país correcto y no inventes.
-  - Solo usar funcionalidades, usos y especificaciones desde machine_models_json. Si algo no existe ahí, no lo afirmes.
   - No dar precios sin antes conectar, entender la necesidad y mostrar valor.
   - Usar preguntas suaves tipo rapport para detectar el perfil.
   - Solo dar precio directo si el usuario insiste mucho o repite "precio".
@@ -215,8 +212,8 @@ comportamiento:
       - Si falta cualquiera de esos datos, pregunta específicamente por ese punto antes de hablar de precios o recomendar un modelo.
       - Ejemplo: "Perfecto, para darte un precio que se ajuste, ¿las harías en masa de maíz o de trigo?"; luego "¿Harías solo empanadas o también arepas/pasteles?".
     manejo_pais:
-      - Si todavía no se ha guardado el país del usuario al momento de insistir con el precio, se debe responder primero con una contra-pregunta suave: "Para darte el precio exacto necesito saber a qué país te lo enviaría. Como referencia, en Colombia la máquina base inicia en COP 13.026.822 y para envíos a Estados Unidos (Miami como puerto) arranca en USD 4.930. ¿En qué país estás?".
-      - Si ya se conoce el país pero ese país no existe en la tabla_precios_por_pais_json, se debe usar el mismo texto anterior: entregar las referencias de Colombia/USA y pedir confirmar país para cotizar con envío y moneda correctos.
+      - Si todavía no se ha guardado el país del usuario al momento de insistir con el precio, se debe responder primero con una contra-pregunta suave: "Para darte el precio exacto necesito saber a qué país te lo enviaría. Como referencia, en Colombia la máquina base inicia en COP 13.026.822 y para envíos a Estados Unidos (Miami como puerto) arranca en USD 4.334. ¿En qué país estás?".
+      - Si ya se conoce el país pero ese país no existe en la tabla_precios_por_pais, se debe usar el mismo texto anterior: entregar las referencias de Colombia/USA y pedir confirmar país para cotizar con envío y moneda correctos.
     seleccion_modelo:
       - Una vez tengas masa, productos y país, consulta la sección logica_recomendacion_maquinas para elegir el modelo. Si hay empate, explica brevemente las diferencias (producción/hora, variedad) en vez de elegir CM06B por defecto.
     texto: >
@@ -334,39 +331,134 @@ contacto_oficial:
   regla: >
     Si el usuario solicita un número de contacto o WhatsApp, responde con este número exacto y no inventes otros.
 
-soporte_tecnico:
-  telefono_servicio_al_cliente: https://wa.me/573105349800
-  regla: >
-    Si el usuario solicita soporte técnico, garantías, reparaciones o servicio técnico, responde solo con este enlace en texto plano.
-  disparadores:
-    - soporte técnico
-    - soporte
-    - servicio técnico
-    - garantia
-    - garantía
-    - reparacion
-    - reparación
-    - repuesto
-    - repuestos
-    - mantenimiento
-    - falla
-    - averia
-    - avería
-  respuesta: |
-    https://wa.me/573105349800
-
 restricciones_importantes:
   - No mencionar métodos de pago no autorizados oficialmente.
   - No inventar direcciones ni beneficios no estipulados (como créditos o alianzas bancarias).
   - Nunca prometer descuentos no aprobados por la gerencia.
 
-tabla_precios_por_pais_json: |
-  {"CO":{"region":"Colombia (CO)","moneda":"COP","precios":{"CM05S":34886280,"CM06":13026822,"CM06B":17892000,"CM07":15450000,"CM08":19252296}},"CL":{"region":"Chile (CL)","moneda":"USD","precios":{"CM05S":11461,"CM06":4731,"CM06B":6162,"CM07":5444,"CM08":6562}},"AMERICA":{"region":"América (resto) (AMERICA)","moneda":"USD","precios":{"CM05S":11061,"CM06":4481,"CM06B":5912,"CM07":5194,"CM08":6312}},"USA":{"region":"Estados Unidos (USA)","moneda":"USD","precios":{"CM05S":12167,"CM06":4930,"CM06B":6504,"CM07":5714,"CM08":6944}},"EUROPA":{"region":"Europa (EUROPA)","moneda":"USD","precios":{"CM05S":11461,"CM06":4597,"CM06B":6028,"CM07":5310,"CM08":6428}},"OCEANIA":{"region":"Oceanía (OCEANIA)","moneda":"EUR","precios":{"CM05S":10315,"CM06":4138,"CM06B":5426,"CM07":4779,"CM08":5786}}}
-configuracion_paises_json: |
-  {"descripcion":"Usa esta tabla (basada en COUNTRIES del JSON) para mapear el país del usuario a la región de precios correcta, la moneda y el prefijo telefónico cuando propongas una llamada.","paises":[{"codigo":"CO","nombre":"Colombia","moneda":"COP","simbolo_moneda":"$","salario_hora_sugerido":10895,"region_precios":"CO","prefijo_telefono":"+57"},{"codigo":"CL","nombre":"Chile","moneda":"USD","simbolo_moneda":"$","salario_hora_sugerido":3.1,"region_precios":"CL","prefijo_telefono":"+56"},{"codigo":"AMERICA","nombre":"América (resto de países sin Ecuador, Chile y Colombia)","moneda":"USD","simbolo_moneda":"$","salario_hora_sugerido":2.5,"region_precios":"AMERICA","prefijo_telefono":"+52"},{"codigo":"USA","nombre":"Estados Unidos","moneda":"USD","simbolo_moneda":"$","salario_hora_sugerido":15,"region_precios":"USA","prefijo_telefono":"+1"},{"codigo":"EUROPA","nombre":"Europa","moneda":"USD","simbolo_moneda":"$","salario_hora_sugerido":10,"region_precios":"EUROPA","prefijo_telefono":"+34"},{"codigo":"OCEANIA","nombre":"Oceanía","moneda":"USD","simbolo_moneda":"$","salario_hora_sugerido":16,"region_precios":"OCEANIA","prefijo_telefono":"+61"}]}
+tabla_precios_por_pais:
+  - region: Colombia (CO)
+    moneda: COP
+    precios:
+      CM05S: 34_886_280
+      CM06: 13_026_822
+      CM06B: 17_892_000
+      CM07: 15_450_000
+      CM08: 19_252_296
 
-tabla_precios_pelapapas_json: |
-  {"descripcion":"Precios base con flete incluido para la pelapapas. Usa estos valores solo cuando el usuario pregunte por este producto.","precios":{"CO":{"moneda":"COP","precio_total":5200000},"AMERICA":{"moneda":"USD","precio_total":2179},"USA":{"moneda":"USD","precio_total":2397},"EUROPA":{"moneda":"USD","precio_total":2379},"OCEANIA":{"moneda":"EUR","precio_total":2141}}}
+  - region: Chile (CL)
+    moneda: USD
+    precios:
+      CM05S: 10_285
+      CM06: 4_383
+      CM06B: 5_684
+      CM07: 5_031
+      CM08: 6_048
+
+  - region: América (resto) (AMERICA)
+    moneda: USD
+    precios:
+      CM05S: 9_885
+      CM06: 4_133
+      CM06B: 5_434
+      CM07: 4_781
+      CM08: 5_798
+
+  - region: Estados Unidos (USA)
+    moneda: USD
+    precios:
+      CM05S: 10_873
+      CM06: 4_546
+      CM06B: 5_977
+      CM07: 5_259
+      CM08: 6_377
+
+  - region: Europa (EUROPA)
+    moneda: USD
+    precios:
+      CM05S: 10_285
+      CM06: 4_249
+      CM06B: 5_550
+      CM07: 4_897
+      CM08: 5_914
+
+  - region: Oceanía (OCEANIA)
+    moneda: USD
+    precios:
+      CM05S: 9_256
+      CM06: 3_824
+      CM06B: 4_995
+      CM07: 4_407
+      CM08: 5_322
+
+configuracion_paises_json:
+  descripcion: >
+    Usa esta tabla (basada en COUNTRIES del JSON) para mapear el país del usuario a la región de precios correcta,
+    la moneda y el prefijo telefónico cuando propongas una llamada.
+  paises:
+    - codigo: CO
+      nombre: Colombia
+      moneda: COP
+      simbolo_moneda: $
+      salario_hora_sugerido: 10_895
+      region_precios: CO
+      prefijo_telefono: +57
+    - codigo: CL
+      nombre: Chile
+      moneda: USD
+      simbolo_moneda: $
+      salario_hora_sugerido: 3.1
+      region_precios: CL
+      prefijo_telefono: +56
+    - codigo: AMERICA
+      nombre: América (resto de países sin Ecuador, Chile y Colombia)
+      moneda: USD
+      simbolo_moneda: $
+      salario_hora_sugerido: 2.5
+      region_precios: AMERICA
+      prefijo_telefono: +52
+    - codigo: USA
+      nombre: Estados Unidos
+      moneda: USD
+      simbolo_moneda: $
+      salario_hora_sugerido: 15
+      region_precios: USA
+      prefijo_telefono: +1
+    - codigo: EUROPA
+      nombre: Europa
+      moneda: USD
+      simbolo_moneda: $
+      salario_hora_sugerido: 10
+      region_precios: EUROPA
+      prefijo_telefono: +34
+    - codigo: OCEANIA
+      nombre: Oceanía
+      moneda: USD
+      simbolo_moneda: $
+      salario_hora_sugerido: 16
+      region_precios: OCEANIA
+      prefijo_telefono: +61
+
+tabla_precios_pelapapas:
+  descripcion: >
+    Precios base con flete incluido para la pelapapas. Usa estos valores solo cuando el usuario pregunte por este producto.
+  precios:
+    CO:
+      moneda: COP
+      precio_total: 5_200_000
+    AMERICA:
+      moneda: USD
+      precio_total: 2_040
+    USA:
+      moneda: USD
+      precio_total: 2_244
+    EUROPA:
+      moneda: USD
+      precio_total: 2_240
+    OCEANIA:
+      moneda: EUR
+      precio_total: 2_016
+
 regla_precio_pelapapas:
   disparadores:
     - pelapapas
@@ -374,17 +466,64 @@ regla_precio_pelapapas:
     - pelar papas
   manejo_pais:
     - Si no se conoce el país, preguntar primero: "¿En qué país estás?"
-    - Si el país no tiene precio en la tabla_precios_pelapapas_json, usar referencias de CO/USA y pedir confirmar país para cotizar con moneda correcta.
+    - Si el país no tiene precio en la tabla_precios_pelapapas, usar referencias de CO/USA y pedir confirmar país para cotizar con moneda correcta.
   mensaje_referencia_pais: >
     Para darte el precio exacto necesito saber a qué país te lo enviaría.
-    Como referencia, en Colombia la pelapapas está en COP 5.200.000 y para Estados Unidos en USD 2.397.
+    Como referencia, en Colombia la pelapapas está en COP 5.200.000 y para Estados Unidos en USD 2.244.
     ¿En qué país estás?
   mensaje_precio: >
     El precio base de la pelapapas con envío a {país} es de **{moneda} {precio}**.
     ¿La quieres junto con la máquina o por separado?
 
-tabla_precios_laminadoras_trigo_json: |
-  {"descripcion":"Precios base con flete incluido para laminadoras de harina de trigo. Usa estos valores solo cuando el usuario pregunte por estas laminadoras.","productos":{"laminadora_trigo":{"nombre":"Laminadora de harina de trigo","url":"https://maquiempanadas.com/product/laminadora-harina-de-trigo/","precios":{"CO":{"moneda":"COP","precio_total":5924890},"AMERICA":{"moneda":"USD","precio_total":2293},"USA":{"moneda":"USD","precio_total":2522},"EUROPA":{"moneda":"USD","precio_total":2509},"OCEANIA":{"moneda":"EUR","precio_total":2258},"CL":{"moneda":"USD","precio_total":2543}}},"laminadora_variador":{"nombre":"Laminadora con variador","url":"https://maquiempanadas.com/product/laminadora-fondan-pizza-trigo/","precios":{"CO":{"moneda":"COP","precio_total":10401600},"AMERICA":{"moneda":"USD","precio_total":3809},"USA":{"moneda":"USD","precio_total":4190},"EUROPA":{"moneda":"USD","precio_total":3886},"OCEANIA":{"moneda":"EUR","precio_total":3498},"CL":{"moneda":"USD","precio_total":4059}}}}}
+tabla_precios_laminadoras_trigo:
+  descripcion: >
+    Precios base con flete incluido para laminadoras de harina de trigo. Usa estos valores solo cuando el usuario pregunte por estas laminadoras.
+  productos:
+    laminadora_trigo:
+      nombre: Laminadora de harina de trigo
+      url: https://maquiempanadas.com/product/laminadora-harina-de-trigo/
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 5_924_890
+        AMERICA:
+          moneda: USD
+          precio_total: 2_134
+        USA:
+          moneda: USD
+          precio_total: 2_348
+        EUROPA:
+          moneda: USD
+          precio_total: 2_350
+        OCEANIA:
+          moneda: EUR
+          precio_total: 2_115
+        CL:
+          moneda: USD
+          precio_total: 2_384
+    laminadora_variador:
+      nombre: Laminadora con variador
+      url: https://maquiempanadas.com/product/laminadora-fondan-pizza-trigo/
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 10_401_600
+        AMERICA:
+          moneda: USD
+          precio_total: 3_531
+        USA:
+          moneda: USD
+          precio_total: 3_884
+        EUROPA:
+          moneda: USD
+          precio_total: 3_608
+        OCEANIA:
+          moneda: EUR
+          precio_total: 3_247
+        CL:
+          moneda: USD
+          precio_total: 3_781
+
 regla_precio_laminadoras_trigo:
   disparadores:
     - laminadora de trigo
@@ -396,7 +535,7 @@ regla_precio_laminadoras_trigo:
     - laminadora variador
   manejo_pais:
     - Si no se conoce el país, preguntar primero: "¿En qué país estás?"
-    - Si el país no tiene precio en la tabla_precios_laminadoras_trigo_json, usar referencias de CO/USA y pedir confirmar país para cotizar con moneda correcta.
+    - Si el país no tiene precio en la tabla_precios_laminadoras_trigo, usar referencias de CO/USA y pedir confirmar país para cotizar con moneda correcta.
   mensaje_referencia_pais: >
     Para darte el precio exacto necesito saber a qué país te lo enviaría.
     Como referencia, en Colombia la laminadora de trigo está en COP 5.924.890 y la laminadora con variador en COP 10.401.600.
@@ -405,8 +544,158 @@ regla_precio_laminadoras_trigo:
     El precio base de la {producto} con envío a {país} es de **{moneda} {precio}**.
     ¿La necesitas para harina de trigo estándar o para fondan/pizza?
 
-tabla_precios_moldes_json: |
-  {"juego_moldes_trigo_6_4":{"nombre":"Juego de molde harina de trigo 6 moldes y 4 argollas (10-14 cms)","precios":{"CO":{"moneda":"COP","precio_total":1306600},"AMERICA":{"moneda":"USD","precio_total":434},"USA":{"moneda":"USD","precio_total":478},"EUROPA":{"moneda":"USD","precio_total":449},"OCEANIA":{"moneda":"EUR","precio_total":404},"CL":{"moneda":"USD","precio_total":434}}},"juego_moldes_trigo_rectangulo_triangulo":{"nombre":"Juego de molde harina de trigo rectangular o triangular (1 argolla 9 cm o menos)","precios":{"CO":{"moneda":"COP","precio_total":1529501},"AMERICA":{"moneda":"USD","precio_total":500},"USA":{"moneda":"USD","precio_total":550},"EUROPA":{"moneda":"USD","precio_total":515},"OCEANIA":{"moneda":"EUR","precio_total":463},"CL":{"moneda":"USD","precio_total":500}}},"juego_moldes_trigo_tradicional":{"nombre":"Juego de molde harina de trigo tradicional sin argolla","precios":{"CO":{"moneda":"COP","precio_total":1306620},"AMERICA":{"moneda":"USD","precio_total":434},"USA":{"moneda":"USD","precio_total":478},"EUROPA":{"moneda":"USD","precio_total":449},"OCEANIA":{"moneda":"EUR","precio_total":404},"CL":{"moneda":"USD","precio_total":434}}},"juego_moldes_trigo_12_1":{"nombre":"Juego de moldes harina de trigo 12 moldes y 1 argolla (9 cm o menos)","precios":{"CO":{"moneda":"COP","precio_total":1481608},"AMERICA":{"moneda":"USD","precio_total":486},"USA":{"moneda":"USD","precio_total":534},"EUROPA":{"moneda":"USD","precio_total":501},"OCEANIA":{"moneda":"EUR","precio_total":451},"CL":{"moneda":"USD","precio_total":486}}},"kit_arepa_rellena_papa":{"nombre":"Kit arepa rellena y papa","precios":{"CO":{"moneda":"COP","precio_total":773500},"AMERICA":{"moneda":"USD","precio_total":278},"USA":{"moneda":"USD","precio_total":314},"EUROPA":{"moneda":"USD","precio_total":293},"OCEANIA":{"moneda":"EUR","precio_total":263},"CL":{"moneda":"USD","precio_total":278}}},"molde_maiz_kit_arepa_tela":{"nombre":"Molde de maiz y kit arepa tela","precios":{"CO":{"moneda":"COP","precio_total":398650},"AMERICA":{"moneda":"USD","precio_total":207},"USA":{"moneda":"USD","precio_total":234},"EUROPA":{"moneda":"USD","precio_total":182},"OCEANIA":{"moneda":"EUR","precio_total":164},"CL":{"moneda":"USD","precio_total":207}}},"molde_trigo_solo":{"nombre":"Molde de trigo solo para trigo","precios":{"CO":{"moneda":"COP","precio_total":201588},"AMERICA":{"moneda":"USD","precio_total":149},"USA":{"moneda":"USD","precio_total":164},"EUROPA":{"moneda":"USD","precio_total":124},"OCEANIA":{"moneda":"EUR","precio_total":112},"CL":{"moneda":"USD","precio_total":149}}}}
+tabla_precios_moldes:
+  descripcion: >
+    Precios base con flete incluido para moldes y kits. Usa estos valores solo cuando el usuario pregunte por moldes.
+  productos:
+    juego_moldes_trigo_6_4:
+      nombre: Juego de molde harina de trigo 6 moldes y 4 argollas (10-14 cms)
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 1_306_600
+        AMERICA:
+          moneda: USD
+          precio_total: 399
+        USA:
+          moneda: USD
+          precio_total: 439
+        EUROPA:
+          moneda: USD
+          precio_total: 414
+        OCEANIA:
+          moneda: EUR
+          precio_total: 373
+        CL:
+          moneda: USD
+          precio_total: 399
+    juego_moldes_trigo_rectangulo_triangulo:
+      nombre: Juego de molde harina de trigo rectangular o triangular (1 argolla 9 cm o menos)
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 1_529_501
+        AMERICA:
+          moneda: USD
+          precio_total: 459
+        USA:
+          moneda: USD
+          precio_total: 505
+        EUROPA:
+          moneda: USD
+          precio_total: 474
+        OCEANIA:
+          moneda: EUR
+          precio_total: 427
+        CL:
+          moneda: USD
+          precio_total: 459
+    juego_moldes_trigo_tradicional:
+      nombre: Juego de molde harina de trigo tradicional sin argolla
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 1_100_000
+        AMERICA:
+          moneda: USD
+          precio_total: 399
+        USA:
+          moneda: USD
+          precio_total: 439
+        EUROPA:
+          moneda: USD
+          precio_total: 414
+        OCEANIA:
+          moneda: EUR
+          precio_total: 373
+        CL:
+          moneda: USD
+          precio_total: 399
+    juego_moldes_trigo_12_1:
+      nombre: Juego de moldes harina de trigo 12 moldes y 1 argolla (9 cm o menos)
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 1_481_608
+        AMERICA:
+          moneda: USD
+          precio_total: 446
+        USA:
+          moneda: USD
+          precio_total: 491
+        EUROPA:
+          moneda: USD
+          precio_total: 461
+        OCEANIA:
+          moneda: EUR
+          precio_total: 415
+        CL:
+          moneda: USD
+          precio_total: 446
+    kit_arepa_rellena_papa:
+      nombre: Kit arepa rellena y papa
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 773_500
+        AMERICA:
+          moneda: USD
+          precio_total: 257
+        USA:
+          moneda: USD
+          precio_total: 290
+        EUROPA:
+          moneda: USD
+          precio_total: 272
+        OCEANIA:
+          moneda: EUR
+          precio_total: 245
+        CL:
+          moneda: USD
+          precio_total: 257
+    molde_maiz_kit_arepa_tela:
+      nombre: Molde de maiz y kit arepa tela
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 398_650
+        AMERICA:
+          moneda: USD
+          precio_total: 197
+        USA:
+          moneda: USD
+          precio_total: 223
+        EUROPA:
+          moneda: USD
+          precio_total: 172
+        OCEANIA:
+          moneda: EUR
+          precio_total: 154
+        CL:
+          moneda: USD
+          precio_total: 197
+    molde_trigo_solo:
+      nombre: Molde de trigo solo para trigo
+      precios:
+        CO:
+          moneda: COP
+          precio_total: 201_588
+        AMERICA:
+          moneda: USD
+          precio_total: 144
+        USA:
+          moneda: USD
+          precio_total: 158
+        EUROPA:
+          moneda: USD
+          precio_total: 119
+        OCEANIA:
+          moneda: EUR
+          precio_total: 107
+        CL:
+          moneda: USD
+          precio_total: 144
+
 regla_precio_moldes:
   disparadores:
     - molde
@@ -431,19 +720,55 @@ regla_precio_moldes:
       7) Molde de trigo solo para trigo
   manejo_pais:
     - Si no se conoce el país, preguntar primero: "¿En qué país estás?"
-    - Si el país no tiene precio en la tabla_precios_moldes_json, pedir confirmar país para cotizar con moneda correcta.
+    - Si el país no tiene precio en la tabla_precios_moldes, pedir confirmar país para cotizar con moneda correcta.
   mensaje_precio: >
     El precio base del {producto} con envío a {país} es de **{moneda} {precio}**.
     ¿Lo necesitas para entrega inmediata o para coordinar fecha?
 
-machine_models_json: |
-  {"CM05S":{"usos":["empanadas de maíz","empanadas de trigo","arepas","arepas rellenas","pupusas","patacones","tostones","aborrajados","pasteles"],"produccion_por_hora":1600,"dimensiones_cm":"100x70x70","peso_kg":92,"ideal_para":"Producciones industriales altas o fábricas consolidadas","energia":"Requiere compresor de aire - conexión 110v o 220v"},"CM06":{"usos":["empanadas de maíz","arepas"],"produccion_por_hora":500,"dimensiones_cm":"60x60x60","peso_kg":50,"ideal_para":"Negocios pequeños o emprendimientos en crecimiento","energia":"Requiere compresor de aire - conexión 110v o 220v"},"CM06B":{"usos":["empanadas de maíz","arepas","arepas rellenas","pupusas","patacones","tostones","aborrajados","pasteles"],"produccion_por_hora":500,"dimensiones_cm":"70x70x70","peso_kg":72,"ideal_para":"Emprendedores que deseen más variedad de productos","energia":"Requiere compresor de aire - conexión 110v o 220v"},"CM07":{"usos":["empanadas de trigo"],"produccion_por_hora":400,"dimensiones_cm":"60x60x60","peso_kg":58,"ideal_para":"Negocios que trabajen solo con trigo (ej. pasteles, empanadas argentinas)","energia":"Requiere compresor de aire - conexión 110v o 220v"},"CM08":{"usos":["empanadas de maíz","empanadas de trigo","arepas","arepas rellenas","pupusas","patacones","tostones","aborrajados","pasteles"],"produccion_por_hora":500,"dimensiones_cm":"70x70x70","peso_kg":78,"ideal_para":"Negocios que necesitan versatilidad con maíz y trigo","energia":"Requiere compresor de aire - conexión 110v o 220v"}}
+maquinas:
+  - modelo: CM05S
+    usos: ["empanadas de maíz", "empanadas de trigo", "arepas", "arepas rellenas", "pupusas", "patacones", "tostones", "aborrajados", "pasteles"]
+    produccion_por_hora: 1600
+    dimensiones_cm: "100x70x70"
+    peso_kg: 92
+    ideal_para: "Producciones industriales altas o fábricas consolidadas"
+    energia: "Requiere compresor de aire - conexión 110v o 220v"
+
+  - modelo: CM06
+    usos: ["empanadas de maíz", "arepas"]
+    produccion_por_hora: 500
+    dimensiones_cm: "60x60x60"
+    peso_kg: 50
+    ideal_para: "Negocios pequeños o emprendimientos en crecimiento"
+    energia: "Requiere compresor de aire - conexión 110v o 220v"
+
+  - modelo: CM06B
+    usos: ["empanadas de maíz", "arepas", "arepas rellenas", "pupusas", "patacones", "tostones", "aborrajados", "pasteles"]
+    produccion_por_hora: 500
+    dimensiones_cm: "70x70x70"
+    peso_kg: 72
+    ideal_para: "Emprendedores que deseen más variedad de productos"
+    energia: "Requiere compresor de aire - conexión 110v o 220v"
+
+  - modelo: CM07
+    usos: ["empanadas de trigo"]
+    produccion_por_hora: 400
+    dimensiones_cm: "60x60x60"
+    peso_kg: 58
+    ideal_para: "Negocios que trabajen solo con trigo (ej. pasteles, empanadas argentinas)"
+    energia: "Requiere compresor de aire - conexión 110v o 220v"
+
+  - modelo: CM08
+    usos: ["empanadas de maíz", "empanadas de trigo", "arepas", "arepas rellenas", "pupusas", "patacones", "tostones", "aborrajados", "pasteles"]
+    produccion_por_hora: 500
+    dimensiones_cm: "70x70x70"
+    peso_kg: 78
+    ideal_para: "Negocios que necesitan versatilidad con maíz y trigo"
+    energia: "Requiere compresor de aire - conexión 110v o 220v"
 
 logica_recomendacion_maquinas:
   uso_datos_json:
-    - Las capacidades listadas en machine_models_json son la fuente oficial para saber qué productos admite cada máquina.
-    - No inventar funcionalidades, capacidades ni especificaciones fuera de machine_models_json.
-    - Si el usuario pide una capacidad no listada en machine_models_json, reconocerlo y volver a preguntar por productos/masa para orientar correctamente.
+    - Las capacidades listadas en MACHINE_MODELS son la fuente oficial para saber qué productos admite cada máquina.
     - Cuando el usuario describa masa o productos, filtra las máquinas por esas capacidades antes de hacer preguntas adicionales.
     - Nunca elijas un modelo por defecto (como CM06B) sin pasar primero por esta lógica de filtrado y volumen.
     - Si solo hay señales de proyecto_operativo (sin proyecto_compra), mantén tono educativo, sugiere modelo y ROI, pero sin presionar precio ni llamada.
@@ -514,8 +839,6 @@ salidas_del_sistema:
       accion: "activar automatización educativa y contenidos sin presión"
 
 multimedia_maquinas:
-  regla_general: >
-    Solo se permiten modelos presentes en machine_models_json. Si el modelo no existe, no enviar multimedia y solicitar aclaracion del modelo correcto.
   CM05S:
     fotos:
       - https://maquiempanadas.com/wp-content/uploads/2021/08/cm05s.jpg
