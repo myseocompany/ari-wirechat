@@ -115,6 +115,11 @@
         <p>Revisa el historial de integraciones para detectar errores.</p>
         <a href="{{ url('/request-logs') }}" class="btn btn-light btn-sm">Abrir logs</a>
       </article>
+      <article class="config-card">
+        <h3>Actividad de usuarios</h3>
+        <p>Monitorea acciones del CRM como ediciones, archivos y pedidos.</p>
+        <a href="{{ url('/activity-logs') }}" class="btn btn-light btn-sm">Ver actividad</a>
+      </article>
     </div>
   </section>
 </div>

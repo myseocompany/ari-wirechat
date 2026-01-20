@@ -121,6 +121,10 @@ class CustomerController extends Controller
     {
         $menu = $this->customerService->getUserMenu(Auth::user());
 
+        if (! $request->filled('sort')) {
+            $request->merge(['sort' => 'recent_actions_last']);
+        }
+
         $defaultUserFilter = ! $request->has('user_id') && ! $request->filled('search');
 
         if ($defaultUserFilter) {
