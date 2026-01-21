@@ -747,7 +747,7 @@ class ReportController extends Controller
 
         $tags = Tag::orderBy('name')->get();
 
-        $users = User::orderBy('name')->get();
+        $users = User::where('status_id', 1)->orderBy('name')->get();
 
         return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
     }
