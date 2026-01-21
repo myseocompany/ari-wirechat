@@ -707,6 +707,12 @@ class ReportController extends Controller
             ->leftJoin('users', 'users.id', '=', 'customers.user_id')
             ->leftJoin('customer_statuses', 'customer_statuses.id', '=', 'customers.status_id')
             ->whereExists($messagesExistQuery)
+            ->when($request->boolean('user_unassigned'), function ($query) {
+                $query->whereNull('customers.user_id');
+            })
+            ->when($request->filled('user_id') && ! $request->boolean('user_unassigned'), function ($query) use ($request) {
+                $query->where('customers.user_id', $request->integer('user_id'));
+            })
             ->when($request->boolean('tag_none'), function ($query) {
                 $query->whereNotExists(function ($subQuery) {
                     $subQuery->selectRaw('1')
@@ -741,7 +747,9 @@ class ReportController extends Controller
 
         $tags = Tag::orderBy('name')->get();
 
-        return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags'));
+        $users = User::orderBy('name')->get();
+
+        return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
     }
 
     public function scrollActive(Request $request)

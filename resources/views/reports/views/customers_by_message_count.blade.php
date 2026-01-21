@@ -36,6 +36,17 @@
         <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="message_search" name="message_search" value="{{ $request->message_search }}">
       </div>
       <div class="col-span-12 flex flex-col gap-1 lg:col-span-4">
+        <label for="user_id" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Asesor</label>
+        <select id="user_id" name="user_id" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
+          <option value="">Todos</option>
+          @foreach ($users as $user)
+            <option value="{{ $user->id }}" @if ((string) $user->id === (string) $request->user_id) selected @endif>
+              {{ $user->name }}
+            </option>
+          @endforeach
+        </select>
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-4">
         <label for="status_ids" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estados</label>
         <select id="status_ids" name="status_ids[]" multiple class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
           @foreach ($statuses as $status)
@@ -57,10 +68,16 @@
       </div>
     </div>
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-        <input type="checkbox" name="tag_none" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('tag_none')) checked @endif>
-        Sin etiqueta
-      </label>
+      <div class="flex flex-wrap items-center gap-4">
+        <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          <input type="checkbox" name="user_unassigned" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('user_unassigned')) checked @endif>
+          Sin asesor
+        </label>
+        <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          <input type="checkbox" name="tag_none" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('tag_none')) checked @endif>
+          Sin etiqueta
+        </label>
+      </div>
       <button type="submit" class="inline-flex items-center rounded-xl bg-[color:var(--ds-coral)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Filtrar</button>
     </div>
   </form>
