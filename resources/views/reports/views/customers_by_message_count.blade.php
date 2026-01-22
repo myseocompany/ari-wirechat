@@ -102,6 +102,7 @@
         @foreach ($model as $item)
           @php
             $tagNames = $item->tag_names ? explode('||', $item->tag_names) : [];
+            $bestPhone = $item->getBestPhoneCandidate();
           @endphp
           <tr class="customer-overlay-link hover:bg-slate-50" data-url="{{ route('customers.show', $item->id) }}">
             <td class="px-4 py-3 font-semibold">
@@ -110,7 +111,7 @@
                 <a href="{{ route('customers.show', $item->id) }}" class="text-xs font-semibold text-slate-500 hover:text-slate-700" data-customer-overlay-ignore>Ver</a>
               </div>
             </td>
-            <td class="px-4 py-3">{{ $item->phone }}</td>
+            <td class="px-4 py-3">{{ $bestPhone ? $item->getInternationalPhone($bestPhone) : 'Sin telefono' }}</td>
             <td class="px-4 py-3 text-sm text-slate-600">{{ $item->user_name ?? 'Sin asignar' }}</td>
             <td class="px-4 py-3">
               <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white" style="background-color: {{ $item->status_color ?? '#94a3b8' }};">

@@ -5,6 +5,10 @@
 
     RewriteEngine On
 
+    # Short media URLs -> WordPress uploads
+    RewriteRule ^m/2025-02/(.+)$ /wp-content/uploads/2025/02/$1 [L,NC]
+    RewriteRule ^m/2021-08/(.+)$ /wp-content/uploads/2021/08/$1 [L,NC]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

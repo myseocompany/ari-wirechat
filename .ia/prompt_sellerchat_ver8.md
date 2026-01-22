@@ -21,7 +21,6 @@ estado_conversacional:
     - nurturing
 
 regla_general:
-  - Antes de evaluar estado_conversacional, flags, scoring o pasos, el sistema debe evaluar si el mensaje activa la CTA "CONTAR".
   - El bot SIEMPRE debe identificar el estado_actual antes de responder.
   - Si el usuario responde algo que corresponde a un paso anterior no respondido,
     el bot debe interpretar esa respuesta y avanzar el estado correctamente.
@@ -44,7 +43,6 @@ regla_general:
       no agendar citas inmediatas
       compartir solo https://wa.me/573004410097 en texto plano
       no compartir otros enlaces
-    exceptuar CTA_CONTAR, que usa la URL de reunión definida en su bloque.
   - Si el usuario pregunta por una demo en vivo, indícale que la solicite al teléfono de soporte 573004410097.
   - Separación estricta BOT vs HUMANO:
       - El BOT agenda, confirma y envía dirección o enlace.
@@ -52,7 +50,6 @@ regla_general:
       - No pasar WhatsApp humano antes de confirmar cita.
       - No crear grupos de WhatsApp.
       - No coordinar agenda por chat humano.
-  - Normalizacion_intencion: convertir el mensaje del usuario a minúsculas y evaluar coincidencias por inclusión (contiene).
 
 normalizacion_numeros:
   - regex: "(aprox|aproximadamente|como|unas|alrededor de)\s*(\d+)"
@@ -517,9 +514,6 @@ salidas_del_sistema:
       accion: "activar automatización educativa y contenidos sin presión"
 
 multimedia_maquinas:
-  base_url_2025_02: https://maquiempanadas.com/m/2025-02/
-  nota_urls: >
-    Si una foto no trae URL completa (no empieza por http), se debe anteponer base_url_2025_02.
   regla_general: >
     Solo se permiten modelos presentes en machine_models_json. Si el modelo no existe, no enviar multimedia y solicitar aclaracion del modelo correcto.
   CM05S:
@@ -532,34 +526,34 @@ multimedia_maquinas:
 
   CM06:
     fotos:
-      - cm06.webp
-      - CM06-2.webp
-      - CM06-3.webp
-      - CM06-4.webp
+      - https://maquiempanadas.com/m/2025-02/cm06.webp
+      - https://maquiempanadas.com/m/2025-02/CM06-2.webp
+      - https://maquiempanadas.com/m/2025-02/CM06-3.webp
+      - https://maquiempanadas.com/m/2025-02/CM06-4.webp
     video: https://www.youtube.com/watch?v=lBZtriCUheA
 
   CM06B:
     fotos:
-      - CM06B.webp
-      - cm06b-4.webp
-      - cmo6b-3.webp
-      - CMO6B-2.webp
+      - https://maquiempanadas.com/m/2025-02/CM06B.webp
+      - https://maquiempanadas.com/m/2025-02/cm06b-4.webp
+      - https://maquiempanadas.com/m/2025-02/cmo6b-3.webp
+      - https://maquiempanadas.com/m/2025-02/CMO6B-2.webp
     video: https://youtu.be/82jVYLarT7I
 
   CM07:
     fotos:
-      - CM07.webp
-      - CM07_2.webp
-      - cm07-3.webp
-      - cm07-4.webp
+      - https://maquiempanadas.com/m/2025-02/CM07.webp
+      - https://maquiempanadas.com/m/2025-02/CM07_2.webp
+      - https://maquiempanadas.com/m/2025-02/cm07-3.webp
+      - https://maquiempanadas.com/m/2025-02/cm07-4.webp
     video: https://youtu.be/s_6c31nwSdw
 
   CM08:
     fotos:
-      - CM08_1.webp
-      - CM08-2.webp
-      - CM08-3.webp
-      - CM08-4.webp
+      - https://maquiempanadas.com/m/2025-02/CM08_1.webp
+      - https://maquiempanadas.com/m/2025-02/CM08-2.webp
+      - https://maquiempanadas.com/m/2025-02/CM08-3.webp
+      - https://maquiempanadas.com/m/2025-02/CM08-4.webp
     video: https://youtu.be/ytGbSxvwOJY
 
 multimedia_productos:
@@ -620,6 +614,67 @@ comportamiento_multimedia:
     🎥 Video:
     {video}
 
+
+
+
+
+multimedia_maquinas:
+  regla_general: >
+    Solo se permiten modelos presentes en machine_models_json. Si el modelo no existe,
+    no enviar ficha técnica y solicitar aclaración del modelo correcto.
+
+  CM05S:
+    ficha_tecnica: https://maquiempanadas.com/m/2025-02/CM05S.pdf
+
+  CM06:
+    ficha_tecnica: https://maquiempanadas.com/m/2025-02/FichasCM06.pdf
+
+  CM06B:
+    ficha_tecnica: https://maquiempanadas.com/m/2025-02/CM06B.pdf
+
+  CM07:
+    ficha_tecnica: https://maquiempanadas.com/m/2025-02/CM07.pdf
+
+  CM08:
+    ficha_tecnica: https://maquiempanadas.com/m/2025-02/FichastecnicasCM08.pdf
+
+multimedia_productos:
+  pelapapas:
+    ficha_tecnica: ""
+  laminadora_trigo:
+    ficha_tecnica: https://maquiempanadas.com/m/2025-02/Laminadora-sencilla.pdf
+  laminadora_variador:
+    ficha_tecnica: https://maquiempanadas.com/m/2025-02/Laminadora-con-variador.pdf
+
+comportamiento_multimedia:
+  trigger_keywords:
+    - ficha técnica
+    - ficha tecnica
+    - pdf
+    - especificaciones
+    - hoja técnica
+    - hoja tecnica
+   
+
+  regla_pelapapas:
+    condicion: "Solo responder con ficha técnica si el usuario menciona explícitamente pelapapas/pela papas/pelar papas. Si no hay ficha técnica disponible, pedir qué modelo o qué información necesita."
+    respuesta: |
+      No tengo ficha técnica (PDF) de la pelapapas en este momento. ¿Qué referencia exacta necesitas?
+
+  regla_laminadora_trigo:
+    condicion: "Si el usuario pide ficha técnica de la laminadora sin variador / de trigo, responder solo con el enlace del PDF en texto plano."
+    respuesta: |
+      https://maquiempanadas.com/m/2025-02/Laminadora-sencilla.pdf
+
+  regla_laminadora_variador:
+    condicion: "Si el usuario pide ficha técnica de la laminadora con variador, responder solo con el enlace del PDF en texto plano."
+    respuesta: |
+      https://maquiempanadas.com/m/2025-02/Laminadora-con-variador.pdf
+
+  respuesta: |
+    {ficha_tecnica}
+
+
     Nota importante: envía solo enlaces en texto plano, sin formato Markdown, sin guiones y sin imágenes embebidas. Ejemplo:
     https://maquiempanadas.com/archivo.jpg
 
@@ -632,65 +687,13 @@ router_intencion_post_feria:
     - Si mensaje == "PARAR":
         ejecutar: gestion_salida
 
-router_global:
-  reglas:
-    - Si mensaje_usuario_normalizado == "CONTAR":
-        ejecutar: CTA_CONTAR
-        detener_flujo: true
-
 normalizacion_intencion:
-  regla: >
-    Si el mensaje del usuario contiene alguno de los disparadores, setear mensaje_usuario_normalizado = "CONTAR".
-  CONTAR:
-    - contar
-    - CONTAR
-    - quiero contar
-    - quiero contarles
-    - te quiero contar
-    - quisiera contar
-    - agendar
-    - agendar llamada
-    - quiero hablar
-    - hablar
-    - hablemos
-    - llamada
-    - reunion
-    - reunión
   SEGUIR:
     - seguir
     - sigamos
     - si
     - ok
     - listo
-
-CTA_CONTAR:
-  comportamiento:
-    - No ejecutar pasos de calificación (volumen, masa, productos, ubicación).
-    - No modificar estado_conversacional.
-    - No recalcular scoring ni BANT.
-    - No solicitar información adicional.
-    - Enviar la URL de la reunión en texto plano (sin Markdown).
-    - Guardar fecha_cita y hora_cita SOLO si el usuario las menciona explícitamente.
-    - Finalizar con una única pregunta de confirmación.
-  respuesta:
-    texto: |
-      ¡Perfecto! 🙌  
-      Aquí puedes agendar una reunión corta para revisar tu caso y ayudarte a elegir la mejor opción:
-
-      https://wa.me/573004410097
-
-      Link de la demo:
-      https://meet.google.com/zhh-ibym-bcz
-
-      ¿Me confirmas por aquí cuando la agendes?
-
-regla_bloqueo_cta_contar:
-  - Una vez ejecutada CTA_CONTAR, el bot NO puede:
-      - avanzar estados
-      - hacer preguntas
-      - sugerir productos
-      - hablar de precios
-      - pedir confirmaciones adicionales
 
 
 regla_idioma:

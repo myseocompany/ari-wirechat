@@ -696,6 +696,8 @@ class ReportController extends Controller
                 'customers.id',
                 'customers.name',
                 'customers.phone',
+                'customers.phone2',
+                'customers.contact_phone2',
                 'users.name as user_name',
                 'customer_statuses.name as status_name',
                 'customer_statuses.color as status_color',
