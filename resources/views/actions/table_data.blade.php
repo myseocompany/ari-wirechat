@@ -17,6 +17,23 @@
         <div class="text-lg font-bold text-gray-800 mt-1">
           {{ $action->note }}
         </div>
+        @if(!empty($action->url))
+          @php
+            $lowerUrl = Str::lower($action->url);
+            $isAudio = Str::endsWith($lowerUrl, ['.mp3', '.wav', '.ogg', '.oga', '.m4a', '.m4b', '.webm']);
+            $mime = Str::endsWith($lowerUrl, '.mp3') ? 'audio/mpeg' :
+              (Str::endsWith($lowerUrl, '.wav') ? 'audio/wav' :
+              (Str::endsWith($lowerUrl, ['.ogg', '.oga']) ? 'audio/ogg' :
+              (Str::endsWith($lowerUrl, ['.m4a', '.m4b']) ? 'audio/mp4' :
+              (Str::endsWith($lowerUrl, '.webm') ? 'audio/webm' : 'audio/mpeg'))));
+          @endphp
+          @if($isAudio)
+            <audio controls class="mt-2">
+              <source src="{{ $action->url }}" type="{{ $mime }}">
+              Tu navegador no soporta el audio.
+            </audio><br>
+          @endif
+        @endif
         @if($action->isPending() && $action->next_action_created_at)
           <div class="mt-1 text-xs text-slate-500">
             Última acción: {{ \Carbon\Carbon::parse($action->next_action_created_at)->format('d M Y H:i') }}

@@ -80,6 +80,13 @@
         <input type="hidden" name="pending" :value="pending ? 'true' : 'false'">
     </div>
 
+    <!-- Solo audios -->
+    <div class="flex items-center gap-2">
+        <input type="checkbox" id="has_audio" name="has_audio" value="1" @checked($request->boolean('has_audio'))
+            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+        <label for="has_audio" class="text-sm font-medium text-gray-700">Solo audios</label>
+    </div>
+
     <!-- Tipo acción -->
     <div>
         <select name="type_id" id="type_id"

@@ -113,6 +113,10 @@ class ActionService
                 if ($request->filled('action_search')) {
                     $query->where('note', 'like', '%'.$request->action_search.'%');
                 }
+                if ($request->boolean('has_audio')) {
+                    $query->whereNotNull('url')
+                        ->where('url', '!=', '');
+                }
             });
     }
 
@@ -180,7 +184,7 @@ class ActionService
     {
         $filteredRequest = new Request;
 
-        $filters = ['user_id', 'type_id', 'action_search', 'from_date', 'to_date', 'from_time', 'to_time'];
+        $filters = ['user_id', 'type_id', 'action_search', 'from_date', 'to_date', 'from_time', 'to_time', 'has_audio'];
         foreach ($filters as $filter) {
             if ($originalRequest->has($filter)) {
                 $filteredRequest->merge([
