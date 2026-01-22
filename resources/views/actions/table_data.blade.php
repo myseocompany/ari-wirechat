@@ -20,16 +20,21 @@
         @if(!empty($action->url))
           @php
             $lowerUrl = Str::lower($action->url);
-            $isAudio = Str::endsWith($lowerUrl, ['.mp3', '.wav', '.ogg', '.oga', '.m4a', '.m4b', '.webm']);
-            $mime = Str::endsWith($lowerUrl, '.mp3') ? 'audio/mpeg' :
-              (Str::endsWith($lowerUrl, '.wav') ? 'audio/wav' :
-              (Str::endsWith($lowerUrl, ['.ogg', '.oga']) ? 'audio/ogg' :
-              (Str::endsWith($lowerUrl, ['.m4a', '.m4b']) ? 'audio/mp4' :
-              (Str::endsWith($lowerUrl, '.webm') ? 'audio/webm' : 'audio/mpeg'))));
+            $isAudio = Str::contains($lowerUrl, [
+              '.mp3', '.wav', '.ogg', '.oga', '.m4a', '.m4b', '.webm',
+              'backend.channels.app/recording-files/',
+            ]);
+            $mime = Str::contains($lowerUrl, '.mp3') ? 'audio/mpeg' :
+              (Str::contains($lowerUrl, '.wav') ? 'audio/wav' :
+              (Str::contains($lowerUrl, ['.ogg', '.oga']) ? 'audio/ogg' :
+              (Str::contains($lowerUrl, ['.m4a', '.m4b']) ? 'audio/mp4' :
+              (Str::contains($lowerUrl, '.webm') ? 'audio/webm' : null))));
           @endphp
           @if($isAudio)
-            <audio controls class="mt-2">
-              <source src="{{ $action->url }}" type="{{ $mime }}">
+            <audio controls class="mt-2" @if(! $mime) src="{{ $action->url }}" @endif>
+              @if($mime)
+                <source src="{{ $action->url }}" type="{{ $mime }}">
+              @endif
               Tu navegador no soporta el audio.
             </audio><br>
           @endif
