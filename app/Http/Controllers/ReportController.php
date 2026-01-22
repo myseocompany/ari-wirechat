@@ -762,11 +762,6 @@ class ReportController extends Controller
                     if (isset($request->user_id)) {
                         $query = $query->where('user_id', '=', $request->user_id);
                     }
-                    $query = $query->where('creator_user_id', '=', $request->user_id);
-                    if (isset($request->user_id) && ($request->user_id != null)) {
-                        $query = $query->where('user_id', '=', $request->user_id);
-                        $query = $query->where('creator_user_id', '=', $request->user_id);
-                    }
                     if (isset($request->from_date) && ($request->from_date != null)) {
                         $query = $query->whereBetween('created_at_action_max', [$request->from_date, $request->to_date]);
                     }
