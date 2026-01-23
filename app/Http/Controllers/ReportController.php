@@ -696,6 +696,8 @@ class ReportController extends Controller
                 'customers.id',
                 'customers.name',
                 'customers.phone',
+                'customers.phone2',
+                'customers.contact_phone2',
                 'users.name as user_name',
                 'customer_statuses.name as status_name',
                 'customer_statuses.color as status_color',
@@ -707,6 +709,12 @@ class ReportController extends Controller
             ->leftJoin('users', 'users.id', '=', 'customers.user_id')
             ->leftJoin('customer_statuses', 'customer_statuses.id', '=', 'customers.status_id')
             ->whereExists($messagesExistQuery)
+            ->when($request->boolean('user_unassigned'), function ($query) {
+                $query->whereNull('customers.user_id');
+            })
+            ->when($request->filled('user_id') && ! $request->boolean('user_unassigned'), function ($query) use ($request) {
+                $query->where('customers.user_id', $request->integer('user_id'));
+            })
             ->when($request->boolean('tag_none'), function ($query) {
                 $query->whereNotExists(function ($subQuery) {
                     $subQuery->selectRaw('1')
@@ -741,7 +749,9 @@ class ReportController extends Controller
 
         $tags = Tag::orderBy('name')->get();
 
-        return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags'));
+        $users = User::where('status_id', 1)->orderBy('name')->get();
+
+        return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
     }
 
     public function scrollActive(Request $request)
@@ -753,11 +763,6 @@ class ReportController extends Controller
                 ->where(function ($query) use ($request) {
                     if (isset($request->user_id)) {
                         $query = $query->where('user_id', '=', $request->user_id);
-                    }
-                    $query = $query->where('creator_user_id', '=', $request->user_id);
-                    if (isset($request->user_id) && ($request->user_id != null)) {
-                        $query = $query->where('user_id', '=', $request->user_id);
-                        $query = $query->where('creator_user_id', '=', $request->user_id);
                     }
                     if (isset($request->from_date) && ($request->from_date != null)) {
                         $query = $query->whereBetween('created_at_action_max', [$request->from_date, $request->to_date]);

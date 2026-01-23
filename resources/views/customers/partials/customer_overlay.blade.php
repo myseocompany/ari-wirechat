@@ -49,6 +49,50 @@
       };
     }
 
+    if (!window.initCustomerTabs) {
+      window.initCustomerTabs = function (scope) {
+        const $scope = scope ? $(scope) : $(document);
+        $scope.find('.customer-tabs').each(function () {
+          const container = this;
+          if (container.dataset.tabsReady === '1') {
+            return;
+          }
+          const buttons = Array.from(container.querySelectorAll('[data-section-target]'));
+          const panes = Array.from(container.querySelectorAll('.customer-section-pane'));
+          if (buttons.length === 0 || panes.length === 0) {
+            return;
+          }
+          const activeClasses = ['bg-white', 'text-slate-900', 'shadow'];
+          const inactiveClasses = ['text-slate-500', 'hover:text-slate-700'];
+          const setActive = function (targetId) {
+            panes.forEach(function (pane) {
+              pane.classList.toggle('is-active', pane.id === targetId);
+            });
+            buttons.forEach(function (button) {
+              const isActive = button.getAttribute('data-section-target') === targetId;
+              button.classList.toggle('is-active', isActive);
+              activeClasses.forEach(function (className) {
+                button.classList.toggle(className, isActive);
+              });
+              inactiveClasses.forEach(function (className) {
+                button.classList.toggle(className, !isActive);
+              });
+            });
+          };
+          buttons.forEach(function (button) {
+            button.addEventListener('click', function () {
+              const targetId = button.getAttribute('data-section-target');
+              if (targetId) {
+                setActive(targetId);
+              }
+            });
+          });
+          setActive(buttons[0].getAttribute('data-section-target'));
+          container.dataset.tabsReady = '1';
+        });
+      };
+    }
+
     const overlay = document.getElementById('customer_overlay');
     const overlayBody = document.getElementById('customer_overlay_body');
     if (!overlay || !overlayBody) {
@@ -92,6 +136,9 @@
           overlayBody.innerHTML = newContent;
           if (window.initCustomerTags) {
             window.initCustomerTags($('#customer_overlay_body'));
+          }
+          if (window.initCustomerTabs) {
+            window.initCustomerTabs($('#customer_overlay_body'));
           }
           if (window.initNotesEditors) {
             window.initNotesEditors($('#customer_overlay_body'));

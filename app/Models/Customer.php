@@ -6,11 +6,45 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Auth;
 use Namu\WireChat\Traits\Chatable;
 
 class Customer extends Authenticatable
 {
     use Chatable;
+
+    protected static function booted(): void
+    {
+        static::updated(function (Customer $customer): void {
+            $changes = array_diff_key($customer->getChanges(), ['updated_at' => true]);
+            if ($changes === []) {
+                return;
+            }
+
+            self::recordActivity($customer, 'customer.updated', [
+                'changes' => array_keys($changes),
+            ]);
+        });
+    }
+
+    private static function recordActivity(Customer $customer, string $event, array $meta = []): void
+    {
+        $userId = Auth::id();
+
+        if (! $userId) {
+            return;
+        }
+
+        ActivityLog::create([
+            'user_id' => $userId,
+            'action' => $event,
+            'subject_type' => self::class,
+            'subject_id' => $customer->id,
+            'meta' => $meta,
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
 
     // Custom logic for allowing chat creation
     public function canCreateChats(): bool

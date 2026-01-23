@@ -19,6 +19,8 @@ class CustomerMessagesReportRequest extends FormRequest
             'messages_min' => ['nullable', 'integer', 'min:0'],
             'messages_max' => ['nullable', 'integer', 'min:0', 'gte:messages_min'],
             'message_search' => ['nullable', 'string', 'max:200'],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
+            'user_unassigned' => ['nullable', 'boolean'],
             'status_ids' => ['nullable', 'array'],
             'status_ids.*' => ['integer', 'exists:customer_statuses,id'],
             'tag_ids' => ['nullable', 'array'],

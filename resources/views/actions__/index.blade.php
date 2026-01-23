@@ -100,6 +100,23 @@ Registro <strong>{{ $model->currentPage() * $model->perPage() - ( $model->perPag
 {{$item->created_at}} -   {{$item->getTypeName()}} 
         <a href="/customers/{{$item->customer_id}}/show"><h4> {{$item->getCustomerName()}}</h4></a>
         <div class="action_note">{{$item->note}}</div>
+        @if(!empty($item->url))
+          @php
+            $lowerUrl = Str::lower($item->url);
+            $isAudio = Str::endsWith($lowerUrl, ['.mp3', '.wav', '.ogg', '.oga', '.m4a', '.m4b', '.webm']);
+            $mime = Str::endsWith($lowerUrl, '.mp3') ? 'audio/mpeg' :
+              (Str::endsWith($lowerUrl, '.wav') ? 'audio/wav' :
+              (Str::endsWith($lowerUrl, ['.ogg', '.oga']) ? 'audio/ogg' :
+              (Str::endsWith($lowerUrl, ['.m4a', '.m4b']) ? 'audio/mp4' :
+              (Str::endsWith($lowerUrl, '.webm') ? 'audio/webm' : 'audio/mpeg'))));
+          @endphp
+          @if($isAudio)
+            <audio controls class="mt-2" style="width:100%;">
+              <source src="{{ $item->url }}" type="{{ $mime }}">
+              Tu navegador no soporta el audio.
+            </audio><br>
+          @endif
+        @endif
         <div class="action_created"></div>
         <div class="row">
           

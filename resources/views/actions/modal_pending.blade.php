@@ -12,6 +12,7 @@
         <h3 id="customer_name" class="text-xl font-semibold mb-2"></h3>
         <div id="pending_note" class="text-gray-700 mb-2"></div>
         <textarea name="note" id="note" rows="5" class="w-full border rounded p-2 mb-4"></textarea>
+        <input type="url" name="url" id="url" class="w-full border rounded p-2" placeholder="Pega aquí la URL del archivo (opcional)">
         <input type="hidden" id="action_id" name="action_id" value="">
       </div>
 

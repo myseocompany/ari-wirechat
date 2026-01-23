@@ -121,6 +121,10 @@ class CustomerController extends Controller
     {
         $menu = $this->customerService->getUserMenu(Auth::user());
 
+        if (! $request->filled('sort')) {
+            $request->merge(['sort' => 'recent_actions_last']);
+        }
+
         $defaultUserFilter = ! $request->has('user_id') && ! $request->filled('search');
 
         if ($defaultUserFilter) {
@@ -926,7 +930,9 @@ class CustomerController extends Controller
         $model->bought_products = $request->bought_products;
         $model->total_sold = $request->total_sold;
         $model->purchase_date = $request->purchase_date;
-        $model->status_id = $request->status_id;
+        if ($request->filled('status_id')) {
+            $model->status_id = $request->status_id;
+        }
         $model->user_id = $assignedUserId;
         $model->source_id = $request->source_id;
         $model->technical_visit = $request->technical_visit;
@@ -999,7 +1005,7 @@ class CustomerController extends Controller
     public function show($id)
     {
         $model = Customer::findOrFail($id);
-        $model->loadMissing(['user', 'status']);
+        $model->loadMissing(['user', 'status', 'customer_files.creator']);
         $fullAccess = $model->hasFullAccess(Auth::user());
 
         if (! $fullAccess) {
@@ -1881,6 +1887,9 @@ class CustomerController extends Controller
         $model->customer_createad_at = $customer->created_at;
         $model->customer_updated_at = $customer->updated_at;
         $model->customer_id = $request->customer_id;
+        if ($request->filled('url')) {
+            $model->url = $request->url;
+        }
         if ($request->filled('date_programed')) {
             $model->due_date = $date_programed;
         }
