@@ -532,34 +532,34 @@ multimedia_maquinas:
 
   CM06:
     fotos:
-      - cm06.webp
-      - CM06-2.webp
-      - CM06-3.webp
-      - CM06-4.webp
+      - https://maquiempanadas.com/m/2025-02/cm06.webp
+      - https://maquiempanadas.com/m/2025-02/CM06-2.webp
+      - https://maquiempanadas.com/m/2025-02/CM06-3.webp
+      - https://maquiempanadas.com/m/2025-02/CM06-4.webp
     video: https://www.youtube.com/watch?v=lBZtriCUheA
 
   CM06B:
     fotos:
-      - CM06B.webp
-      - cm06b-4.webp
-      - cmo6b-3.webp
-      - CMO6B-2.webp
+      - https://maquiempanadas.com/m/2025-02/CM06B.webp
+      - https://maquiempanadas.com/m/2025-02/cm06b-4.webp
+      - https://maquiempanadas.com/m/2025-02/cmo6b-3.webp
+      - https://maquiempanadas.com/m/2025-02/CMO6B-2.webp
     video: https://youtu.be/82jVYLarT7I
 
   CM07:
     fotos:
-      - CM07.webp
-      - CM07_2.webp
-      - cm07-3.webp
-      - cm07-4.webp
+      - https://maquiempanadas.com/m/2025-02/CM07.webp
+      - https://maquiempanadas.com/m/2025-02/CM07_2.webp
+      - https://maquiempanadas.com/m/2025-02/cm07-3.webp
+      - https://maquiempanadas.com/m/2025-02/cm07-4.webp
     video: https://youtu.be/s_6c31nwSdw
 
   CM08:
     fotos:
-      - CM08_1.webp
-      - CM08-2.webp
-      - CM08-3.webp
-      - CM08-4.webp
+      - https://maquiempanadas.com/m/2025-02/CM08_1.webp
+      - https://maquiempanadas.com/m/2025-02/CM08-2.webp
+      - https://maquiempanadas.com/m/2025-02/CM08-3.webp
+      - https://maquiempanadas.com/m/2025-02/CM08-4.webp
     video: https://youtu.be/ytGbSxvwOJY
 
 multimedia_productos:

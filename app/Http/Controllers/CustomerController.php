@@ -1887,6 +1887,9 @@ class CustomerController extends Controller
         $model->customer_createad_at = $customer->created_at;
         $model->customer_updated_at = $customer->updated_at;
         $model->customer_id = $request->customer_id;
+        if ($request->filled('url')) {
+            $model->url = $request->url;
+        }
         if ($request->filled('date_programed')) {
             $model->due_date = $date_programed;
         }
