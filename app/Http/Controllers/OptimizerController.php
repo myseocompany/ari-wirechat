@@ -46,7 +46,7 @@ class OptimizerController extends Controller
                 // para getModelText():
                 'status', 'source', 'user', 'updated_user', 'product',
                 // para la vista:
-                'actions.type', 'actions.creator', 'files',
+                'actions.type', 'actions.creator', 'files:id,customer_id,url,name,creator_user_id',
             ])
             ->orderByDesc('created_at')
             ->limit(100)
