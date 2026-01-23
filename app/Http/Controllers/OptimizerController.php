@@ -188,7 +188,7 @@ class OptimizerController extends Controller
             // Mover relaciones
             $others = array_values(array_diff($ids, [$winnerId]));
 
-            $filesToMove = [];
+            $filesToCopy = [];
 
             if (! empty($others)) {
                 $filesQuery = CustomerFile::query();
@@ -198,8 +198,18 @@ class OptimizerController extends Controller
                     $filesQuery->whereIn('customer_id', $others);
                 }
 
-                $filesToMove = $filesQuery
-                    ->get(['id', 'customer_id', 'url'])
+                $filesToCopy = $filesQuery
+                    ->get([
+                        'id',
+                        'customer_id',
+                        'url',
+                        'name',
+                        'creator_user_id',
+                        'uuid',
+                        'filename',
+                        'size',
+                        'mime_type',
+                    ])
                     ->filter(function (CustomerFile $file) use ($winnerId) {
                         return $file->customer_id !== $winnerId;
                     })
@@ -208,6 +218,12 @@ class OptimizerController extends Controller
                             'id' => $file->id,
                             'from_customer_id' => $file->customer_id,
                             'filename' => $file->url,
+                            'name' => $file->name,
+                            'creator_user_id' => $file->creator_user_id,
+                            'uuid' => $file->uuid,
+                            'filename_original' => $file->filename,
+                            'size' => $file->size,
+                            'mime_type' => $file->mime_type,
                         ];
                     })
                     ->values()
@@ -218,13 +234,6 @@ class OptimizerController extends Controller
                     Action::whereIn('id', $data['action_all'])->update(['customer_id' => $winnerId]);
                 } else {
                     Action::whereIn('customer_id', $others)->update(['customer_id' => $winnerId]);
-                }
-
-                // Files
-                if (! empty($data['file_all'] ?? [])) {
-                    CustomerFile::whereIn('id', $data['file_all'])->update(['customer_id' => $winnerId]);
-                } else {
-                    CustomerFile::whereIn('customer_id', $others)->update(['customer_id' => $winnerId]);
                 }
 
                 // Customer metas (encuestas / metadata)
@@ -269,27 +278,56 @@ class OptimizerController extends Controller
                 Customer::whereIn('id', $others)->delete();
             }
 
-            if (! empty($filesToMove)) {
-                DB::afterCommit(function () use ($filesToMove, $winnerId) {
+            if (! empty($filesToCopy)) {
+                DB::afterCommit(function () use ($filesToCopy, $winnerId) {
                     $disk = Storage::disk('spaces');
 
-                    foreach ($filesToMove as $fileMove) {
-                        $srcKey = "files/{$fileMove['from_customer_id']}/{$fileMove['filename']}";
-                        $dstKey = "files/{$winnerId}/{$fileMove['filename']}";
+                    foreach ($filesToCopy as $fileCopy) {
+                        if (empty($fileCopy['filename'])) {
+                            Log::warning('Archivo sin nombre al copiar en fusión de duplicados.', [
+                                'file_id' => $fileCopy['id'],
+                                'from_customer_id' => $fileCopy['from_customer_id'],
+                                'to_customer_id' => $winnerId,
+                            ]);
+
+                            continue;
+                        }
+
+                        $srcKey = "files/{$fileCopy['from_customer_id']}/{$fileCopy['filename']}";
+                        $dstKey = "files/{$winnerId}/{$fileCopy['filename']}";
 
                         if ($srcKey === $dstKey) {
                             continue;
                         }
 
                         if ($disk->exists($srcKey)) {
-                            $disk->move($srcKey, $dstKey);
+                            if (! $disk->exists($dstKey)) {
+                                $disk->copy($srcKey, $dstKey);
+                            }
+
+                            $alreadyExists = CustomerFile::where('customer_id', $winnerId)
+                                ->where('url', $fileCopy['filename'])
+                                ->exists();
+
+                            if (! $alreadyExists) {
+                                CustomerFile::create([
+                                    'customer_id' => $winnerId,
+                                    'url' => $fileCopy['filename'],
+                                    'name' => $fileCopy['name'],
+                                    'creator_user_id' => $fileCopy['creator_user_id'],
+                                    'uuid' => $fileCopy['uuid'],
+                                    'filename' => $fileCopy['filename_original'],
+                                    'size' => $fileCopy['size'],
+                                    'mime_type' => $fileCopy['mime_type'],
+                                ]);
+                            }
 
                             continue;
                         }
 
-                        Log::warning('Archivo no encontrado para mover en fusión de duplicados.', [
-                            'file_id' => $fileMove['id'],
-                            'from_customer_id' => $fileMove['from_customer_id'],
+                        Log::warning('Archivo no encontrado para copiar en fusión de duplicados.', [
+                            'file_id' => $fileCopy['id'],
+                            'from_customer_id' => $fileCopy['from_customer_id'],
                             'to_customer_id' => $winnerId,
                             'source_key' => $srcKey,
                         ]);
