@@ -188,7 +188,7 @@ class CustomerService
 
         // Ordenamiento personalizado
         $sort = $request->get('sort');
-        $allowedSorts = ['recent', 'last_action', 'advisor', 'status', 'recent_actions_last'];
+        $allowedSorts = ['recent', 'last_action', 'advisor', 'status'];
         $sortKey = in_array($sort, $allowedSorts, true) ? $sort : 'status';
 
         if ($sortKey === 'last_action') {
@@ -199,19 +199,6 @@ class CustomerService
                 ->orderBy('advisor_sort.name', 'ASC');
         } elseif ($sortKey === 'recent') {
             $query->orderBy('customers.created_at', 'DESC');
-        } elseif ($sortKey === 'recent_actions_last') {
-            $recentActions = DB::table('actions')
-                ->select('customer_id', DB::raw('MAX(created_at) AS last_action_at'))
-                ->whereNotNull('creator_user_id')
-                ->whereNotIn('creator_user_id', [1, 2])
-                ->whereNull('deleted_at')
-                ->groupBy('customer_id');
-
-            $query->leftJoinSub($recentActions, 'recent_actions', function ($join) {
-                $join->on('recent_actions.customer_id', '=', 'customers.id');
-            })
-                ->orderByRaw('CASE WHEN recent_actions.last_action_at IS NULL THEN 0 ELSE 1 END ASC')
-                ->orderBy('customers.created_at', 'DESC');
         } elseif ($sortKey === 'status') {
             $query->orderByRaw('COALESCE(customer_statuses.weight, 9999) ASC')
                 ->orderBy('customers.created_at', 'DESC');
