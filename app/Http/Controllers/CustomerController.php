@@ -122,7 +122,7 @@ class CustomerController extends Controller
         $menu = $this->customerService->getUserMenu(Auth::user());
 
         if (! $request->filled('sort')) {
-            $request->merge(['sort' => 'recent_actions_last']);
+            $request->merge(['sort' => 'recent']);
         }
 
         $defaultUserFilter = ! $request->has('user_id') && ! $request->filled('search');
@@ -138,8 +138,9 @@ class CustomerController extends Controller
         // dd($statuses);
         $query = $request->input('search');
 
-        $model = $this->customerService->filterCustomers($request, $statuses, null, false, 10);
-        $childGroups = $this->customerService->filterCustomers($request, $statuses, null, true);
+        $filterResult = $this->customerService->filterCustomersWithGroups($request, $statuses, null, 10);
+        $model = $filterResult['model'];
+        $childGroups = $filterResult['childGroups'];
         $parentStatuses = CustomerStatus::query()
             ->whereNull('parent_id')
             ->orderBy('weight')
@@ -152,8 +153,9 @@ class CustomerController extends Controller
             && ! $request->boolean('no_date');
 
         if ($defaultUserFilter && $usingDefaultDateRange && method_exists($model, 'total') && $model->total() === 0) {
-            $model = $this->customerService->filterCustomers($request, $statuses, null, false, 10, false);
-            $childGroups = $this->customerService->filterCustomers($request, $statuses, null, true, 0, false);
+            $filterResult = $this->customerService->filterCustomersWithGroups($request, $statuses, null, 10, false);
+            $model = $filterResult['model'];
+            $childGroups = $filterResult['childGroups'];
             $customersGroup = $this->customerService->groupStatusesByParent($childGroups, $parentStatuses);
         }
 

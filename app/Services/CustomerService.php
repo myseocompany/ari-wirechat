@@ -9,6 +9,7 @@ use App\Models\RoleProduct;
 use Auth;
 use Carbon;
 use DB;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
@@ -23,6 +24,103 @@ class CustomerService
     {
         $t0 = function_exists('hrtime') ? hrtime(true) : (int) (microtime(true) * 1e9);
 
+        $query = $this->buildCustomerQuery($request, $stage_id, $applyDefaultDateRange, $onlyWithTags);
+        $this->applyHasQuoteFilter($query, $request);
+        $this->applySort($query, $request->get('sort'));
+
+        // Ejecutar y medir
+        if ($countOnly) {
+            // Evitar ORDER BY con columnas no agregadas en modo only_full_group_by
+            $query->getQuery()->orders = null;
+            $result = $query->select(
+                DB::raw('count(distinct(customers.id)) as count'),
+                'customers.status_id',
+                DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
+                DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color'),
+                DB::raw('customer_statuses.id as status_table_id')
+            )
+                ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color', 'customer_statuses.id')
+                ->orderBy(DB::raw('COALESCE(customer_statuses.weight, 999)'), 'ASC')
+                ->get();
+        } else {
+            $selectColumns = ['customers.*'];
+            $result = $query->select($selectColumns)
+                ->orderBy('customers.created_at', 'DESC')
+                ->when($pageSize > 0, fn ($q) => $q->paginate($pageSize), fn ($q) => $q->get());
+        }
+
+        $t1 = function_exists('hrtime') ? hrtime(true) : (int) (microtime(true) * 1e9);
+        $elapsedMs = ($t1 - $t0) / 1e6; // ns → ms
+
+        // ⚠️ Añadir propiedades dinámicas en objetos paginator puede emitir deprecations en PHP 8.2.
+        // Si ya añadías "action", seguimos igual por compatibilidad:
+        $result->action = 'customers';
+        $result->benchmark_ms = round($elapsedMs, 2);
+
+        $authUser = Auth::user();
+        $annotateAccess = function ($item) use ($authUser) {
+            if (method_exists($item, 'hasFullAccess')) {
+                $item->limited_access = ! $item->hasFullAccess($authUser);
+            }
+
+            return $item;
+        };
+
+        if ($result instanceof \Illuminate\Pagination\LengthAwarePaginator || $result instanceof \Illuminate\Pagination\Paginator) {
+            $result->getCollection()->transform($annotateAccess);
+        } else {
+            $result = $result->map($annotateAccess);
+        }
+
+        return $result;
+    }
+
+    public function filterCustomersWithGroups(Request $request, $statuses, $stage_id, int $pageSize = 10, bool $applyDefaultDateRange = true, bool $onlyWithTags = false): array
+    {
+        $t0 = function_exists('hrtime') ? hrtime(true) : (int) (microtime(true) * 1e9);
+
+        $baseQuery = $this->buildCustomerQuery($request, $stage_id, $applyDefaultDateRange, $onlyWithTags);
+        $this->applyHasQuoteFilter($baseQuery, $request);
+
+        $listQuery = clone $baseQuery;
+        $this->applySort($listQuery, $request->get('sort'));
+
+        $selectColumns = ['customers.*'];
+        $model = $listQuery->select($selectColumns)
+            ->orderBy('customers.created_at', 'DESC')
+            ->when($pageSize > 0, fn ($q) => $q->paginate($pageSize), fn ($q) => $q->get());
+
+        $t1 = function_exists('hrtime') ? hrtime(true) : (int) (microtime(true) * 1e9);
+        $elapsedMs = ($t1 - $t0) / 1e6;
+
+        $model->action = 'customers';
+        $model->benchmark_ms = round($elapsedMs, 2);
+
+        $authUser = Auth::user();
+        $annotateAccess = function ($item) use ($authUser) {
+            if (method_exists($item, 'hasFullAccess')) {
+                $item->limited_access = ! $item->hasFullAccess($authUser);
+            }
+
+            return $item;
+        };
+
+        if ($model instanceof LengthAwarePaginator || $model instanceof Paginator) {
+            $model->getCollection()->transform($annotateAccess);
+        } else {
+            $model = $model->map($annotateAccess);
+        }
+
+        $childGroups = $this->buildGroupCounts(clone $baseQuery);
+
+        return [
+            'model' => $model,
+            'childGroups' => $childGroups,
+        ];
+    }
+
+    private function buildCustomerQuery(Request $request, $stage_id, bool $applyDefaultDateRange, bool $onlyWithTags): Builder
+    {
         $searchTerm = $request->search;
         $dates = $this->getDates($request);
         $authUser = Auth::user();
@@ -30,7 +128,7 @@ class CustomerService
         $skipDefaultDateRange = $request->boolean('no_date');
 
         $query = Customer::query()
-            ->with(['user', 'tags', 'status']) // needed for card view (asesor) y etiquetas
+            ->with(['user', 'tags', 'status'])
             ->leftJoin('customer_statuses', 'customers.status_id', '=', 'customer_statuses.id');
 
         $filterTagIds = array_values(array_filter(
@@ -130,7 +228,6 @@ class CustomerService
 
             if (! empty($searchTerm)) {
                 $query->where(function ($innerQuery) use ($searchTerm) {
-
                     $digits = preg_replace('/\D/', '', (string) $searchTerm);
                     $looksPhone = $digits !== '' && preg_match('/^\d{5,}$/', $digits);
 
@@ -174,93 +271,71 @@ class CustomerService
             }
         });
 
-        if ($request->filled('has_quote')) {
-            if ($request->has_quote === '1') {
-                $query->whereHas('orders', function ($q) {
-                    $q->whereNull('invoice_id');
-                });
-            } elseif ($request->has_quote === '0') {
-                $query->whereDoesntHave('orders', function ($q) {
-                    $q->whereNull('invoice_id');
-                });
-            }
+        return $query;
+    }
+
+    private function applyHasQuoteFilter(Builder $query, Request $request): void
+    {
+        if (! $request->filled('has_quote')) {
+            return;
         }
 
-        // Ordenamiento personalizado
-        $sort = $request->get('sort');
-        $allowedSorts = ['recent', 'last_action', 'advisor', 'status', 'recent_actions_last'];
+        if ($request->has_quote === '1') {
+            $query->whereHas('orders', function ($q) {
+                $q->whereNull('invoice_id');
+            });
+
+            return;
+        }
+
+        if ($request->has_quote === '0') {
+            $query->whereDoesntHave('orders', function ($q) {
+                $q->whereNull('invoice_id');
+            });
+        }
+    }
+
+    private function applySort(Builder $query, ?string $sort): void
+    {
+        $allowedSorts = ['recent', 'last_action', 'advisor', 'status'];
         $sortKey = in_array($sort, $allowedSorts, true) ? $sort : 'status';
 
         if ($sortKey === 'last_action') {
             $query->leftJoin(DB::raw('(SELECT customer_id, MAX(created_at) AS last_action_at FROM actions GROUP BY customer_id) AS last_actions'), 'last_actions.customer_id', '=', 'customers.id')
                 ->orderBy('last_actions.last_action_at', 'DESC');
-        } elseif ($sortKey === 'advisor') {
+
+            return;
+        }
+
+        if ($sortKey === 'advisor') {
             $query->leftJoin('users as advisor_sort', 'advisor_sort.id', '=', 'customers.user_id')
                 ->orderBy('advisor_sort.name', 'ASC');
-        } elseif ($sortKey === 'recent') {
+
+            return;
+        }
+
+        if ($sortKey === 'recent') {
             $query->orderBy('customers.created_at', 'DESC');
-        } elseif ($sortKey === 'recent_actions_last') {
-            $recentActions = DB::table('actions')
-                ->select('customer_id', DB::raw('MAX(created_at) AS last_action_at'))
-                ->whereNotNull('creator_user_id')
-                ->whereNotIn('creator_user_id', [1, 2])
-                ->whereNull('deleted_at')
-                ->groupBy('customer_id');
 
-            $query->leftJoinSub($recentActions, 'recent_actions', function ($join) {
-                $join->on('recent_actions.customer_id', '=', 'customers.id');
-            })
-                ->orderByRaw('CASE WHEN recent_actions.last_action_at IS NULL THEN 0 ELSE 1 END ASC')
-                ->orderBy('customers.created_at', 'DESC');
-        } elseif ($sortKey === 'status') {
-            $query->orderByRaw('COALESCE(customer_statuses.weight, 9999) ASC')
-                ->orderBy('customers.created_at', 'DESC');
+            return;
         }
 
-        // Ejecutar y medir
-        if ($countOnly) {
-            // Evitar ORDER BY con columnas no agregadas en modo only_full_group_by
-            $query->getQuery()->orders = null;
-            $result = $query->select(
-                DB::raw('count(distinct(customers.id)) as count'),
-                'customers.status_id',
-                DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
-                DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color'),
-                DB::raw('customer_statuses.id as status_table_id')
-            )
-                ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color', 'customer_statuses.id')
-                ->orderBy(DB::raw('COALESCE(customer_statuses.weight, 999)'), 'ASC')
-                ->get();
-        } else {
-            $selectColumns = ['customers.*'];
-            $result = $query->select($selectColumns)
-                ->orderBy('customers.created_at', 'DESC')
-                ->when($pageSize > 0, fn ($q) => $q->paginate($pageSize), fn ($q) => $q->get());
-        }
+        $query->orderByRaw('COALESCE(customer_statuses.weight, 9999) ASC')
+            ->orderBy('customers.created_at', 'DESC');
+    }
 
-        $t1 = function_exists('hrtime') ? hrtime(true) : (int) (microtime(true) * 1e9);
-        $elapsedMs = ($t1 - $t0) / 1e6; // ns → ms
-
-        // ⚠️ Añadir propiedades dinámicas en objetos paginator puede emitir deprecations en PHP 8.2.
-        // Si ya añadías "action", seguimos igual por compatibilidad:
-        $result->action = 'customers';
-        $result->benchmark_ms = round($elapsedMs, 2);
-
-        $annotateAccess = function ($item) use ($authUser) {
-            if (method_exists($item, 'hasFullAccess')) {
-                $item->limited_access = ! $item->hasFullAccess($authUser);
-            }
-
-            return $item;
-        };
-
-        if ($result instanceof \Illuminate\Pagination\LengthAwarePaginator || $result instanceof \Illuminate\Pagination\Paginator) {
-            $result->getCollection()->transform($annotateAccess);
-        } else {
-            $result = $result->map($annotateAccess);
-        }
-
-        return $result;
+    private function buildGroupCounts(Builder $query): Collection
+    {
+        return $query->select(
+            DB::raw('count(distinct(customers.id)) as count'),
+            'customers.status_id',
+            DB::raw('COALESCE(customer_statuses.name, "Sin Estado") as status_name'),
+            DB::raw('COALESCE(customer_statuses.color, "#000000") as status_color'),
+            DB::raw('customer_statuses.id as status_table_id')
+        )
+            ->groupBy('customers.status_id', 'customer_statuses.name', 'customer_statuses.color', 'customer_statuses.id')
+            ->orderBy(DB::raw('COALESCE(customer_statuses.weight, 999)'), 'ASC')
+            ->get();
     }
 
     public function getUserMenu($user)
