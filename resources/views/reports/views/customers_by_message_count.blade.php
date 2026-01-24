@@ -158,15 +158,30 @@
                     @php
                       $parts = array_pad(explode('|||', $actionLine), 4, '');
                       [$note, $actionType, $actionUser, $actionDate] = $parts;
+                      $userLabel = $actionUser ?: 'Automatico';
+                      $userWords = preg_split('/\\s+/', trim($userLabel));
+                      $userInitials = '';
+                      if (! empty($userWords[0])) {
+                          $userInitials .= mb_substr($userWords[0], 0, 1, 'UTF-8');
+                      }
+                      if (! empty($userWords[1])) {
+                          $userInitials .= mb_substr($userWords[1], 0, 1, 'UTF-8');
+                      }
+                      $userInitials = mb_strtoupper($userInitials ?: '??', 'UTF-8');
                     @endphp
-                    <div class="space-y-1">
-                      <div class="text-sm font-semibold text-slate-700">
-                        {{ $note ?: 'Sin notas' }}
+                    <div class="flex gap-3">
+                      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-[linear-gradient(135deg,#1c2640,#0f172a)] text-[0.65rem] font-semibold text-white">
+                        {{ $userInitials }}
                       </div>
-                      <div class="flex flex-wrap items-center gap-2 text-[11px]">
-                        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-slate-500">{{ $actionType ?: 'Sin accion' }}</span>
-                        <span class="text-slate-500">{{ $actionUser ?: 'Automatico' }}</span>
-                        <span class="text-slate-400">{{ $actionDate ?: '—' }}</span>
+                      <div class="space-y-1">
+                        <div class="text-sm font-semibold text-slate-700">
+                          {{ $note ?: 'Sin notas' }}
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 text-[11px]">
+                          <span class="rounded-full bg-slate-100 px-2 py-0.5 text-slate-500">{{ $actionType ?: 'Sin accion' }}</span>
+                          <span class="text-slate-500">{{ $userLabel }}</span>
+                          <span class="text-slate-400">{{ $actionDate ?: '—' }}</span>
+                        </div>
                       </div>
                     </div>
                   @endforeach
