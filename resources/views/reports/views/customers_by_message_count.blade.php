@@ -89,12 +89,9 @@
       <thead class="bg-slate-50">
         <tr>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Cliente</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Telefono</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Asesor</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estado</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Etiquetas</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Mensajes</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultimo mensaje</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultimas 3 acciones</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultimos 5 mensajes</th>
         </tr>
       </thead>
@@ -107,15 +104,13 @@
           @endphp
           <tr class="customer-overlay-link hover:bg-slate-50" data-url="{{ route('customers.show', $item->id) }}">
             <td class="px-4 py-3 font-semibold">
-              <div class="flex items-center gap-2">
-                <a href="{{ route('customers.show', $item->id) }}" class="customer-overlay-link text-slate-900 hover:underline" data-url="{{ route('customers.show', $item->id) }}">{{ $item->name }}</a>
-                <a href="{{ route('customers.show', $item->id) }}" class="text-xs font-semibold text-slate-500 hover:text-slate-700" data-customer-overlay-ignore>Ver</a>
-              </div>
-            </td>
-            <td class="px-4 py-3">
-              @if ($bestPhone)
-                <div class="flex flex-wrap items-center gap-2">
-                  <span>{{ $item->getInternationalPhone($bestPhone) }}</span>
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                  <a href="{{ route('customers.show', $item->id) }}" class="customer-overlay-link text-slate-900 hover:underline" data-url="{{ route('customers.show', $item->id) }}">{{ $item->name }}</a>
+                  <a href="{{ route('customers.show', $item->id) }}" class="text-xs font-semibold text-slate-500 hover:text-slate-700" data-customer-overlay-ignore>Ver</a>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-sm font-normal text-slate-700">
+                  <span>{{ $bestPhone ? $item->getInternationalPhone($bestPhone) : 'Sin telefono' }}</span>
                   @if ($whatsappPhone)
                     <a
                       href="https://wa.me/{{ $whatsappPhone }}"
@@ -131,15 +126,13 @@
                     </a>
                   @endif
                 </div>
-              @else
-                <span>Sin telefono</span>
-              @endif
-            </td>
-            <td class="px-4 py-3 text-sm text-slate-600">{{ $item->user_name ?? 'Sin asignar' }}</td>
-            <td class="px-4 py-3">
-              <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white" style="background-color: {{ $item->status_color ?? '#94a3b8' }};">
-                {{ $item->status_name ?? 'Sin estado' }}
-              </span>
+                <div class="flex flex-wrap items-center gap-2 text-xs font-normal text-slate-500">
+                  <span>{{ $item->user_name ?? 'Sin asignar' }}</span>
+                  <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold text-white" style="background-color: {{ $item->status_color ?? '#94a3b8' }};">
+                    {{ $item->status_name ?? 'Sin estado' }}
+                  </span>
+                </div>
+              </div>
             </td>
             <td class="px-4 py-3">
               @if (count($tagNames))
@@ -155,9 +148,53 @@
               @endif
             </td>
             <td class="px-4 py-3 font-semibold text-slate-900">{{ $item->messages_count }}</td>
-            <td class="px-4 py-3">{{ $item->last_message_at }}</td>
-            <td class="px-4 py-3 text-sm text-slate-600 whitespace-pre-line">
-              {{ $item->last_messages_body ?? 'Sin mensajes' }}
+            <td class="px-4 py-3">
+              @php
+                $lastActions = $item->last_actions ? explode("\n", $item->last_actions) : [];
+              @endphp
+              @if (count($lastActions))
+                <div class="flex flex-col gap-3 text-xs text-slate-500">
+                  @foreach ($lastActions as $actionLine)
+                    @php
+                      $parts = array_pad(explode('|||', $actionLine), 4, '');
+                      [$note, $actionType, $actionUser, $actionDate] = $parts;
+                    @endphp
+                    <div class="space-y-1">
+                      <div class="text-sm font-semibold text-slate-700">
+                        {{ $note ?: 'Sin notas' }}
+                      </div>
+                      <div class="flex flex-wrap items-center gap-2 text-[11px]">
+                        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-slate-500">{{ $actionType ?: 'Sin accion' }}</span>
+                        <span class="text-slate-500">{{ $actionUser ?: 'Automatico' }}</span>
+                        <span class="text-slate-400">{{ $actionDate ?: '—' }}</span>
+                      </div>
+                    </div>
+                  @endforeach
+                </div>
+              @else
+                <span class="text-sm text-slate-400">Sin acciones</span>
+              @endif
+            </td>
+            <td class="px-4 py-3">
+              @php
+                $lastMessages = $item->last_messages_body ? explode("\n", $item->last_messages_body) : [];
+              @endphp
+              @if (count($lastMessages))
+                <div class="flex flex-col gap-3 text-sm text-slate-600">
+                  @foreach ($lastMessages as $messageLine)
+                    @php
+                      $parts = array_pad(explode('|||', $messageLine), 2, '');
+                      [$messageBody, $messageDate] = $parts;
+                    @endphp
+                    <div class="space-y-1">
+                      <div>{{ $messageBody ?: 'Sin mensaje' }}</div>
+                      <div class="text-xs text-slate-400">{{ $messageDate ?: '—' }}</div>
+                    </div>
+                  @endforeach
+                </div>
+              @else
+                <span class="text-sm text-slate-400">Sin mensajes</span>
+              @endif
             </td>
           </tr>
         @endforeach
