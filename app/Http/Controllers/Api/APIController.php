@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GoogleAdsLeadRequest;
+use App\Http\Requests\UpdateCustomerFromRdRequest;
 use App\Jobs\RetellProcessCall;
 use App\Models\Action;
 use App\Models\ActionType;
@@ -2566,8 +2567,12 @@ class APIController extends Controller
         return null;
     }
 
-    public function updateFromRD(Request $request, MetaConversionsService $metaConversionsService)
+    public function updateFromRD(UpdateCustomerFromRdRequest $request, MetaConversionsService $metaConversionsService)
     {
+        if ($request->filled('phone') && $request->filled('tag_id')) {
+            return $this->attachTagToCustomerByPhone($request);
+        }
+
         $json = $request->json()->all();
         $data = isset($json['leads']) ? $json['leads'][0] : [];
         $rdLeadId = is_array($data) ? $this->extractRdLeadId($data) : null;
@@ -2751,6 +2756,55 @@ class APIController extends Controller
         // $this->sendToN8n($modelRD->id);
 
         return $modelRD->id;
+    }
+
+    private function attachTagToCustomerByPhone(UpdateCustomerFromRdRequest $request): JsonResponse
+    {
+        $phone = (string) $request->input('phone');
+        $tagId = (int) $request->input('tag_id');
+
+        $customer = $this->findCustomerByPhone($phone);
+        if (! $customer) {
+            return response()->json([
+                'message' => 'Cliente no encontrado para el phone proporcionado.',
+            ], 404);
+        }
+
+        $customer->tags()->syncWithoutDetaching([$tagId]);
+
+        return response()->json([
+            'customer_id' => $customer->id,
+            'tag_id' => $tagId,
+            'attached' => true,
+        ]);
+    }
+
+    private function findCustomerByPhone(string $phone): ?Customer
+    {
+        $normalized = $this->cleanPhoneCharters($phone);
+        if (! $normalized) {
+            return null;
+        }
+
+        return Customer::query()
+            ->where(function ($query) use ($normalized) {
+                $query->where('phone', $normalized)
+                    ->orWhere('phone2', $normalized)
+                    ->orWhere('contact_phone2', $normalized)
+                    ->orWhereRaw(
+                        "REPLACE(REPLACE(REPLACE(phone, ' ', ''), '-', ''), '(', '') LIKE ?",
+                        ["%{$normalized}%"]
+                    )
+                    ->orWhereRaw(
+                        "REPLACE(REPLACE(REPLACE(phone2, ' ', ''), '-', ''), '(', '') LIKE ?",
+                        ["%{$normalized}%"]
+                    )
+                    ->orWhereRaw(
+                        "REPLACE(REPLACE(REPLACE(contact_phone2, ' ', ''), '-', ''), '(', '') LIKE ?",
+                        ["%{$normalized}%"]
+                    );
+            })
+            ->first();
     }
 
     public function getStatusRD($data)

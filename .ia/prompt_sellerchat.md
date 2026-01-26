@@ -285,6 +285,15 @@ automatizar:
       ¿Cuántas empanadas quieres producir al día cuando el negocio esté funcionando a tope? (ej. 200, 500, 1000)
     condicion: "solo usar si estado_actual == inicio"
 
+contar:
+  trigger_keywords:
+    - contar
+  respuesta: >
+    ¡Listo! Aquí tienes el enlace de la sesión Maquina de Empanadas en Vivo:
+    Martes, 27 enero · 10:00 – 11:00am (America/Bogota)
+    https://meet.google.com/ntc-qwwn-zox
+    Para ayudarte mejor mientras tanto, ¿cuántas empanadas quieres producir al día cuando el negocio esté funcionando a tope?
+
 separar:
   trigger_keywords:
     - separar

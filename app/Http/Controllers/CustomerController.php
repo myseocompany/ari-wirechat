@@ -1416,6 +1416,12 @@ class CustomerController extends Controller
             ->where('status_id', '1')
             ->orderBy('weight', 'ASC')
             ->get();
+        if ($model->status_id && ! $customer_statuses->contains('id', $model->status_id)) {
+            $currentStatus = CustomerStatus::find($model->status_id);
+            if ($currentStatus) {
+                $customer_statuses->push($currentStatus);
+            }
+        }
         $customer_sources = CustomerSource::all();
         $users = User::where('status_id', 1)
             ->orderBy('name', 'ASC')
@@ -1515,7 +1521,7 @@ class CustomerController extends Controller
         $model->purchase_date = $request->purchase_date;
         $model->user_id = $canAssignCustomers ? $requestedUserId : $currentUserId;
         $model->source_id = $request->source_id;
-        $model->status_id = $request->status_id;
+        $model->status_id = $request->filled('status_id') ? $request->input('status_id') : $model->status_id;
         // Agregamos el producto en edicion de prospecto
         $model->product_id = $request->product_id;
         // datos de contacto
