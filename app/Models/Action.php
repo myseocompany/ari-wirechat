@@ -27,6 +27,7 @@ class Action extends Model
         'owner_user_id',
         'sale_date',
         'sale_amount',
+        'reminder_type',
     ];
 
     /** Casts para fechas y numéricos. */
