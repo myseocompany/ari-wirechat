@@ -3,9 +3,9 @@
 namespace App\Services\LeadClassifier;
 
 use App\Models\Customer;
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use Illuminate\Support\Collection;
-use Namu\WireChat\Models\Message;
+use Illuminate\Support\Facades\DB;
 
 class ConversationSnapshotBuilder
 {
@@ -21,14 +21,10 @@ class ConversationSnapshotBuilder
      */
     public function build(int $conversationId): ?array
     {
-        $customerMorph = (new Customer)->getMorphClass();
-        $customerClass = Customer::class;
-
-        /** @var Collection<int, Message> $messages */
-        $messages = Message::withoutGlobalScopes()
+        $messages = DB::table('wire_messages')
             ->select(['sendable_id', 'body', 'created_at'])
             ->where('conversation_id', $conversationId)
-            ->whereIn('sendable_type', [$customerMorph, $customerClass])
+            ->whereIn('sendable_id', Customer::query()->select('id'))
             ->orderBy('created_at')
             ->get();
 
@@ -49,8 +45,8 @@ class ConversationSnapshotBuilder
             return null;
         }
 
-        /** @var CarbonInterface $lastCustomerMessageAt */
-        $lastCustomerMessageAt = $messages->last()->created_at;
+        $lastCreatedAt = (string) $messages->last()->created_at;
+        $lastCustomerMessageAt = Carbon::parse($lastCreatedAt);
 
         return [
             'conversation_id' => $conversationId,

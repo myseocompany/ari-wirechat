@@ -23,7 +23,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Namu\WireChat\Models\Message;
 
 class ReportController extends Controller
 {
@@ -928,32 +927,16 @@ class ReportController extends Controller
         ?Carbon $toDate,
         int $limit
     ): array {
-        $customerMorph = (new Customer)->getMorphClass();
-        $customerClass = Customer::class;
-
-        $baseQuery = Message::withoutGlobalScopes()
+        $baseQuery = DB::table('wire_messages')
             ->select('conversation_id')
-            ->whereNotNull('conversation_id');
+            ->whereNotNull('conversation_id')
+            ->whereIn('sendable_id', Customer::query()->select('id'));
 
         if ($fromDate && $toDate) {
             $baseQuery->whereBetween('created_at', [$fromDate, $toDate]);
         }
 
-        $ids = $this->collectConversationIds(
-            (clone $baseQuery)->whereIn('sendable_type', [$customerMorph, $customerClass]),
-            $limit
-        );
-
-        if ($ids !== []) {
-            return $ids;
-        }
-
-        $fallbackIds = $this->collectConversationIds(
-            (clone $baseQuery)->whereIn('sendable_id', Customer::query()->select('id')),
-            $limit
-        );
-
-        return $fallbackIds;
+        return $this->collectConversationIds($baseQuery, $limit);
     }
 
     /**
