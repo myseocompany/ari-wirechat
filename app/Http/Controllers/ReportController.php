@@ -930,15 +930,36 @@ class ReportController extends Controller
         $customerMorph = (new Customer)->getMorphClass();
         $customerClass = Customer::class;
 
-        $query = Message::query()
+        $baseQuery = Message::query()
             ->select('conversation_id')
-            ->whereIn('sendable_type', [$customerMorph, $customerClass])
             ->whereNotNull('conversation_id');
 
         if ($fromDate && $toDate) {
-            $query->whereBetween('created_at', [$fromDate, $toDate]);
+            $baseQuery->whereBetween('created_at', [$fromDate, $toDate]);
         }
 
+        $ids = $this->collectConversationIds(
+            (clone $baseQuery)->whereIn('sendable_type', [$customerMorph, $customerClass]),
+            $limit
+        );
+
+        if ($ids !== []) {
+            return $ids;
+        }
+
+        $fallbackIds = $this->collectConversationIds(
+            (clone $baseQuery)->whereIn('sendable_id', Customer::query()->select('id')),
+            $limit
+        );
+
+        return $fallbackIds;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function collectConversationIds($query, int $limit): array
+    {
         $ids = [];
         $target = $limit === 0 ? PHP_INT_MAX : $limit;
 
