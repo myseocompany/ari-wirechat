@@ -878,22 +878,24 @@ class ReportController extends Controller
         LeadConversationClassificationRunRequest $request,
         LeadConversationClassifier $classifier
     ): RedirectResponse {
-        $fromDate = null;
-        $toDate = null;
-
-        if ($request->filled('from_date') && $request->filled('to_date')) {
-            $fromDate = Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay();
-            $toDate = Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay();
-        }
+        $hasDateFilter = $request->filled('from_date') && $request->filled('to_date');
+        $fromDate = $hasDateFilter
+            ? Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay()
+            : Carbon::yesterday()->startOfDay();
+        $toDate = $hasDateFilter
+            ? Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay()
+            : Carbon::yesterday()->endOfDay();
 
         $limit = (int) $request->integer('limit');
 
         $conversationIds = $this->getConversationIdsForClassificationRun($fromDate, $toDate, $limit);
 
         if ($conversationIds === []) {
+            $rangeLabel = $fromDate->toDateString().' a '.$toDate->toDateString();
+
             return redirect()
                 ->to('/reports/views/customers_lead_classifications?'.http_build_query($request->safe()->except('limit')))
-                ->with('status', 'No se encontraron conversaciones para procesar en ese rango.');
+                ->with('status', "No se encontraron conversaciones para procesar en el rango {$rangeLabel}.");
         }
 
         $processed = 0;
@@ -910,13 +912,12 @@ class ReportController extends Controller
         }
 
         $limitLabel = $limit === 0 ? 'todas' : (string) $limit;
-        $rangeLabel = ($fromDate && $toDate)
-            ? $fromDate->toDateString().' a '.$toDate->toDateString()
-            : 'sin filtro de fechas';
+        $rangeLabel = $fromDate->toDateString().' a '.$toDate->toDateString();
+        $foundCount = count($conversationIds);
 
         return redirect()
             ->to('/reports/views/customers_lead_classifications?'.http_build_query($request->safe()->except('limit')))
-            ->with('status', "Clasificación ejecutada ({$rangeLabel}). Límite: {$limitLabel}. Procesadas: {$processed}. Omitidas: {$skipped}.");
+            ->with('status', "Clasificación ejecutada ({$rangeLabel}). Conversaciones encontradas: {$foundCount}. Límite: {$limitLabel}. Procesadas: {$processed}. Omitidas: {$skipped}.");
     }
 
     /**
