@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CalculatorCustomersReportRequest;
 use App\Http\Requests\CustomerMessagesReportRequest;
+use App\Http\Requests\LeadConversationClassificationReportRequest;
 use App\Models\Action;
 use App\Models\ActionType;
 use App\Models\Customer;
 use App\Models\CustomerMeta;
 use App\Models\CustomerStatus;
+use App\Models\LeadConversationClassification;
 use App\Models\Project;
 use App\Models\Tag;
 use App\Models\User;
@@ -755,6 +757,117 @@ class ReportController extends Controller
         $users = User::where('status_id', 1)->orderBy('name')->get();
 
         return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
+    }
+
+    public function customersLeadClassifications(LeadConversationClassificationReportRequest $request): View
+    {
+        $fromDate = null;
+        $toDate = null;
+
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $fromDate = Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay();
+            $toDate = Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay();
+        }
+
+        $customerMorph = (new Customer)->getMorphClass();
+
+        $model = LeadConversationClassification::query()
+            ->from('lead_conversation_classifications as lcc')
+            ->select(
+                'lcc.id',
+                'lcc.conversation_id',
+                'lcc.customer_id',
+                'lcc.status as classification_status',
+                'lcc.score',
+                'lcc.confidence',
+                'lcc.signals_json',
+                'lcc.reasons_json',
+                'lcc.suggested_tag_id',
+                'lcc.applied_tag_id',
+                'lcc.last_customer_message_at',
+                'lcc.classified_at',
+                'lcc.classifier_version',
+                'customers.name',
+                'customers.phone',
+                'customers.phone2',
+                'customers.contact_phone2',
+                'users.name as user_name',
+                'customer_statuses.name as status_name',
+                'customer_statuses.color as status_color',
+                'suggested_tags.name as suggested_tag_name',
+                'applied_tags.name as applied_tag_name',
+                DB::raw("(select group_concat(tags.name order by tags.name separator '||') from customer_tag as ct join tags on tags.id = ct.tag_id where ct.customer_id = customers.id) as tag_names"),
+                DB::raw("(select group_concat(concat(case when nullif(trim(wm.body), '') is null then concat('[', coalesce(wm.type, 'mensaje'), ']') else wm.body end, '|||', date_format(wm.created_at, '%Y-%m-%d %H:%i')) order by wm.created_at desc separator '\n') from (select wire_messages.body, wire_messages.type, wire_messages.created_at from wire_messages where wire_messages.conversation_id = lcc.conversation_id and wire_messages.sendable_type = '".$customerMorph."' and wire_messages.sendable_id = customers.id order by wire_messages.created_at desc limit 5) as wm) as last_messages_body")
+            )
+            ->join('customers', 'customers.id', '=', 'lcc.customer_id')
+            ->leftJoin('users', 'users.id', '=', 'customers.user_id')
+            ->leftJoin('customer_statuses', 'customer_statuses.id', '=', 'customers.status_id')
+            ->leftJoin('tags as suggested_tags', 'suggested_tags.id', '=', 'lcc.suggested_tag_id')
+            ->leftJoin('tags as applied_tags', 'applied_tags.id', '=', 'lcc.applied_tag_id')
+            ->when($request->filled('customer_id'), function ($query) use ($request) {
+                $query->where('lcc.customer_id', $request->integer('customer_id'));
+            })
+            ->when($request->filled('conversation_id'), function ($query) use ($request) {
+                $query->where('lcc.conversation_id', $request->integer('conversation_id'));
+            })
+            ->when($request->filled('classifier_version'), function ($query) use ($request) {
+                $query->where('lcc.classifier_version', $request->string('classifier_version'));
+            })
+            ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+                $query->whereBetween('lcc.last_customer_message_at', [$fromDate, $toDate]);
+            })
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->where('lcc.status', $request->string('status'));
+            })
+            ->when($request->filled('score_min'), function ($query) use ($request) {
+                $query->where('lcc.score', '>=', (int) $request->input('score_min'));
+            })
+            ->when($request->filled('score_max'), function ($query) use ($request) {
+                $query->where('lcc.score', '<=', (int) $request->input('score_max'));
+            })
+            ->when($request->boolean('user_unassigned'), function ($query) {
+                $query->whereNull('customers.user_id');
+            })
+            ->when($request->filled('user_id') && ! $request->boolean('user_unassigned'), function ($query) use ($request) {
+                $query->where('customers.user_id', $request->integer('user_id'));
+            })
+            ->when($request->boolean('tag_none'), function ($query) {
+                $query->whereNotExists(function ($subQuery) {
+                    $subQuery->selectRaw('1')
+                        ->from('customer_tag as ct')
+                        ->whereColumn('ct.customer_id', 'customers.id');
+                });
+            })
+            ->when($request->filled('tag_ids') && ! $request->boolean('tag_none'), function ($query) use ($request) {
+                $tagIds = $request->input('tag_ids', []);
+                $query->whereExists(function ($subQuery) use ($tagIds) {
+                    $subQuery->selectRaw('1')
+                        ->from('customer_tag as ct')
+                        ->whereColumn('ct.customer_id', 'customers.id')
+                        ->whereIn('ct.tag_id', $tagIds);
+                });
+            })
+            ->when($request->filled('status_ids'), function ($query) use ($request) {
+                $query->whereIn('customers.status_id', $request->input('status_ids', []));
+            })
+            ->when($request->filled('suggested_tag_ids'), function ($query) use ($request) {
+                $query->whereIn('lcc.suggested_tag_id', $request->input('suggested_tag_ids', []));
+            })
+            ->when($request->filled('applied_tag_ids'), function ($query) use ($request) {
+                $query->whereIn('lcc.applied_tag_id', $request->input('applied_tag_ids', []));
+            })
+            ->orderByDesc('lcc.score')
+            ->orderByDesc('lcc.last_customer_message_at')
+            ->paginate(50)
+            ->withQueryString();
+
+        $statuses = CustomerStatus::orderBy('weight')->get();
+
+        $tags = Tag::orderBy('name')->get();
+
+        $users = User::where('status_id', 1)->orderBy('name')->get();
+
+        return view('reports.views.customers_lead_classifications', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
     }
 
     public function customersCalculator(CalculatorCustomersReportRequest $request): View
