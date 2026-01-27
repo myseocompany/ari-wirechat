@@ -12,6 +12,12 @@
   </div>
 </div>
 
+@if (session('status'))
+  <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+    {{ session('status') }}
+  </div>
+@endif
+
 <div class="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
   <form action="/reports/views/customers_lead_classifications" method="GET" class="flex flex-col gap-4">
     <div class="grid gap-4 lg:grid-cols-[repeat(12,minmax(0,1fr))]">
@@ -110,6 +116,27 @@
       <button type="submit" class="inline-flex items-center rounded-xl bg-[color:var(--ds-coral)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Filtrar</button>
     </div>
   </form>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4">
+    <span class="mr-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Procesar</span>
+
+    @foreach ([0 => 'Todas', 5 => '5 de prueba', 10 => '10 de prueba', 50 => '50 de prueba'] as $limitValue => $label)
+      <form action="{{ route('reports.customers_lead_classifications.run') }}" method="POST" class="inline-flex">
+        @csrf
+        <input type="hidden" name="from_date" value="{{ $request->from_date }}">
+        <input type="hidden" name="to_date" value="{{ $request->to_date }}">
+        <input type="hidden" name="classifier_version" value="{{ $request->classifier_version }}">
+        <input type="hidden" name="limit" value="{{ $limitValue }}">
+        <button type="submit" class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-800">
+          {{ $label }}
+        </button>
+      </form>
+    @endforeach
+
+    <span class="text-[11px] text-slate-400">
+      Usa el filtro de fechas para acotar el procesamiento.
+    </span>
+  </div>
 </div>
 
 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

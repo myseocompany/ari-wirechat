@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CalculatorCustomersReportRequest;
 use App\Http\Requests\CustomerMessagesReportRequest;
 use App\Http\Requests\LeadConversationClassificationReportRequest;
+use App\Http\Requests\LeadConversationClassificationRunRequest;
 use App\Models\Action;
 use App\Models\ActionType;
 use App\Models\Customer;
@@ -14,12 +15,16 @@ use App\Models\LeadConversationClassification;
 use App\Models\Project;
 use App\Models\Tag;
 use App\Models\User;
+use App\Services\LeadClassifier\LeadConversationClassifier;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Namu\WireChat\Enums\MessageType;
+use Namu\WireChat\Models\Message;
 
 class ReportController extends Controller
 {
@@ -868,6 +873,91 @@ class ReportController extends Controller
         $users = User::where('status_id', 1)->orderBy('name')->get();
 
         return view('reports.views.customers_lead_classifications', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
+    }
+
+    public function runCustomersLeadClassifications(
+        LeadConversationClassificationRunRequest $request,
+        LeadConversationClassifier $classifier
+    ): RedirectResponse {
+        $fromDate = null;
+        $toDate = null;
+
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $fromDate = Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay();
+            $toDate = Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay();
+        }
+
+        $limit = (int) $request->integer('limit');
+
+        $conversationIds = $this->getConversationIdsForClassificationRun($fromDate, $toDate, $limit);
+
+        if ($conversationIds === []) {
+            return redirect()
+                ->to('/reports/views/customers_lead_classifications?'.http_build_query($request->safe()->except('limit')))
+                ->with('status', 'No se encontraron conversaciones para procesar en ese rango.');
+        }
+
+        $processed = 0;
+        $skipped = 0;
+
+        foreach ($conversationIds as $conversationId) {
+            $result = $classifier->classify($conversationId);
+
+            if ($result === null) {
+                $skipped++;
+            } else {
+                $processed++;
+            }
+        }
+
+        $limitLabel = $limit === 0 ? 'todas' : (string) $limit;
+        $rangeLabel = ($fromDate && $toDate)
+            ? $fromDate->toDateString().' a '.$toDate->toDateString()
+            : 'sin filtro de fechas';
+
+        return redirect()
+            ->to('/reports/views/customers_lead_classifications?'.http_build_query($request->safe()->except('limit')))
+            ->with('status', "Clasificación ejecutada ({$rangeLabel}). Límite: {$limitLabel}. Procesadas: {$processed}. Omitidas: {$skipped}.");
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function getConversationIdsForClassificationRun(
+        ?Carbon $fromDate,
+        ?Carbon $toDate,
+        int $limit
+    ): array {
+        $customerMorph = (new Customer)->getMorphClass();
+
+        $query = Message::query()
+            ->select('conversation_id')
+            ->where('sendable_type', $customerMorph)
+            ->where('type', MessageType::TEXT->value)
+            ->whereNotNull('conversation_id');
+
+        if ($fromDate && $toDate) {
+            $query->whereBetween('created_at', [$fromDate, $toDate]);
+        }
+
+        $ids = [];
+        $target = $limit === 0 ? PHP_INT_MAX : $limit;
+
+        foreach ($query->distinct()->orderBy('conversation_id')->cursor() as $row) {
+            $conversationId = (int) $row->conversation_id;
+
+            if ($conversationId <= 0) {
+                continue;
+            }
+
+            $ids[] = $conversationId;
+
+            if (count($ids) >= $target) {
+                break;
+            }
+        }
+
+        return $ids;
     }
 
     public function customersCalculator(CalculatorCustomersReportRequest $request): View

@@ -377,6 +377,8 @@ Route::middleware('auth')->prefix('reports')->group(function () {
     Route::get('/views/daily_customers_followup', [CustomerController::class, 'daily']);
     Route::get('/views/customers_messages_count', [ReportController::class, 'customersByMessageCount']);
     Route::get('/views/customers_lead_classifications', [ReportController::class, 'customersLeadClassifications']);
+    Route::post('/views/customers_lead_classifications/run', [ReportController::class, 'runCustomersLeadClassifications'])
+        ->name('reports.customers_lead_classifications.run');
     Route::get('/views/customers_calculator', [ReportController::class, 'customersCalculator']);
     Route::get('/fm', [ReportController::class, 'RFM']);
 });
