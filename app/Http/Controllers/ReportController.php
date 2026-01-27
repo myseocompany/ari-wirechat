@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CalculatorCustomersReportRequest;
 use App\Http\Requests\CustomerMessagesReportRequest;
 use App\Models\Action;
 use App\Models\ActionType;
 use App\Models\Customer;
+use App\Models\CustomerMeta;
 use App\Models\CustomerStatus;
 use App\Models\Project;
 use App\Models\Tag;
@@ -753,6 +755,58 @@ class ReportController extends Controller
         $users = User::where('status_id', 1)->orderBy('name')->get();
 
         return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
+    }
+
+    public function customersCalculator(CalculatorCustomersReportRequest $request): View
+    {
+        $fromDate = null;
+        $toDate = null;
+        $calculatorRootIds = [3000, 30000];
+
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $fromDate = Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay();
+            $toDate = Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay();
+        }
+
+        $latestCalculatorMetaIdQuery = CustomerMeta::query()
+            ->selectRaw('max(customer_metas.id) as last_meta_id, customer_metas.customer_id')
+            ->whereIn('customer_metas.meta_data_id', $calculatorRootIds)
+            ->groupBy('customer_metas.customer_id');
+
+        $model = Customer::query()
+            ->select(
+                'customers.id',
+                'customers.name',
+                'customers.phone',
+                'customers.phone2',
+                'customers.contact_phone2',
+                'users.name as user_name',
+                'customer_statuses.name as status_name',
+                'customer_statuses.color as status_color',
+                'calc.created_at as last_calculator_at',
+                DB::raw("json_unquote(json_extract(calc.value, '$.stage')) as calculator_stage"),
+                DB::raw("cast(json_unquote(json_extract(calc.value, '$.final_score')) as decimal(10,2)) as calculator_score"),
+                DB::raw("json_unquote(json_extract(calc.value, '$.completed_at')) as calculator_completed_at")
+            )
+            ->joinSub($latestCalculatorMetaIdQuery, 'latest_calc', function ($join) {
+                $join->on('latest_calc.customer_id', '=', 'customers.id');
+            })
+            ->join('customer_metas as calc', 'calc.id', '=', 'latest_calc.last_meta_id')
+            ->leftJoin('users', 'users.id', '=', 'customers.user_id')
+            ->leftJoin('customer_statuses', 'customer_statuses.id', '=', 'customers.status_id')
+            ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+                $query->whereBetween('calc.created_at', [$fromDate, $toDate]);
+            })
+            ->when($request->filled('user_id'), function ($query) use ($request) {
+                $query->where('customers.user_id', $request->integer('user_id'));
+            })
+            ->orderByDesc('calc.created_at')
+            ->paginate(50)
+            ->withQueryString();
+
+        $users = User::where('status_id', 1)->orderBy('name')->get();
+
+        return view('reports.views.customers_calculator', compact('model', 'fromDate', 'toDate', 'request', 'users'));
     }
 
     public function scrollActive(Request $request)
