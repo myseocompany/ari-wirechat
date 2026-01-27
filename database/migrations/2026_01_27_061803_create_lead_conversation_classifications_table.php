@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('lead_conversation_classifications');
+
         Schema::create('lead_conversation_classifications', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('conversation_id');
@@ -20,14 +22,8 @@ return new class extends Migration
             $table->decimal('confidence', 5, 4)->nullable();
             $table->json('signals_json')->nullable();
             $table->json('reasons_json')->nullable();
-            $table->foreignId('suggested_tag_id')
-                ->nullable()
-                ->constrained('tags')
-                ->nullOnDelete();
-            $table->foreignId('applied_tag_id')
-                ->nullable()
-                ->constrained('tags')
-                ->nullOnDelete();
+            $table->unsignedInteger('suggested_tag_id')->nullable();
+            $table->unsignedInteger('applied_tag_id')->nullable();
             $table->timestamp('applied_tag_at')->nullable();
             $table->timestamp('last_customer_message_at')->nullable();
             $table->timestamp('classified_at')->nullable();
@@ -35,6 +31,15 @@ return new class extends Migration
             $table->string('prompt_version', 32)->nullable();
             $table->string('model', 64)->nullable();
             $table->timestamps();
+
+            $table->foreign('suggested_tag_id')
+                ->references('id')
+                ->on('tags')
+                ->nullOnDelete();
+            $table->foreign('applied_tag_id')
+                ->references('id')
+                ->on('tags')
+                ->nullOnDelete();
 
             $table->unique('conversation_id');
             $table->index('customer_id');
