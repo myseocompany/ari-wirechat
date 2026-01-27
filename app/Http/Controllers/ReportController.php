@@ -23,7 +23,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Models\Message;
 
 class ReportController extends Controller
@@ -929,11 +928,11 @@ class ReportController extends Controller
         int $limit
     ): array {
         $customerMorph = (new Customer)->getMorphClass();
+        $customerClass = Customer::class;
 
         $query = Message::query()
             ->select('conversation_id')
-            ->where('sendable_type', $customerMorph)
-            ->where('type', MessageType::TEXT->value)
+            ->whereIn('sendable_type', [$customerMorph, $customerClass])
             ->whereNotNull('conversation_id');
 
         if ($fromDate && $toDate) {

@@ -5,7 +5,6 @@ namespace App\Services\LeadClassifier;
 use App\Models\Customer;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
-use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Models\Message;
 
 class ConversationSnapshotBuilder
@@ -23,13 +22,13 @@ class ConversationSnapshotBuilder
     public function build(int $conversationId): ?array
     {
         $customerMorph = (new Customer)->getMorphClass();
+        $customerClass = Customer::class;
 
         /** @var Collection<int, Message> $messages */
         $messages = Message::query()
             ->select(['sendable_id', 'body', 'created_at'])
             ->where('conversation_id', $conversationId)
-            ->where('sendable_type', $customerMorph)
-            ->where('type', MessageType::TEXT->value)
+            ->whereIn('sendable_type', [$customerMorph, $customerClass])
             ->orderBy('created_at')
             ->get();
 

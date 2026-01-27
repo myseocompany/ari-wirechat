@@ -7,7 +7,6 @@ use App\Services\LeadClassifier\LeadConversationClassifier;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Models\Message;
 
 class ClassifyLeadConversations extends Command
@@ -98,11 +97,11 @@ class ClassifyLeadConversations extends Command
     private function getConversationIds(Carbon $fromDate, Carbon $toDate): Collection
     {
         $customerMorph = (new Customer)->getMorphClass();
+        $customerClass = Customer::class;
 
         return Message::query()
             ->select('conversation_id')
-            ->where('sendable_type', $customerMorph)
-            ->where('type', MessageType::TEXT->value)
+            ->whereIn('sendable_type', [$customerMorph, $customerClass])
             ->whereBetween('created_at', [$fromDate, $toDate])
             ->whereNotNull('conversation_id')
             ->distinct()
