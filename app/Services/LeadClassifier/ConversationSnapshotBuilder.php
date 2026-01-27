@@ -25,7 +25,7 @@ class ConversationSnapshotBuilder
         $customerClass = Customer::class;
 
         /** @var Collection<int, Message> $messages */
-        $messages = Message::query()
+        $messages = Message::withoutGlobalScopes()
             ->select(['sendable_id', 'body', 'created_at'])
             ->where('conversation_id', $conversationId)
             ->whereIn('sendable_type', [$customerMorph, $customerClass])

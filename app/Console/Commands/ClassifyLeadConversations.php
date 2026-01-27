@@ -99,7 +99,7 @@ class ClassifyLeadConversations extends Command
         $customerMorph = (new Customer)->getMorphClass();
         $customerClass = Customer::class;
 
-        return Message::query()
+        return Message::withoutGlobalScopes()
             ->select('conversation_id')
             ->whereIn('sendable_type', [$customerMorph, $customerClass])
             ->whereBetween('created_at', [$fromDate, $toDate])

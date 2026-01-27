@@ -931,7 +931,7 @@ class ReportController extends Controller
         $customerMorph = (new Customer)->getMorphClass();
         $customerClass = Customer::class;
 
-        $baseQuery = Message::query()
+        $baseQuery = Message::withoutGlobalScopes()
             ->select('conversation_id')
             ->whereNotNull('conversation_id');
 
