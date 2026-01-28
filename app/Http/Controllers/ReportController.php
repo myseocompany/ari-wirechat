@@ -919,6 +919,78 @@ class ReportController extends Controller
             ->with('status', "Clasificación ejecutada ({$rangeLabel}). Conversaciones encontradas: {$foundCount}. Límite: {$limitLabel}. Procesadas: {$processed}. Omitidas: {$skipped}.");
     }
 
+    public function customersStatusEightConversations(Request $request): View
+    {
+        $fromDate = null;
+        $toDate = null;
+
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $fromDate = Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay();
+            $toDate = Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay();
+        }
+
+        $customerMorph = (new Customer)->getMorphClass();
+
+        $applyMessageDateFilter = function ($query) use ($fromDate, $toDate) {
+            if ($fromDate && $toDate) {
+                $query->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
+            }
+        };
+
+        $conversationCountQuery = DB::table('wire_messages')
+            ->selectRaw('count(distinct wire_messages.conversation_id)')
+            ->where('wire_messages.sendable_type', $customerMorph)
+            ->whereColumn('wire_messages.sendable_id', 'customers.id');
+
+        $lastMessageAtQuery = DB::table('wire_messages')
+            ->selectRaw('max(wire_messages.created_at)')
+            ->where('wire_messages.sendable_type', $customerMorph)
+            ->whereColumn('wire_messages.sendable_id', 'customers.id');
+
+        $lastConversationIdQuery = DB::table('wire_messages')
+            ->select('wire_messages.conversation_id')
+            ->where('wire_messages.sendable_type', $customerMorph)
+            ->whereColumn('wire_messages.sendable_id', 'customers.id')
+            ->orderByDesc('wire_messages.created_at')
+            ->limit(1);
+
+        $applyMessageDateFilter($conversationCountQuery);
+        $applyMessageDateFilter($lastMessageAtQuery);
+        $applyMessageDateFilter($lastConversationIdQuery);
+
+        $model = Customer::query()
+            ->select(
+                'customers.id',
+                'customers.name',
+                'customers.phone',
+                'customers.phone2',
+                'customers.contact_phone2',
+                'customers.status_id',
+                'users.name as user_name',
+                'customer_statuses.name as status_name',
+                'customer_statuses.color as status_color'
+            )
+            ->selectSub($conversationCountQuery, 'conversation_count')
+            ->selectSub($lastMessageAtQuery, 'last_message_at')
+            ->selectSub($lastConversationIdQuery, 'last_conversation_id')
+            ->leftJoin('users', 'users.id', '=', 'customers.user_id')
+            ->leftJoin('customer_statuses', 'customer_statuses.id', '=', 'customers.status_id')
+            ->where('customers.status_id', 8)
+            ->whereExists(function ($query) use ($customerMorph, $applyMessageDateFilter) {
+                $query->selectRaw('1')
+                    ->from('wire_messages')
+                    ->whereColumn('wire_messages.sendable_id', 'customers.id')
+                    ->where('wire_messages.sendable_type', $customerMorph);
+
+                $applyMessageDateFilter($query);
+            })
+            ->orderByDesc('last_message_at')
+            ->paginate(50)
+            ->withQueryString();
+
+        return view('reports.views.customers_status8_conversations', compact('model', 'fromDate', 'toDate', 'request'));
+    }
+
     /**
      * @return array<int, int>
      */
