@@ -30,6 +30,9 @@ class LeadConversationClassification extends Model
         'classifier_version',
         'prompt_version',
         'model',
+        'llm_used',
+        'llm_error',
+        'llm_duration_ms',
     ];
 
     /**
@@ -45,6 +48,8 @@ class LeadConversationClassification extends Model
             'applied_tag_at' => 'datetime',
             'last_customer_message_at' => 'datetime',
             'classified_at' => 'datetime',
+            'llm_used' => 'boolean',
+            'llm_duration_ms' => 'integer',
         ];
     }
 

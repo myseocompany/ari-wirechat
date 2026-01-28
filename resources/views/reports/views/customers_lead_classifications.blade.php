@@ -249,7 +249,25 @@
                   <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-600">
                     {{ $item->classifier_version }}
                   </span>
+                  <span class="inline-flex items-center rounded-full px-2 py-1 font-semibold {{ $item->llm_used ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600' }}">
+                    {{ $item->llm_used ? 'LLM' : 'Heurístico' }}
+                  </span>
+                  @if ($item->model)
+                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-600">
+                      {{ $item->model }}
+                    </span>
+                  @endif
+                  @if (! is_null($item->llm_duration_ms))
+                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-600">
+                      {{ $item->llm_duration_ms }} ms
+                    </span>
+                  @endif
                 </div>
+                @if ($item->llm_error)
+                  <div class="text-xs text-rose-500">
+                    LLM error: {{ $item->llm_error }}
+                  </div>
+                @endif
                 <div class="flex flex-wrap gap-2">
                   @forelse ($tagNames as $tagName)
                     <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">
