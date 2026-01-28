@@ -4,6 +4,7 @@ namespace App\Services\LeadClassifier;
 
 use App\Models\LeadConversationClassification;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Log;
 
 class LeadConversationClassifier
 {
@@ -51,6 +52,9 @@ class LeadConversationClassifier
         $signalsResult = $this->signalsExtractor->extract($snapshot);
         $signals = $signalsResult['signals'];
         $reasons = $signalsResult['reasons'];
+        $llmUsed = $signalsResult['llm_used'];
+        $llmError = $signalsResult['llm_error'];
+        $llmDurationMs = $signalsResult['llm_duration_ms'];
 
         $scoreResult = $this->scoreCalculator->calculate($signals);
         $score = $scoreResult['score'];
@@ -75,8 +79,23 @@ class LeadConversationClassifier
                 'classifier_version' => $classifierVersion,
                 'prompt_version' => 'sellerchat-v1',
                 'model' => $signalsResult['model'],
+                'llm_used' => $llmUsed,
+                'llm_error' => $llmError,
+                'llm_duration_ms' => $llmDurationMs,
             ]
         );
+
+        Log::info('lead_classifier.classified', [
+            'conversation_id' => $snapshot['conversation_id'],
+            'customer_id' => $snapshot['customer_id'],
+            'score' => $score,
+            'status' => $status,
+            'llm_used' => $llmUsed,
+            'llm_error' => $llmError,
+            'llm_duration_ms' => $llmDurationMs,
+            'model' => $signalsResult['model'],
+            'classifier_version' => $classifierVersion,
+        ]);
 
         return $classification;
     }

@@ -15,6 +15,7 @@ class LeadSignalsLlmExtractor
      *     reasons: array<int, string>,
      *     llm_used: bool,
      *     llm_error: string|null,
+     *     llm_duration_ms: int|null,
      *     model: string|null
      * }
      */
@@ -33,6 +34,7 @@ class LeadSignalsLlmExtractor
                 'reasons' => $this->buildFallbackReasons($heuristicSignals),
                 'llm_used' => false,
                 'llm_error' => 'missing_openai_configuration',
+                'llm_duration_ms' => null,
                 'model' => null,
             ];
         }
@@ -40,6 +42,7 @@ class LeadSignalsLlmExtractor
         $prompt = $this->buildPrompt($snapshot['full_customer_text'] ?? '');
 
         try {
+            $startTime = microtime(true);
             $response = Http::timeout($timeout)
                 ->withToken($apiKey)
                 ->acceptJson()
@@ -58,6 +61,7 @@ class LeadSignalsLlmExtractor
                         ],
                     ],
                 ]);
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
 
             if ($response->failed()) {
                 return [
@@ -65,6 +69,7 @@ class LeadSignalsLlmExtractor
                     'reasons' => $this->buildFallbackReasons($heuristicSignals),
                     'llm_used' => false,
                     'llm_error' => 'http_'.$response->status(),
+                    'llm_duration_ms' => $durationMs,
                     'model' => $model,
                 ];
             }
@@ -78,6 +83,7 @@ class LeadSignalsLlmExtractor
                     'reasons' => $this->buildFallbackReasons($heuristicSignals),
                     'llm_used' => false,
                     'llm_error' => 'invalid_json',
+                    'llm_duration_ms' => $durationMs,
                     'model' => $model,
                 ];
             }
@@ -103,6 +109,7 @@ class LeadSignalsLlmExtractor
                 'reasons' => $normalizedReasons,
                 'llm_used' => true,
                 'llm_error' => null,
+                'llm_duration_ms' => $durationMs,
                 'model' => $model,
             ];
         } catch (Throwable $exception) {
@@ -111,6 +118,7 @@ class LeadSignalsLlmExtractor
                 'reasons' => $this->buildFallbackReasons($heuristicSignals),
                 'llm_used' => false,
                 'llm_error' => $exception->getMessage(),
+                'llm_duration_ms' => null,
                 'model' => $model,
             ];
         }
