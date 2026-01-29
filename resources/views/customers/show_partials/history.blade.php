@@ -1,6 +1,11 @@
 <h2 class="mt-6 text-lg font-semibold text-slate-900">Historial</h2>
 
 @php
+    $currentItem = [
+        'type' => 'current',
+        'date' => $model->updated_at,
+        'model' => $model,
+    ];
     $timelineItems = $timelineItems ?? collect($histories)->map(function ($history) {
         return [
             'type' => 'history',
@@ -8,12 +13,52 @@
             'model' => $history,
         ];
     });
+    $timelineItems = collect([$currentItem])->merge($timelineItems);
     $historyOwnerMap = $historyOwnerMap ?? [];
 @endphp
 
 <div class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
     @foreach($timelineItems as $index => $item)
-        @if($item['type'] === 'history')
+        @if($item['type'] === 'current')
+            @php
+                $customer = $item['model'];
+                $timestamp = \Carbon\Carbon::parse($item['date']);
+            @endphp
+
+            <div class="border-b border-slate-200 py-3">
+                <div class="mb-1 text-xs text-slate-500">
+                    <i class="fa fa-clock-o"></i>
+                    {{ $timestamp->format('d/m/Y H:i') }}
+                    <span class="text-slate-400">({{ $timestamp->diffForHumans() }})</span>
+                    <span class="ml-2 inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">Estado actual</span>
+                </div>
+
+                @if(isset($customer->user) && !empty($customer->user_id))
+                    <span>
+                        <i class="fa fa-user"></i> Propietario:
+                        <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">{{$customer->user->name}}</span>
+                    </span>
+                @else
+                    <span>
+                        <i class="fa fa-user-slash"></i> Sin asignar
+                    </span>
+                @endif
+
+                @if(isset($customer->updated_user))
+                    <br>
+                    <span class="text-slate-700">
+                        <i class="fa fa-pencil"></i> Actualizado por: {{$customer->updated_user->name}}
+                    </span>
+                @endif
+
+                <span>
+                    <i class="fa fa-flag"></i> Estado:
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold text-white" style="background-color: {{ isset($customer->status) ? $customer->status->color : 'gray' }}">
+                        {{ isset($customer->status) ? $customer->status->name : $customer->status_id }}
+                    </span>
+                </span>
+            </div>
+        @elseif($item['type'] === 'history')
             @php
                 $history = $item['model'];
                 $ownerInfo = $historyOwnerMap[$history->id] ?? null;
