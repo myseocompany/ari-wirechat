@@ -1004,31 +1004,35 @@ class ReportController extends Controller
         ?Carbon $toDate,
         int $limit
     ): array {
-        $baseQuery = LeadConversationClassification::query()
-            ->from('lead_conversation_classifications as lcc')
-            ->select('lcc.conversation_id')
-            ->whereNotNull('lcc.conversation_id')
-            ->join('customers', 'customers.id', '=', 'lcc.customer_id');
+        $customerMorph = (new Customer)->getMorphClass();
 
-        $this->applyLeadClassificationFilters($baseQuery, $request, $fromDate, $toDate);
+        $baseQuery = DB::table('wire_messages')
+            ->select('wire_messages.conversation_id')
+            ->whereNotNull('wire_messages.conversation_id')
+            ->where('wire_messages.sendable_type', $customerMorph)
+            ->join('customers', 'customers.id', '=', 'wire_messages.sendable_id')
+            ->leftJoin('lead_conversation_classifications as lcc', 'lcc.conversation_id', '=', 'wire_messages.conversation_id');
+
+        if ($fromDate && $toDate) {
+            $baseQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
+        }
+
+        $this->applyLeadClassificationFilters($baseQuery, $request);
 
         return $this->collectConversationIds($baseQuery, $limit);
     }
 
-    private function applyLeadClassificationFilters($query, Request $request, ?Carbon $fromDate, ?Carbon $toDate): void
+    private function applyLeadClassificationFilters($query, Request $request): void
     {
         $query
             ->when($request->filled('customer_id'), function ($query) use ($request) {
-                $query->where('lcc.customer_id', $request->integer('customer_id'));
+                $query->where('customers.id', $request->integer('customer_id'));
             })
             ->when($request->filled('conversation_id'), function ($query) use ($request) {
-                $query->where('lcc.conversation_id', $request->integer('conversation_id'));
+                $query->where('wire_messages.conversation_id', $request->integer('conversation_id'));
             })
             ->when($request->filled('classifier_version'), function ($query) use ($request) {
                 $query->where('lcc.classifier_version', $request->string('classifier_version'));
-            })
-            ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
-                $query->whereBetween('lcc.last_customer_message_at', [$fromDate, $toDate]);
             })
             ->when($request->filled('status'), function ($query) use ($request) {
                 $query->where('lcc.status', $request->string('status'));
