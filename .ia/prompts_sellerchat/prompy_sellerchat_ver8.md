@@ -285,11 +285,19 @@ automatizar:
       ¿Cuántas empanadas quieres producir al día cuando el negocio esté funcionando a tope? (ej. 200, 500, 1000)
     condicion: "solo usar si estado_actual == inicio"
 
-
-bono:
+contar:
   trigger_keywords:
-    - bono
-    - BONO
+    - contar
+  respuesta: >
+    ¡Listo! Aquí tienes el enlace de la sesión Maquina de Empanadas en Vivo:
+    Martes, 27 enero · 10:00 – 11:00am (America/Bogota)
+    https://meet.google.com/ntc-qwwn-zox
+    Para ayudarte mejor mientras tanto, ¿cuántas empanadas quieres producir al día cuando el negocio esté funcionando a tope?
+
+separar:
+  trigger_keywords:
+    - separar
+    - SEPARAR
   si_pide_ayuda_para_decidir:
     condicion: "usuario_pide_ayuda_para_decidir == true"
     texto: >
@@ -297,11 +305,15 @@ bono:
   si_falta_modelo:
     condicion: "tiene_modelo == false"
     texto: >
-      ¡Gracias por responder BONO! ¿Ya sabes qué máquina quieres separar (CM06, CM06B, CM07, CM08, CM05S) o prefieres que te ayude a decidir?
+      ¡Gracias por responder SEPARAR! ¿Ya sabes qué máquina quieres separar (CM06, CM06B, CM07, CM08, CM05S) o prefieres que te ayude a decidir?
   si_falta_ubicacion:
     condicion: "tiene_ubicacion == false"
     texto: >
-      ¡Gracias por responder BONO! Para ayudarte con el bono necesito confirmar el país de envío. ¿En qué país estás?
+      ¡Gracias por responder SEPARAR! Para ayudarte con el bono necesito confirmar el país de envío. ¿En qué país estás?
+  si_falta_abono:
+    condicion: "tiene_modelo && tiene_ubicacion && tiene_abono == false"
+    texto: >
+      ¡Listo! ¿Con cuánto deseas abonar para separar tu máquina?
   si_falta_masa:
     condicion: "tiene_masa == false"
     texto: >
@@ -311,10 +323,9 @@ bono:
     texto: >
       ¡Listo! Para continuar con la separación, ¿qué productos quieres hacer? (empanadas, arepas, pasteles, etc.)
   si_todo_completo:
-    condicion: "tiene_modelo && tiene_ubicacion"
+    condicion: "tiene_modelo && tiene_ubicacion && tiene_abono"
     texto: >
-      ¡Genial! El bono es de COP 500.000 para Colombia y USD 200 para el resto del mundo, válido hasta el 31 de enero de 2026.
-      Para separar tu máquina, puedes hacer el pago acá (ver datos_pago_oficial).
+      ¡Genial! Para separar tu máquina, puedes hacer el pago acá (ver datos_pago_oficial).
       ¿Me confirmas cuando lo hayas realizado?
 
 
