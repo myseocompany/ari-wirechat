@@ -113,10 +113,10 @@
       @elseif($item['type'] === 'asignacion')
         <div class="d-flex justify-content-between">
           <div>
-            <strong class="text-primary">🔁 Reasignación</strong><br>
+            <strong class="text-primary">🔁 Asignación registrada</strong><br>
             <small class="text-muted">
-              Cliente reasignado a <strong>{{ $item['assigned_to'] }}</strong><br>
-              Modificado por <strong>{{ $item['editor'] }}</strong>
+              Propietario actual: <strong>{{ $item['assigned_to'] }}</strong><br>
+              Registrado por <strong>{{ $item['editor'] }}</strong>
             </small>
           </div>
           <div class="text-end small text-muted">
