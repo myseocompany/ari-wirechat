@@ -125,7 +125,31 @@
         @csrf
         <input type="hidden" name="from_date" value="{{ $request->from_date }}">
         <input type="hidden" name="to_date" value="{{ $request->to_date }}">
+        <input type="hidden" name="status" value="{{ $request->status }}">
+        <input type="hidden" name="score_min" value="{{ $request->score_min }}">
+        <input type="hidden" name="score_max" value="{{ $request->score_max }}">
         <input type="hidden" name="classifier_version" value="{{ $request->classifier_version }}">
+        <input type="hidden" name="customer_id" value="{{ $request->customer_id }}">
+        <input type="hidden" name="conversation_id" value="{{ $request->conversation_id }}">
+        <input type="hidden" name="user_id" value="{{ $request->user_id }}">
+        @if ($request->boolean('user_unassigned'))
+          <input type="hidden" name="user_unassigned" value="1">
+        @endif
+        @if ($request->boolean('tag_none'))
+          <input type="hidden" name="tag_none" value="1">
+        @endif
+        @foreach ($request->input('status_ids', []) as $statusId)
+          <input type="hidden" name="status_ids[]" value="{{ $statusId }}">
+        @endforeach
+        @foreach ($request->input('tag_ids', []) as $tagId)
+          <input type="hidden" name="tag_ids[]" value="{{ $tagId }}">
+        @endforeach
+        @foreach ($request->input('suggested_tag_ids', []) as $tagId)
+          <input type="hidden" name="suggested_tag_ids[]" value="{{ $tagId }}">
+        @endforeach
+        @foreach ($request->input('applied_tag_ids', []) as $tagId)
+          <input type="hidden" name="applied_tag_ids[]" value="{{ $tagId }}">
+        @endforeach
         <input type="hidden" name="limit" value="{{ $limitValue }}">
         <button type="submit" class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-800">
           {{ $label }}

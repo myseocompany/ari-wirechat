@@ -891,7 +891,7 @@ class ReportController extends Controller
 
         $limit = (int) $request->integer('limit');
 
-        $conversationIds = $this->getConversationIdsForClassificationRun($fromDate, $toDate, $limit);
+        $conversationIds = $this->getConversationIdsForClassificationRun($request, $fromDate, $toDate, $limit);
 
         if ($conversationIds === []) {
             $rangeLabel = $fromDate->toDateString().' a '.$toDate->toDateString();
@@ -999,20 +999,77 @@ class ReportController extends Controller
      * @return array<int, int>
      */
     private function getConversationIdsForClassificationRun(
+        LeadConversationClassificationRunRequest $request,
         ?Carbon $fromDate,
         ?Carbon $toDate,
         int $limit
     ): array {
-        $baseQuery = DB::table('wire_messages')
-            ->select('conversation_id')
-            ->whereNotNull('conversation_id')
-            ->whereIn('sendable_id', Customer::query()->select('id'));
+        $baseQuery = LeadConversationClassification::query()
+            ->from('lead_conversation_classifications as lcc')
+            ->select('lcc.conversation_id')
+            ->whereNotNull('lcc.conversation_id')
+            ->join('customers', 'customers.id', '=', 'lcc.customer_id');
 
-        if ($fromDate && $toDate) {
-            $baseQuery->whereBetween('created_at', [$fromDate, $toDate]);
-        }
+        $this->applyLeadClassificationFilters($baseQuery, $request, $fromDate, $toDate);
 
         return $this->collectConversationIds($baseQuery, $limit);
+    }
+
+    private function applyLeadClassificationFilters($query, Request $request, ?Carbon $fromDate, ?Carbon $toDate): void
+    {
+        $query
+            ->when($request->filled('customer_id'), function ($query) use ($request) {
+                $query->where('lcc.customer_id', $request->integer('customer_id'));
+            })
+            ->when($request->filled('conversation_id'), function ($query) use ($request) {
+                $query->where('lcc.conversation_id', $request->integer('conversation_id'));
+            })
+            ->when($request->filled('classifier_version'), function ($query) use ($request) {
+                $query->where('lcc.classifier_version', $request->string('classifier_version'));
+            })
+            ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+                $query->whereBetween('lcc.last_customer_message_at', [$fromDate, $toDate]);
+            })
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->where('lcc.status', $request->string('status'));
+            })
+            ->when($request->filled('score_min'), function ($query) use ($request) {
+                $query->where('lcc.score', '>=', (int) $request->input('score_min'));
+            })
+            ->when($request->filled('score_max'), function ($query) use ($request) {
+                $query->where('lcc.score', '<=', (int) $request->input('score_max'));
+            })
+            ->when($request->boolean('user_unassigned'), function ($query) {
+                $query->whereNull('customers.user_id');
+            })
+            ->when($request->filled('user_id') && ! $request->boolean('user_unassigned'), function ($query) use ($request) {
+                $query->where('customers.user_id', $request->integer('user_id'));
+            })
+            ->when($request->boolean('tag_none'), function ($query) {
+                $query->whereNotExists(function ($subQuery) {
+                    $subQuery->selectRaw('1')
+                        ->from('customer_tag as ct')
+                        ->whereColumn('ct.customer_id', 'customers.id');
+                });
+            })
+            ->when($request->filled('tag_ids') && ! $request->boolean('tag_none'), function ($query) use ($request) {
+                $tagIds = $request->input('tag_ids', []);
+                $query->whereExists(function ($subQuery) use ($tagIds) {
+                    $subQuery->selectRaw('1')
+                        ->from('customer_tag as ct')
+                        ->whereColumn('ct.customer_id', 'customers.id')
+                        ->whereIn('ct.tag_id', $tagIds);
+                });
+            })
+            ->when($request->filled('status_ids'), function ($query) use ($request) {
+                $query->whereIn('customers.status_id', $request->input('status_ids', []));
+            })
+            ->when($request->filled('suggested_tag_ids'), function ($query) use ($request) {
+                $query->whereIn('lcc.suggested_tag_id', $request->input('suggested_tag_ids', []));
+            })
+            ->when($request->filled('applied_tag_ids'), function ($query) use ($request) {
+                $query->whereIn('lcc.applied_tag_id', $request->input('applied_tag_ids', []));
+            });
     }
 
     /**
