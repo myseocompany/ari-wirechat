@@ -31,9 +31,9 @@
 
 <nav class="fixed inset-x-0 top-0 z-50 bg-white shadow">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="flex h-16 items-center justify-between">
-      <div class="flex items-center gap-4">
-        <a class="flex items-center" href="/customers">
+    <div class="flex h-16 items-center justify-between gap-3">
+      <div class="flex min-w-0 flex-1 items-center gap-4">
+        <a class="hidden items-center lg:flex" href="/customers">
           <img src="/img/Logo_MQE_normal-40px.png" alt="" class="h-10 w-auto">
         </a>
         <div class="hidden lg:flex lg:items-center lg:gap-4">
@@ -69,6 +69,12 @@
             @endforeach
           @endif
         </div>
+        @if (!Auth::guest())
+          <form class="flex min-w-0 flex-1 items-center gap-2 lg:hidden" action="/customers" method="GET">
+            <input class="h-9 w-full min-w-0 rounded-md border border-slate-300 px-3 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" type="text" placeholder="Busca o escribe..." aria-label="Cliente" id="name_mobile" name="search" @if (isset($request->search)) value="{{ $request->search }}" @endif>
+            <button class="inline-flex h-9 items-center rounded-md bg-blue-600 px-3 text-sm font-semibold text-white hover:bg-blue-700" type="submit">Ir</button>
+          </form>
+        @endif
       </div>
 
       <div class="hidden lg:flex lg:items-center lg:gap-3">
@@ -160,12 +166,6 @@
             @endif
           @endif
         @endforeach
-        <div class="border-t border-slate-200 pt-3">
-          <form class="flex items-center gap-2" action="/customers" method="GET">
-            <input class="h-9 w-full rounded-md border border-slate-300 px-3 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" type="text" placeholder="Busca o escribe..." aria-label="Cliente" id="name_mobile" name="search" @if (isset($request->search)) value="{{ $request->search }}" @endif>
-            <button class="inline-flex h-9 items-center rounded-md bg-blue-600 px-3 text-sm font-semibold text-white hover:bg-blue-700" type="submit">Ir</button>
-          </form>
-        </div>
         <div class="flex items-center gap-3">
           <a href="{{ $actionsLink ?? '/actions/' }}" class="relative inline-flex h-9 w-9 items-center justify-center text-slate-500" title="Acciones pendientes">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
