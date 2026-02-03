@@ -146,6 +146,9 @@
           if (window.initActionDateToggle) {
             window.initActionDateToggle($('#customer_overlay_body'));
           }
+          if (window.initActionCreationTimer) {
+            window.initActionCreationTimer($('#customer_overlay_body'));
+          }
         } else {
           window.location.href = url;
         }
