@@ -669,23 +669,17 @@ class ReportController extends Controller
             $toDate = Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay();
         }
 
-        $customerMorph = (new Customer)->getMorphClass();
-        $conversationIdsQuery = DB::table('wire_participants as wp')
-            ->select('wp.conversation_id')
-            ->whereColumn('wp.participantable_id', 'customers.id')
-            ->where('wp.participantable_type', $customerMorph);
-
         $messagesCountQuery = DB::table('wire_messages')
             ->selectRaw('count(*)')
-            ->whereIn('wire_messages.conversation_id', $conversationIdsQuery);
+            ->whereColumn('wire_messages.sendable_id', 'customers.id');
 
         $lastMessageAtQuery = DB::table('wire_messages')
             ->selectRaw('max(wire_messages.created_at)')
-            ->whereIn('wire_messages.conversation_id', $conversationIdsQuery);
+            ->whereColumn('wire_messages.sendable_id', 'customers.id');
 
         $messagesExistQuery = DB::table('wire_messages')
             ->selectRaw('1')
-            ->whereIn('wire_messages.conversation_id', $conversationIdsQuery);
+            ->whereColumn('wire_messages.sendable_id', 'customers.id');
 
         if ($fromDate && $toDate) {
             $messagesCountQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
