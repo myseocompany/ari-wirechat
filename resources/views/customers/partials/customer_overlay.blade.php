@@ -49,6 +49,42 @@
       };
     }
 
+    if (!window.initActionCreationTimer) {
+      window.initActionCreationTimer = function (scope) {
+        const $scope = scope ? $(scope) : $(document);
+        $scope.find('form').each(function () {
+          const form = this;
+          const timer = form.querySelector('[data-action-timer]');
+          const display = form.querySelector('[data-action-timer-display]');
+          const secondsField = form.querySelector('[data-action-timer-seconds]');
+          if (!timer || !display || !secondsField || timer.dataset.initialized === 'true') {
+            return;
+          }
+
+          timer.dataset.initialized = 'true';
+          const startedAt = Date.now();
+          const updateDisplay = function () {
+            if (!document.body.contains(form)) {
+              window.clearInterval(intervalId);
+              return;
+            }
+            const elapsedSeconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+            const minutes = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+            const seconds = String(elapsedSeconds % 60).padStart(2, '0');
+            display.textContent = `${minutes}:${seconds}`;
+            secondsField.value = String(elapsedSeconds);
+          };
+
+          updateDisplay();
+          const intervalId = window.setInterval(updateDisplay, 1000);
+          form.addEventListener('submit', function () {
+            updateDisplay();
+            window.clearInterval(intervalId);
+          }, { once: true });
+        });
+      };
+    }
+
     if (!window.initCustomerTabs) {
       window.initCustomerTabs = function (scope) {
         const $scope = scope ? $(scope) : $(document);
