@@ -151,6 +151,16 @@ class CustomerAssignedConversations extends Component
             ->whereHas('participants', function (Builder $query) use ($authId, $customerMorph, $shouldLimitToAssignedCustomers): void {
                 $query
                     ->where('participantable_type', $customerMorph)
+                    ->when(trim($this->search) !== '', function (Builder $customerQuery): void {
+                        $search = '%'.trim($this->search).'%';
+                        $customerQuery->whereHasMorph('participantable', [Customer::class], function (Builder $participantableQuery) use ($search): void {
+                            $participantableQuery->where(function (Builder $query) use ($search): void {
+                                $query
+                                    ->where('phone', 'like', $search)
+                                    ->orWhere('phone2', 'like', $search);
+                            });
+                        });
+                    })
                     ->when($shouldLimitToAssignedCustomers, function (Builder $customerQuery) use ($authId): void {
                         $customerQuery->whereIn('participantable_id', $this->assignedCustomerIdsQuery($authId));
                     });
@@ -161,17 +171,7 @@ class CustomerAssignedConversations extends Component
     {
         return Customer::query()
             ->select('id')
-            ->where('user_id', $authId)
-            ->when(trim($this->search) !== '', function (Builder $query): void {
-                $search = '%'.trim($this->search).'%';
-                $query->where(function (Builder $innerQuery) use ($search): void {
-                    $innerQuery
-                        ->where('name', 'like', $search)
-                        ->orWhere('phone', 'like', $search)
-                        ->orWhere('phone2', 'like', $search)
-                        ->orWhere('contact_phone2', 'like', $search);
-                });
-            });
+            ->where('user_id', $authId);
     }
 
     #[Title('Conversaciones de mis clientes')]
