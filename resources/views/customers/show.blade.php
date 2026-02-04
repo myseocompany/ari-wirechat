@@ -138,9 +138,9 @@
 -->
             <div class="space-y-3">
               <div class="space-y-0.5">
-                <div class="text-xs text-slate-500">Imagen</div>
+                <div class="text-xs text-slate-500">Perfil</div>
                 <div class="inline-flex items-center gap-2 text-sm text-slate-900">
-                  <a href="https://arichat.co/customers/{{ $model->id }}/show" class="text-blue-600 hover:underline">https://arichat.co/customers/{{ $model->id }}/show</a>
+                  <a href="https://arichat.co/customers/{{ $model->id }}/show" class="text-blue-600 hover:underline">Copiar</a>
                   <button
                     type="button"
                     class="inline-flex items-center text-slate-500 transition hover:text-slate-700"
