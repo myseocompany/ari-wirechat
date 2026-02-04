@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Customer;
+use App\Models\CustomerStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
@@ -31,6 +32,10 @@ class CustomerAssignedConversations extends Component
 
     public Collection $selectedMessages;
 
+    public ?int $customerStatusId = null;
+
+    public Collection $customerStatuses;
+
     private int $perPage = 20;
 
     public function mount(): void
@@ -38,6 +43,9 @@ class CustomerAssignedConversations extends Component
         abort_unless(auth()->check(), 401);
         $this->conversations = collect();
         $this->selectedMessages = collect();
+        $this->customerStatuses = CustomerStatus::query()
+            ->orderBy('weight')
+            ->get(['id', 'name']);
     }
 
     public function updatedSearch(): void
@@ -46,6 +54,11 @@ class CustomerAssignedConversations extends Component
     }
 
     public function updatedAdminOnlyMyAssigned(): void
+    {
+        $this->reset(['page', 'canLoadMore', 'selectedConversationId']);
+    }
+
+    public function updatedCustomerStatusId(): void
     {
         $this->reset(['page', 'canLoadMore', 'selectedConversationId']);
     }
@@ -159,6 +172,11 @@ class CustomerAssignedConversations extends Component
                                     ->where('phone', 'like', $search)
                                     ->orWhere('phone2', 'like', $search);
                             });
+                        });
+                    })
+                    ->when($this->customerStatusId, function (Builder $customerQuery): void {
+                        $customerQuery->whereHasMorph('participantable', [Customer::class], function (Builder $participantableQuery): void {
+                            $participantableQuery->where('status_id', $this->customerStatusId);
                         });
                     })
                     ->when($shouldLimitToAssignedCustomers, function (Builder $customerQuery) use ($authId): void {
