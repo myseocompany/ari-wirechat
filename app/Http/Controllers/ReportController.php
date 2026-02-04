@@ -661,13 +661,12 @@ class ReportController extends Controller
 
     public function customersByMessageCount(CustomerMessagesReportRequest $request): View
     {
-        $fromDate = null;
-        $toDate = null;
-
-        if ($request->filled('from_date') && $request->filled('to_date')) {
-            $fromDate = Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay();
-            $toDate = Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay();
-        }
+        $fromDate = $request->filled('from_date')
+            ? Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay()
+            : now()->startOfDay();
+        $toDate = $request->filled('to_date')
+            ? Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay()
+            : now()->endOfDay();
 
         $messagesCountQuery = DB::table('wire_messages')
             ->selectRaw('count(*)')
@@ -681,11 +680,9 @@ class ReportController extends Controller
             ->selectRaw('1')
             ->whereColumn('wire_messages.sendable_id', 'customers.id');
 
-        if ($fromDate && $toDate) {
-            $messagesCountQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
-            $lastMessageAtQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
-            $messagesExistQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
-        }
+        $messagesCountQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
+        $lastMessageAtQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
+        $messagesExistQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
 
         if ($request->filled('message_search')) {
             $searchTerm = '%'.$request->input('message_search').'%';
