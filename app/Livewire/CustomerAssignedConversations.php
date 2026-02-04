@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\Title;
@@ -69,6 +70,7 @@ class CustomerAssignedConversations extends Component
 
         $this->canLoadMore = $conversations->count() > $limit;
         $this->conversations = $conversations->take($limit)->values();
+        $this->loadCustomerAdvisorRelations($this->conversations);
 
         if ($this->selectedConversationId === null && $this->conversations->isNotEmpty()) {
             $this->selectedConversationId = (int) $this->conversations->first()->id;
@@ -115,6 +117,16 @@ class CustomerAssignedConversations extends Component
             ->oldest('created_at')
             ->take(80)
             ->get();
+
+        $this->loadCustomerAdvisorRelations(collect([$conversation]));
+    }
+
+    protected function loadCustomerAdvisorRelations(Collection $conversations): void
+    {
+        $participants = new EloquentCollection($conversations->pluck('participants')->flatten()->all());
+        $participants->loadMorph('participantable', [
+            Customer::class => ['user'],
+        ]);
     }
 
     protected function accessibleConversationsQuery(): Builder

@@ -83,7 +83,6 @@
                                                 <div class="mb-1 flex items-center justify-between gap-3">
                                                     <h6 class="truncate font-medium text-gray-900 dark:text-white">{{ $displayName }}</h6>
                                                 </div>
-
                                                 @if ($lastMessage)
                                                     <div class="flex items-center gap-2">
                                                         <p class="truncate text-sm text-gray-600 dark:text-white">
@@ -105,7 +104,9 @@
                                                             Ver cliente
                                                         </a>
                                                     @endif
-                                                    <span class="font-semibold text-slate-500">Ver conversación aquí</span>
+                                                    <span class="font-semibold text-slate-500">
+                                                        Asesor: {{ $customer?->user?->name ?? 'Sin asesor' }}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </aside>
