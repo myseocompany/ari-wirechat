@@ -47,6 +47,8 @@
           @foreach($menuItems as $item)
               @php
                 $liClasses = $item->hasChildren() ? 'dropdown' : 'nav-item';
+                $resolvedItemUrl = strtolower(trim($item->name)) === 'seguimientos' ? route('customer-chats') : $item->url;
+                $resolvedItemName = strtolower(trim($item->name)) === 'seguimientos' ? 'Chats' : $item->name;
               @endphp
               <li class="{{ $liClasses }}">
                   
@@ -62,13 +64,17 @@
                               {{ csrf_field() }}
                           </form>
                       @else
-                      <a class="nav-link text-dark @if($item->hasChildren()) dropdown-toggle @endif" href="{{$item->url}}" @if($item->hasChildren()) data-toggle="dropdown" role="button" aria-expanded="false" @endif>
-                          {{$item->name}}
+                      <a class="nav-link text-dark @if($item->hasChildren()) dropdown-toggle @endif" href="{{$resolvedItemUrl}}" @if($item->hasChildren()) data-toggle="dropdown" role="button" aria-expanded="false" @endif>
+                          {{$resolvedItemName}}
                       </a>
                       @endif
                   @if($item->hasChildren())
                     <ul class="dropdown-menu" role="menu">
                       @foreach($item->getChildren() as $subitem)
+                        @php
+                          $resolvedSubitemUrl = strtolower(trim($subitem->name)) === 'seguimientos' ? route('customer-chats') : $subitem->url;
+                          $resolvedSubitemName = strtolower(trim($subitem->name)) === 'seguimientos' ? 'Chats' : $subitem->name;
+                        @endphp
                         <li class="nav-item">
                           @if($subitem->url == "/logout")
                               <a class="nav-link text-dark" href="#"
@@ -80,9 +86,9 @@
                                   {{ csrf_field() }}
                               </form>
                           @else
-                          <a class="nav-link text-dark" href="{{$subitem->url}}">
+                          <a class="nav-link text-dark" href="{{$resolvedSubitemUrl}}">
                               
-                                  {{$subitem->name}} 
+                                  {{$resolvedSubitemName}} 
                               
                           </a>
                           @endif
