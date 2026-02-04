@@ -1899,6 +1899,13 @@ class CustomerController extends Controller
         if ($request->filled('date_programed')) {
             $model->due_date = $date_programed;
         }
+        $creationSeconds = $request->input('creation_seconds');
+        if ($creationSeconds !== null && $creationSeconds !== '' && is_numeric($creationSeconds)) {
+            $creationSeconds = (int) $creationSeconds;
+            if ($creationSeconds >= 0) {
+                $model->creation_seconds = $creationSeconds;
+            }
+        }
 
         $model->save();
         if (! is_null($request->status_id)) {

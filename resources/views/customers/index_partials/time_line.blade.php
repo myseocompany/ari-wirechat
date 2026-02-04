@@ -17,6 +17,7 @@
           'type_name' => $action->getTypeName(), // nombre del tipo
           'is_pending' => $action->isPending(),  // estado pendiente
           'due_date' => $action->due_date,       // fecha de vencimiento
+          'creation_seconds' => $action->creation_seconds,
           
       ]);
   }
@@ -111,6 +112,18 @@
             <span class="text-muted small">
               {{ $item['type_name'] ?? 'Tipo no definido' }}
             </span>
+
+            @if(!empty($item['creation_seconds']))
+              @php
+                $durationSeconds = (int) $item['creation_seconds'];
+                $durationLabel = $durationSeconds >= 3600
+                  ? gmdate('H:i:s', $durationSeconds)
+                  : gmdate('i:s', $durationSeconds);
+              @endphp
+              <div class="text-muted small">
+                ⏱ Duración: {{ $durationLabel }}
+              </div>
+            @endif
 
           </div>
 

@@ -6,8 +6,10 @@
   $timeline = collect();
   $chatMessages = $chatMessages ?? collect();
 
+  $actions = $actions ?? $customer->actions ?? collect();
+
   // Agregamos acciones
-  foreach ($customer->actions as $action) {
+  foreach ($actions as $action) {
       $timeline->push([
           'type' => 'action',
           'id' => $action->id,
@@ -21,6 +23,7 @@
           'is_pending' => $action->isPending(),
           'due_date' => $action->due_date,
           'type_id' => $action->type_id,
+          'creation_seconds' => $action->creation_seconds,
           'status_id' => $customer->status_id,
           'customer_name' => $customer->name,
       ]);
@@ -108,6 +111,18 @@
             <span class="text-xs text-slate-500">
               {{ $item['type_name'] }}
             </span>
+
+            @if(!empty($item['creation_seconds']))
+              @php
+                $durationSeconds = (int) $item['creation_seconds'];
+                $durationLabel = $durationSeconds >= 3600
+                  ? gmdate('H:i:s', $durationSeconds)
+                  : gmdate('i:s', $durationSeconds);
+              @endphp
+              <div class="text-xs text-slate-500">
+                ⏱ Duración: {{ $durationLabel }}
+              </div>
+            @endif
           </div>
           <div class="text-right text-xs text-slate-500">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}<br>
