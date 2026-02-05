@@ -148,6 +148,7 @@ class CustomerAssignedConversations extends Component
         $authId = (int) $authUser->id;
         $customerMorph = (new Customer)->getMorphClass();
         $shouldLimitToAssignedCustomers = (int) $authUser->role_id !== 1 || $this->adminOnlyMyAssigned;
+        $searchTerm = trim($this->search);
 
         return Conversation::query()
             ->with([
@@ -161,19 +162,33 @@ class CustomerAssignedConversations extends Component
             ->whereHas('messages', function (Builder $query): void {
                 $query->withoutGlobalScope(WithoutRemovedMessages::class);
             })
+            ->when($searchTerm !== '', function (Builder $query) use ($searchTerm): void {
+                $search = '%'.$searchTerm.'%';
+                $customerMorph = (new Customer)->getMorphClass();
+
+                $query->where(function (Builder $searchQuery) use ($search, $customerMorph): void {
+                    $searchQuery
+                        ->whereHas('participants', function (Builder $participantQuery) use ($search, $customerMorph): void {
+                            $participantQuery
+                                ->where('participantable_type', $customerMorph)
+                                ->whereHasMorph('participantable', [Customer::class], function (Builder $participantableQuery) use ($search): void {
+                                    $participantableQuery->where(function (Builder $phoneQuery) use ($search): void {
+                                        $phoneQuery
+                                            ->where('phone', 'like', $search)
+                                            ->orWhere('phone2', 'like', $search);
+                                    });
+                                });
+                        })
+                        ->orWhereHas('messages', function (Builder $messageQuery) use ($search): void {
+                            $messageQuery
+                                ->withoutGlobalScope(WithoutRemovedMessages::class)
+                                ->where('body', 'like', $search);
+                        });
+                });
+            })
             ->whereHas('participants', function (Builder $query) use ($authId, $customerMorph, $shouldLimitToAssignedCustomers): void {
                 $query
                     ->where('participantable_type', $customerMorph)
-                    ->when(trim($this->search) !== '', function (Builder $customerQuery): void {
-                        $search = '%'.trim($this->search).'%';
-                        $customerQuery->whereHasMorph('participantable', [Customer::class], function (Builder $participantableQuery) use ($search): void {
-                            $participantableQuery->where(function (Builder $query) use ($search): void {
-                                $query
-                                    ->where('phone', 'like', $search)
-                                    ->orWhere('phone2', 'like', $search);
-                            });
-                        });
-                    })
                     ->when($this->customerStatusId, function (Builder $customerQuery): void {
                         $customerQuery->whereHasMorph('participantable', [Customer::class], function (Builder $participantableQuery): void {
                             $participantableQuery->where('status_id', $this->customerStatusId);

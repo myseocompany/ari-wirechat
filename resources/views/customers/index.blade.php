@@ -201,7 +201,7 @@
     </div>
 
     <div class="flex justify-center">
-      {!! $model->appends(request()->input())->links() !!}
+      {!! $model->onEachSide(1)->links('pagination::bootstrap-4') !!}
     </div>
   </div>
 

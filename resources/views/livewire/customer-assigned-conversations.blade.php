@@ -21,7 +21,7 @@
                             </svg>
                         </label>
                         <input id="assigned-chats-search" name="assigned_chats_search" maxlength="100" type="search"
-                            wire:model.live.debounce.400ms="search" placeholder="Buscar por phone o phone2"
+                            wire:model.live.debounce.400ms="search" placeholder="Buscar por phone, phone2 o mensaje"
                             autocomplete="off"
                             class="col-span-11 w-full border-0 bg-inherit text-sm outline-none focus:outline-none focus:ring-0 hover:ring-0 dark:text-white">
                     </div>
