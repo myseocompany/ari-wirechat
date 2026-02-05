@@ -27,6 +27,8 @@ class Action extends Model
         'owner_user_id',
         'sale_date',
         'sale_amount',
+        'reminder_type',
+        'creation_seconds',
     ];
 
     /** Casts para fechas y numéricos. */
@@ -37,6 +39,7 @@ class Action extends Model
         'customer_updated_at' => 'datetime',
         'sale_date' => 'date',
         'sale_amount' => 'decimal:2',
+        'creation_seconds' => 'integer',
     ];
 
     protected static function booted(): void

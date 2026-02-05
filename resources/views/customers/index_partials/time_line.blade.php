@@ -17,9 +17,21 @@
           'type_name' => $action->getTypeName(), // nombre del tipo
           'is_pending' => $action->isPending(),  // estado pendiente
           'due_date' => $action->due_date,       // fecha de vencimiento
+          'creation_seconds' => $action->creation_seconds,
           
       ]);
   }
+
+  // Estado actual del customer (registro actual)
+  $timeline->push([
+      'type' => 'estado',
+      'date' => $customer->updated_at,
+      'status' => $customer->status->name ?? $customer->status_id,
+      'assigned_to' => $customer->user->name ?? 'Sin asignar',
+      'editor' => $customer->updated_user->name ?? 'Desconocido',
+      'color' => $customer->status->color ?? 'gray',
+      'is_current' => true,
+  ]);
 
   // Detectamos cambios de asignación o estado en historial
   $prevUserId = null;
@@ -45,6 +57,7 @@
           'assigned_to' => $asignadoA,
           'editor' => $editor,
           'color' => $history->status->color ?? 'gray',
+          'is_current' => false,
       ]);
 
       $prevUserId = $currentUserId;
@@ -100,6 +113,18 @@
               {{ $item['type_name'] ?? 'Tipo no definido' }}
             </span>
 
+            @if(!empty($item['creation_seconds']))
+              @php
+                $durationSeconds = (int) $item['creation_seconds'];
+                $durationLabel = $durationSeconds >= 3600
+                  ? gmdate('H:i:s', $durationSeconds)
+                  : gmdate('i:s', $durationSeconds);
+              @endphp
+              <div class="text-muted small">
+                ⏱ Duración: {{ $durationLabel }}
+              </div>
+            @endif
+
           </div>
 
           {{-- Lado derecho: fecha y creador --}}
@@ -113,10 +138,10 @@
       @elseif($item['type'] === 'asignacion')
         <div class="d-flex justify-content-between">
           <div>
-            <strong class="text-primary">🔁 Reasignación</strong><br>
+            <strong class="text-primary">🔁 Asignación registrada</strong><br>
             <small class="text-muted">
-              Cliente reasignado a <strong>{{ $item['assigned_to'] }}</strong><br>
-              Modificado por <strong>{{ $item['editor'] }}</strong>
+              Propietario actual: <strong>{{ $item['assigned_to'] }}</strong><br>
+              Registrado por <strong>{{ $item['editor'] }}</strong>
             </small>
           </div>
           <div class="text-end small text-muted">
@@ -127,7 +152,11 @@
       @elseif($item['type'] === 'estado')
         <div class="d-flex justify-content-between">
           <div>
-            <strong>📝 Cambio de estado</strong><br>
+            <strong>📝 Cambio de estado</strong>
+            @if(!empty($item['is_current']))
+              <span class="badge bg-success ms-2">Actual</span>
+            @endif
+            <br>
             <small class="text-muted">
               Nuevo estado: <strong>{{ $item['status'] }}</strong><br>
               Asignado a <strong>{{ $item['assigned_to'] }}</strong><br>

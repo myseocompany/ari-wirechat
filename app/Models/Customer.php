@@ -615,9 +615,16 @@ class Customer extends Authenticatable
     {
         $normalized = self::normalizePhone($incomingPhone);
 
-        return self::whereRaw("REPLACE(REPLACE(REPLACE(phone, '+', ''), ' ', ''), '-', '') = ?", [$normalized])
-            ->orWhereRaw("REPLACE(REPLACE(REPLACE(phone2, '+', ''), ' ', ''), '-', '') = ?", [$normalized])
-            ->orWhereRaw("REPLACE(REPLACE(REPLACE(contact_phone2, '+', ''), ' ', ''), '-', '') = ?", [$normalized])
+        if ($normalized === '') {
+            return null;
+        }
+
+        $last9 = substr($normalized, -9);
+
+        return self::query()
+            ->where('phone_last9', $last9)
+            ->orWhere('phone2_last9', $last9)
+            ->orWhere('contact_phone2_last9', $last9)
             ->first();
     }
 }

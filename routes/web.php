@@ -13,8 +13,8 @@ use App\Http\Controllers\CustomerStatusController;
 use App\Http\Controllers\CustomerTagController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailController;
-// use App\Http\Controllers\WompiController;
 use App\Http\Controllers\HomeController;
+// use App\Http\Controllers\WompiController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\LandingController;
@@ -36,6 +36,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WhatsAppAPIController;
 use App\Http\Controllers\WhatsAppBroadcastController;
+use App\Livewire\CustomerAssignedConversations;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -54,6 +55,8 @@ Route::get('/', function () {
 Route::middleware('auth')->get('/design-system', function () {
     return view('design-system');
 })->name('design-system');
+
+Route::middleware('auth')->get('/customer-chats', CustomerAssignedConversations::class)->name('customer-chats');
 
 Route::middleware('auth')->get('/faq', [HomeController::class, 'indexFaq'])->name('faq');
 
@@ -376,6 +379,11 @@ Route::middleware('auth')->prefix('reports')->group(function () {
     Route::get('/views/customers_followup', [ReportController::class, 'RFM_CustomersFollowups']);
     Route::get('/views/daily_customers_followup', [CustomerController::class, 'daily']);
     Route::get('/views/customers_messages_count', [ReportController::class, 'customersByMessageCount']);
+    Route::get('/views/customers_lead_classifications', [ReportController::class, 'customersLeadClassifications']);
+    Route::post('/views/customers_lead_classifications/run', [ReportController::class, 'runCustomersLeadClassifications'])
+        ->name('reports.customers_lead_classifications.run');
+    Route::get('/views/customers_status8_conversations', [ReportController::class, 'customersStatusEightConversations']);
+    Route::get('/views/customers_calculator', [ReportController::class, 'customersCalculator']);
     Route::get('/fm', [ReportController::class, 'RFM']);
 });
 

@@ -31,9 +31,9 @@
 
 <nav class="fixed inset-x-0 top-0 z-50 bg-white shadow">
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-    <div class="flex h-16 items-center justify-between">
-      <div class="flex items-center gap-4">
-        <a class="flex items-center" href="/customers">
+    <div class="flex h-16 items-center justify-between gap-3">
+      <div class="flex min-w-0 flex-1 items-center gap-4">
+        <a class="hidden items-center lg:flex" href="/customers">
           <img src="/img/Logo_MQE_normal-40px.png" alt="" class="h-10 w-auto">
         </a>
         <div class="hidden lg:flex lg:items-center lg:gap-4">
@@ -41,20 +41,28 @@
             <a class="text-sm font-medium text-slate-700 hover:text-slate-900" href="{{ route('login') }}">Iniciar sesión</a>
           @else
             @foreach ($menuItems as $item)
+              @php
+                $resolvedItemUrl = strtolower(trim($item->name)) === 'seguimientos' ? route('customer-chats') : $item->url;
+                $resolvedItemName = strtolower(trim($item->name)) === 'seguimientos' ? 'Chats' : $item->name;
+              @endphp
               @if ($item->hasChildren())
                 <div class="relative" data-dropdown>
                   <button type="button" class="inline-flex items-center gap-1 text-sm font-medium text-slate-700 hover:text-slate-900" data-dropdown-trigger>
-                    {{ $item->name }}
+                    {{ $resolvedItemName }}
                     <svg class="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.18l3.71-3.95a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clip-rule="evenodd" />
                     </svg>
                   </button>
                   <div class="absolute left-0 mt-2 hidden min-w-[220px] rounded-md border border-slate-200 bg-white py-2 shadow-lg" data-dropdown-menu>
                     @foreach ($item->getChildren() as $subitem)
+                      @php
+                        $resolvedSubitemUrl = strtolower(trim($subitem->name)) === 'seguimientos' ? route('customer-chats') : $subitem->url;
+                        $resolvedSubitemName = strtolower(trim($subitem->name)) === 'seguimientos' ? 'Chats' : $subitem->name;
+                      @endphp
                       @if ($subitem->url === '/logout')
                         <button type="button" class="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50" data-logout>Salir</button>
                       @else
-                        <a class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" href="{{ $subitem->url }}">{{ $subitem->name }}</a>
+                        <a class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" href="{{ $resolvedSubitemUrl }}">{{ $resolvedSubitemName }}</a>
                       @endif
                     @endforeach
                   </div>
@@ -63,12 +71,18 @@
                 @if ($item->url === '/logout')
                   <button type="button" class="text-sm font-medium text-slate-700 hover:text-slate-900" data-logout>Salir</button>
                 @else
-                  <a class="text-sm font-medium text-slate-700 hover:text-slate-900" href="{{ $item->url }}">{{ $item->name }}</a>
+                  <a class="text-sm font-medium text-slate-700 hover:text-slate-900" href="{{ $resolvedItemUrl }}">{{ $resolvedItemName }}</a>
                 @endif
               @endif
             @endforeach
           @endif
         </div>
+        @if (!Auth::guest())
+          <form class="flex min-w-0 flex-1 items-center gap-2 lg:hidden" action="/customers" method="GET">
+            <input class="h-9 w-full min-w-0 rounded-md border border-slate-300 px-3 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" type="text" placeholder="Busca o escribe..." aria-label="Cliente" id="name_mobile" name="search" @if (isset($request->search)) value="{{ $request->search }}" @endif>
+            <button class="inline-flex h-9 items-center rounded-md bg-blue-600 px-3 text-sm font-semibold text-white hover:bg-blue-700" type="submit">Ir</button>
+          </form>
+        @endif
       </div>
 
       <div class="hidden lg:flex lg:items-center lg:gap-3">
@@ -141,14 +155,22 @@
         <a class="block text-sm font-medium text-slate-700" href="{{ route('login') }}">Iniciar sesión</a>
       @else
         @foreach ($menuItems as $item)
+          @php
+            $resolvedItemUrl = strtolower(trim($item->name)) === 'seguimientos' ? route('customer-chats') : $item->url;
+            $resolvedItemName = strtolower(trim($item->name)) === 'seguimientos' ? 'Chats' : $item->name;
+          @endphp
           @if ($item->hasChildren())
             <div class="space-y-1">
-              <span class="block text-xs font-semibold uppercase text-slate-400">{{ $item->name }}</span>
+              <span class="block text-xs font-semibold uppercase text-slate-400">{{ $resolvedItemName }}</span>
               @foreach ($item->getChildren() as $subitem)
+                @php
+                  $resolvedSubitemUrl = strtolower(trim($subitem->name)) === 'seguimientos' ? route('customer-chats') : $subitem->url;
+                  $resolvedSubitemName = strtolower(trim($subitem->name)) === 'seguimientos' ? 'Chats' : $subitem->name;
+                @endphp
                 @if ($subitem->url === '/logout')
                   <button type="button" class="block text-sm font-medium text-slate-700" data-logout>Salir</button>
                 @else
-                  <a class="block text-sm font-medium text-slate-700" href="{{ $subitem->url }}">{{ $subitem->name }}</a>
+                  <a class="block text-sm font-medium text-slate-700" href="{{ $resolvedSubitemUrl }}">{{ $resolvedSubitemName }}</a>
                 @endif
               @endforeach
             </div>
@@ -156,16 +178,10 @@
             @if ($item->url === '/logout')
               <button type="button" class="block text-sm font-medium text-slate-700" data-logout>Salir</button>
             @else
-              <a class="block text-sm font-medium text-slate-700" href="{{ $item->url }}">{{ $item->name }}</a>
+              <a class="block text-sm font-medium text-slate-700" href="{{ $resolvedItemUrl }}">{{ $resolvedItemName }}</a>
             @endif
           @endif
         @endforeach
-        <div class="border-t border-slate-200 pt-3">
-          <form class="flex items-center gap-2" action="/customers" method="GET">
-            <input class="h-9 w-full rounded-md border border-slate-300 px-3 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" type="text" placeholder="Busca o escribe..." aria-label="Cliente" id="name_mobile" name="search" @if (isset($request->search)) value="{{ $request->search }}" @endif>
-            <button class="inline-flex h-9 items-center rounded-md bg-blue-600 px-3 text-sm font-semibold text-white hover:bg-blue-700" type="submit">Ir</button>
-          </form>
-        </div>
         <div class="flex items-center gap-3">
           <a href="{{ $actionsLink ?? '/actions/' }}" class="relative inline-flex h-9 w-9 items-center justify-center text-slate-500" title="Acciones pendientes">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">

@@ -1,0 +1,82 @@
+import { useState } from 'react';
+import { TrendingUp } from 'lucide-react';
+
+interface MachineCostStepProps {
+  value?: number;
+  currency: string;
+  onNext: (value: number) => void;
+  onBack: () => void;
+}
+
+export default function MachineCostStep({
+  value,
+  currency,
+  onNext,
+  onBack,
+}: MachineCostStepProps) {
+  const [input, setInput] = useState(value?.toString() || '');
+  const [error, setError] = useState('');
+
+  const handleNext = () => {
+    const num = parseFloat(input);
+    if (!input || isNaN(num) || num <= 0) {
+      setError('Por favor ingresa un monto válido');
+      return;
+    }
+    setError('');
+    onNext(num);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-3 bg-blue-100 rounded-lg">
+          <TrendingUp className="w-6 h-6 text-blue-600" />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900">
+          ¿Cuánto cuesta la máquina que estás evaluando?
+        </h2>
+      </div>
+
+      <div>
+        <div className="relative">
+          <span className="absolute left-4 top-3 text-gray-500 text-lg font-semibold">
+            {currency}
+          </span>
+          <input
+            type="number"
+            step="0.01"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleNext()}
+            placeholder="0.00"
+            className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+          />
+        </div>
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      </div>
+
+      <div className="bg-green-50 p-4 rounded-lg">
+        <p className="text-sm text-green-800">
+          <strong>Tip:</strong> Incluye el costo total de la máquina, instalación y
+          capacitación si aplica.
+        </p>
+      </div>
+
+      <div className="flex gap-3 pt-4">
+        <button
+          onClick={onBack}
+          className="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+        >
+          Atrás
+        </button>
+        <button
+          onClick={handleNext}
+          className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 transition-all shadow-lg"
+        >
+          Ver mi cálculo
+        </button>
+      </div>
+    </div>
+  );
+}

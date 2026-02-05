@@ -75,6 +75,12 @@
             <input class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200" name="date_programed" type="datetime-local" id="date_programed" disabled>
         </div>
 
+        <div class="mt-4 flex items-center justify-between rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600" data-action-timer>
+            <span class="font-medium text-slate-700">Tiempo creando acción</span>
+            <span class="font-semibold tabular-nums text-slate-900" data-action-timer-display>00:00</span>
+            <input type="hidden" name="creation_seconds" value="0" data-action-timer-seconds>
+        </div>
+
         {{-- Botón submit --}}
         <div class="mt-4">
             <button type="submit" class="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">Guardar acción</button>
@@ -119,9 +125,43 @@ if (!window.initActionDateToggle) {
     };
 }
 
+if (!window.initActionCreationTimer) {
+    window.initActionCreationTimer = function(scope) {
+        const root = scope instanceof Element ? scope : document;
+        root.querySelectorAll('form').forEach(function(form) {
+            const timer = form.querySelector('[data-action-timer]');
+            const display = form.querySelector('[data-action-timer-display]');
+            const secondsField = form.querySelector('[data-action-timer-seconds]');
+            if (!timer || !display || !secondsField || timer.dataset.initialized === 'true') {
+                return;
+            }
+
+            timer.dataset.initialized = 'true';
+            const startedAt = Date.now();
+            const updateDisplay = function() {
+                const elapsedSeconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+                const minutes = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0');
+                const seconds = String(elapsedSeconds % 60).padStart(2, '0');
+                display.textContent = `${minutes}:${seconds}`;
+                secondsField.value = String(elapsedSeconds);
+            };
+
+            updateDisplay();
+            const intervalId = window.setInterval(updateDisplay, 1000);
+            form.addEventListener('submit', function() {
+                updateDisplay();
+                window.clearInterval(intervalId);
+            }, { once: true });
+        });
+    };
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     if (window.initActionDateToggle) {
         window.initActionDateToggle();
+    }
+    if (window.initActionCreationTimer) {
+        window.initActionCreationTimer();
     }
 });
 </script>

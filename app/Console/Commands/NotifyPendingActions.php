@@ -232,7 +232,13 @@ TXT;
         return Action::query()
             ->where('type_id', 16)
             ->where('object_id', $actionId)
-            ->where('note', 'like', '%"reminder_type":"'.$reminderType.'"%')
+            ->where(function ($query) use ($reminderType) {
+                $query->where('reminder_type', $reminderType)
+                    ->orWhere(function ($legacyQuery) use ($reminderType) {
+                        $legacyQuery->whereNull('reminder_type')
+                            ->where('note', 'like', '%"reminder_type":"'.$reminderType.'"%');
+                    });
+            })
             ->exists();
     }
 }

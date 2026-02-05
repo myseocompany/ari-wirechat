@@ -288,12 +288,14 @@ class WhatsAppService
         ], JSON_UNESCAPED_SLASHES);
 
         $actionId = $context['action_id'] ?? null;
+        $reminderType = isset($context['reminder_type']) ? (string) $context['reminder_type'] : null;
 
         Action::create([
             'customer_id' => $customer->id,
             'type_id' => 16,
             'note' => $note,
             'object_id' => is_numeric($actionId) ? (int) $actionId : null,
+            'reminder_type' => $reminderType,
             'creator_user_id' => 0,
         ]);
     }

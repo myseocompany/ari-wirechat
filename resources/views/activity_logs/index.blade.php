@@ -126,7 +126,11 @@
                             <td>
                                 @if($log->subject_type && $log->subject_id)
                                     <span class="muted">{{ \Illuminate\Support\Str::afterLast($log->subject_type, '\\') }}</span>
-                                    #{{ $log->subject_id }}
+                                    @if($log->subject_type === \App\Models\Customer::class)
+                                        <a href="{{ route('customers.show', $log->subject_id) }}">#{{ $log->subject_id }}</a>
+                                    @else
+                                        #{{ $log->subject_id }}
+                                    @endif
                                 @else
                                     <span class="muted">-</span>
                                 @endif
