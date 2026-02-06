@@ -110,6 +110,11 @@ class ActionService
                 if ($request->filled('type_id')) {
                     $query->where('type_id', $request->type_id);
                 }
+                if ($request->filled('status_id')) {
+                    $query->whereHas('customer', function ($q) use ($request) {
+                        $q->where('status_id', $request->status_id);
+                    });
+                }
                 if ($request->filled('action_search')) {
                     $query->where('note', 'like', '%'.$request->action_search.'%');
                 }
@@ -184,7 +189,7 @@ class ActionService
     {
         $filteredRequest = new Request;
 
-        $filters = ['user_id', 'type_id', 'action_search', 'from_date', 'to_date', 'from_time', 'to_time', 'has_audio'];
+        $filters = ['user_id', 'type_id', 'status_id', 'action_search', 'from_date', 'to_date', 'from_time', 'to_time', 'has_audio'];
         foreach ($filters as $filter) {
             if ($originalRequest->has($filter)) {
                 $filteredRequest->merge([
