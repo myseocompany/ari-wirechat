@@ -19,7 +19,14 @@
         </div>
         @if(!empty($action->url))
           @php
-            $lowerUrl = Str::lower($action->url);
+            $audioUrl = trim($action->url);
+            if (! Str::startsWith($audioUrl, ['http://', 'https://'])) {
+              $audioUrl = 'https://'.$audioUrl;
+            }
+            if (Str::startsWith($audioUrl, 'http://')) {
+              $audioUrl = 'https://'.Str::after($audioUrl, 'http://');
+            }
+            $lowerUrl = Str::lower($audioUrl);
             $isAudio = Str::contains($lowerUrl, [
               '.mp3', '.wav', '.ogg', '.oga', '.m4a', '.m4b', '.webm',
               'backend.channels.app/recording-files/',
@@ -31,9 +38,9 @@
               (Str::contains($lowerUrl, '.webm') ? 'audio/webm' : null))));
           @endphp
           @if($isAudio)
-            <audio controls class="mt-2" @if(! $mime) src="{{ $action->url }}" @endif>
+            <audio controls class="mt-2" @if(! $mime) src="{{ $audioUrl }}" @endif>
               @if($mime)
-                <source src="{{ $action->url }}" type="{{ $mime }}">
+                <source src="{{ $audioUrl }}" type="{{ $mime }}">
               @endif
               Tu navegador no soporta el audio.
             </audio><br>
