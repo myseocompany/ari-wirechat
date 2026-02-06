@@ -20,11 +20,11 @@
         @if(!empty($action->url))
           @php
             $audioUrl = trim($action->url);
+            if (Str::startsWith($audioUrl, '//')) {
+              $audioUrl = 'https:'.$audioUrl;
+            }
             if (! Str::startsWith($audioUrl, ['http://', 'https://'])) {
               $audioUrl = 'https://'.$audioUrl;
-            }
-            if (Str::startsWith($audioUrl, 'http://')) {
-              $audioUrl = 'https://'.Str::after($audioUrl, 'http://');
             }
             $lowerUrl = Str::lower($audioUrl);
             $isAudio = Str::contains($lowerUrl, [
