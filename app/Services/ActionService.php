@@ -36,6 +36,7 @@ class ActionService
 
         return Action::query()
             ->select('actions.*')
+            ->with(['customer.status', 'creator', 'type', 'transcription'])
             ->selectSub(function ($sub) {
                 $sub->from('actions as next_actions')
                     ->select('next_actions.note')

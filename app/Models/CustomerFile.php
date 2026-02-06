@@ -10,6 +10,7 @@ class CustomerFile extends Model
 {
     protected $fillable = [
         'customer_id',
+        'action_id',
         'url',
         'name',
         'creator_user_id',
@@ -47,6 +48,11 @@ class CustomerFile extends Model
     {
         return $this->belongsTo(User::class, 'creator_user_id')
             ->withDefault(['name' => 'Sin usuario']);
+    }
+
+    public function action(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Action::class);
     }
 
     /* ====== Helpers internos ====== */

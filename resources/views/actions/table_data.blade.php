@@ -39,6 +39,31 @@
             </audio><br>
           @endif
         @endif
+        @if($action->isCall())
+          @php $transcription = $action->transcription; @endphp
+          <div class="mt-2 space-y-2">
+            @if($transcription && $transcription->status === 'done' && $transcription->transcript_text)
+              <div class="whitespace-pre-line rounded-md border border-slate-200 bg-slate-50 p-2 text-sm text-slate-700">
+                {{ $transcription->transcript_text }}
+              </div>
+            @elseif($transcription && in_array($transcription->status, ['pending', 'processing'], true))
+              <div class="text-xs text-slate-500">Transcribiendo...</div>
+            @elseif($transcription && $transcription->status === 'error')
+              <div class="text-xs text-red-600">
+                Error al transcribir: {{ $transcription->error_message ?? 'Error desconocido' }}
+              </div>
+            @endif
+
+            @if(Auth::check() && Auth::user()->role_id == 1)
+              <form method="POST" action="{{ route('actions.transcribe', $action) }}">
+                @csrf
+                <button type="submit" class="inline-flex items-center rounded-md border border-blue-600 px-2 py-1 text-xs font-semibold text-blue-600 transition hover:bg-blue-50">
+                  Transcribir
+                </button>
+              </form>
+            @endif
+          </div>
+        @endif
         @if($action->isPending() && $action->next_action_created_at)
           <div class="mt-1 text-xs text-slate-500">
             Última acción: {{ \Carbon\Carbon::parse($action->next_action_created_at)->format('d M Y H:i') }}

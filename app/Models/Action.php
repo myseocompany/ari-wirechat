@@ -99,6 +99,16 @@ class Action extends Model
         return $this->belongsTo('App\Models\Customer', 'customer_id');
     }
 
+    public function transcription(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ActionTranscription::class);
+    }
+
+    public function isCall(): bool
+    {
+        return (int) $this->type_id === 21 && ! empty($this->url);
+    }
+
     public function creator()
     {
         return $this->belongsTo('App\Models\User', 'creator_user_id');

@@ -383,7 +383,10 @@ class CustomerController extends Controller
             $id = $request->customer_id;
         }
         // dd($model->scoring_profile);
-        $actions = Action::where('customer_id', '=', $id)->orderby('created_at', 'DESC')->get();
+        $actions = Action::where('customer_id', '=', $id)
+            ->with(['type', 'creator', 'transcription'])
+            ->orderby('created_at', 'DESC')
+            ->get();
         $action_options = ActionType::where('status_id', 1)
             ->orderBy('weigth')
             ->get();
@@ -1017,6 +1020,7 @@ class CustomerController extends Controller
         $model->load('tags');
         $action_options = ActionType::orderby('weigth')->get();
         $actions = Action::where('customer_id', '=', $id)
+            ->with(['type', 'creator', 'transcription'])
             ->orderby('created_at', 'DESC')
             ->get();
         $histories = CustomerHistory::where('customer_id', '=', $id)
@@ -1358,7 +1362,10 @@ class CustomerController extends Controller
         $model = Customer::findOrFail($id);
         $this->ensureCanAccessCustomer($model);
         $allTags = Tag::orderBy('name')->get();
-        $actions = Action::where('customer_id', '=', $id)->orderby('created_at', 'DESC')->get();
+        $actions = Action::where('customer_id', '=', $id)
+            ->with(['type', 'creator', 'transcription'])
+            ->orderby('created_at', 'DESC')
+            ->get();
         $action_options = ActionType::orderBy('weigth')->get();
         $histories = CustomerHistory::where('customer_id', '=', $id)->get();
         $email_options = Email::all();
