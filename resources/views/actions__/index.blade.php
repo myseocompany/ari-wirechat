@@ -85,72 +85,65 @@ Registro <strong>{{ $model->currentPage() * $model->perPage() - ( $model->perPag
        
      
     </form>
-<table class="table table-striped">
-  <tbody>
+<div class="d-flex flex-column">
   @foreach ($model as $item)
-    <tr>
-      
-      
-      <td>
-        <div>@if(isset($item->customer->status))
-        <span class="badge" style="background-color: {{$item->customer->status->color}} ">
-        {{$item->customer->status->name}} 
-         </span> 
-        @endif</div>
-{{$item->created_at}} -   {{$item->getTypeName()}} 
-        <a href="/customers/{{$item->customer_id}}/show"><h4> {{$item->getCustomerName()}}</h4></a>
-        <div class="action_note">{{$item->note}}</div>
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center mb-2">
+          @if(isset($item->customer->status))
+            <span class="badge mr-2" style="background-color: {{$item->customer->status->color}} ">
+              {{$item->customer->status->name}}
+            </span>
+          @endif
+          <span class="text-muted small">{{$item->created_at}} - {{$item->getTypeName()}}</span>
+        </div>
+
+        <a href="/customers/{{$item->customer_id}}/show"><h4 class="mb-2"> {{$item->getCustomerName()}}</h4></a>
+
+        <div class="action_note mb-2">{{$item->note}}</div>
+
         @if(!empty($item->url))
           @php
             $lowerUrl = Str::lower($item->url);
-            $isAudio = Str::endsWith($lowerUrl, ['.mp3', '.wav', '.ogg', '.oga', '.m4a', '.m4b', '.webm']);
-            $mime = Str::endsWith($lowerUrl, '.mp3') ? 'audio/mpeg' :
-              (Str::endsWith($lowerUrl, '.wav') ? 'audio/wav' :
-              (Str::endsWith($lowerUrl, ['.ogg', '.oga']) ? 'audio/ogg' :
-              (Str::endsWith($lowerUrl, ['.m4a', '.m4b']) ? 'audio/mp4' :
-              (Str::endsWith($lowerUrl, '.webm') ? 'audio/webm' : 'audio/mpeg'))));
+            $parsedPath = parse_url($lowerUrl, PHP_URL_PATH);
+            $normalizedPath = $parsedPath ?? $lowerUrl;
+            $isAudio = Str::endsWith($normalizedPath, ['.mp3', '.wav', '.ogg', '.oga', '.m4a', '.m4b', '.webm']);
+            $mime = Str::endsWith($normalizedPath, '.mp3') ? 'audio/mpeg' :
+              (Str::endsWith($normalizedPath, '.wav') ? 'audio/wav' :
+              (Str::endsWith($normalizedPath, ['.ogg', '.oga']) ? 'audio/ogg' :
+              (Str::endsWith($normalizedPath, ['.m4a', '.m4b']) ? 'audio/mp4' :
+              (Str::endsWith($normalizedPath, '.webm') ? 'audio/webm' : 'audio/mpeg'))));
           @endphp
           @if($isAudio)
-            <audio controls class="mt-2" style="width:100%;">
+            <audio controls preload="metadata" class="w-100 mt-2" src="{{ $item->url }}">
               <source src="{{ $item->url }}" type="{{ $mime }}">
               Tu navegador no soporta el audio.
-            </audio><br>
+            </audio>
           @endif
         @endif
-        <div class="action_created"></div>
-        <div class="row">
-          
-            @if(isset($item->customer))
-            Asesor:
-            @if(isset($item->customer->user))
-            <div class="col">{{$item->customer->user->name}}</div>
-            @endif
-            
-            @if(isset($item->creator))
-            <div class="col">Creador: {{$item->creator->name}}</div>
-            @endif
-          
-            <div class="col">{{$item->customer->phone}}</div>
-          <div class="col">{{$item->customer->email}}</div>
 
-          
+        <div class="action_created"></div>
+
+        @if(isset($item->customer))
+          <div class="d-flex flex-wrap text-muted small">
+            <span class="mr-3 mb-1">Asesor: {{$item->customer->user->name ?? 'N/A'}}</span>
+            @if(isset($item->creator))
+              <span class="mr-3 mb-1">Creador: {{$item->creator->name}}</span>
+            @endif
+            <span class="mr-3 mb-1">{{$item->customer->phone}}</span>
+            <span class="mr-3 mb-1">{{$item->customer->email}}</span>
             @if(isset($item->customer->project))
-            
-            <div class="col">{{$item->customer->project->name}}</div>
+              <span class="mr-3 mb-1">{{$item->customer->project->name}}</span>
             @endif
             @if(isset($item->customer->source))
-            
-            <div class="col">{{$item->customer->source->name}}</div>
+              <span class="mr-3 mb-1">{{$item->customer->source->name}}</span>
             @endif
-          @endif
-          
-        </div>
-        
-          </td>
-    </tr>
+          </div>
+        @endif
+      </div>
+    </div>
   @endforeach
-  </tbody>
-</table>
+</div>
 @if($model instanceof \Illuminate\Pagination\LengthAwarePaginator )
 
 {{ $model->appends(request()->input())->links() }}
