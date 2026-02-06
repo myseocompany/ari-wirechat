@@ -89,7 +89,7 @@
     <div class="rounded-lg border border-slate-200 border-l-4 bg-white p-4 shadow-sm" style="border-left-color: {{ $item['color'] }};">
       @if($item['type'] === 'action')
         <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
+          <div class="min-w-0 flex-1">
             {{-- ⏰ Pendiente programado --}}
             @if($item['is_pending'] && $item['due_date'])
               <span class="text-xs font-semibold text-red-600">
@@ -107,7 +107,7 @@
 
             {{-- 🎧 Reproductor si es llamada --}}
             @if(!empty($item['url']) && (int) $item['type_id'] === 21)
-              <audio controls class="mt-2">
+              <audio controls class="mt-2 w-full max-w-full">
                 <source src="{{ $item['url'] }}" type="audio/ogg">
                 Tu navegador no soporta el audio.
               </audio><br>
@@ -116,7 +116,7 @@
             @if(!empty($item['url']) && (int) $item['type_id'] === 21)
               <div class="mt-2 space-y-2">
                 @if(($item['transcription_status'] ?? null) === 'done' && ! empty($item['transcription_text']))
-                  <div class="whitespace-pre-line rounded-md border border-slate-200 bg-slate-50 p-2 text-sm text-slate-700">
+                  <div class="whitespace-pre-line break-words rounded-md border border-slate-200 bg-slate-50 p-2 text-sm text-slate-700">
                     {{ $item['transcription_text'] }}
                   </div>
                 @elseif(in_array($item['transcription_status'] ?? '', ['pending', 'processing'], true))
