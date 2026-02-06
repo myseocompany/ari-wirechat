@@ -58,7 +58,7 @@ class TranscribeActionAudio implements ShouldQueue
 
         $transcription->status = 'processing';
         $transcription->error_message = null;
-        $transcription->save();
+        $this->updateProgress($transcription, 'start', 'Iniciando transcripción', 5);
 
         $tempFiles = [];
 
@@ -69,14 +69,20 @@ class TranscribeActionAudio implements ShouldQueue
             $durationSeconds = null;
 
             if (! $customerFile) {
+                $this->updateProgress($transcription, 'download', 'Descargando audio original', 10);
                 [$localPath, $contentType, $originalName] = $this->downloadToTemp($action->url, $timeout);
+                $contentType = $this->normalizeContentType($contentType) ?? $this->detectContentType($localPath);
                 $tempFiles[] = $localPath;
 
                 $durationSeconds = $this->getDurationSeconds($localPath);
+                $this->updateProgress($transcription, 'store', 'Guardando audio en archivos del cliente', 20);
                 $customerFile = $this->storeCustomerFile($action, $transcription, $localPath, $contentType, $originalName);
                 $transcription->customer_file_id = $customerFile->id;
             } else {
+                $this->updateProgress($transcription, 'download', 'Descargando audio almacenado', 10);
                 [$localPath, $contentType] = $this->downloadFromCustomerFile($customerFile, $timeout);
+                $contentType = $this->normalizeContentType($contentType) ?? $this->detectContentType($localPath);
+                $customerFile = $this->ensureCustomerFileExtension($customerFile, $localPath, $contentType);
                 $tempFiles[] = $localPath;
                 $durationSeconds = $this->getDurationSeconds($localPath);
             }
@@ -85,13 +91,24 @@ class TranscribeActionAudio implements ShouldQueue
                 $transcription->duration_seconds = (int) round($durationSeconds);
             }
 
+            $this->updateProgress($transcription, 'prepare', 'Preparando audio para transcripción', 30);
             $chunkPaths = $this->splitIfNeeded($localPath, $tempFiles);
             $texts = [];
 
-            foreach ($chunkPaths as $chunkPath) {
+            $totalChunks = count($chunkPaths);
+            foreach ($chunkPaths as $index => $chunkPath) {
+                $percent = 30 + (int) round((($index + 1) / max(1, $totalChunks)) * 60);
+                $this->updateProgress(
+                    $transcription,
+                    'transcribe',
+                    'Transcribiendo segmento '.($index + 1).' de '.$totalChunks,
+                    min(95, $percent)
+                );
+                $chunkContentType = $this->detectContentType($chunkPath) ?? $contentType;
                 $texts[] = $this->transcribeFile(
                     $chunkPath,
                     basename($chunkPath),
+                    $chunkContentType,
                     $apiKey,
                     $baseUrl,
                     $timeout
@@ -99,6 +116,7 @@ class TranscribeActionAudio implements ShouldQueue
             }
 
             $transcription->status = 'done';
+            $this->updateProgress($transcription, 'done', 'Transcripción completada', 100);
             $transcription->transcript_text = trim(implode("\n\n", $texts));
             $transcription->error_message = null;
             $transcription->save();
@@ -184,12 +202,52 @@ class TranscribeActionAudio implements ShouldQueue
         ]);
     }
 
-    private function transcribeFile(string $path, string $filename, string $apiKey, string $baseUrl, int $timeout): string
+    private function ensureCustomerFileExtension(CustomerFile $file, string $localPath, ?string $contentType): CustomerFile
+    {
+        $existingExtension = pathinfo($file->url, PATHINFO_EXTENSION);
+        if ($existingExtension !== '') {
+            return $file;
+        }
+
+        $extension = $this->guessExtension($file->url, $contentType);
+        if ($extension === '') {
+            return $file;
+        }
+
+        $disk = Storage::disk('spaces');
+        $newName = $file->url.'.'.$extension;
+        $newKey = "files/{$file->customer_id}/{$newName}";
+        $stream = fopen($localPath, 'r');
+
+        $disk->put($newKey, $stream, [
+            'visibility' => 'public',
+            'ContentType' => $contentType ?: 'application/octet-stream',
+        ]);
+
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
+
+        $oldKey = "files/{$file->customer_id}/{$file->url}";
+        if ($disk->exists($oldKey)) {
+            $disk->delete($oldKey);
+        }
+
+        $file->url = $newName;
+        $file->filename = $newName;
+        $file->size = filesize($localPath) ?: $file->size;
+        $file->mime_type = $contentType ?: $file->mime_type;
+        $file->save();
+
+        return $file;
+    }
+
+    private function transcribeFile(string $path, string $filename, ?string $contentType, string $apiKey, string $baseUrl, int $timeout): string
     {
         $stream = fopen($path, 'r');
         $response = Http::timeout($timeout)
             ->withToken($apiKey)
-            ->attach('file', $stream, $filename)
+            ->attach('file', $stream, $filename, $contentType ? ['Content-Type' => $contentType] : [])
             ->post($baseUrl.'/audio/transcriptions', [
                 'model' => 'whisper-1',
                 'language' => 'es',
@@ -201,7 +259,16 @@ class TranscribeActionAudio implements ShouldQueue
         }
 
         if ($response->failed()) {
-            throw new \RuntimeException('Error de transcripción: http_'.$response->status());
+            $body = $response->json() ?: $response->body();
+            $bodyPreview = is_string($body) ? $body : json_encode($body);
+            $bodyPreview = $bodyPreview ? mb_substr($bodyPreview, 0, 600) : '';
+
+            \Log::warning('whisper_transcription_failed', [
+                'status' => $response->status(),
+                'body' => $body,
+            ]);
+
+            throw new \RuntimeException('Error de transcripción: http_'.$response->status().' '.$bodyPreview);
         }
 
         $text = (string) data_get($response->json(), 'text', '');
@@ -233,7 +300,9 @@ class TranscribeActionAudio implements ShouldQueue
 
         $segmentSeconds = (int) max(1, floor(($maxBytes * 0.9) / $bytesPerSecond));
         $extension = pathinfo($path, PATHINFO_EXTENSION);
-        $extension = $extension !== '' ? $extension : 'mp3';
+        if ($extension === '') {
+            $extension = $this->guessExtension('', $this->detectContentType($path)) ?: 'mp3';
+        }
         $outputPattern = $this->makeTempDir().'/segment-%03d.'.$extension;
 
         $process = new Process([
@@ -320,7 +389,7 @@ class TranscribeActionAudio implements ShouldQueue
             return $extension;
         }
 
-        $contentType = $contentType ? trim(strtolower(explode(';', $contentType)[0])) : null;
+        $contentType = $this->normalizeContentType($contentType);
         $map = [
             'audio/mpeg' => 'mp3',
             'audio/mp4' => 'm4a',
@@ -333,10 +402,49 @@ class TranscribeActionAudio implements ShouldQueue
         return $contentType && isset($map[$contentType]) ? $map[$contentType] : '';
     }
 
+    private function normalizeContentType(?string $contentType): ?string
+    {
+        if (! $contentType) {
+            return null;
+        }
+
+        $normalized = trim(strtolower(explode(';', $contentType)[0]));
+
+        return $normalized === '' ? null : $normalized;
+    }
+
+    private function detectContentType(string $path): ?string
+    {
+        if (! is_file($path)) {
+            return null;
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if (! $finfo) {
+            return null;
+        }
+
+        $mime = finfo_file($finfo, $path) ?: null;
+        finfo_close($finfo);
+
+        return $mime ? $this->normalizeContentType($mime) : null;
+    }
+
     private function markError(ActionTranscription $transcription, string $message): void
     {
         $transcription->status = 'error';
         $transcription->error_message = $message;
+        $transcription->progress_step = 'error';
+        $transcription->progress_message = 'Error durante la transcripción';
+        $transcription->progress_percent = null;
+        $transcription->save();
+    }
+
+    private function updateProgress(ActionTranscription $transcription, string $step, string $message, ?int $percent = null): void
+    {
+        $transcription->progress_step = $step;
+        $transcription->progress_message = $message;
+        $transcription->progress_percent = $percent;
         $transcription->save();
     }
 }

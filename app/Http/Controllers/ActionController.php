@@ -368,6 +368,9 @@ class ActionController extends Controller
         $transcription->fill([
             'requested_by' => $user->id,
             'status' => 'pending',
+            'progress_step' => 'queued',
+            'progress_message' => 'En cola para transcripción',
+            'progress_percent' => 0,
             'error_message' => null,
             'model' => 'whisper-1',
             'language' => 'es',

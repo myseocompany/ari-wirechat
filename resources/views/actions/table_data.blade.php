@@ -54,6 +54,22 @@
               </div>
             @endif
 
+            @if($transcription)
+              <details class="text-xs text-slate-500">
+                <summary class="cursor-pointer select-none">Ver proceso</summary>
+                <div class="mt-2 space-y-1">
+                  <div>Estado: {{ $transcription->status }}</div>
+                  @if($transcription->progress_message)
+                    <div>Paso: {{ $transcription->progress_message }}</div>
+                  @endif
+                  @if($transcription->progress_percent !== null)
+                    <div>Progreso: {{ $transcription->progress_percent }}%</div>
+                  @endif
+                  <div>Actualizado: {{ optional($transcription->updated_at)->format('Y-m-d H:i:s') }}</div>
+                </div>
+              </details>
+            @endif
+
             @if(Auth::check() && Auth::user()->role_id == 1)
               <form method="POST" action="{{ route('actions.transcribe', $action) }}">
                 @csrf

@@ -29,6 +29,9 @@
           'transcription_status' => $action->transcription->status ?? null,
           'transcription_text' => $action->transcription->transcript_text ?? null,
           'transcription_error' => $action->transcription->error_message ?? null,
+          'transcription_step' => $action->transcription->progress_step ?? null,
+          'transcription_message' => $action->transcription->progress_message ?? null,
+          'transcription_percent' => $action->transcription->progress_percent ?? null,
       ]);
   }
 
@@ -131,6 +134,21 @@
                       Transcribir
                     </button>
                   </form>
+                @endif
+
+                @if(($item['transcription_status'] ?? null) !== null)
+                  <details class="text-xs text-slate-500">
+                    <summary class="cursor-pointer select-none">Ver proceso</summary>
+                    <div class="mt-2 space-y-1">
+                      <div>Estado: {{ $item['transcription_status'] }}</div>
+                      @if(! empty($item['transcription_message']))
+                        <div>Paso: {{ $item['transcription_message'] }}</div>
+                      @endif
+                      @if(($item['transcription_percent'] ?? null) !== null)
+                        <div>Progreso: {{ $item['transcription_percent'] }}%</div>
+                      @endif
+                    </div>
+                  </details>
                 @endif
               </div>
             @endif
