@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\TranscribeActionAudio;
 use App\Models\Action;
+use App\Models\ActionTranscription;
 use App\Models\ActionType;
 use App\Models\Customer;
 use App\Models\CustomerHistory;
@@ -349,6 +351,35 @@ class ActionController extends Controller
             'overdueActions', 'todayActions', 'upcomingActions',
             'statuses_options', 'totalFilteredActions', 'types'
         ));
+    }
+
+    public function transcribe(Request $request, Action $action): \Symfony\Component\HttpFoundation\Response
+    {
+        $user = Auth::user();
+        if (! $user || (int) $user->role_id !== 1) {
+            abort(403);
+        }
+
+        if (! $action->isCall()) {
+            return back()->with('error', 'La acción no es una llamada con audio.');
+        }
+
+        $transcription = ActionTranscription::firstOrNew(['action_id' => $action->id]);
+        $transcription->fill([
+            'requested_by' => $user->id,
+            'status' => 'pending',
+            'progress_step' => 'queued',
+            'progress_message' => 'En cola para transcripción',
+            'progress_percent' => 0,
+            'error_message' => null,
+            'model' => 'whisper-1',
+            'language' => 'es',
+        ]);
+        $transcription->save();
+
+        TranscribeActionAudio::dispatch($action->id, $transcription->id);
+
+        return back()->with('status', 'Transcripción en cola.');
     }
 
     public function calendarFeed(Request $request)

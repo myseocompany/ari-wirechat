@@ -221,8 +221,13 @@ class CustomerService
         } else {
             $selectColumns = ['customers.*'];
             $result = $query->select($selectColumns)
-                ->orderBy('customers.created_at', 'DESC')
-                ->when($pageSize > 0, fn ($q) => $q->paginate($pageSize), fn ($q) => $q->get());
+                ->orderBy('customers.created_at', 'DESC');
+
+            if ($pageSize > 0) {
+                $result = $result->paginate($pageSize)->withQueryString();
+            } else {
+                $result = $result->get();
+            }
         }
 
         $t1 = function_exists('hrtime') ? hrtime(true) : (int) (microtime(true) * 1e9);

@@ -111,6 +111,17 @@
         </div>
     @endif
 
+    <!-- Estado cliente -->
+    <div>
+        <select name="status_id" id="status_id"
+            class="block w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500">
+            <option value="">Estado cliente...</option>
+            @foreach($statuses_options as $statusOption)
+                <option value="{{ $statusOption->id }}" @if ($request->status_id == $statusOption->id) selected @endif>{{ $statusOption->name }}</option>
+            @endforeach
+        </select>
+    </div>
+
     <!-- Búsqueda -->
     <div>
         <input type="text" placeholder="Busca o escribe" id="action_search" name="action_search" value="{{ $request->get('action_search') }}"

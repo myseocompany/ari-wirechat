@@ -349,6 +349,7 @@ Route::middleware('auth')->prefix('actions')->group(function () {
     Route::get('/{action}/update', [ActionController::class, 'update']);
     Route::get('/{action}/destroy', [ActionController::class, 'destroy']);
     Route::get('/schedule', [ActionController::class, 'schedule']);
+    Route::post('/{action}/transcribe', [ActionController::class, 'transcribe'])->name('actions.transcribe');
 });
 
 Route::post('/customers/action/pending', [ActionController::class, 'completePendingAction'])->middleware('auth');

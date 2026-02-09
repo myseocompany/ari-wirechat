@@ -19,7 +19,14 @@
         </div>
         @if(!empty($action->url))
           @php
-            $lowerUrl = Str::lower($action->url);
+            $audioUrl = trim($action->url);
+            if (Str::startsWith($audioUrl, '//')) {
+              $audioUrl = 'https:'.$audioUrl;
+            }
+            if (! Str::startsWith($audioUrl, ['http://', 'https://'])) {
+              $audioUrl = 'https://'.$audioUrl;
+            }
+            $lowerUrl = Str::lower($audioUrl);
             $isAudio = Str::contains($lowerUrl, [
               '.mp3', '.wav', '.ogg', '.oga', '.m4a', '.m4b', '.webm',
               'backend.channels.app/recording-files/',
@@ -31,13 +38,54 @@
               (Str::contains($lowerUrl, '.webm') ? 'audio/webm' : null))));
           @endphp
           @if($isAudio)
-            <audio controls class="mt-2" @if(! $mime) src="{{ $action->url }}" @endif>
+            <audio controls class="mt-2" @if(! $mime) src="{{ $audioUrl }}" @endif>
               @if($mime)
-                <source src="{{ $action->url }}" type="{{ $mime }}">
+                <source src="{{ $audioUrl }}" type="{{ $mime }}">
               @endif
               Tu navegador no soporta el audio.
             </audio><br>
           @endif
+        @endif
+        @if($action->isCall())
+          @php $transcription = $action->transcription; @endphp
+          <div class="mt-2 space-y-2">
+            @if($transcription && $transcription->status === 'done' && $transcription->transcript_text)
+              <div class="whitespace-pre-line rounded-md border border-slate-200 bg-slate-50 p-2 text-sm text-slate-700">
+                {{ $transcription->transcript_text }}
+              </div>
+            @elseif($transcription && in_array($transcription->status, ['pending', 'processing'], true))
+              <div class="text-xs text-slate-500">Transcribiendo...</div>
+            @elseif($transcription && $transcription->status === 'error')
+              <div class="text-xs text-red-600">
+                Error al transcribir: {{ $transcription->error_message ?? 'Error desconocido' }}
+              </div>
+            @endif
+
+            @if($transcription)
+              <details class="text-xs text-slate-500">
+                <summary class="cursor-pointer select-none">Ver proceso</summary>
+                <div class="mt-2 space-y-1">
+                  <div>Estado: {{ $transcription->status }}</div>
+                  @if($transcription->progress_message)
+                    <div>Paso: {{ $transcription->progress_message }}</div>
+                  @endif
+                  @if($transcription->progress_percent !== null)
+                    <div>Progreso: {{ $transcription->progress_percent }}%</div>
+                  @endif
+                  <div>Actualizado: {{ optional($transcription->updated_at)->format('Y-m-d H:i:s') }}</div>
+                </div>
+              </details>
+            @endif
+
+            @if(Auth::check() && Auth::user()->role_id == 1)
+              <form method="POST" action="{{ route('actions.transcribe', $action) }}">
+                @csrf
+                <button type="submit" class="inline-flex items-center rounded-md border border-blue-600 px-2 py-1 text-xs font-semibold text-blue-600 transition hover:bg-blue-50">
+                  Transcribir
+                </button>
+              </form>
+            @endif
+          </div>
         @endif
         @if($action->isPending() && $action->next_action_created_at)
           <div class="mt-1 text-xs text-slate-500">

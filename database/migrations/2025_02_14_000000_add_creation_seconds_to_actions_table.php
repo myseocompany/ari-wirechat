@@ -14,7 +14,10 @@ return new class extends Migration
 
         if (! Schema::hasColumn('actions', 'creation_seconds')) {
             Schema::table('actions', function (Blueprint $table) {
-                $table->unsignedInteger('creation_seconds')->nullable()->after('reminder_type');
+                $column = $table->unsignedInteger('creation_seconds')->nullable();
+                if (Schema::hasColumn('actions', 'reminder_type')) {
+                    $column->after('reminder_type');
+                }
             });
         }
     }

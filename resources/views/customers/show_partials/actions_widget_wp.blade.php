@@ -26,6 +26,12 @@
           'creation_seconds' => $action->creation_seconds,
           'status_id' => $customer->status_id,
           'customer_name' => $customer->name,
+          'transcription_status' => $action->transcription->status ?? null,
+          'transcription_text' => $action->transcription->transcript_text ?? null,
+          'transcription_error' => $action->transcription->error_message ?? null,
+          'transcription_step' => $action->transcription->progress_step ?? null,
+          'transcription_message' => $action->transcription->progress_message ?? null,
+          'transcription_percent' => $action->transcription->progress_percent ?? null,
       ]);
   }
 
@@ -83,7 +89,7 @@
     <div class="rounded-lg border border-slate-200 border-l-4 bg-white p-4 shadow-sm" style="border-left-color: {{ $item['color'] }};">
       @if($item['type'] === 'action')
         <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
+          <div class="min-w-0 flex-1">
             {{-- ⏰ Pendiente programado --}}
             @if($item['is_pending'] && $item['due_date'])
               <span class="text-xs font-semibold text-red-600">
@@ -100,11 +106,51 @@
             </strong><br>
 
             {{-- 🎧 Reproductor si es llamada --}}
-            @if(!empty($item['url']) && Str::contains(Str::lower($item['note']), 'llamada'))
-              <audio controls class="mt-2">
+            @if(!empty($item['url']) && (int) $item['type_id'] === 21)
+              <audio controls class="mt-2 w-full max-w-full">
                 <source src="{{ $item['url'] }}" type="audio/ogg">
                 Tu navegador no soporta el audio.
               </audio><br>
+            @endif
+
+            @if(!empty($item['url']) && (int) $item['type_id'] === 21)
+              <div class="mt-2 space-y-2">
+                @if(($item['transcription_status'] ?? null) === 'done' && ! empty($item['transcription_text']))
+                  <div class="whitespace-pre-line break-words rounded-md border border-slate-200 bg-slate-50 p-2 text-sm text-slate-700">
+                    {{ $item['transcription_text'] }}
+                  </div>
+                @elseif(in_array($item['transcription_status'] ?? '', ['pending', 'processing'], true))
+                  <div class="text-xs text-slate-500">Transcribiendo...</div>
+                @elseif(($item['transcription_status'] ?? null) === 'error')
+                  <div class="text-xs text-red-600">
+                    Error al transcribir: {{ $item['transcription_error'] ?? 'Error desconocido' }}
+                  </div>
+                @endif
+
+                @if(Auth::check() && Auth::user()->role_id == 1)
+                  <form method="POST" action="{{ route('actions.transcribe', $item['id']) }}">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center rounded-md border border-blue-600 px-2 py-1 text-[11px] font-semibold text-blue-600 transition hover:bg-blue-50">
+                      Transcribir
+                    </button>
+                  </form>
+                @endif
+
+                @if(($item['transcription_status'] ?? null) !== null)
+                  <details class="text-xs text-slate-500">
+                    <summary class="cursor-pointer select-none">Ver proceso</summary>
+                    <div class="mt-2 space-y-1">
+                      <div>Estado: {{ $item['transcription_status'] }}</div>
+                      @if(! empty($item['transcription_message']))
+                        <div>Paso: {{ $item['transcription_message'] }}</div>
+                      @endif
+                      @if(($item['transcription_percent'] ?? null) !== null)
+                        <div>Progreso: {{ $item['transcription_percent'] }}%</div>
+                      @endif
+                    </div>
+                  </details>
+                @endif
+              </div>
             @endif
 
             {{-- Tipo de acción --}}
