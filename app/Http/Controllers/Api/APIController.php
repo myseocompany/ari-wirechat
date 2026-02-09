@@ -1658,14 +1658,14 @@ class APIController extends Controller
 
     private function updateOnboardingStatus(Customer $customer): void
     {
-        if ((int) $customer->status_id === 20) {
+        if ((int) $customer->status_id != 8) {
             return;
         }
 
         $history = new CustomerHistory;
         $history->saveFromModel($customer);
 
-        $customer->status_id = 20;
+        $customer->status_id = 63;
         $customer->save();
     }
 
