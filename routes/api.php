@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\Api\CustomerApiController;
+use App\Http\Controllers\Api\MachineReportController;
 use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\WAToolBoxController;
 use App\Http\Controllers\Api\WhatsAppWebhookController;
@@ -46,4 +47,8 @@ Route::middleware([CheckApiToken::class, 'throttle:60,1'])->group(function () {
 
     Route::post('/customers/bulk/status', [CustomerApiController::class, 'bulkUpdateStatus']);
     Route::post('/customers/bulk/actions', [CustomerApiController::class, 'bulkAddAction']);
+});
+
+Route::prefix('v1')->middleware(['api', 'machine.token'])->group(function () {
+    Route::post('/machines/report', [MachineReportController::class, 'store']);
 });
