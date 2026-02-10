@@ -49,6 +49,6 @@ Route::middleware([CheckApiToken::class, 'throttle:60,1'])->group(function () {
     Route::post('/customers/bulk/actions', [CustomerApiController::class, 'bulkAddAction']);
 });
 
-Route::prefix('v1')->middleware(['api', 'machine.token'])->group(function () {
+Route::prefix('v1')->middleware(['api', \App\Http\Middleware\MachineTokenAuth::class])->group(function () {
     Route::post('/machines/report', [MachineReportController::class, 'store']);
 });

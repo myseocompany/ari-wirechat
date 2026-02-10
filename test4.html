@@ -1,0 +1,274 @@
+HTTP/2 500 
+server: nginx
+content-type: application/json
+cache-control: no-cache, private
+date: Tue, 10 Feb 2026 19:51:41 GMT
+access-control-allow-origin: *
+
+{
+    "message": "Target class [machine.token] does not exist.",
+    "exception": "Illuminate\\Contracts\\Container\\BindingResolutionException",
+    "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Container/Container.php",
+    "line": 961,
+    "trace": [
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Container/Container.php",
+            "line": 832,
+            "function": "build",
+            "class": "Illuminate\\Container\\Container",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Application.php",
+            "line": 1078,
+            "function": "resolve",
+            "class": "Illuminate\\Container\\Container",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Container/Container.php",
+            "line": 763,
+            "function": "resolve",
+            "class": "Illuminate\\Foundation\\Application",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Application.php",
+            "line": 1058,
+            "function": "make",
+            "class": "Illuminate\\Container\\Container",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 198,
+            "function": "make",
+            "class": "Illuminate\\Foundation\\Application",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Routing/Middleware/SubstituteBindings.php",
+            "line": 51,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Routing\\Middleware\\SubstituteBindings",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 127,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+            "line": 807,
+            "function": "then",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+            "line": 786,
+            "function": "runRouteWithinStack",
+            "class": "Illuminate\\Routing\\Router",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+            "line": 750,
+            "function": "runRoute",
+            "class": "Illuminate\\Routing\\Router",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Routing/Router.php",
+            "line": 739,
+            "function": "dispatchToRoute",
+            "class": "Illuminate\\Routing\\Router",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+            "line": 201,
+            "function": "dispatch",
+            "class": "Illuminate\\Routing\\Router",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 170,
+            "function": "Illuminate\\Foundation\\Http\\{closure}",
+            "class": "Illuminate\\Foundation\\Http\\Kernel",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/livewire/livewire/src/Features/SupportDisablingBackButtonCache/DisableBackButtonCacheMiddleware.php",
+            "line": 19,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Livewire\\Features\\SupportDisablingBackButtonCache\\DisableBackButtonCacheMiddleware",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+            "line": 21,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php",
+            "line": 31,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php",
+            "line": 21,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php",
+            "line": 51,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\TrimStrings",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php",
+            "line": 27,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Http\\Middleware\\ValidatePostSize",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php",
+            "line": 110,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php",
+            "line": 62,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Http\\Middleware\\HandleCors",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php",
+            "line": 58,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Http\\Middleware\\TrustProxies",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php",
+            "line": 22,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 209,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php",
+            "line": 127,
+            "function": "Illuminate\\Pipeline\\{closure}",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+            "line": 176,
+            "function": "then",
+            "class": "Illuminate\\Pipeline\\Pipeline",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php",
+            "line": 145,
+            "function": "sendRequestThroughRouter",
+            "class": "Illuminate\\Foundation\\Http\\Kernel",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/vendor/laravel/framework/src/Illuminate/Foundation/Application.php",
+            "line": 1220,
+            "function": "handle",
+            "class": "Illuminate\\Foundation\\Http\\Kernel",
+            "type": "->"
+        },
+        {
+            "file": "/home/forge/arichat.co/public/index.php",
+            "line": 19,
+            "function": "handleRequest",
+            "class": "Illuminate\\Foundation\\Application",
+            "type": "->"
+        }
+    ]
+}
