@@ -223,7 +223,6 @@
           <option value="1 a 5">1 a 5</option>
           <option value="6 a 10">6 a 10</option>
           <option value="Más de 10">Más de 10</option>
-       number_venues
         </select> 
       </div>
     </div>
@@ -284,25 +283,7 @@
   </div>
   <div class="form-group">
     <label for="first_installment_date">Fecha de Compra:</label>
-    <input type="date" class="form-control" name="date_bought" id="date_bought">
-  </div>
-  {{-- Asignado a --}}
-  <div class="form-group">
-    <label for="users">Asignado A:</label>
-    @if ($canAssignCustomers)
-      @php $selectedUserId = old('user_id', $defaultAssignedUserId); @endphp
-      <select name="user_id" id="user_id" class="form-control">
-        <option value="">Seleccione...</option>
-        @foreach ($users as $item)
-          @if($item->status_id == 1)
-            <option value="{{ $item->id }}" @selected((string) $selectedUserId === (string) $item->id)>{{  $item->name }}</option>
-          @endif
-        @endforeach
-      </select>
-    @else
-      <input type="hidden" name="user_id" value="{{ $defaultAssignedUserId }}">
-      <input type="text" class="form-control" value="{{ optional(Auth::user())->name }}" readonly>
-    @endif
+    <input type="date" class="form-control" name="purchase_date" id="purchase_date">
   </div>
   {{-- fuente --}}
   <div class="">

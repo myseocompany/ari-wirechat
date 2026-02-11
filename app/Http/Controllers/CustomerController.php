@@ -815,7 +815,7 @@ class CustomerController extends Controller
         $products = Product::all();
         $authUser = Auth::user();
         $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
-        $defaultAssignedUserId = $canAssignCustomers ? null : $authUser?->id;
+        $defaultAssignedUserId = $authUser?->id;
 
         return view('customers.create', compact('products', 'customers_statuses', 'users', 'customer_sources', 'canAssignCustomers', 'defaultAssignedUserId'));
     }
@@ -913,7 +913,9 @@ class CustomerController extends Controller
         $authUser = Auth::user();
         $canAssignCustomers = $authUser?->canAssignCustomers() ?? false;
         $requestedUserId = $this->normalizeUserId($request->input('user_id'));
-        $assignedUserId = $canAssignCustomers ? $requestedUserId : ($authUser?->id ?? null);
+        $assignedUserId = $canAssignCustomers
+            ? ($requestedUserId ?? $authUser?->id)
+            : ($authUser?->id ?? null);
 
         $model = new Customer;
         $model->name = $request->name;
@@ -932,7 +934,7 @@ class CustomerController extends Controller
         $model->department = $request->department;
         $model->bought_products = $request->bought_products;
         $model->total_sold = $request->total_sold;
-        $model->purchase_date = $request->purchase_date;
+        $model->purchase_date = $request->input('purchase_date', $request->input('date_bought'));
         if ($request->filled('status_id')) {
             $model->status_id = $request->status_id;
         }
