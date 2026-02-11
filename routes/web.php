@@ -4,6 +4,7 @@ use App\Http\Controllers\ActionController;
 use App\Http\Controllers\ActionTypeController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\Admin\LeadDistributionController;
+use App\Http\Controllers\Admin\MachineAdminController;
 use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\AudienceController;
 use App\Http\Controllers\CampaignController;
@@ -637,4 +638,13 @@ Route::middleware('auth')
     ->group(function () {
         Route::get('/leads-distribution', [LeadDistributionController::class, 'index'])->name('leads-distribution.index');
         Route::post('/leads-distribution', [LeadDistributionController::class, 'update'])->name('leads-distribution.update');
+
+        Route::get('/machines', [MachineAdminController::class, 'index'])->name('machines.index');
+        Route::get('/machines/create', [MachineAdminController::class, 'create'])->name('machines.create');
+        Route::post('/machines', [MachineAdminController::class, 'store'])->name('machines.store');
+        Route::get('/machines/{machine}', [MachineAdminController::class, 'show'])->name('machines.show');
+        Route::get('/machines/{machine}/edit', [MachineAdminController::class, 'edit'])->name('machines.edit');
+        Route::put('/machines/{machine}', [MachineAdminController::class, 'update'])->name('machines.update');
+        Route::post('/machines/{machine}/tokens', [MachineAdminController::class, 'issueToken'])->name('machines.tokens.issue');
+        Route::post('/machines/{machine}/tokens/{token}/revoke', [MachineAdminController::class, 'revokeToken'])->name('machines.tokens.revoke');
     });

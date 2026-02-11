@@ -9,7 +9,10 @@
         Ajusta el peso de cada asesor para definir qué porcentaje de leads recibirá. La suma debe ser 100%.
       </p>
     </div>
-    <a href="{{ route('users') }}" class="btn btn-link">Ver usuarios</a>
+    <div class="d-flex align-items-center">
+      <a href="{{ route('admin.machines.index') }}" class="btn btn-link">Administrar máquinas</a>
+      <a href="{{ route('users') }}" class="btn btn-link">Ver usuarios</a>
+    </div>
   </div>
 
   @if (session('status'))
