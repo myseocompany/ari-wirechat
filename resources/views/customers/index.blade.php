@@ -201,25 +201,12 @@
     </div>
 
     @php
-      $paginationQuery = [
-        'parent_status_id' => $request->parent_status_id,
-        'search' => $request->search,
-        'from_date' => $request->from_date,
-        'to_date' => $request->to_date,
-        'scoring_profile' => $request->scoring_profile,
-        'scoring_interest' => $request->scoring_interest,
-        'country' => $request->country,
-        'status_id' => $request->status_id,
-        'user_id' => $request->user_id,
-        'source_id' => $request->source_id,
-        'tag_id' => $request->tag_id,
-        'created_updated' => $request->created_updated,
-        'sort' => $request->sort,
-        'no_date' => $request->boolean('no_date') ? 1 : null,
-        'has_quote' => $request->has_quote,
-        'maker' => $request->maker,
-        'inquiry_product_id' => $request->inquiry_product_id,
-      ];
+      $paginationQuery = collect($request->query())
+        ->except('page')
+        ->map(function ($value) {
+          return $value === null ? '' : $value;
+        })
+        ->all();
     @endphp
 
     <div class="flex justify-center">

@@ -125,7 +125,8 @@ class CustomerController extends Controller
             $request->merge(['sort' => 'recent']);
         }
 
-        $defaultUserFilter = ! $request->has('user_id') && ! $request->filled('search');
+        $hasUserFilterParam = array_key_exists('user_id', $request->query());
+        $defaultUserFilter = ! $hasUserFilterParam && ! $request->filled('search');
 
         if ($defaultUserFilter) {
             $request->merge(['user_id' => Auth::id()]);
