@@ -68,6 +68,7 @@ Route::middleware('auth')
     ->group(function () {
         Route::get('/', [VoipController::class, 'index'])->name('index');
         Route::post('/token', [VoipController::class, 'token'])->name('token');
+        Route::post('/call', [VoipController::class, 'call'])->name('call');
     });
 
 Route::middleware('auth')->group(function () {

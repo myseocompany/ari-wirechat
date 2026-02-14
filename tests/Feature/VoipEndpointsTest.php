@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Http;
 
 test('voip page requires authentication', function () {
     $this->get('/voip')->assertRedirect(route('login'));
@@ -57,6 +58,44 @@ test('twiml endpoint returns message when destination is missing', function () {
 
     $response->assertOk();
     $response->assertSee('No destination number was provided.');
+});
+
+test('authenticated users can trigger an outbound call from server', function () {
+    config([
+        'services.twilio.account_sid' => 'test-account-sid',
+        'services.twilio.auth_token' => 'test-auth-token',
+        'services.twilio.caller_id' => '+14155550100',
+    ]);
+
+    Http::fake([
+        'https://api.twilio.com/*' => Http::response([
+            'sid' => 'call-sid-001',
+            'status' => 'queued',
+        ], 201),
+    ]);
+
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->postJson('/voip/call', [
+        'to' => '+573001234567',
+    ]);
+
+    $response
+        ->assertOk()
+        ->assertJson([
+            'call_sid' => 'call-sid-001',
+            'status' => 'queued',
+            'to' => '+573001234567',
+            'from' => '+14155550100',
+        ]);
+
+    Http::assertSent(function ($request) {
+        return $request->url() === 'https://api.twilio.com/2010-04-01/Accounts/test-account-sid/Calls.json'
+            && $request['To'] === '+573001234567'
+            && $request['From'] === '+14155550100'
+            && $request['Method'] === 'POST'
+            && str_ends_with((string) $request['Url'], '/api/voip/twiml');
+    });
 });
 
 function base64UrlDecode(string $value): string

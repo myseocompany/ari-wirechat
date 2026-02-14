@@ -28,7 +28,10 @@
                             Conectar softphone
                         </button>
                         <button id="voip-call" type="button" class="btn btn-success" disabled>
-                            Llamar
+                            Llamar (web)
+                        </button>
+                        <button id="voip-call-server" type="button" class="btn btn-primary">
+                            Llamar (server)
                         </button>
                         <button id="voip-hangup" type="button" class="btn btn-danger" disabled>
                             Colgar
@@ -46,10 +49,12 @@
     <script>
         (function () {
             const tokenUrl = '{{ route('voip.token') }}';
+            const serverCallUrl = '{{ route('voip.call') }}';
             const statusBadge = document.getElementById('voip-status');
             const twimlUrl = document.getElementById('twiml-url');
             const connectButton = document.getElementById('voip-connect');
             const callButton = document.getElementById('voip-call');
+            const callServerButton = document.getElementById('voip-call-server');
             const hangupButton = document.getElementById('voip-hangup');
             const identityInput = document.getElementById('voip-identity');
             const destinationInput = document.getElementById('voip-to');
@@ -76,6 +81,16 @@
             function setButtons(connected, inCall) {
                 callButton.disabled = !connected || inCall;
                 hangupButton.disabled = !inCall;
+            }
+
+            function getValidatedDestination() {
+                const destination = destinationInput.value.trim();
+                if (!/^\+?[1-9]\d{6,14}$/.test(destination)) {
+                    setStatus('Número inválido. Usa formato E.164.', 'warning');
+                    return null;
+                }
+
+                return destination;
             }
 
             function attachCallEvents(call) {
@@ -146,6 +161,9 @@
                 }
 
                 const sdkCandidates = [
+                    '/vendor/twilio/twilio.min.js',
+                    'https://cdn.jsdelivr.net/npm/@twilio/voice-sdk@2.12.3/dist/twilio.min.js',
+                    'https://unpkg.com/@twilio/voice-sdk@2.12.3/dist/twilio.min.js',
                     'https://media.twiliocdn.com/sdk/js/voice/releases/2.12.3/twilio.min.js',
                     'https://sdk.twilio.com/js/voice/releases/2.12.3/twilio.min.js',
                     'https://media.twiliocdn.com/sdk/js/voice/releases/2.9.0/twilio.min.js',
@@ -166,7 +184,7 @@
                         }
                     }
 
-                    throw lastError || new Error('No fue posible cargar Twilio Voice SDK.');
+                    throw lastError || new Error('No fue posible cargar Twilio Voice SDK desde los orígenes configurados.');
                 })();
 
                 await sdkLoadPromise;
@@ -228,9 +246,8 @@
             });
 
             callButton.addEventListener('click', async function () {
-                const destination = destinationInput.value.trim();
-                if (!/^\+?[1-9]\d{6,14}$/.test(destination)) {
-                    setStatus('Número inválido. Usa formato E.164.', 'warning');
+                const destination = getValidatedDestination();
+                if (!destination) {
                     return;
                 }
 
@@ -252,6 +269,42 @@
                     if (!activeCall) {
                         callButton.disabled = false;
                     }
+                }
+            });
+
+            callServerButton.addEventListener('click', async function () {
+                const destination = getValidatedDestination();
+                if (!destination) {
+                    return;
+                }
+
+                callServerButton.disabled = true;
+                setStatus('Enviando llamada a Twilio...', 'info');
+
+                try {
+                    const response = await fetch(serverCallUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: JSON.stringify({
+                            to: destination,
+                        }),
+                    });
+
+                    const payload = await response.json();
+                    if (!response.ok) {
+                        throw new Error(payload.message || 'Twilio rechazó la solicitud de llamada.');
+                    }
+
+                    const callSid = payload.call_sid ? ' SID: ' + payload.call_sid : '';
+                    setStatus('Llamada creada en Twilio.' + callSid, 'success');
+                } catch (error) {
+                    setStatus(error?.message || 'No se pudo crear la llamada en servidor.', 'danger');
+                } finally {
+                    callServerButton.disabled = false;
                 }
             });
 
