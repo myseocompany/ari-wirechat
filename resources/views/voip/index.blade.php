@@ -43,7 +43,6 @@
 
 @section('footer_scripts')
     @parent
-    <script src="https://sdk.twilio.com/js/voice/releases/2.9.0/twilio.min.js"></script>
     <script>
         (function () {
             const tokenUrl = '{{ route('voip.token') }}';
@@ -58,6 +57,7 @@
 
             let device = null;
             let activeCall = null;
+            let sdkLoadPromise = null;
 
             const statusClassMap = {
                 primary: 'badge-primary',
@@ -120,6 +120,58 @@
                 });
             }
 
+            function injectScript(sourceUrl) {
+                return new Promise(function (resolve, reject) {
+                    const script = document.createElement('script');
+                    script.src = sourceUrl;
+                    script.async = true;
+                    script.onload = function () {
+                        resolve(sourceUrl);
+                    };
+                    script.onerror = function () {
+                        reject(new Error('No se pudo cargar: ' + sourceUrl));
+                    };
+                    document.head.appendChild(script);
+                });
+            }
+
+            async function ensureTwilioSdk() {
+                if (window.Twilio && window.Twilio.Device) {
+                    return;
+                }
+
+                if (sdkLoadPromise) {
+                    await sdkLoadPromise;
+                    return;
+                }
+
+                const sdkCandidates = [
+                    'https://media.twiliocdn.com/sdk/js/voice/releases/2.12.3/twilio.min.js',
+                    'https://sdk.twilio.com/js/voice/releases/2.12.3/twilio.min.js',
+                    'https://media.twiliocdn.com/sdk/js/voice/releases/2.9.0/twilio.min.js',
+                    'https://sdk.twilio.com/js/voice/releases/2.9.0/twilio.min.js',
+                ];
+
+                sdkLoadPromise = (async function () {
+                    let lastError = null;
+
+                    for (const candidate of sdkCandidates) {
+                        try {
+                            await injectScript(candidate);
+                            if (window.Twilio && window.Twilio.Device) {
+                                return;
+                            }
+                        } catch (error) {
+                            lastError = error;
+                        }
+                    }
+
+                    throw lastError || new Error('No fue posible cargar Twilio Voice SDK.');
+                })();
+
+                await sdkLoadPromise;
+            }
+
             async function connectDevice() {
                 if (device) {
                     setStatus('Softphone listo', 'success');
@@ -127,9 +179,7 @@
                     return device;
                 }
 
-                if (!window.Twilio || !window.Twilio.Device) {
-                    throw new Error('No fue posible cargar Twilio Voice SDK.');
-                }
+                await ensureTwilioSdk();
 
                 setStatus('Generando token...', 'info');
 
