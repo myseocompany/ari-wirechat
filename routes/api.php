@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\MachineReportController;
 use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\WAToolBoxController;
 use App\Http\Controllers\Api\WhatsAppWebhookController;
+use App\Http\Controllers\VoipController;
 use App\Http\Middleware\CheckApiToken;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,7 @@ Route::middleware('api')->group(
 
         Route::get('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'verify']);
         Route::post('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'receive']);
+        Route::match(['get', 'post'], '/voip/twiml', [VoipController::class, 'twiml'])->name('api.voip.twiml');
 
     });
 

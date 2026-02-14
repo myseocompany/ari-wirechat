@@ -6,6 +6,7 @@
 /storage/*.key
 /vendor
 .env
+twilio.env
 .env.backup
 .env.production
 .phpactor.json

@@ -35,6 +35,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VoipController;
 use App\Http\Controllers\WhatsAppAPIController;
 use App\Http\Controllers\WhatsAppBroadcastController;
 use App\Livewire\CustomerAssignedConversations;
@@ -60,6 +61,14 @@ Route::middleware('auth')->get('/design-system', function () {
 Route::middleware('auth')->get('/customer-chats', CustomerAssignedConversations::class)->name('customer-chats');
 
 Route::middleware('auth')->get('/faq', [HomeController::class, 'indexFaq'])->name('faq');
+
+Route::middleware('auth')
+    ->prefix('voip')
+    ->name('voip.')
+    ->group(function () {
+        Route::get('/', [VoipController::class, 'index'])->name('index');
+        Route::post('/token', [VoipController::class, 'token'])->name('token');
+    });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

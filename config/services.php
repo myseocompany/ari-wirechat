@@ -46,5 +46,13 @@ return [
         'test_event_code' => env('META_CONVERSIONS_TEST_EVENT_CODE'),
     ],
 
+    'twilio' => [
+        'account_sid' => env('TWILIO_ACCOUNT_SID'),
+        'api_key_sid' => env('TWILIO_API_KEY_SID'),
+        'api_key_secret' => env('TWILIO_API_KEY_SECRET'),
+        'twiml_app_sid' => env('TWILIO_TWIML_APP_SID'),
+        'caller_id' => env('TWILIO_CALLER_ID'),
+        'token_ttl' => env('TWILIO_TOKEN_TTL', 3600),
+    ],
 
 ];
