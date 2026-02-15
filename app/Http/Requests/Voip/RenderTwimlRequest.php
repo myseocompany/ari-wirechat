@@ -32,16 +32,25 @@ class RenderTwimlRequest extends FormRequest
 
     public function destinationNumber(): ?string
     {
-        $to = trim((string) $this->validated('to', ''));
-        if ($to === '') {
-            $to = trim((string) $this->validated('To', ''));
+        $to = $this->explicitDestinationNumber();
+        if ($to !== null) {
+            return $to;
         }
+
+        $to = trim((string) $this->validated('To', ''));
 
         if ($to === '') {
             return null;
         }
 
         return $to;
+    }
+
+    public function explicitDestinationNumber(): ?string
+    {
+        $to = trim((string) $this->validated('to', ''));
+
+        return $to === '' ? null : $to;
     }
 
     public function actionId(): ?int

@@ -48,19 +48,17 @@ class VoipController extends Controller
         return response()->json([
             'token' => $token,
             'identity' => $identity,
-            'twiml_url' => url('/api/voip/twiml'),
+            'twiml_url' => $this->publicUrl(url('/api/voip/twiml')),
         ]);
     }
 
     public function twiml(RenderTwimlRequest $request): Response
     {
-        $destinationNumber = $request->destinationNumber();
+        $destinationNumber = $request->explicitDestinationNumber();
         $actionId = $request->actionId();
 
         if ($destinationNumber === null) {
-            return $this->xmlResponse(
-                '<Response><Say voice="alice">No destination number was provided.</Say></Response>'
-            );
+            return $this->directTwimlResponse();
         }
 
         $callerId = (string) config('services.twilio.caller_id');
@@ -77,24 +75,53 @@ class VoipController extends Controller
         ];
 
         if ($actionId !== null) {
-            $recordingCallbackUrl = $this->buildUrlWithQuery(
+            $recordingCallbackUrl = $this->publicUrl($this->buildUrlWithQuery(
                 route('api.voip.callbacks.recording'),
                 [
                     'action_id' => $actionId,
                     'token' => $this->callbackSecret(),
                 ]
-            );
+            ));
             $safeRecordingCallbackUrl = htmlspecialchars($recordingCallbackUrl, ENT_QUOTES | ENT_XML1, 'UTF-8');
+            $statusCallbackUrl = $this->publicUrl($this->buildUrlWithQuery(
+                route('api.voip.callbacks.status'),
+                [
+                    'action_id' => $actionId,
+                    'token' => $this->callbackSecret(),
+                ]
+            ));
+            $safeStatusCallbackUrl = htmlspecialchars($statusCallbackUrl, ENT_QUOTES | ENT_XML1, 'UTF-8');
+            $dialActionUrl = $this->publicUrl($this->buildUrlWithQuery(
+                route('api.voip.callbacks.status'),
+                [
+                    'action_id' => $actionId,
+                    'token' => $this->callbackSecret(),
+                    'source' => 'dial_action',
+                ]
+            ));
+            $safeDialActionUrl = htmlspecialchars($dialActionUrl, ENT_QUOTES | ENT_XML1, 'UTF-8');
             $dialAttributes[] = 'record="record-from-answer-dual"';
             $dialAttributes[] = 'recordingStatusCallback="'.$safeRecordingCallbackUrl.'"';
             $dialAttributes[] = 'recordingStatusCallbackMethod="POST"';
+            $dialAttributes[] = 'action="'.$safeDialActionUrl.'"';
+            $dialAttributes[] = 'method="POST"';
+
+            $numberAttributes = [
+                'statusCallback="'.$safeStatusCallbackUrl.'"',
+                'statusCallbackMethod="POST"',
+                'statusCallbackEvent="initiated ringing answered completed"',
+            ];
+        } else {
+            $numberAttributes = [];
         }
 
         $dialAttributesText = implode(' ', $dialAttributes);
+        $numberAttributesText = implode(' ', $numberAttributes);
+        $numberAttributesPrefix = $numberAttributesText === '' ? '' : ' '.$numberAttributesText;
         $twiml = <<<XML
 <Response>
     <Dial {$dialAttributesText}>
-        <Number>{$safeDestination}</Number>
+        <Number{$numberAttributesPrefix}>{$safeDestination}</Number>
     </Dial>
 </Response>
 XML;
@@ -108,7 +135,7 @@ XML;
         $authToken = (string) config('services.twilio.auth_token');
         $callerId = (string) config('services.twilio.caller_id');
         $destinationNumber = $request->destinationNumber();
-        $twimlUrl = url('/api/voip/twiml');
+        $twimlUrl = $this->publicUrl(url('/api/voip/twiml'));
 
         if ($accountSid === '' || $authToken === '' || $callerId === '') {
             return response()->json([
@@ -165,13 +192,6 @@ XML;
             ], 403);
         }
 
-        $agentPhone = $request->agentPhone();
-        if ($agentPhone === null) {
-            return response()->json([
-                'message' => 'Debes indicar el teléfono del asesor en formato E.164.',
-            ], 422);
-        }
-
         $destinationNumber = $request->destinationNumber();
         if ($destinationNumber === null) {
             $bestPhone = $customer->getBestPhoneCandidate();
@@ -198,28 +218,40 @@ XML;
             'customer_id' => $customer->id,
             'type_id' => 21,
             'creator_user_id' => (int) ($user?->id ?? 0),
-            'note' => $this->buildInitialCallNote($creatorName, $agentPhone, $destinationNumber),
+            'note' => $this->buildInitialCallNote($creatorName, $callerId, $destinationNumber),
         ]);
 
+        if ($request->isClientPreparation()) {
+            return response()->json([
+                'message' => 'Acción de llamada preparada.',
+                'action_id' => $action->id,
+                'to' => $destinationNumber,
+                'from' => $callerId,
+            ]);
+        }
+
         $secret = $this->callbackSecret();
-        $twimlUrl = $this->buildUrlWithQuery(route('api.voip.twiml'), [
-            'to' => $destinationNumber,
+        $twimlUrl = $this->publicUrl(route('api.voip.twiml'));
+        $statusCallbackUrl = $this->publicUrl($this->buildUrlWithQuery(route('api.voip.callbacks.status'), [
             'action_id' => $action->id,
             'token' => $secret,
-        ]);
-        $statusCallbackUrl = $this->buildUrlWithQuery(route('api.voip.callbacks.status'), [
+        ]));
+        $recordingCallbackUrl = $this->publicUrl($this->buildUrlWithQuery(route('api.voip.callbacks.recording'), [
             'action_id' => $action->id,
             'token' => $secret,
-        ]);
+        ]));
 
         try {
             $response = Http::asForm()
                 ->withBasicAuth($accountSid, $authToken)
                 ->post("https://api.twilio.com/2010-04-01/Accounts/{$accountSid}/Calls.json", [
-                    'To' => $agentPhone,
+                    'To' => $destinationNumber,
                     'From' => $callerId,
                     'Url' => $twimlUrl,
                     'Method' => 'POST',
+                    'Record' => 'true',
+                    'RecordingStatusCallback' => $recordingCallbackUrl,
+                    'RecordingStatusCallbackMethod' => 'POST',
                     'StatusCallback' => $statusCallbackUrl,
                     'StatusCallbackMethod' => 'POST',
                     'StatusCallbackEvent' => 'initiated ringing answered completed',
@@ -265,7 +297,6 @@ XML;
             'call_sid' => $callSid !== '' ? $callSid : null,
             'status' => $payload['status'] ?? null,
             'action_id' => $action->id,
-            'agent_phone' => $agentPhone,
             'to' => $destinationNumber,
             'from' => $callerId,
         ]);
@@ -274,19 +305,43 @@ XML;
     public function statusCallback(TwilioStatusCallbackRequest $request): Response
     {
         if (! $this->isValidCallback($request->accountSid(), $request->webhookToken())) {
+            Log::warning('Twilio status callback rejected.', [
+                'account_sid' => $request->accountSid(),
+                'action_id' => $request->actionId(),
+                'call_sid' => $request->callSid(),
+                'source' => (string) $request->input('source', ''),
+            ]);
+
             return response('Forbidden', 403);
         }
 
-        $action = $this->resolveCallAction($request->actionId(), $request->callSid());
+        $action = $this->resolveCallAction(
+            $request->actionId(),
+            $request->callSid(),
+            $request->destinationNumber()
+        );
         if (! $action) {
             return response('OK', 200);
         }
 
         $callStatus = $request->callStatus();
+        $callSid = $request->callSid();
+        if ($callSid !== null) {
+            $action->note = $this->appendNoteLine($action->note, $this->callSidTag($callSid));
+        }
+
         if ($callStatus !== null) {
             $action->note = $this->appendNoteLine($action->note, 'Estado Twilio: '.$callStatus);
             if ($callStatus === 'completed' && $action->delivery_date === null) {
                 $action->delivery_date = now();
+            }
+
+            if ($callStatus === 'completed' && $action->url === null && $callSid !== null) {
+                $recordingUrl = $this->fetchRecordingUrlByCallSid($callSid);
+                if ($recordingUrl !== null) {
+                    $action->url = $recordingUrl;
+                    $action->note = $this->appendNoteLine($action->note, 'Grabación Twilio: completed');
+                }
             }
         }
 
@@ -305,15 +360,30 @@ XML;
     public function recordingCallback(TwilioRecordingCallbackRequest $request): Response
     {
         if (! $this->isValidCallback($request->accountSid(), $request->webhookToken())) {
+            Log::warning('Twilio recording callback rejected.', [
+                'account_sid' => $request->accountSid(),
+                'action_id' => $request->actionId(),
+                'call_sid' => $request->callSid(),
+            ]);
+
             return response('Forbidden', 403);
         }
 
-        $action = $this->resolveCallAction($request->actionId(), $request->callSid());
+        $action = $this->resolveCallAction(
+            $request->actionId(),
+            $request->callSid(),
+            $request->destinationNumber()
+        );
         if (! $action) {
             return response('OK', 200);
         }
 
         $recordingStatus = $request->recordingStatus();
+        $callSid = $request->callSid();
+        if ($callSid !== null) {
+            $action->note = $this->appendNoteLine($action->note, $this->callSidTag($callSid));
+        }
+
         if ($recordingStatus !== null) {
             $action->note = $this->appendNoteLine($action->note, 'Grabación Twilio: '.$recordingStatus);
         }
@@ -340,9 +410,24 @@ XML;
         ]);
     }
 
-    private function buildInitialCallNote(string $creatorName, string $agentPhone, string $destinationNumber): string
+    private function buildInitialCallNote(string $creatorName, string $callerId, string $destinationNumber): string
     {
-        return "Llamada Twilio iniciada por {$creatorName}. Asesor: {$agentPhone}. Destino: {$destinationNumber}.";
+        return "Llamada Twilio iniciada por {$creatorName}. Línea: {$callerId}. Destino: {$destinationNumber}.";
+    }
+
+    private function directTwimlResponse(): Response
+    {
+        $twimlFilePath = base_path('twilio.xml');
+        if (is_file($twimlFilePath)) {
+            $twiml = trim((string) file_get_contents($twimlFilePath));
+            if ($twiml !== '' && str_contains($twiml, '<Response')) {
+                return $this->xmlResponse($twiml);
+            }
+        }
+
+        return $this->xmlResponse(
+            '<Response><Say voice="alice">Llamada iniciada desde AriChat.</Say></Response>'
+        );
     }
 
     private function appendNoteLine(?string $note, string $line): string
@@ -364,7 +449,7 @@ XML;
         return '[twilio_call_sid:'.$callSid.']';
     }
 
-    private function resolveCallAction(?int $actionId, ?string $callSid): ?Action
+    private function resolveCallAction(?int $actionId, ?string $callSid, ?string $destinationNumber = null): ?Action
     {
         if ($actionId !== null) {
             $action = Action::query()
@@ -384,26 +469,46 @@ XML;
             ->where('type_id', 21)
             ->where('note', 'like', '%'.$this->callSidTag($callSid).'%')
             ->latest('id')
+            ->first()
+            ?? $this->resolveCallActionByDestination($destinationNumber);
+    }
+
+    private function resolveCallActionByDestination(?string $destinationNumber): ?Action
+    {
+        if ($destinationNumber === null || $destinationNumber === '') {
+            return null;
+        }
+
+        return Action::query()
+            ->where('type_id', 21)
+            ->whereNull('delivery_date')
+            ->where('created_at', '>=', now()->subHours(12))
+            ->where('note', 'like', '%Destino: '.$destinationNumber.'%')
+            ->latest('id')
             ->first();
     }
 
-    private function isValidCallback(string $accountSid, ?string $token): bool
+    private function isValidCallback(?string $accountSid, ?string $token): bool
     {
-        $configuredAccountSid = trim((string) config('services.twilio.account_sid'));
-        if ($configuredAccountSid === '' || ! hash_equals($configuredAccountSid, $accountSid)) {
-            return false;
+        $secret = $this->callbackSecret();
+        if ($secret !== null) {
+            if ($token === null) {
+                return false;
+            }
+
+            return hash_equals($secret, $token);
         }
 
-        $secret = $this->callbackSecret();
-        if ($secret === null) {
+        $configuredAccountSid = trim((string) config('services.twilio.account_sid'));
+        if ($configuredAccountSid === '') {
             return true;
         }
 
-        if ($token === null) {
+        if ($accountSid === null || $accountSid === '') {
             return false;
         }
 
-        return hash_equals($secret, $token);
+        return hash_equals($configuredAccountSid, $accountSid);
     }
 
     private function callbackSecret(): ?string
@@ -444,5 +549,68 @@ XML;
         }
 
         return $recordingUrl.'.mp3';
+    }
+
+    private function fetchRecordingUrlByCallSid(string $callSid): ?string
+    {
+        $accountSid = trim((string) config('services.twilio.account_sid'));
+        $authToken = trim((string) config('services.twilio.auth_token'));
+        if ($accountSid === '' || $authToken === '') {
+            return null;
+        }
+
+        try {
+            $response = Http::withBasicAuth($accountSid, $authToken)
+                ->get("https://api.twilio.com/2010-04-01/Accounts/{$accountSid}/Recordings.json", [
+                    'CallSid' => $callSid,
+                    'PageSize' => 1,
+                ]);
+        } catch (\Throwable $exception) {
+            Log::warning('Twilio recordings lookup failed.', [
+                'message' => $exception->getMessage(),
+                'call_sid' => $callSid,
+            ]);
+
+            return null;
+        }
+
+        if (! $response->successful()) {
+            return null;
+        }
+
+        $recording = $response->json('recordings.0');
+        if (! is_array($recording)) {
+            return null;
+        }
+
+        $recordingUrl = trim((string) ($recording['media_url'] ?? ''));
+        if ($recordingUrl === '') {
+            $uri = trim((string) ($recording['uri'] ?? ''));
+            if ($uri !== '') {
+                $recordingUrl = 'https://api.twilio.com'.$uri;
+            }
+        }
+        if ($recordingUrl === '') {
+            return null;
+        }
+
+        if (str_ends_with($recordingUrl, '.json')) {
+            $recordingUrl = substr($recordingUrl, 0, -5);
+        }
+
+        return $this->ensureRecordingAudioUrl($recordingUrl);
+    }
+
+    private function publicUrl(string $url): string
+    {
+        if (str_starts_with($url, 'https://')) {
+            return $url;
+        }
+
+        if (str_starts_with($url, 'http://')) {
+            return 'https://'.substr($url, 7);
+        }
+
+        return $url;
     }
 }

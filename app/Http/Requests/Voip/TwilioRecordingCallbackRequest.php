@@ -16,7 +16,9 @@ class TwilioRecordingCallbackRequest extends FormRequest
         return [
             'action_id' => ['nullable', 'integer'],
             'token' => ['nullable', 'string', 'max:255'],
-            'AccountSid' => ['required', 'string', 'max:64'],
+            'AccountSid' => ['nullable', 'string', 'max:64'],
+            'To' => ['nullable', 'string', 'max:20', 'regex:/^\+?[1-9]\d{6,14}$/'],
+            'Called' => ['nullable', 'string', 'max:20', 'regex:/^\+?[1-9]\d{6,14}$/'],
             'CallSid' => ['nullable', 'string', 'regex:/^CA[a-fA-F0-9]{32}$/'],
             'RecordingSid' => ['nullable', 'string', 'regex:/^RE[a-fA-F0-9]{32}$/'],
             'RecordingStatus' => ['nullable', 'string', 'max:32'],
@@ -27,7 +29,6 @@ class TwilioRecordingCallbackRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'AccountSid.required' => 'El callback de grabación no incluye AccountSid.',
             'CallSid.regex' => 'El CallSid recibido no tiene el formato esperado.',
             'RecordingSid.regex' => 'El RecordingSid recibido no tiene el formato esperado.',
         ];
@@ -51,9 +52,11 @@ class TwilioRecordingCallbackRequest extends FormRequest
         return $value === '' ? null : $value;
     }
 
-    public function accountSid(): string
+    public function accountSid(): ?string
     {
-        return trim((string) $this->validated('AccountSid'));
+        $value = trim((string) $this->validated('AccountSid', ''));
+
+        return $value === '' ? null : $value;
     }
 
     public function callSid(): ?string
@@ -73,6 +76,16 @@ class TwilioRecordingCallbackRequest extends FormRequest
     public function recordingUrl(): ?string
     {
         $value = trim((string) $this->validated('RecordingUrl', ''));
+
+        return $value === '' ? null : $value;
+    }
+
+    public function destinationNumber(): ?string
+    {
+        $value = trim((string) $this->validated('To', ''));
+        if ($value === '') {
+            $value = trim((string) $this->validated('Called', ''));
+        }
 
         return $value === '' ? null : $value;
     }

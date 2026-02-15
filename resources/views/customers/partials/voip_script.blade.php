@@ -8,7 +8,8 @@
         window.customerVoipBindingsReady = true;
 
         var e164Pattern = /^\+?[1-9]\d{6,14}$/;
-        var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        var voipPopupName = 'ari_voip_softphone';
+        var voipPopupFeatures = 'popup=yes,width=360,height=640,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes';
 
         function normalizePhone(value) {
           return (value || '').trim();
@@ -18,37 +19,26 @@
           return e164Pattern.test(value);
         }
 
-        function requestAgentPhone() {
-          var cachedPhone = normalizePhone(window.localStorage.getItem('crm_agent_phone'));
-          if (isValidPhone(cachedPhone)) {
-            return cachedPhone;
+        function openVoipPopup(url) {
+          var existingPopup = window.customerVoipPopupRef;
+          if (existingPopup && !existingPopup.closed) {
+            existingPopup.location.href = url;
+            existingPopup.focus();
+            return true;
           }
 
-          var typedPhone = window.prompt('Ingresa tu teléfono de asesor en formato E.164 (ej: +573001234567):');
-          if (typedPhone === null) {
-            return null;
+          var popup = window.open(url, voipPopupName, voipPopupFeatures);
+          if (!popup) {
+            return false;
           }
 
-          typedPhone = normalizePhone(typedPhone);
-          if (!isValidPhone(typedPhone)) {
-            window.alert('El teléfono del asesor debe estar en formato E.164.');
-            return null;
-          }
+          window.customerVoipPopupRef = popup;
+          popup.focus();
 
-          window.localStorage.setItem('crm_agent_phone', typedPhone);
-
-          return typedPhone;
+          return true;
         }
 
-        async function parseJsonResponse(response) {
-          try {
-            return await response.json();
-          } catch (error) {
-            return {};
-          }
-        }
-
-        document.addEventListener('click', async function (event) {
+        document.addEventListener('click', function (event) {
           var button = event.target.closest('[data-start-customer-call]');
           if (!button) {
             return;
@@ -56,51 +46,32 @@
 
           event.preventDefault();
 
-          var callUrl = button.getAttribute('data-call-url');
+          var voipPageUrl = button.getAttribute('data-voip-url') || '/voip';
+          var prepareUrl = button.getAttribute('data-call-url') || '';
           var targetPhone = normalizePhone(button.getAttribute('data-target-phone'));
-          var customerName = button.getAttribute('data-customer-name') || 'cliente';
 
-          if (!callUrl || !isValidPhone(targetPhone)) {
+          if (!isValidPhone(targetPhone)) {
             window.alert('No se encontró un teléfono válido para iniciar la llamada.');
             return;
           }
 
-          var agentPhone = requestAgentPhone();
-          if (!agentPhone) {
-            return;
-          }
-
-          var previousText = button.textContent;
           button.disabled = true;
-          button.textContent = 'Llamando...';
+          button.classList.add('opacity-60', 'cursor-not-allowed');
 
           try {
-            var response = await fetch(callUrl, {
-              method: 'POST',
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-              },
-              body: JSON.stringify({
-                to: targetPhone,
-                agent_phone: agentPhone,
-              }),
-            });
-
-            var payload = await parseJsonResponse(response);
-
-            if (!response.ok) {
-              throw new Error(payload.message || 'Twilio rechazó la llamada.');
+            var separator = voipPageUrl.indexOf('?') >= 0 ? '&' : '?';
+            var destination = voipPageUrl + separator + 'to=' + encodeURIComponent(targetPhone) + '&autocall=1';
+            if (prepareUrl) {
+              destination += '&prepare_url=' + encodeURIComponent(prepareUrl);
             }
-
-            var sidText = payload.call_sid ? ' SID: ' + payload.call_sid : '';
-            window.alert('Llamada enviada para ' + customerName + '.' + sidText);
+            if (!openVoipPopup(destination)) {
+              throw new Error('El navegador bloqueó la ventana emergente. Habilita popups para este sitio.');
+            }
           } catch (error) {
-            window.alert(error.message || 'No fue posible iniciar la llamada.');
+            window.alert(error.message || 'No fue posible abrir el softphone.');
           } finally {
             button.disabled = false;
-            button.textContent = previousText;
+            button.classList.remove('opacity-60', 'cursor-not-allowed');
           }
         });
       })();

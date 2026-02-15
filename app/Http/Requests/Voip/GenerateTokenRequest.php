@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Voip;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 class GenerateTokenRequest extends FormRequest
 {
@@ -13,29 +14,20 @@ class GenerateTokenRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'identity' => ['nullable', 'string', 'max:80', 'regex:/^[A-Za-z0-9._-]+$/'],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'identity.max' => 'La identidad no puede superar 80 caracteres.',
-            'identity.regex' => 'La identidad solo permite letras, números, punto, guion y guion bajo.',
-        ];
+        return [];
     }
 
     public function resolvedIdentity(): string
     {
-        $identity = trim((string) $this->input('identity'));
+        $user = $this->user();
+        $authId = (string) ($user?->getAuthIdentifier() ?? 'guest');
+        $rawName = trim((string) ($user?->name ?? 'user'));
 
-        if ($identity !== '') {
-            return $identity;
-        }
+        $normalizedName = Str::slug(Str::ascii(Str::lower($rawName)));
+        $normalizedName = trim($normalizedName, '-');
+        $normalizedName = $normalizedName === '' ? 'user' : $normalizedName;
+        $identity = $normalizedName.'-'.$authId;
 
-        $authId = (string) ($this->user()?->getAuthIdentifier() ?? 'guest');
-
-        return 'user-'.$authId;
+        return Str::limit($identity, 80, '');
     }
 }

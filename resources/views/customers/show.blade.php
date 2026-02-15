@@ -172,8 +172,8 @@
             @if($phone1)
               <div class="space-y-0.5">
                 <div class="text-xs text-slate-500">Teléfono</div>
-                <div class="inline-flex items-center gap-2 text-sm text-slate-900">
-                  <span>{{ $phone1 }}</span>
+                <div class="flex flex-wrap items-center gap-2 text-sm text-slate-900">
+                  <span class="break-all">{{ $phone1 }}</span>
                   <button type="button" class="inline-flex items-center text-slate-500 transition hover:text-slate-700 copy-phone" data-phone="{{ $phone1 }}" aria-label="Copiar teléfono">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
@@ -181,28 +181,31 @@
                   </button>
                   <button
                     type="button"
-                    class="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2 py-1 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
+                    class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-sky-200 bg-sky-50 text-sky-700 transition hover:bg-sky-100"
                     data-start-customer-call
                     data-call-url="{{ $customerCallUrl }}"
+                    data-voip-url="{{ route('voip.index') }}"
                     data-target-phone="{{ $phone1 }}"
                     data-customer-name="{{ $model->name }}"
+                    title="Llamar"
+                    aria-label="Llamar"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
                       <path d="M2 3.75A1.75 1.75 0 0 1 3.75 2h2.38c.74 0 1.39.5 1.58 1.22l.53 1.98a1.75 1.75 0 0 1-.78 1.94l-1.03.62a11.03 11.03 0 0 0 5.8 5.8l.62-1.03a1.75 1.75 0 0 1 1.94-.78l1.98.53A1.75 1.75 0 0 1 18 13.87v2.38A1.75 1.75 0 0 1 16.25 18h-1C8.48 18 2 11.52 2 4.75v-1Z"/>
                     </svg>
-                    Llamar
                   </button>
                   @if ($phone1Whatsapp)
                     <a
                       href="https://wa.me/{{ $phone1Whatsapp }}"
                       target="_blank"
                       rel="noopener"
-                      class="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                      class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 transition hover:bg-emerald-100"
+                      title="WhatsApp"
+                      aria-label="WhatsApp"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
                         <path d="M12 2a9.9 9.9 0 0 0-8.53 15.03L2 22l5.1-1.33A9.93 9.93 0 0 0 12 22a10 10 0 0 0 0-20Zm0 18a7.93 7.93 0 0 1-4.02-1.1l-.29-.18-2.97.77.79-2.89-.19-.3A7.9 7.9 0 0 1 4 12a8 8 0 1 1 8 8Zm4.38-5.36c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1-.37-1.9-1.18-.7-.62-1.18-1.39-1.32-1.63-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.7 2.6 4.12 3.64.58.25 1.04.4 1.39.51.58.18 1.1.16 1.52.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
                       </svg>
-                      WhatsApp
                     </a>
                   @endif
                 </div>
@@ -212,8 +215,8 @@
             @if($phone2 && $phone2 !== $phone1)
               <div class="space-y-0.5">
                 <div class="text-xs text-slate-500">Celular</div>
-                <div class="inline-flex items-center gap-2 text-sm text-slate-900">
-                  <span>{{ $phone2 }}</span>
+                <div class="flex flex-wrap items-center gap-2 text-sm text-slate-900">
+                  <span class="break-all">{{ $phone2 }}</span>
                   <button type="button" class="inline-flex items-center text-slate-500 transition hover:text-slate-700 copy-phone" data-phone="{{ $phone2 }}" aria-label="Copiar teléfono">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
@@ -221,28 +224,31 @@
                   </button>
                   <button
                     type="button"
-                    class="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2 py-1 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
+                    class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-sky-200 bg-sky-50 text-sky-700 transition hover:bg-sky-100"
                     data-start-customer-call
                     data-call-url="{{ $customerCallUrl }}"
+                    data-voip-url="{{ route('voip.index') }}"
                     data-target-phone="{{ $phone2 }}"
                     data-customer-name="{{ $model->name }}"
+                    title="Llamar"
+                    aria-label="Llamar"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
                       <path d="M2 3.75A1.75 1.75 0 0 1 3.75 2h2.38c.74 0 1.39.5 1.58 1.22l.53 1.98a1.75 1.75 0 0 1-.78 1.94l-1.03.62a11.03 11.03 0 0 0 5.8 5.8l.62-1.03a1.75 1.75 0 0 1 1.94-.78l1.98.53A1.75 1.75 0 0 1 18 13.87v2.38A1.75 1.75 0 0 1 16.25 18h-1C8.48 18 2 11.52 2 4.75v-1Z"/>
                     </svg>
-                    Llamar
                   </button>
                   @if ($phone2Whatsapp)
                     <a
                       href="https://wa.me/{{ $phone2Whatsapp }}"
                       target="_blank"
                       rel="noopener"
-                      class="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100"
+                      class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 transition hover:bg-emerald-100"
+                      title="WhatsApp"
+                      aria-label="WhatsApp"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
                         <path d="M12 2a9.9 9.9 0 0 0-8.53 15.03L2 22l5.1-1.33A9.93 9.93 0 0 0 12 22a10 10 0 0 0 0-20Zm0 18a7.93 7.93 0 0 1-4.02-1.1l-.29-.18-2.97.77.79-2.89-.19-.3A7.9 7.9 0 0 1 4 12a8 8 0 1 1 8 8Zm4.38-5.36c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1-.37-1.9-1.18-.7-.62-1.18-1.39-1.32-1.63-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.42-.14-.01-.3-.01-.46-.01-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.7 2.6 4.12 3.64.58.25 1.04.4 1.39.51.58.18 1.1.16 1.52.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/>
                       </svg>
-                      WhatsApp
                     </a>
                   @endif
                 </div>
