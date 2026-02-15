@@ -166,6 +166,7 @@
                 $phone2 = $model->phone2 ? '+' . ltrim($model->getInternationalPhone($model->phone2), '+') : null;
                 $phone1Whatsapp = $phone1 ? preg_replace('/\\D+/', '', $phone1) : null;
                 $phone2Whatsapp = $phone2 ? preg_replace('/\\D+/', '', $phone2) : null;
+                $customerCallUrl = route('customers.voip.call', $model->id);
             @endphp
 
             @if($phone1)
@@ -177,6 +178,19 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
                     </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2 py-1 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
+                    data-start-customer-call
+                    data-call-url="{{ $customerCallUrl }}"
+                    data-target-phone="{{ $phone1 }}"
+                    data-customer-name="{{ $model->name }}"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
+                      <path d="M2 3.75A1.75 1.75 0 0 1 3.75 2h2.38c.74 0 1.39.5 1.58 1.22l.53 1.98a1.75 1.75 0 0 1-.78 1.94l-1.03.62a11.03 11.03 0 0 0 5.8 5.8l.62-1.03a1.75 1.75 0 0 1 1.94-.78l1.98.53A1.75 1.75 0 0 1 18 13.87v2.38A1.75 1.75 0 0 1 16.25 18h-1C8.48 18 2 11.52 2 4.75v-1Z"/>
+                    </svg>
+                    Llamar
                   </button>
                   @if ($phone1Whatsapp)
                     <a
@@ -204,6 +218,19 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="18" height="18">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
                     </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-50 px-2 py-1 text-xs font-semibold text-sky-700 transition hover:bg-sky-100"
+                    data-start-customer-call
+                    data-call-url="{{ $customerCallUrl }}"
+                    data-target-phone="{{ $phone2 }}"
+                    data-customer-name="{{ $model->name }}"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
+                      <path d="M2 3.75A1.75 1.75 0 0 1 3.75 2h2.38c.74 0 1.39.5 1.58 1.22l.53 1.98a1.75 1.75 0 0 1-.78 1.94l-1.03.62a11.03 11.03 0 0 0 5.8 5.8l.62-1.03a1.75 1.75 0 0 1 1.94-.78l1.98.53A1.75 1.75 0 0 1 18 13.87v2.38A1.75 1.75 0 0 1 16.25 18h-1C8.48 18 2 11.52 2 4.75v-1Z"/>
+                    </svg>
+                    Llamar
                   </button>
                   @if ($phone2Whatsapp)
                     <a
@@ -478,6 +505,7 @@
         </div>
 
         @include('customers.partials.notes_script')
+        @include('customers.partials.voip_script')
         @include('customers.show_partials.orders')
       </div>
     </div>

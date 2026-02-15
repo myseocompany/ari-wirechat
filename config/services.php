@@ -54,6 +54,7 @@ return [
         'twiml_app_sid' => env('TWILIO_TWIML_APP_SID'),
         'caller_id' => env('TWILIO_CALLER_ID'),
         'token_ttl' => env('TWILIO_TOKEN_TTL', 3600),
+        'webhook_secret' => env('TWILIO_WEBHOOK_SECRET'),
     ],
 
 ];

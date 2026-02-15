@@ -11,6 +11,7 @@
 
 @include('customers.partials.tags_script')
 @include('customers.partials.notes_script')
+@include('customers.partials.voip_script')
 
 @push('scripts')
 <script>

@@ -37,6 +37,8 @@ Route::middleware('api')->group(
         Route::get('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'verify']);
         Route::post('/webhooks/whatsapp', [WhatsAppWebhookController::class, 'receive']);
         Route::match(['get', 'post'], '/voip/twiml', [VoipController::class, 'twiml'])->name('api.voip.twiml');
+        Route::post('/voip/callbacks/status', [VoipController::class, 'statusCallback'])->name('api.voip.callbacks.status');
+        Route::post('/voip/callbacks/recording', [VoipController::class, 'recordingCallback'])->name('api.voip.callbacks.recording');
 
     });
 

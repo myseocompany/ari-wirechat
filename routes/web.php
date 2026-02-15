@@ -163,6 +163,7 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     Route::post('/{customer}/action/spare', [CustomerController::class, 'spareAction'])->whereNumber('customer');
     Route::post('/{customer}/action/mail', [CustomerController::class, 'storeMail'])->whereNumber('customer');
     Route::post('/{customer}/send-welcome', [CustomerController::class, 'sendWelcomeTemplate'])->whereNumber('customer')->name('customers.send-welcome');
+    Route::post('/{customer}/voip/call', [VoipController::class, 'callCustomer'])->whereNumber('customer')->name('customers.voip.call');
     Route::get('/{customer}/assignMe', [CustomerController::class, 'assignMe'])->whereNumber('customer');
     Route::post('/{customer}/audience', [CustomerController::class, 'storeAudience'])->whereNumber('customer');
     Route::get('/history/{customer}/show', [CustomerController::class, 'showHistory'])->whereNumber('customer');

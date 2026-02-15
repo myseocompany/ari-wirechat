@@ -186,6 +186,7 @@ response_templates:
     En febrero te llevas gratis un molde en forma de corazón ✨
     ¿Cuántas empanadas quieres producir al día cuando el negocio esté funcionando a tope?
   invitacion_demo_en_vivo: |
+    Demo en vivo: martes 17 y jueves 19 de febrero de 2026, 10:00 a.m. (America/Bogota)
     https://meet.google.com/qvr-cuog-ivc
     ¿Trabajas con masa de maíz, de trigo o prefieres otra mezcla?
   bono_ayuda_decidir: >
