@@ -64,6 +64,13 @@
       text-align: center;
     }
 
+    .page-title-top .tagline {
+      margin: 8px 0 0 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
     .section {
       padding: 32px 0;
     }
@@ -291,6 +298,11 @@
       gap: 12px;
     }
 
+    .locations-grid {
+      display: grid;
+      gap: 12px;
+    }
+
     .reel {
       background: #000000;
       border-radius: 12px;
@@ -512,6 +524,10 @@
       .reels {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+
+      .locations-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
   </style>
 </head>
@@ -519,6 +535,7 @@
   <section class="page-title-top" id="titulo-principal">
     <div class="container">
       <h1>Crece tu Empresa de Empanadas</h1>
+      <p class="tagline">Haz 1200 empanadas en medio día con 1 persona</p>
     </div>
   </section>
 
@@ -588,8 +605,8 @@
         </div>
         <div class="step">
           <div class="card-icon">2️⃣</div>
-          <strong>Ahorrar dinero</strong>
-          <span class="card-text">Pasa de pagar $250 a $25 por empanada.</span>
+          <strong>Mide lo importante</strong>
+          <span class="card-text">Revisa y controla el ritmo de producción.</span>
         </div>
         <div class="step">
           <div class="card-icon">3️⃣</div>
@@ -608,10 +625,6 @@
   <header class="hero">
     <div class="container">
       <div class="hero-inner">
-        <div>
-          <p>Haz 1200 empanadas en medio día con 1 persona</p>
-        </div>
-
         <div class="hero-actions">
           <a class="btn btn-primary" href="#videos" data-cta="hero-ver-videos">Ver videos ahora</a>
           <a class="btn btn-secondary" href="https://wa.me/573148586635?text=Hola%2C%20vi%20la%20landing%20de%20educaci%C3%B3n%20y%20quiero%20informaci%C3%B3n." data-cta="hero-whatsapp">Preguntar por WhatsApp</a>
@@ -730,12 +743,51 @@
             </div>
           </div>
 
+          <div class="card" id="video-arepas">
+            <div class="card-title">Arepas</div>
+            <div class="video-embed">
+              <iframe
+                src="https://www.youtube.com/embed/2KYL-pWwvEs?rel=0"
+                title="Arepas"
+                loading="lazy"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+
+          <div class="card" id="video-arepa-pequena">
+            <div class="card-title">Arepa pequeña</div>
+            <div class="video-embed">
+              <iframe
+                src="https://www.youtube.com/embed/r0T7ku5aXDg?rel=0"
+                title="Arepa pequeña"
+                loading="lazy"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+
           <div class="card" id="video-pasteles">
             <div class="card-title">Pasteles</div>
             <div class="video-embed">
               <iframe
                 src="https://www.youtube.com/embed/vEZxVxWxUsc?rel=0"
                 title="Pasteles"
+                loading="lazy"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+
+          <div class="card" id="video-trigo">
+            <div class="card-title">Empanadas y pasteles de trigo</div>
+            <div class="video-embed">
+              <iframe
+                src="https://www.youtube.com/embed/iFY0NyHZcYw?rel=0"
+                title="Empanadas y pasteles de trigo"
                 loading="lazy"
                 allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
@@ -771,10 +823,10 @@
                 data-instgrm-version="14"
               ></blockquote>
             </div>
-            <span class="pill">Negocio #4</span>
+            <span class="pill">Empanadas Don José</span>
             <div class="card-text">Colombia, Bogotá, Cundinamarca</div>
-            <div class="card-text">Producto: CM5M, CM08</div>
-            <div class="card-text">"...podemos creacer lo que uno quiera con estas máquinas"</div>
+            <div class="card-text">De 70 a más de 2000 empanadas</div>
+            <div class="card-text">"Mi esposa se quedó sin manguito rotador", "...podemos crecer lo que uno quiera con estas máquinas"</div>
           </div>
           <div class="social-card">
             <div class="instagram-embed">
@@ -784,23 +836,23 @@
                 data-instgrm-version="14"
               ></blockquote>
             </div>
-            <span class="pill">Negocio #6</span>
+            <span class="pill">La Otra Empanada</span>
             <div class="card-text">Colombia, Bogotá, Cundinamarca</div>
-            <div class="card-text">Producto: CM08</div>
-            <div class="card-text">"A mano no es el mismo rinde."</div>
+            <div class="card-text">De 50 a 600 empanadas</div>
+            <div class="card-text">"Cualquier persona la puede manejar"</div>
           </div>
           <div class="social-card">
             <div class="instagram-embed">
               <blockquote
                 class="instagram-media"
-                data-instgrm-permalink="https://www.instagram.com/p/DMLm5hnB1jU/"
+                data-instgrm-permalink="https://www.instagram.com/p/DIM5mXvu_ZK/"
                 data-instgrm-version="14"
               ></blockquote>
             </div>
-            <span class="pill">Negocio #8</span>
-            <div class="card-text">Colombia, Bogotá, Cundinamarca</div>
-            <div class="card-text">Producto: CM08</div>
-            <div class="card-text">"...no se joda las manos, hágalas en la máquina"</div>
+            <span class="pill">Deli Cronch</span>
+            <div class="card-text">Colombia, Dosquebradas, Risarlada</div>
+            <div class="card-text">De 1.200 a 20.000 empanadas</div>
+            <div class="card-text">"...tener un personal que quisiera la empresa"</div>
           </div>
         </div>
       </div>
@@ -937,16 +989,33 @@
     <section class="section" id="direccion">
       <div class="container">
         <h2 class="section-title">Dirección y ubicación</h2>
-        
-        
-        <div class="video-embed">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4765.050261732589!2d-75.49898165533928!3d5.053191849516156!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e4765667c73ba3b%3A0x32fe853af652e57b!2sMaquiempanadas!5e1!3m2!1ses-419!2sco!4v1770562278805!5m2!1ses-419!2sco"
-            title="Ubicación en Google Maps"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
+
+        <div class="locations-grid">
+          <div class="card">
+            <div class="card-title">Fábrica en Colombia</div>
+            <div class="video-embed">
+              <iframe
+                src="https://www.google.com/maps?q=Carrera+34+No+64-24+Manizales+Caldas+Colombia&output=embed"
+                title="Fábrica en Colombia en Google Maps"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Sede USA</div>
+            <div class="video-embed">
+              <iframe
+                src="https://www.google.com/maps?q=3775+NW+46th+Street+Miami+FL+33142&output=embed"
+                title="Sede USA en Google Maps"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
         </div>
       </div>
     </section>
