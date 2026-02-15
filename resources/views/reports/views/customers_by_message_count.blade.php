@@ -89,10 +89,8 @@
       <thead class="bg-slate-50">
         <tr>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Cliente</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Etiquetas</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Mensajes</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultimas 3 acciones</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultimos 5 mensajes</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Ultimas 3 acciones</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
@@ -132,22 +130,43 @@
                     {{ $item->status_name ?? 'Sin estado' }}
                   </span>
                 </div>
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                  <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-600">
+                    Mensajes: {{ $item->messages_count }}
+                  </span>
+                  @if (count($tagNames))
+                    @foreach ($tagNames as $tagName)
+                      <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-600">
+                        {{ $tagName }}
+                      </span>
+                    @endforeach
+                  @else
+                    <span class="text-slate-400">Sin etiqueta</span>
+                  @endif
+                </div>
               </div>
             </td>
             <td class="px-4 py-3">
-              @if (count($tagNames))
-                <div class="flex flex-wrap gap-2">
-                  @foreach ($tagNames as $tagName)
-                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">
-                      {{ $tagName }}
-                    </span>
+              @php
+                $lastMessages = $item->last_messages_body ? explode("\n", $item->last_messages_body) : [];
+              @endphp
+              @if (count($lastMessages))
+                <div class="flex flex-col gap-3 text-sm text-slate-600">
+                  @foreach ($lastMessages as $messageLine)
+                    @php
+                      $parts = array_pad(explode('|||', $messageLine), 2, '');
+                      [$messageBody, $messageDate] = $parts;
+                    @endphp
+                    <div class="space-y-1">
+                      <div>{{ $messageBody ?: 'Sin mensaje' }}</div>
+                      <div class="text-xs text-slate-400">{{ $messageDate ?: '—' }}</div>
+                    </div>
                   @endforeach
                 </div>
               @else
-                <span class="text-xs text-slate-400">Sin etiqueta</span>
+                <span class="text-sm text-slate-400">Sin mensajes</span>
               @endif
             </td>
-            <td class="px-4 py-3 font-semibold text-slate-900">{{ $item->messages_count }}</td>
             <td class="px-4 py-3">
               @php
                 $lastActions = $item->last_actions ? explode("\n", $item->last_actions) : [];
@@ -188,27 +207,6 @@
                 </div>
               @else
                 <span class="text-sm text-slate-400">Sin acciones</span>
-              @endif
-            </td>
-            <td class="px-4 py-3">
-              @php
-                $lastMessages = $item->last_messages_body ? explode("\n", $item->last_messages_body) : [];
-              @endphp
-              @if (count($lastMessages))
-                <div class="flex flex-col gap-3 text-sm text-slate-600">
-                  @foreach ($lastMessages as $messageLine)
-                    @php
-                      $parts = array_pad(explode('|||', $messageLine), 2, '');
-                      [$messageBody, $messageDate] = $parts;
-                    @endphp
-                    <div class="space-y-1">
-                      <div>{{ $messageBody ?: 'Sin mensaje' }}</div>
-                      <div class="text-xs text-slate-400">{{ $messageDate ?: '—' }}</div>
-                    </div>
-                  @endforeach
-                </div>
-              @else
-                <span class="text-sm text-slate-400">Sin mensajes</span>
               @endif
             </td>
           </tr>
