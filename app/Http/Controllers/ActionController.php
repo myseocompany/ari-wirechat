@@ -16,6 +16,8 @@ use Auth;
 use Carbon;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Mail;
 
 class ActionController extends Controller
@@ -380,6 +382,115 @@ class ActionController extends Controller
         TranscribeActionAudio::dispatch($action->id, $transcription->id);
 
         return back()->with('status', 'Transcripción en cola.');
+    }
+
+    public function audio(Request $request, Action $action): \Symfony\Component\HttpFoundation\Response
+    {
+        $user = $request->user();
+        $customer = $action->customer;
+
+        if (! $user || ! $customer || ! $customer->hasFullAccess($user)) {
+            abort(403);
+        }
+
+        $audioUrl = $this->normalizeActionUrl((string) $action->url);
+        if ($audioUrl === null) {
+            abort(404);
+        }
+
+        if (! $this->isTwilioRecordingUrl($audioUrl)) {
+            abort(404);
+        }
+
+        $accountSid = trim((string) config('services.twilio.account_sid'));
+        $authToken = trim((string) config('services.twilio.auth_token'));
+
+        if ($accountSid === '' || $authToken === '') {
+            abort(503, 'Configuración de Twilio incompleta.');
+        }
+
+        $audioUrl = $this->ensureAudioExtension($audioUrl);
+
+        $twilioResponse = Http::withBasicAuth($accountSid, $authToken)
+            ->accept('audio/mpeg,audio/*;q=0.9,*/*;q=0.8')
+            ->get($audioUrl);
+
+        if (! $twilioResponse->successful()) {
+            Log::warning('Twilio audio proxy failed.', [
+                'action_id' => $action->id,
+                'status' => $twilioResponse->status(),
+                'url' => $audioUrl,
+            ]);
+
+            abort($twilioResponse->status() === 404 ? 404 : 502);
+        }
+
+        $contentType = trim((string) $twilioResponse->header('Content-Type'));
+        if ($contentType === '') {
+            $contentType = $this->guessAudioMimeType($audioUrl);
+        }
+
+        return response($twilioResponse->body(), 200, [
+            'Content-Type' => $contentType,
+            'Cache-Control' => 'private, max-age=300',
+        ]);
+    }
+
+    private function normalizeActionUrl(string $url): ?string
+    {
+        $normalized = trim($url);
+        if ($normalized === '') {
+            return null;
+        }
+
+        if (str_starts_with($normalized, '//')) {
+            $normalized = 'https:'.$normalized;
+        } elseif (! str_starts_with($normalized, 'http://') && ! str_starts_with($normalized, 'https://')) {
+            $normalized = 'https://'.$normalized;
+        }
+
+        return $normalized;
+    }
+
+    private function isTwilioRecordingUrl(string $url): bool
+    {
+        $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+        $path = strtolower((string) parse_url($url, PHP_URL_PATH));
+
+        return $host === 'api.twilio.com'
+            && str_contains($path, '/recordings/');
+    }
+
+    private function ensureAudioExtension(string $url): string
+    {
+        if (preg_match('/\.(mp3|wav|ogg|oga|m4a|m4b|webm)(\?.*)?$/i', $url) === 1) {
+            return $url;
+        }
+
+        return $url.'.mp3';
+    }
+
+    private function guessAudioMimeType(string $url): string
+    {
+        $lowerUrl = strtolower($url);
+
+        if (str_contains($lowerUrl, '.wav')) {
+            return 'audio/wav';
+        }
+
+        if (str_contains($lowerUrl, '.ogg') || str_contains($lowerUrl, '.oga')) {
+            return 'audio/ogg';
+        }
+
+        if (str_contains($lowerUrl, '.m4a') || str_contains($lowerUrl, '.m4b')) {
+            return 'audio/mp4';
+        }
+
+        if (str_contains($lowerUrl, '.webm')) {
+            return 'audio/webm';
+        }
+
+        return 'audio/mpeg';
     }
 
     public function calendarFeed(Request $request)

@@ -36,6 +36,11 @@
               (Str::contains($lowerUrl, ['.ogg', '.oga']) ? 'audio/ogg' :
               (Str::contains($lowerUrl, ['.m4a', '.m4b']) ? 'audio/mp4' :
               (Str::contains($lowerUrl, '.webm') ? 'audio/webm' : null))));
+            $isTwilioRecording = Str::contains($lowerUrl, 'api.twilio.com')
+              && Str::contains($lowerUrl, '/recordings/');
+            if ($isTwilioRecording) {
+              $audioUrl = route('actions.audio', $action);
+            }
           @endphp
           @if($isAudio)
             <audio controls class="mt-2" @if(! $mime) src="{{ $audioUrl }}" @endif>

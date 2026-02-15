@@ -304,6 +304,8 @@ XML;
 
     public function statusCallback(TwilioStatusCallbackRequest $request): Response
     {
+        $this->logTwilioCallback('Twilio status callback received.', $request);
+
         if (! $this->isValidCallback($request->accountSid(), $request->webhookToken())) {
             Log::warning('Twilio status callback rejected.', [
                 'account_sid' => $request->accountSid(),
@@ -321,6 +323,12 @@ XML;
             $request->destinationNumber()
         );
         if (! $action) {
+            Log::warning('Twilio status callback action not found.', [
+                'action_id' => $request->actionId(),
+                'call_sid' => $request->callSid(),
+                'destination' => $request->destinationNumber(),
+            ]);
+
             return response('OK', 200);
         }
 
@@ -359,6 +367,8 @@ XML;
 
     public function recordingCallback(TwilioRecordingCallbackRequest $request): Response
     {
+        $this->logTwilioCallback('Twilio recording callback received.', $request);
+
         if (! $this->isValidCallback($request->accountSid(), $request->webhookToken())) {
             Log::warning('Twilio recording callback rejected.', [
                 'account_sid' => $request->accountSid(),
@@ -375,6 +385,13 @@ XML;
             $request->destinationNumber()
         );
         if (! $action) {
+            Log::warning('Twilio recording callback action not found.', [
+                'action_id' => $request->actionId(),
+                'call_sid' => $request->callSid(),
+                'destination' => $request->destinationNumber(),
+                'recording_status' => $request->recordingStatus(),
+            ]);
+
             return response('OK', 200);
         }
 
@@ -612,5 +629,41 @@ XML;
         }
 
         return $url;
+    }
+
+    private function logTwilioCallback(string $message, \Illuminate\Http\Request $request): void
+    {
+        Log::info($message, [
+            'request_url' => $request->fullUrl(),
+            'action_id' => $request->input('action_id'),
+            'has_token' => $request->filled('token'),
+            'account_sid' => $request->input('AccountSid'),
+            'call_sid' => $request->input('CallSid'),
+            'dial_call_sid' => $request->input('DialCallSid'),
+            'to' => $request->input('To'),
+            'called' => $request->input('Called'),
+            'call_status' => $request->input('CallStatus'),
+            'dial_call_status' => $request->input('DialCallStatus'),
+            'call_duration' => $request->input('CallDuration'),
+            'dial_call_duration' => $request->input('DialCallDuration'),
+            'recording_sid' => $request->input('RecordingSid'),
+            'recording_status' => $request->input('RecordingStatus'),
+            'recording_url' => $this->shortenLogValue((string) $request->input('RecordingUrl', '')),
+            'source' => $request->input('source'),
+        ]);
+    }
+
+    private function shortenLogValue(string $value, int $maxLength = 180): ?string
+    {
+        $trimmed = trim($value);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        if (mb_strlen($trimmed) <= $maxLength) {
+            return $trimmed;
+        }
+
+        return mb_substr($trimmed, 0, $maxLength).'...';
     }
 }

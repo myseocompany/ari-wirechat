@@ -356,6 +356,7 @@ Route::get('/jobs', [JobController::class, 'index']);
 // Action Routes
 Route::middleware('auth')->prefix('actions')->group(function () {
     Route::get('/', [ActionController::class, 'index'])->name('actions');
+    Route::get('/{action}/audio', [ActionController::class, 'audio'])->name('actions.audio');
     Route::get('/{action}/show', [ActionController::class, 'show']);
     Route::get('/{action}/edit', [ActionController::class, 'edit']);
     Route::get('/{action}/update', [ActionController::class, 'update']);
