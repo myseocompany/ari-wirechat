@@ -1,0 +1,1 @@
+arepa pequeña, arepa grande, pastel de pollo, pastel de carne, empanadas de yuca, empanadas de maiz, empanadas de platano verde, empanada de harina P.A.N.

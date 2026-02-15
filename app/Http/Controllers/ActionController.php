@@ -324,6 +324,29 @@ class ActionController extends Controller
 
     public function index(Request $request)
     {
+        if (! $request->has('pending')) {
+            $request->merge([
+                'pending' => 'true',
+            ]);
+        }
+
+        $hasExplicitDateFilters = $request->filled('from_date')
+            || $request->filled('to_date')
+            || $request->filled('range_type')
+            || $request->filled('filter');
+
+        if (! $hasExplicitDateFilters) {
+            $today = now()->toDateString();
+            $request->merge([
+                'filter' => '0',
+                'range_type' => 'today',
+                'from_date' => $today,
+                'to_date' => $today,
+                'from_time' => '00:00',
+                'to_time' => '23:59',
+            ]);
+        }
+
         $view = $request->get('view', 'list'); // 'list' | 'calendar'
 
         // Filtros y KPIs (se calculan igual para ambas vistas)
