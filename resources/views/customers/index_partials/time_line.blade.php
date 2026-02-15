@@ -8,6 +8,7 @@
   foreach ($customer->actions as $action) {
       $timeline->push([
           'type' => 'action',
+          'id' => $action->id,
           'date' => $action->created_at,
           'note' => $action->note,
           'creator' => $action->creator->name ?? 'Automático',
@@ -96,13 +97,27 @@
             {{-- 🎧 Reproductor de audio --}}
             @if(!empty($item['url']) && Str::contains(Str::lower($item['note']), 'llamada'))
               @php
-                $lower = Str::lower($item['url']);
-                $mime = Str::endsWith($lower, '.mp3') ? 'audio/mpeg' :
-                        (Str::endsWith($lower, '.wav') ? 'audio/wav' :
-                        (Str::endsWith($lower, ['.ogg','.oga']) ? 'audio/ogg' : 'audio/mpeg'));
+                $audioUrl = trim((string) $item['url']);
+                if (Str::startsWith($audioUrl, '//')) {
+                  $audioUrl = 'https:'.$audioUrl;
+                }
+                if (! Str::startsWith($audioUrl, ['http://', 'https://'])) {
+                  $audioUrl = 'https://'.$audioUrl;
+                }
+                $lower = Str::lower($audioUrl);
+                $isTwilioRecording = Str::contains($lower, 'api.twilio.com')
+                  && Str::contains($lower, '/recordings/');
+                if ($isTwilioRecording && !empty($item['id'])) {
+                  $audioUrl = route('actions.audio', $item['id']);
+                }
+                $mime = Str::contains($lower, '.mp3') ? 'audio/mpeg' :
+                        (Str::contains($lower, '.wav') ? 'audio/wav' :
+                        (Str::contains($lower, ['.ogg', '.oga']) ? 'audio/ogg' :
+                        (Str::contains($lower, ['.m4a', '.m4b']) ? 'audio/mp4' :
+                        (Str::contains($lower, '.webm') ? 'audio/webm' : 'audio/mpeg'))));
               @endphp
               <audio controls class="mt-2" style="width:100%;">
-                <source src="{{ $item['url'] }}" type="{{ $mime }}">
+                <source src="{{ $audioUrl }}" type="{{ $mime }}">
                 Tu navegador no soporta el audio.
               </audio><br>
             @endif

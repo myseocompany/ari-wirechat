@@ -107,8 +107,28 @@
 
             {{-- 🎧 Reproductor si es llamada --}}
             @if(!empty($item['url']) && (int) $item['type_id'] === 21)
+              @php
+                $audioUrl = trim((string) $item['url']);
+                if (Str::startsWith($audioUrl, '//')) {
+                  $audioUrl = 'https:'.$audioUrl;
+                }
+                if (! Str::startsWith($audioUrl, ['http://', 'https://'])) {
+                  $audioUrl = 'https://'.$audioUrl;
+                }
+                $lowerUrl = Str::lower($audioUrl);
+                $isTwilioRecording = Str::contains($lowerUrl, 'api.twilio.com')
+                  && Str::contains($lowerUrl, '/recordings/');
+                if ($isTwilioRecording) {
+                  $audioUrl = route('actions.audio', $item['id']);
+                }
+                $mime = Str::contains($lowerUrl, '.mp3') ? 'audio/mpeg' :
+                  (Str::contains($lowerUrl, '.wav') ? 'audio/wav' :
+                  (Str::contains($lowerUrl, ['.ogg', '.oga']) ? 'audio/ogg' :
+                  (Str::contains($lowerUrl, ['.m4a', '.m4b']) ? 'audio/mp4' :
+                  (Str::contains($lowerUrl, '.webm') ? 'audio/webm' : 'audio/mpeg'))));
+              @endphp
               <audio controls class="mt-2 w-full max-w-full">
-                <source src="{{ $item['url'] }}" type="audio/ogg">
+                <source src="{{ $audioUrl }}" type="{{ $mime }}">
                 Tu navegador no soporta el audio.
               </audio><br>
             @endif
