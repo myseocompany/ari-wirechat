@@ -348,6 +348,17 @@ class ActionController extends Controller
             ]);
         }
 
+        if (
+            $request->filled('from_date')
+            && $request->filled('to_date')
+            && ! $request->filled('filter')
+            && in_array($request->input('range_type'), ['today', 'overdue', 'upcoming'], true)
+        ) {
+            $request->merge([
+                'range_type' => 'all',
+            ]);
+        }
+
         $view = $request->get('view', 'list'); // 'list' | 'calendar'
 
         // Filtros y KPIs (se calculan igual para ambas vistas)
