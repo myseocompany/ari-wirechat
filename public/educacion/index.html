@@ -7,7 +7,7 @@
   <link rel="apple-touch-icon" href="https://maquiempanadas.com/wp-content/uploads/2025/02/cropped-favicon-1-192x192-1.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Crece tu Empresa de Empanadas</title>
-  <meta name="description" content="Mira videos reales de máquinas para empanadas, patacones, arepas de huevo y pasteles. Resuelve dudas antes de tu llamada por WhatsApp." />
+  <meta name="description" content="Produce 1,200 empanadas en medio día con 1 persona. Máquinas para empanadas, patacones, arepas de huevo y más. Videos reales de clientes." />
 
   <style>
     :root {
@@ -53,24 +53,6 @@
       padding: 0 16px;
     }
 
-    .page-title-top {
-      padding: 20px 0 12px 0;
-    }
-
-    .page-title-top h1 {
-      font-size: 30px;
-      line-height: 1.2;
-      margin: 0;
-      text-align: center;
-    }
-
-    .page-title-top .tagline {
-      margin: 8px 0 0 0;
-      text-align: center;
-      color: var(--muted);
-      font-size: 16px;
-    }
-
     .section {
       padding: 32px 0;
     }
@@ -92,13 +74,9 @@
     }
 
     .hero-inner {
-      background: #ffffff;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 16px;
+      padding: 0;
       display: grid;
       gap: 12px;
-      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
     }
 
     .hero h1 {
@@ -110,12 +88,6 @@
     .hero p {
       margin: 0 0 16px 0;
       color: var(--muted);
-    }
-
-    .hero-actions {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 16px;
     }
 
     .btn {
@@ -133,47 +105,6 @@
     .btn-primary {
       background: var(--orange);
       color: #ffffff;
-    }
-
-    .btn-secondary {
-      background: #ffffff;
-      color: var(--blue);
-      border-color: var(--blue);
-    }
-
-    .micro-trust {
-      font-size: 13px;
-      color: var(--muted);
-      display: grid;
-      gap: 6px;
-    }
-
-    .trust-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
-    .trust-item {
-      background: var(--light);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 6px 10px;
-    }
-
-    .bonus-bar {
-      margin-top: 16px;
-      background: #ffffff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px;
-      display: grid;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--muted);
     }
 
     .grid-2 {
@@ -230,31 +161,6 @@
       gap: 12px;
     }
 
-    .process-steps {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .process-step {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      background: #ffffff;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 14px 18px;
-      text-align: center;
-      font-weight: 600;
-    }
-
-
-    .process-step .card-icon {
-      font-size: 22px;
-    }
-
     .step {
       display: grid;
       gap: 6px;
@@ -282,39 +188,17 @@
       display: block;
     }
 
-    #proceso .video-embed {
+    .hero .video-embed {
       border-radius: 0;
-    }
-
-    .video-file {
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #000000;
-    }
-
-    .reels {
-      display: grid;
-      gap: 12px;
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      margin-right: calc(50% - 50vw);
+      aspect-ratio: 9 / 16;
     }
 
     .locations-grid {
       display: grid;
       gap: 12px;
-    }
-
-    .reel {
-      background: #000000;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      aspect-ratio: 9 / 16;
-      overflow: hidden;
-    }
-
-    .reel video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
 
     .social-grid {
@@ -329,16 +213,6 @@
       padding: 12px;
       display: grid;
       gap: 8px;
-    }
-
-    .social-media {
-      background: var(--light);
-      height: 120px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      color: var(--muted);
-      font-size: 12px;
     }
 
     .instagram-embed {
@@ -403,6 +277,24 @@
       color: var(--muted);
     }
 
+    .certifications {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    .certifications img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 8px;
+    }
+
     .faq details {
       border: 1px solid var(--line);
       border-radius: 12px;
@@ -458,10 +350,6 @@
         font-size: 36px;
       }
 
-      .hero-actions {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
       .grid-2 {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
@@ -474,55 +362,8 @@
         grid-template-columns: repeat(4, minmax(0, 1fr));
       }
 
-      .process-steps {
-        display: flex;
-        gap: 0;
-        align-items: stretch;
-      }
-
-      .process-step {
-        min-width: 0;
-        flex: 1;
-      }
-
-      .process-step:not(:last-child) {
-        margin-right: 24px;
-      }
-
-      .process-step:not(:last-child)::after {
-        content: "";
-        position: absolute;
-        right: -18px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        border-top: 34px solid transparent;
-        border-bottom: 34px solid transparent;
-        border-left: 18px solid #ffffff;
-        z-index: 2;
-      }
-
-      .process-step:not(:last-child)::before {
-        content: "";
-        position: absolute;
-        right: -19px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        border-top: 35px solid transparent;
-        border-bottom: 35px solid transparent;
-        border-left: 19px solid var(--line);
-        z-index: 1;
-      }
-
       .social-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .reels {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .locations-grid {
@@ -532,541 +373,340 @@
   </style>
 </head>
 <body>
-  <section class="page-title-top" id="titulo-principal">
+<header class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <h1>¿Cuántos pedidos rechazaste esta semana?</h1>
+        <p>Produce 1,200 empanadas en medio día con 1 persona. Acepta todos los pedidos que llegan.</p>
+      </div>
+      <div class="video-embed">
+        <iframe src="https://www.youtube.com/embed/YGPUs1o0qgM?rel=0" title="Atrévete a crecer tu negocio con Maqui Empanadas" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="section" id="como-funciona">
+  <div class="container">
+    <h2 class="section-title">¿Cómo producir 10X más empanadas sin contratar más personal?</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="card-icon">1️⃣</div>
+        <strong>Acepta pedidos que hoy rechazas</strong>
+        <span class="card-text">500 empanadas/hora con 1 persona (vs 50 manual). Esos pedidos grandes ahora son tuyos.</span>
+      </div>
+      <div class="step">
+        <div class="card-icon">2️⃣</div>
+        <strong>Controla todo desde tu celular</strong>
+        <span class="card-text">Ve cuántas empanadas llevas producidas en tiempo real. Estés donde estés.</span>
+      </div>
+      <div class="step">
+        <div class="card-icon">3️⃣</div>
+        <strong>Se acabó rogar personal</strong>
+        <span class="card-text">Cualquiera la opera en 15 minutos. Ya no dependes de "maestros empanadores".</span>
+      </div>
+      <div class="step">
+        <div class="card-icon">4️⃣</div>
+        <strong>Todas idénticas + menos desperdicio</strong>
+        <span class="card-text">Mismo tamaño siempre. Reduces merma de masa hasta 30%.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <section class="section" id="videos">
     <div class="container">
-      <h1>Crece tu Empresa de Empanadas</h1>
-      <p class="tagline">Haz 1200 empanadas en medio día con 1 persona</p>
+      <h2 class="section-title">Mira cómo se hace</h2>
+      <p class="section-subtitle">Sin edición. Sin trucos. Así funciona la máquina.</p>
+
+      <div class="grid-3">
+        <div class="card" id="video-empanadas-maiz">
+          <div class="card-icon">🥟</div>
+          <div class="card-title">Empanadas de maíz</div>
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/ifHabLLD5e4?rel=0" title="Empanadas de maíz" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="card" id="video-trigo">
+          <div class="card-icon">🌾</div>
+          <div class="card-title">Empanadas de trigo</div>
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/iFY0NyHZcYw?rel=0" title="Empanadas de trigo" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="card" id="video-patacones">
+          <div class="card-icon">🍌</div>
+          <div class="card-title">Patacones</div>
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/dqF336zwQ9Y?rel=0" title="Patacones y tostones" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="card" id="video-arepa-huevo">
+          <div class="card-icon">🍳</div>
+          <div class="card-title">Arepas de huevo</div>
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/zzUqu-gCcdw?rel=0" title="Arepas de huevo" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="card" id="video-pasteles">
+          <div class="card-icon">🥧</div>
+          <div class="card-title">Pasteles</div>
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/vEZxVxWxUsc?rel=0" title="Pasteles" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="card" id="video-arepas">
+          <div class="card-icon">🫓</div>
+          <div class="card-title">Arepas</div>
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/2KYL-pWwvEs?rel=0" title="Arepas" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="card" id="video-arepa-pequena">
+          <div class="card-icon">🫓</div>
+          <div class="card-title">Arepa pequeña</div>
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/r0T7ku5aXDg?rel=0" title="Arepa pequeña" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="card" id="video-cocteleras">
+          <div class="card-icon">🥟</div>
+          <div class="card-title">Empanadas cocteleras</div>
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/0g8yBwgyjjY?rel=0" title="Empanadas cocteleras" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section id="proceso">
-    <div class="video-embed">
-      <!-- Video del proceso -->
-      <iframe
-        src="https://www.youtube.com/embed/YGPUs1o0qgM?rel=0"
-        title="Atrévete a Crecer tu negocio con Maqui Empanadas"
-        loading="lazy"
-        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-      ></iframe>
-    </div>
-  </section>
-
-  <section class="section" id="como-funciona">
+  <section class="section" id="prueba-social">
     <div class="container">
-      <div style="text-align: center; margin-bottom: 12px;">
-        <div class="card-title"><h2>En 15 años 42 países confían en nuestras máquinas</h2></div>
-        <div class="flags-grid" aria-label="Países donde hemos llegado">
-          <span class="flag" title="CO" aria-label="CO">🇨🇴</span>
-          <span class="flag" title="US" aria-label="US">🇺🇸</span>
-          <span class="flag" title="CA" aria-label="CA">🇨🇦</span>
-          <span class="flag" title="CH" aria-label="CH">🇨🇭</span>
-          <span class="flag" title="EC" aria-label="EC">🇪🇨</span>
-          <span class="flag" title="HN" aria-label="HN">🇭🇳</span>
-          <span class="flag" title="CR" aria-label="CR">🇨🇷</span>
-          <span class="flag" title="VE" aria-label="VE">🇻🇪</span>
-          <span class="flag" title="FR" aria-label="FR">🇫🇷</span>
-          <span class="flag" title="ES" aria-label="ES">🇪🇸</span>
-          <span class="flag" title="PA" aria-label="PA">🇵🇦</span>
-          <span class="flag" title="AR" aria-label="AR">🇦🇷</span>
-          <span class="flag" title="AU" aria-label="AU">🇦🇺</span>
-          <span class="flag" title="GB" aria-label="GB">🇬🇧</span>
-          <span class="flag" title="AT" aria-label="AT">🇦🇹</span>
-          <span class="flag" title="CL" aria-label="CL">🇨🇱</span>
-          <span class="flag" title="TT" aria-label="TT">🇹🇹</span>
-          <span class="flag" title="IT" aria-label="IT">🇮🇹</span>
-          <span class="flag" title="GT" aria-label="GT">🇬🇹</span>
-          <span class="flag" title="MX" aria-label="MX">🇲🇽</span>
-          <span class="flag" title="NL" aria-label="NL">🇳🇱</span>
-          <span class="flag" title="DE" aria-label="DE">🇩🇪</span>
-          <span class="flag" title="PR" aria-label="PR">🇵🇷</span>
-          <span class="flag" title="BE" aria-label="BE">🇧🇪</span>
-          <span class="flag" title="CW" aria-label="CW">🇨🇼</span>
-          <span class="flag" title="DO" aria-label="DO">🇩🇴</span>
-          <span class="flag" title="AW" aria-label="AW">🇦🇼</span>
-          <span class="flag" title="BO" aria-label="BO">🇧🇴</span>
-          <span class="flag" title="NO" aria-label="NO">🇳🇴</span>
-          <span class="flag" title="LU" aria-label="LU">🇱🇺</span>
-          <span class="flag" title="AF" aria-label="AF">🇦🇫</span>
-          <span class="flag" title="DM" aria-label="DM">🇩🇲</span>
-          <span class="flag" title="PE" aria-label="PE">🇵🇪</span>
-          <span class="flag" title="PT" aria-label="PT">🇵🇹</span>
-          <span class="flag" title="UY" aria-label="UY">🇺🇾</span>
-          <span class="flag" title="DK" aria-label="DK">🇩🇰</span>
-          <span class="flag" title="LA" aria-label="LA">🇱🇦</span>
+      <h2 class="section-title">Gente real, negocios reales</h2>
+      <div class="social-grid">
+        <div class="social-card">
+          <div class="instagram-embed">
+            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DMk01m5C5fM/" data-instgrm-version="14"></blockquote>
+          </div>
+          <span class="pill">Empanadas Don José - Bogotá</span>
+          <div class="card-text"><strong>De 70 a más de 2,000 empanadas al día</strong></div>
+          <div class="card-text" style="font-style: italic; margin-top: 8px;">"Mi esposa se quedó sin manguito rotador... ahora podemos crecer lo que queramos con estas máquinas"</div>
         </div>
-      </div>
-      <h2 class="section-title">¿Cómo crecer tu negocio de comida latina?</h2>
-      <div class="steps">
-        <div class="step">
-          <div class="card-icon">1️⃣</div>
-          <strong>Vende más</strong>
-          <span class="card-text">Pasa de 50 a 500 empanadas por hora.</span>
+        <div class="social-card">
+          <div class="instagram-embed">
+            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DMsVFYBOORe/" data-instgrm-version="14"></blockquote>
+          </div>
+          <span class="pill">La Otra Empanada - Bogotá</span>
+          <div class="card-text"><strong>De 50 a 600 empanadas al día</strong></div>
+          <div class="card-text" style="font-style: italic; margin-top: 8px;">"Cualquier persona la puede manejar"</div>
         </div>
-        <div class="step">
-          <div class="card-icon">2️⃣</div>
-          <strong>Mide lo importante</strong>
-          <span class="card-text">Revisa y controla el ritmo de producción.</span>
-        </div>
-        <div class="step">
-          <div class="card-icon">3️⃣</div>
-          <strong>Ciuda tu equipo</strong>
-          <span class="card-text">Evita lesiones de biceps, manguito rotador. Sin problemas laborales</span>
-        </div>
-        <div class="step">
-          <div class="card-icon">4️⃣</div>
-          <strong>Estandariza tu producto</strong>
-          <span class="card-text">Mismo tamaño, mismo grosor de masa.</span>
+        <div class="social-card">
+          <div class="instagram-embed">
+            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DIM5mXvu_ZK/" data-instgrm-version="14"></blockquote>
+          </div>
+          <span class="pill">Deli Cronch - Dosquebradas</span>
+          <div class="card-text"><strong>De 1,200 a 20,000 empanadas al día</strong></div>
+          <div class="card-text" style="font-style: italic; margin-top: 8px;">"Ahora tenemos personal que quiere la empresa"</div>
         </div>
       </div>
     </div>
   </section>
 
-  <header class="hero">
+  <section class="section" id="quiz">
     <div class="container">
-      <div class="hero-inner">
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#videos" data-cta="hero-ver-videos">Ver videos ahora</a>
-          <a class="btn btn-secondary" href="https://wa.me/573148586635?text=Hola%2C%20vi%20la%20landing%20de%20educaci%C3%B3n%20y%20quiero%20informaci%C3%B3n." data-cta="hero-whatsapp">Preguntar por WhatsApp</a>
+      <h2 class="section-title">¿Cuál máquina necesitas?</h2>
+      <p class="section-subtitle">Responde 4 preguntas. Te enviamos la respuesta por WhatsApp en minutos.</p>
+      <div class="quiz">
+        <form id="quiz-form">
+          <div class="field">
+            <label for="quiz-country">País</label>
+            <select id="quiz-country" name="pais" required>
+              <option value="">Selecciona tu país</option>
+              <option value="Colombia">Colombia</option>
+              <option value="Mexico">México</option>
+              <option value="Peru">Perú</option>
+              <option value="Ecuador">Ecuador</option>
+              <option value="Chile">Chile</option>
+              <option value="Argentina">Argentina</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="quiz-product">¿Qué haces?</label>
+            <select id="quiz-product" name="producto" required>
+              <option value="">Selecciona un producto</option>
+              <option value="empanada">Empanada</option>
+              <option value="patacon">Patacón</option>
+              <option value="arepa de huevo">Arepa de huevo</option>
+              <option value="pastel">Pastel</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="quiz-size">Qué masas usas</label>
+            <select id="quiz-size" name="masa" required>
+              <option value="">Selecciona una masa</option>
+              <option value="maiz">Maíz</option>
+              <option value="trigo">Trigo</option>
+              <option value="verde">Verde</option>
+              <option value="anejo">Añejo</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="quiz-qty">¿Cuántas haces al día?</label>
+            <select id="quiz-qty" name="cantidad" required>
+              <option value="">Selecciona un rango</option>
+              <option value="50-100">50-100</option>
+              <option value="100-300">100-300</option>
+              <option value="300-800">300-800</option>
+              <option value="800+">800+</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" type="submit">Enviar por WhatsApp</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="envios">
+    <div class="container">
+      <h2 class="section-title">Tu máquina en 7-15 días (según tu país)</h2>
+      <p class="section-subtitle">Envío, pago y soporte claros. Sin sorpresas.</p>
+      <ul class="list">
+        <li>🚚 Envío mundial con DHL a cualquier país</li>
+        <li>⏱️ Máquinas listas para envío en 24 horas. Llega en 7-15 días según país</li>
+        <li>💳 Pago por transferencia o tarjeta de crédito</li>
+        <li>🎓 Incluye: Escuela de la Empanada + Moldes + Herramientas</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="certificaciones">
+    <div class="container">
+      <h2 class="section-title" style="text-align: center;">Aprobada en Europa y USA</h2>
+      <p class="section-subtitle" style="text-align: center;">Certificaciones CE (Europa) y FDA (Estados Unidos). Cumple todos los estándares.</p>
+      <div class="certifications">
+        <img src="img/ce_certification.png" alt="Certificación CE" loading="lazy" />
+        <img src="img/fda_approved.jpg" alt="Aprobación FDA" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section faq" id="faq">
+    <div class="container">
+      <h2 class="section-title">¿Tienes dudas? Aquí las respuestas</h2>
+      <div class="grid-3">
+        <details>
+          <summary>¿Funciona con mi receta?</summary>
+          <p>Sí, probamos masa y relleno contigo. La máquina se adapta al producto.</p>
+        </details>
+        <details>
+          <summary>¿Entregan a mi país?</summary>
+          <p>Sí hacemos envíos a todo el mundo. Confirmamos costo y tiempo según tu ciudad.</p>
+        </details>
+        <details>
+          <summary>¿Cómo sé que es real?</summary>
+          <p>Checklist de confianza:</p>
+          <ul class="list">
+            <li>✅ Dirección verificable</li>
+            <li>✅ Video llamada de demostración</li>
+            <li>✅ Referencias de clientes</li>
+            <li>✅ Factura y documentación</li>
+            <li>✅ Notas de prensa: <a href="https://www.larepublica.co/empresas/maquiempanadas-de-manizales-al-mundo-2349911">La República</a>, <a href="https://www.elespectador.com/colombia/mas-regiones/maquina-colombiana-para-hacer-empanadas-a-gran-escala-obtiene-patente-mundial-article-482783/">El Espectador</a>, <a href="https://www.eltiempo.com/archivo/documento/dr-921951">El Tiempo</a></li>
+          </ul>
+        </details>
+        <details>
+          <summary>¿Qué garantía tiene?</summary>
+          <p>1 año de garantía completa.</p>
+        </details>
+        <details>
+          <summary>¿Qué electricidad necesita?</summary>
+          <p>110V o 220V, según tu país.</p>
+        </details>
+        <details>
+          <summary>¿Incluye capacitación?</summary>
+          <p>Incluye capacitación virtual + "La Escuela de Empanadas" con videos de costos, recetas y buenas prácticas.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="cta-final">
+    <div class="container">
+      <div class="cta-final">
+        <div>
+          <h2 style="margin: 0; color: #ffffff;">¿Cuánto estás perdiendo cada día?</h2>
+          <p style="margin: 8px 0 0 0; color: rgba(255,255,255,0.9); font-size: 15px;">Dinos qué haces y te decimos cuál máquina te sirve. Respuesta en minutos.</p>
         </div>
+        <a class="btn btn-primary" href="https://wa.me/+573148358924?text=Hola%2C%20vi%20la%20landing%20y%20quiero%20saber%20cu%C3%A1l%20m%C3%A1quina%20me%20sirve.">Hablar por WhatsApp</a>
+      </div>
+    </div>
+  </section>
 
-        <div class="trust-list" aria-label="Datos de confianza">
-          <div class="trust-item">Empresa real</div>
-          <div class="trust-item">Atención por WhatsApp</div>
-          <div class="trust-item">Envíos a todo el mundo</div>
+  <section class="section" id="direccion">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h2 class="section-title" style="text-align: center; margin-bottom: 12px;">En 15 años, 42 países confían en nosotros</h2>
+        <div class="flags-grid">
+          <span class="flag">🇨🇴</span><span class="flag">🇺🇸</span><span class="flag">🇨🇦</span><span class="flag">🇨🇭</span><span class="flag">🇪🇨</span><span class="flag">🇭🇳</span><span class="flag">🇨🇷</span><span class="flag">🇻🇪</span><span class="flag">🇫🇷</span><span class="flag">🇪🇸</span><span class="flag">🇵🇦</span><span class="flag">🇦🇷</span><span class="flag">🇦🇺</span><span class="flag">🇬🇧</span><span class="flag">🇦🇹</span><span class="flag">🇨🇱</span><span class="flag">🇹🇹</span><span class="flag">🇮🇹</span><span class="flag">🇬🇹</span><span class="flag">🇲🇽</span><span class="flag">🇳🇱</span><span class="flag">🇩🇪</span><span class="flag">🇵🇷</span><span class="flag">🇧🇪</span><span class="flag">🇨🇼</span><span class="flag">🇩🇴</span><span class="flag">🇦🇼</span><span class="flag">🇧🇴</span><span class="flag">🇳🇴</span><span class="flag">🇱🇺</span><span class="flag">🇦🇫</span><span class="flag">🇩🇲</span><span class="flag">🇵🇪</span><span class="flag">🇵🇹</span><span class="flag">🇺🇾</span><span class="flag">🇩🇰</span><span class="flag">🇱🇦</span>
         </div>
-
-        <div class="micro-trust">
-          <p class="section-subtitle">Carrera 34 No 64-24 Manizales, Caldas, Colombia</p>
-        <p class="section-subtitle">3775 NW 46th STREET Miami /Florida 33142 USA</p>
-
+      </div>
+      
+      <h2 class="section-title" style="text-align: center;">Nuestras sedes</h2>
+      <div class="locations-grid">
+        <div class="card">
+          <div class="card-title">Fábrica en Colombia</div>
+          <div class="video-embed">
+            <iframe src="https://www.google.com/maps?q=Carrera+34+No+64-24+Manizales+Caldas+Colombia&output=embed" title="Fábrica en Colombia" loading="lazy" allowfullscreen></iframe>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Sede USA</div>
+          <div class="video-embed">
+            <iframe src="https://www.google.com/maps?q=3775+NW+46th+Street+Miami+FL+33142&output=embed" title="Sede USA" loading="lazy" allowfullscreen></iframe>
+          </div>
         </div>
       </div>
     </div>
-  </header>
+  </section>
+</main>
 
-  <main>
-    <section class="section" id="elige">
-      <div class="container">
-        <h2 class="section-title">Elige lo que produces</h2>
-        <p class="section-subtitle">Videos reales (elige tu producto)</p>
-        <div class="grid-2">
-          <a class="card" href="#video-empanadas-1" data-cta="card-empanadas-1">
-            <div class="card-icon">🥟</div>
-            <div class="card-title">Empanadas (1 persona)</div>
-            <div class="card-text">Mira la máquina trabajando paso a paso.</div>
-          </a>
-          <a class="card" href="#video-empanadas-2" data-cta="card-empanadas-2">
-            <div class="card-icon">🥟</div>
-            <div class="card-title">Empanadas (2 personas)</div>
-            <div class="card-text">Producción para equipos pequeños.</div>
-          </a>
-          <a class="card" href="#video-cocteleras" data-cta="card-cocteleras">
-            <div class="card-icon">🥟</div>
-            <div class="card-title">Cocteleras</div>
-            <div class="card-text">Tamaños pequeños y uniformes.</div>
-          </a>
-          <a class="card" href="#video-patacones" data-cta="card-patacones">
-            <div class="card-icon">🌽</div>
-            <div class="card-title">Patacones</div>
-            <div class="card-text">Aplasta y define con rapidez.</div>
-          </a>
-          <a class="card" href="#video-arepa-huevo" data-cta="card-arepa-huevo">
-            <div class="card-icon">🍳</div>
-            <div class="card-title">Arepa de huevo</div>
-            <div class="card-text">Proceso claro para tu receta.</div>
-          </a>
-          <a class="card" href="#video-pasteles" data-cta="card-pasteles">
-            <div class="card-icon">🥧</div>
-            <div class="card-title">Pasteles</div>
-            <div class="card-text">Cierre parejo y rápido.</div>
-          </a>
-        </div>
-      </div>
-    </section>
+<footer>
+  <div class="container">
+    <div><a href="https://maquiempanadas.com">Maquiempanadas</a> • <a href="https://wa.me/573148358924">+57 314 8358924</a> • <a href="https://www.instagram.com/maquiempanadas">@maquiempanadas</a></div>
+    <div style="margin-top: 8px;"><a href="http://maquiempanadas.com">Ver más máquinas</a></div>
+    <div style="margin-top: 12px;"><img src="https://maquiempanadas.com/calculadora/assets/Logo_MQE_normal-40px-Be7tHXlB.png" alt="MQE" loading="lazy" style="height: 32px; width: auto;" /></div>
+  </div>
+</footer>
 
-    <section class="section" id="videos">
-      <div class="container">
-        <h2 class="section-title">Videos reales (elige tu producto)</h2>
-        <p class="section-subtitle">Cada video es real y sin tecnicismos. Solo lo que ves.</p>
-
-        <div class="grid-3">
-          <div class="card" id="video-empanadas-1">
-            <div class="card-title">Empanadas semiautomática (1 persona)</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.youtube.com/embed/lBZtriCUheA?rel=0"
-                title="Empanadas semiautomática 1 persona"
-                loading="lazy"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-
-          <div class="card" id="video-empanadas-2">
-            <div class="card-title">Empanadas semiautomática (2 personas)</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.youtube.com/embed/ifHabLLD5e4?rel=0"
-                title="Empanadas semiautomática 2 personas"
-                loading="lazy"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-
-          <div class="card" id="video-patacones">
-            <div class="card-title">Patacones y tostones</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.youtube.com/embed/dqF336zwQ9Y?rel=0"
-                title="Patacones y tostones"
-                loading="lazy"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-
-          <div class="card" id="video-arepa-huevo">
-            <div class="card-title">Arepas de huevo</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.youtube.com/embed/zzUqu-gCcdw?rel=0"
-                title="Arepas de huevo"
-                loading="lazy"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-
-          <div class="card" id="video-arepas">
-            <div class="card-title">Arepas</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.youtube.com/embed/2KYL-pWwvEs?rel=0"
-                title="Arepas"
-                loading="lazy"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-
-          <div class="card" id="video-arepa-pequena">
-            <div class="card-title">Arepa pequeña</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.youtube.com/embed/r0T7ku5aXDg?rel=0"
-                title="Arepa pequeña"
-                loading="lazy"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-
-          <div class="card" id="video-pasteles">
-            <div class="card-title">Pasteles</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.youtube.com/embed/vEZxVxWxUsc?rel=0"
-                title="Pasteles"
-                loading="lazy"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-
-          <div class="card" id="video-trigo">
-            <div class="card-title">Empanadas y pasteles de trigo</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.youtube.com/embed/iFY0NyHZcYw?rel=0"
-                title="Empanadas y pasteles de trigo"
-                loading="lazy"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-
-          <div class="card" id="video-cocteleras">
-            <div class="card-title">Empanadas cocteleras</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.youtube.com/embed/0g8yBwgyjjY?rel=0"
-                title="Empanadas cocteleras"
-                loading="lazy"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="prueba-social">
-      <div class="container">
-        <h2 class="section-title">Gente real, negocios reales</h2>
-        <div class="social-grid">
-          <div class="social-card">
-            <div class="instagram-embed">
-              <blockquote
-                class="instagram-media"
-                data-instgrm-permalink="https://www.instagram.com/p/DMk01m5C5fM/"
-                data-instgrm-version="14"
-              ></blockquote>
-            </div>
-            <span class="pill">Empanadas Don José</span>
-            <div class="card-text">Colombia, Bogotá, Cundinamarca</div>
-            <div class="card-text">De 70 a más de 2000 empanadas</div>
-            <div class="card-text">"Mi esposa se quedó sin manguito rotador", "...podemos crecer lo que uno quiera con estas máquinas"</div>
-          </div>
-          <div class="social-card">
-            <div class="instagram-embed">
-              <blockquote
-                class="instagram-media"
-                data-instgrm-permalink="https://www.instagram.com/p/DMsVFYBOORe/"
-                data-instgrm-version="14"
-              ></blockquote>
-            </div>
-            <span class="pill">La Otra Empanada</span>
-            <div class="card-text">Colombia, Bogotá, Cundinamarca</div>
-            <div class="card-text">De 50 a 600 empanadas</div>
-            <div class="card-text">"Cualquier persona la puede manejar"</div>
-          </div>
-          <div class="social-card">
-            <div class="instagram-embed">
-              <blockquote
-                class="instagram-media"
-                data-instgrm-permalink="https://www.instagram.com/p/DIM5mXvu_ZK/"
-                data-instgrm-version="14"
-              ></blockquote>
-            </div>
-            <span class="pill">Deli Cronch</span>
-            <div class="card-text">Colombia, Dosquebradas, Risarlada</div>
-            <div class="card-text">De 1.200 a 20.000 empanadas</div>
-            <div class="card-text">"...tener un personal que quisiera la empresa"</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="quiz">
-      <div class="container">
-        <h2 class="section-title">Dime 4 cosas y te digo cuál te sirve</h2>
-        <div class="quiz">
-          <form id="quiz-form">
-            <div class="field">
-              <label for="quiz-country">País</label>
-              <select id="quiz-country" name="pais" required>
-                <option value="">Selecciona tu país</option>
-                <option value="Colombia">Colombia</option>
-                <option value="Mexico">Mexico</option>
-                <option value="Peru">Peru</option>
-                <option value="Ecuador">Ecuador</option>
-                <option value="Chile">Chile</option>
-                <option value="Argentina">Argentina</option>
-                <option value="Otro">Otro</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="quiz-product">¿Qué haces?</label>
-              <select id="quiz-product" name="producto" required>
-                <option value="">Selecciona un producto</option>
-                <option value="empanada">Empanada</option>
-                <option value="patacon">Patacon</option>
-                <option value="arepa de huevo">Arepa de huevo</option>
-                <option value="pastel">Pastel</option>
-                <option value="otro">Otro</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="quiz-size">Qué masas usas</label>
-              <select id="quiz-size" name="masa" required>
-                <option value="">Selecciona una masa</option>
-                <option value="maiz">Maíz</option>
-                <option value="trigo">Trigo</option>
-                <option value="verde">Verde</option>
-                <option value="anejo">Añejo</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label for="quiz-qty">¿Cuántas haces al día?</label>
-              <select id="quiz-qty" name="cantidad" required>
-                <option value="">Selecciona un rango</option>
-                <option value="50-100">50-100</option>
-                <option value="100-300">100-300</option>
-                <option value="300-800">300-800</option>
-                <option value="800+">800+</option>
-              </select>
-            </div>
-
-            <button class="btn btn-primary" type="submit" data-cta="quiz-whatsapp">Enviar por WhatsApp</button>
-          </form>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="envios">
-      <div class="container">
-        <h2 class="section-title">Envíos y pagos (claro y sin enredos)</h2>
-        <ul class="list">
-          <li>🚚 Envío Múndial: Nuestro aliado, DHL, lleva tu máquina a cualquier país</li>
-          <li>⏱️ Tiempo estimado: Tenemos máquinas listas para enviar en 24 horas</li>
-          <li>💳 Forma de pago: transferencia bancaria y tarjeta de crédito</li>
-          <li>🧭 Qué incluye: Escuela de la Empanada, Juego de moldes, Kit de herramientas</li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="section faq" id="faq">
-      <div class="container">
-        <h2 class="section-title">Preguntas típicas (anti-estafa)</h2>
-        <div class="grid-3">
-          <details>
-            <summary>¿Funciona con mi receta?</summary>
-            <p>Sí, probamos masa y relleno contigo. La máquina se adapta al produto.</p>
-          </details>
-          <details>
-            <summary>¿Entregan a mi país?</summary>
-            <p>Sí hacemos envíos a todo el mundo. Confirmamos costo y tiempo según tu ciudad.</p>
-          </details>
-          <details>
-            <summary>¿Cómo sé que es real?</summary>
-            <p>Checklist de confianza:</p>
-            <ul class="list">
-              <li>✅ Dirección verificable</li>
-              <li>✅ Video llamada de demostración</li>
-              <li>✅ Referencias de clientes</li>
-              <li>✅ Factura / documentación</li>
-              <li>✅ Notas de prensa: 
-                <a href="https://www.larepublica.co/empresas/maquiempanadas-de-manizales-al-mundo-2349911">
-                  La República
-              </a>, <a href="https://www.elespectador.com/colombia/mas-regiones/maquina-colombiana-para-hacer-empanadas-a-gran-escala-obtiene-patente-mundial-article-482783/">
-                  El Espectador
-              </a>, 
-                <a href="https://www.eltiempo.com/archivo/documento/dr-921951">El Tiempo</a>,
-                <a href="https://ccmpc.org.co/empresas-en-trayectoria-mega/">Cámara de Comercio</a>
-                , <a href="https://www.youtube.com/watch?v=vRscFRkM3sI">Ministerio de Comercio</a>
-            </li>
-            </ul>
-          </details>
-          <details>
-            <summary>¿Qué garantía tiene?</summary>
-            <p>1 año</p>
-          </details>
-          <details>
-            <summary>¿Qué electricidad necesita?</summary>
-            <p>110V o 220V, según modelo el cliente lo requiera.</p>
-          </details>
-          <details>
-            <summary>¿Incluye capacitación?</summary>
-            <p>Se incluye capacitación virtual. Además se da "La Escuela de Empanadas" con videos explicativos de costos, recetas, buenas prácticas de manufactura.</p>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="cta-final">
-      <div class="container">
-        <div class="cta-final">
-          <h2 class="section-title" style="margin: 0; color: #ffffff;">¿Listo? Te digo en WhatsApp si sirve para tu empanada</h2>
-          <a class="btn btn-primary" href="https://wa.me/+573148586635?text=Hola%2C%20vi%20la%20landing%20de%20educaci%C3%B3n%20y%20quiero%20saber%20cu%C3%A1l%20m%C3%A1quina%20me%20sirve." data-cta="final-whatsapp">Hablar por WhatsApp</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" id="direccion">
-      <div class="container">
-        <h2 class="section-title">Dirección y ubicación</h2>
-
-        <div class="locations-grid">
-          <div class="card">
-            <div class="card-title">Fábrica en Colombia</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.google.com/maps?q=Carrera+34+No+64-24+Manizales+Caldas+Colombia&output=embed"
-                title="Fábrica en Colombia en Google Maps"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-title">Sede USA</div>
-            <div class="video-embed">
-              <iframe
-                src="https://www.google.com/maps?q=3775+NW+46th+Street+Miami+FL+33142&output=embed"
-                title="Sede USA en Google Maps"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                allowfullscreen
-              ></iframe>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">
-      <div><a href="https">Maquiempanadas</a> • Carrera 34 No 64-24 Manizales • <a href="https://wa.me/573148586635">+57 314 8586635</a> • <a href="https://www.instagram.com/maquiempanadas">@maquiempanadas</a></div>
-      <div style="margin-top: 8px;">
-        <a href="http://maquiempanadas.com" data-cta="footer-link">Ver más máquinas</a>
-      </div>
-      <div style="margin-top: 12px;">
-        <img src="https://maquiempanadas.com/calculadora/assets/Logo_MQE_normal-40px-Be7tHXlB.png" alt="MQE" loading="lazy" style="height: 32px; width: auto;" />
-      </div>
-    </div>
-  </footer>
-
-  <script>
-    (function () {
-      var form = document.getElementById('quiz-form');
-      var whatsappBase = 'https://wa.me/573148586635';
-
-      if (!form) {
-        return;
-      }
-
-      form.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        var country = document.getElementById('quiz-country').value;
-        var product = document.getElementById('quiz-product').value;
-        var size = document.getElementById('quiz-size').value;
-        var qty = document.getElementById('quiz-qty').value;
-
-        if (!country || !product || !size || !qty) {
-          return;
-        }
-
-        var message =
-          'Hola, estoy en ' + country +
-          '. Hago ' + product +
-          ', tamaño ' + size +
-          ', hago ' + qty + ' al día. ' +
-          'Vi los videos y quiero saber cuál máquina me sirve. ' +
-          'Vengo de la landing de educación.';
-
-        var url = whatsappBase + '?text=' + encodeURIComponent(message);
-        window.location.href = url;
-      });
-    })();
-  </script>
-  <script async src="https://www.instagram.com/embed.js"></script>
+<script>
+(function () {
+  var form = document.getElementById('quiz-form');
+  if (!form) return;
+  
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var country = document.getElementById('quiz-country').value;
+    var product = document.getElementById('quiz-product').value;
+    var size = document.getElementById('quiz-size').value;
+    var qty = document.getElementById('quiz-qty').value;
+    
+    if (!country || !product || !size || !qty) return;
+    
+    var message = 'Hola, estoy en ' + country + '. Hago ' + product + ' de ' + size + ', hago ' + qty + ' al día. Vi los videos y quiero saber cuál máquina me sirve.';
+    window.location.href = 'https://wa.me/573148358924?text=' + encodeURIComponent(message);
+  });
+})();
+</script>
+<script async src="https://www.instagram.com/embed.js"></script>
 </body>
 </html>

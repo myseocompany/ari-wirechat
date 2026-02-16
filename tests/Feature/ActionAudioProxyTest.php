@@ -86,3 +86,108 @@ test('non owner cannot stream twilio recording through proxy', function () {
 
     Http::assertNothingSent();
 });
+
+test('audio proxy returns gateway timeout when twilio connection times out', function () {
+    config([
+        'services.twilio.account_sid' => 'ACtest123',
+        'services.twilio.auth_token' => 'authtoken123',
+    ]);
+
+    Http::fake([
+        'https://api.twilio.com/*' => Http::failedConnection(),
+    ]);
+
+    $user = User::factory()->create();
+    $customer = Customer::create([
+        'name' => 'Cliente timeout',
+        'phone' => '3001234567',
+        'user_id' => $user->id,
+    ]);
+
+    $action = Action::create([
+        'customer_id' => $customer->id,
+        'type_id' => 21,
+        'note' => 'Llamada grabada',
+        'url' => 'https://api.twilio.com/2010-04-01/Accounts/ACtest123/Recordings/REtimeout123',
+        'creator_user_id' => $user->id,
+    ]);
+
+    $this->withoutExceptionHandling()
+        ->actingAs($user)
+        ->get(route('actions.audio', $action))
+        ->assertStatus(504);
+});
+
+test('audio proxy returns service unavailable when twilio credentials are rejected', function () {
+    config([
+        'services.twilio.account_sid' => 'ACtest123',
+        'services.twilio.auth_token' => 'badtoken',
+    ]);
+
+    Http::fake([
+        'https://api.twilio.com/*' => Http::response('Unauthorized', 401),
+    ]);
+
+    $user = User::factory()->create();
+    $customer = Customer::create([
+        'name' => 'Cliente auth',
+        'phone' => '3001234567',
+        'user_id' => $user->id,
+    ]);
+
+    $action = Action::create([
+        'customer_id' => $customer->id,
+        'type_id' => 21,
+        'note' => 'Llamada grabada',
+        'url' => 'https://api.twilio.com/2010-04-01/Accounts/ACtest123/Recordings/REunauthorized123',
+        'creator_user_id' => $user->id,
+    ]);
+
+    $this->withoutExceptionHandling()
+        ->actingAs($user)
+        ->get(route('actions.audio', $action))
+        ->assertStatus(503);
+});
+
+test('audio proxy forwards range header to twilio', function () {
+    config([
+        'services.twilio.account_sid' => 'ACtest123',
+        'services.twilio.auth_token' => 'authtoken123',
+    ]);
+
+    Http::fake([
+        'https://api.twilio.com/*' => Http::response('PARTIAL', 206, [
+            'Content-Type' => 'audio/mpeg',
+            'Content-Range' => 'bytes 0-6/9999',
+            'Accept-Ranges' => 'bytes',
+            'Content-Length' => '7',
+        ]),
+    ]);
+
+    $user = User::factory()->create();
+    $customer = Customer::create([
+        'name' => 'Cliente range',
+        'phone' => '3001234567',
+        'user_id' => $user->id,
+    ]);
+
+    $action = Action::create([
+        'customer_id' => $customer->id,
+        'type_id' => 21,
+        'note' => 'Llamada grabada',
+        'url' => 'https://api.twilio.com/2010-04-01/Accounts/ACtest123/Recordings/RErange123',
+        'creator_user_id' => $user->id,
+    ]);
+
+    $response = $this->actingAs($user)->get(route('actions.audio', $action), [
+        'Range' => 'bytes=0-6',
+    ]);
+
+    $response->assertStatus(206);
+    $response->assertHeader('Content-Range', 'bytes 0-6/9999');
+
+    Http::assertSent(function ($request) {
+        return $request->url() === 'https://api.twilio.com/2010-04-01/Accounts/ACtest123/Recordings/RErange123.mp3'
+            && ($request->header('Range')[0] ?? null) === 'bytes=0-6';
+    });
+});

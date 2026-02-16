@@ -15,6 +15,7 @@ use App\Services\ActionService;
 use Auth;
 use Carbon;
 use DB;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -433,10 +434,30 @@ class ActionController extends Controller
         }
 
         $audioUrl = $this->ensureAudioExtension($audioUrl);
+        $rangeHeader = trim((string) $request->header('Range'));
 
-        $twilioResponse = Http::withBasicAuth($accountSid, $authToken)
+        $twilioRequest = Http::withBasicAuth($accountSid, $authToken)
             ->accept('audio/mpeg,audio/*;q=0.9,*/*;q=0.8')
-            ->get($audioUrl);
+            ->connectTimeout(10)
+            ->timeout(120);
+
+        if ($rangeHeader !== '') {
+            $twilioRequest = $twilioRequest->withHeaders([
+                'Range' => $rangeHeader,
+            ]);
+        }
+
+        try {
+            $twilioResponse = $twilioRequest->get($audioUrl);
+        } catch (ConnectionException $exception) {
+            Log::warning('Twilio audio proxy timeout/connection failure.', [
+                'action_id' => $action->id,
+                'url' => $audioUrl,
+                'message' => $exception->getMessage(),
+            ]);
+
+            abort(504, 'Tiempo de espera agotado al descargar el audio.');
+        }
 
         if (! $twilioResponse->successful()) {
             Log::warning('Twilio audio proxy failed.', [
@@ -444,6 +465,10 @@ class ActionController extends Controller
                 'status' => $twilioResponse->status(),
                 'url' => $audioUrl,
             ]);
+
+            if ($twilioResponse->status() === 401 || $twilioResponse->status() === 403) {
+                abort(503, 'No fue posible autenticar con Twilio para descargar el audio.');
+            }
 
             abort($twilioResponse->status() === 404 ? 404 : 502);
         }
@@ -453,8 +478,11 @@ class ActionController extends Controller
             $contentType = $this->guessAudioMimeType($audioUrl);
         }
 
-        return response($twilioResponse->body(), 200, [
+        return response($twilioResponse->body(), $twilioResponse->status(), [
             'Content-Type' => $contentType,
+            'Content-Length' => (string) $twilioResponse->header('Content-Length'),
+            'Accept-Ranges' => (string) $twilioResponse->header('Accept-Ranges', 'bytes'),
+            'Content-Range' => (string) $twilioResponse->header('Content-Range'),
             'Cache-Control' => 'private, max-age=300',
         ]);
     }
