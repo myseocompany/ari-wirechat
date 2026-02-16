@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import {
   CAPABILITY_LABELS,
@@ -86,14 +86,22 @@ export default function MachineFitStep({
   const [product, setProduct] = useState<ProductOption | undefined>(productType);
   const [selectedModel, setSelectedModel] = useState<string | undefined>(machineModel);
   const [error, setError] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const readyForModels = Boolean(dough && product);
+  const showDoughStep = !dough;
+  const showProductStep = Boolean(dough) && !product;
+  const showModelsStep = Boolean(dough && product);
 
   const recommendedModels = useMemo(() => {
     if (!readyForModels) return [];
     const filtered = MACHINE_MODELS.filter((model) => matchesSelection(model, dough, product));
     return filtered.length ? filtered : MACHINE_MODELS;
   }, [dough, product, readyForModels]);
+
+  useEffect(() => {
+    containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [dough, product]);
 
   const selectedCapabilities = useMemo(() => {
     if (!product) return new Set<ProductCapability>();
@@ -155,7 +163,7 @@ export default function MachineFitStep({
   };
 
   return (
-    <div className="space-y-6">
+    <div ref={containerRef} className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
         <div className="p-3 bg-emerald-100 rounded-lg">
           <CheckCircle2 className="w-6 h-6 text-emerald-600" />
@@ -165,31 +173,53 @@ export default function MachineFitStep({
         </h2>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-4">
+      {showDoughStep && (
         <div className="space-y-3">
           <p className="text-sm font-semibold text-gray-700">Tipo de masa</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {(['maiz', 'trigo', 'maiz-trigo'] as DoughOption[]).map((option) => (
               <button
                 key={option}
-                onClick={() => setDough(option)}
+                onClick={() => {
+                  setDough(option);
+                  setProduct(undefined);
+                  setSelectedModel(undefined);
+                }}
                 className={`p-3 border-2 rounded-lg text-gray-800 font-semibold transition-all text-sm whitespace-normal ${
                   dough === option ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200 bg-white'
                 }`}
               >
-                {option === 'trigo' ? 'Trigo' : option === 'maiz-trigo' ? 'Maíz y Trigo' : 'Maíz'}
+                {option === 'trigo' ? 'Trigo' : option === 'maiz-trigo' ? 'Maíz, trigo, platano, yuca' : 'Maíz'}
               </button>
             ))}
           </div>
         </div>
+      )}
 
+      {showProductStep && (
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-gray-700">Producto principal</p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-gray-700">Producto principal</p>
+            <button
+              type="button"
+              onClick={() => {
+                setDough(undefined);
+                setProduct(undefined);
+                setSelectedModel(undefined);
+              }}
+              className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+            >
+              Cambiar masa
+            </button>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {(['empanadas', 'empanadas-otros', 'otros'] as ProductOption[]).map((option) => (
               <button
                 key={option}
-                onClick={() => setProduct(option)}
+                onClick={() => {
+                  setProduct(option);
+                  setSelectedModel(undefined);
+                }}
                 className={`p-3 border-2 rounded-lg text-gray-800 font-semibold transition-all text-sm whitespace-normal ${
                   product === option ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'
                 }`}
@@ -201,18 +231,38 @@ export default function MachineFitStep({
             ))}
           </div>
         </div>
-      </div>
+      )}
 
-      <div className="space-y-3">
-        <p className="text-sm text-gray-600">
-          Te mostramos los modelos recomendados según la masa y el producto que seleccionaste.
-        </p>
-        {!readyForModels && (
-          <div className="p-4 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-600 bg-gray-50">
-            Selecciona primero la masa y el producto para ver las opciones de máquina.
+      {showModelsStep && (
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-gray-600">
+              Te mostramos los modelos recomendados según la masa y el producto que seleccionaste.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setProduct(undefined);
+                  setSelectedModel(undefined);
+                }}
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+              >
+                Cambiar producto
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setDough(undefined);
+                  setProduct(undefined);
+                  setSelectedModel(undefined);
+                }}
+                className="text-xs font-semibold text-blue-600 hover:text-blue-700"
+              >
+                Cambiar masa
+              </button>
+            </div>
           </div>
-        )}
-        {readyForModels && (
           <div className="space-y-3">
             {recommendedModels.map((model) => {
               const region = priceRegion as MachineRegion | undefined;
@@ -265,8 +315,8 @@ export default function MachineFitStep({
               );
             })}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {error && (
         <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded-lg">
@@ -275,16 +325,16 @@ export default function MachineFitStep({
         </div>
       )}
 
-      <div className="flex gap-3 pt-4">
+      <div className="sticky bottom-0 z-20 -mx-8 mt-6 flex gap-3 border-t border-slate-200 bg-white/95 px-8 py-4 backdrop-blur">
         <button
           onClick={onBack}
-          className="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-all"
+          className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-all"
         >
           Atrás
         </button>
         <button
           onClick={handleContinue}
-          className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-green-600 transition-all shadow-lg"
+          className="flex-1 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-all shadow-lg"
         >
           Continuar
         </button>

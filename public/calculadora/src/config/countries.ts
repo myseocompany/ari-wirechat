@@ -144,6 +144,35 @@ export const MACHINE_MODELS: MachineModel[] = [
     },
   },
   {
+    name: 'CM05i',
+    empanadasPerHour: 1600,
+    prices: {
+      CO: { currency: 'COP', amount: 38479999 },
+      CL: { currency: 'USD', amount: 12518 },
+      AMERICA: { currency: 'USD', amount: 12118 },
+      USA: { currency: 'USD', amount: 13329 },
+      EUROPA: { currency: 'USD', amount: 12518 },
+      OCEANIA: { currency: 'USD', amount: 11266 },
+    },
+    capabilities: [
+      'empanadas-trigo',
+      'empanadas-maiz',
+      'arepas',
+      'arepas-rellenas',
+      'aborrajados',
+      'pasteles',
+    ],
+    media: {
+      photos: [
+        'https://maquiempanadas.com/wp-content/uploads/2021/08/cm05s.jpg',
+        'https://maquiempanadas.com/wp-content/uploads/2021/08/CM05S_1-600x600-1.jpg',
+        'https://maquiempanadas.com/wp-content/uploads/2021/08/CM05S_2.jpg',
+        'https://maquiempanadas.com/wp-content/uploads/2021/08/CM05S_3-600x600-1.jpg',
+      ],
+      video: 'https://youtu.be/Sm2gIbKSoMQ',
+    },
+  },
+  {
     name: 'CM06',
     empanadasPerHour: 500,
     prices: {

@@ -1,6 +1,6 @@
-# Calculadora de Recuperación de Inversión - Máquina de Empanadas
+# Plan de Crecimiento - Máquina de Empanadas
 
-Calculadora interactiva para estimar el tiempo de recuperación de la inversión y el ahorro con la automatización de empanadas.
+Plan interactivo para estimar el tiempo de recuperación de la inversión y el ahorro con la automatización de empanadas.
 
 ## Características
 

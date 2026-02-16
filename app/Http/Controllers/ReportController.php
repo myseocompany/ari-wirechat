@@ -667,6 +667,8 @@ class ReportController extends Controller
         $toDate = $request->filled('to_date')
             ? Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay()
             : now()->endOfDay();
+        $last60DaysStart = $toDate->copy()->subDays(60)->startOfDay();
+        $withoutActionsLast60Days = $request->boolean('without_actions_last_60_days') || $request->boolean('without_actions_last_30_days');
 
         $messagesCountQuery = DB::table('wire_messages')
             ->selectRaw('count(*)')
@@ -738,6 +740,15 @@ class ReportController extends Controller
             })
             ->when($request->filled('messages_max'), function ($query) use ($request) {
                 $query->having('messages_count', '<=', (int) $request->input('messages_max'));
+            })
+            ->when($withoutActionsLast60Days, function ($query) use ($last60DaysStart, $toDate) {
+                $query->whereNotNull('customers.user_id')
+                    ->whereNotExists(function ($subQuery) use ($last60DaysStart, $toDate) {
+                        $subQuery->selectRaw('1')
+                            ->from('actions')
+                            ->whereColumn('actions.customer_id', 'customers.id')
+                            ->whereBetween('actions.created_at', [$last60DaysStart, $toDate]);
+                    });
             })
             ->orderByDesc('messages_count')
             ->orderByDesc('last_message_at')

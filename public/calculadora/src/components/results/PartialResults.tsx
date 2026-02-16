@@ -97,6 +97,44 @@ export default function PartialResults({ quizData, onNext }: PartialResultsProps
         </h2>
       </div>
 
+      <div className="bg-white border-2 border-blue-200 rounded-xl p-6 mt-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-blue-50 rounded-lg">
+            <Phone className="w-6 h-6 text-blue-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Último paso</h3>
+            <p className="text-sm text-gray-600">
+              Deja tu WhatsApp para enviarte en cuántos meses se paga la máquina.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            WhatsApp
+          </label>
+          <div className="relative">
+            <Phone className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+            <div className="pl-10">
+              <PhoneInput
+                international
+                defaultCountry={defaultCountry as any}
+                value={phone}
+                onChange={setPhone}
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                className="phone-input w-full"
+              />
+            </div>
+          </div>
+          {error && (
+            <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded-lg mt-2">
+              <AlertCircle className="w-4 h-4 mt-0.5" />
+              <p>{error}</p>
+            </div>
+          )}
+        </div>
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
           <div className="flex items-center gap-2 mb-2">
@@ -128,48 +166,10 @@ export default function PartialResults({ quizData, onNext }: PartialResultsProps
           </div>
         </div>
       </div>
-
-      <div className="bg-white border-2 border-blue-200 rounded-xl p-6 mt-6 space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-blue-50 rounded-lg">
-            <Phone className="w-6 h-6 text-blue-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-gray-900">Último paso</h3>
-            <p className="text-sm text-gray-600">
-              Deja tu WhatsApp para enviarte tu cálculo completo de payback.
-            </p>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            WhatsApp
-          </label>
-          <div className="relative">
-            <Phone className="absolute left-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
-            <div className="pl-10">
-              <PhoneInput
-                international
-                defaultCountry={defaultCountry as any}
-                value={phone}
-                onChange={setPhone}
-                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                className="phone-input w-full"
-              />
-            </div>
-          </div>
-          {error && (
-            <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded-lg mt-2">
-              <AlertCircle className="w-4 h-4 mt-0.5" />
-              <p>{error}</p>
-            </div>
-          )}
-        </div>
-
+      <div className="sticky bottom-0 z-20 -mx-8 mt-6 flex gap-3 border-t border-slate-200 bg-white/95 px-8 py-4 backdrop-blur">
         <button
           onClick={handleSubmit}
-          className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-lg font-bold text-lg hover:from-blue-700 hover:to-green-700 transition-all shadow-xl"
+          className="flex-1 px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-semibold transition-all shadow-lg"
         >
           Ver mi cálculo completo
         </button>

@@ -4,9 +4,10 @@ import { Globe } from 'lucide-react';
 interface CountryStepProps {
   value?: string;
   onSelect: (country: CountryConfig) => void;
+  onBack?: () => void;
 }
 
-export default function CountryStep({ value, onSelect }: CountryStepProps) {
+export default function CountryStep({ value, onSelect, onBack }: CountryStepProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-6">
@@ -32,6 +33,16 @@ export default function CountryStep({ value, onSelect }: CountryStepProps) {
           </button>
         ))}
       </div>
+      {onBack && (
+        <div className="sticky bottom-0 z-20 -mx-8 mt-6 flex gap-3 border-t border-slate-200 bg-white/95 px-8 py-4 backdrop-blur">
+          <button
+            onClick={onBack}
+            className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-all"
+          >
+            Atrás
+          </button>
+        </div>
+      )}
     </div>
   );
 }

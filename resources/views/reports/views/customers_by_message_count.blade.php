@@ -77,6 +77,10 @@
           <input type="checkbox" name="tag_none" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('tag_none')) checked @endif>
           Sin etiqueta
         </label>
+        <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          <input type="checkbox" name="without_actions_last_60_days" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('without_actions_last_60_days') || $request->boolean('without_actions_last_30_days')) checked @endif>
+          Sin acciones (ult. 60 dias)
+        </label>
       </div>
       <button type="submit" class="inline-flex items-center rounded-xl bg-[color:var(--ds-coral)] px-4 py-2 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(255,92,92,0.35)]">Filtrar</button>
     </div>

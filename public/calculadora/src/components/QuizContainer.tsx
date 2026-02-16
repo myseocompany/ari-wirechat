@@ -128,39 +128,56 @@ export default function QuizContainer() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <div className={`container mx-auto px-4 py-8 max-w-3xl ${!started ? 'pb-28' : ''}`}>
         <div className="text-center mb-8 space-y-3">
           <div className="flex justify-center">
             <img src={LogoMQE} alt="MQE" className="h-10 w-auto" />
           </div>
           <div className="space-y-2">
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              Calculadora de recuperación de inversión
+              Atrévete a Crecer
             </h1>
             <p className="text-lg text-gray-600" >
-              Descubre en cuánto tiempo la máquina se paga sola y cuánto ahorras
+              ¿Cuánto ganarías si pudieras aceptar TODOS los pedidos que llegan?
             </p>
           </div>
         </div>
 
         {!started && (
           <div className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm p-5 space-y-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-              Antes de comenzar
-            </p>
             <p className="text-base font-semibold text-slate-900">
-              Esta calculadora se basa en datos reales de producción y costos de clientes Maquiempanadas.
-          </p>
-          <p className="text-sm text-slate-600">
-            Está pensada como referencia industrial para negocios con operación continua.
-          </p>
-          <ul className="list-disc space-y-1 pl-5 text-slate-800 text-sm">
-            <li>Producción &gt;300 empanadas/día</li>
-            <li>Enfoque en reducción de costos operativos</li>
-            <li>Compra evaluada como inversión, no gasto</li>
-          </ul>
+              ¿Rechazas pedidos por falta de capacidad?
+            </p>
+            <p className="text-sm text-slate-600">
+              No estás solo. El 73% de nuestros clientes llegó porque:
+            </p>
+            <div className="mb-6 space-y-3 rounded-xl border border-red-100 bg-red-50/50 p-4 text-sm text-red-900">
+              <p>❌ No daban abasto con pedidos grandes</p>
+              <p>❌ Dependían de &quot;maestros empanadores&quot; difíciles de reemplazar</p>
+              <p>❌ La producción manual les limitaba crecer</p>
+            </div>
+            <div className="mb-6 rounded-xl border border-green-100 bg-green-50/50 p-3 text-center text-sm font-semibold text-green-900">
+              HOY producen 10X más con la misma cantidad de personas
+            </div>
+            <p className="text-sm text-slate-600">
+              Esta calculadora te muestra en números reales:
+            </p>
+            <div className="grid grid-cols-1 gap-3 text-sm text-slate-800 sm:grid-cols-2">
+              <div className="rounded-lg border border-slate-200 bg-blue-50/40 p-3">
+                💰 Ahorro mensual (En mano de obra)
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-blue-50/40 p-3">
+                📈 Aumento de capacidad (Cuántas más podrías vender)
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-blue-50/40 p-3">
+                ⏱️ Tiempo de ROI (Meses para recuperar inversión)
+              </div>
+              <div className="rounded-lg border border-slate-200 bg-blue-50/40 p-3">
+                🚀 Crecimiento sin personal (Escala sin contratar más)
+              </div>
+            </div>
           
-          <p className="text-xs uppercase tracking-wide text-slate-400">Exportamos a 42 países</p>
+          <p className="text-xs uppercase tracking-wide text-slate-400">Usada por más de 500 negocios en 42 países</p>
           <div className="flex flex-wrap justify-center gap-2 text-2xl" aria-label="Banderas de países representados">
             {FLAG_COUNTRIES.map((code) => (
               <span key={code} role="img" aria-label={`Bandera ${code}`}>
@@ -179,22 +196,26 @@ export default function QuizContainer() {
             ))}
           </div>
           <p className="text-[11px] text-slate-500 italic">
-            Si estás empezando o produces menos, este cálculo no será una buena referencia para decisiones de inversión.
+            💡 Cálculos basados en datos reales de más de 500 clientes. Tus resultados pueden variar según tu operación.
           </p>
-          <div className="flex justify-center">
-            <button
-              type="button"
-              className="mt-2 rounded-full bg-slate-900 px-5 py-2 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-slate-800"
-              onClick={() => setStarted(true)}
-            >
-              Comenzar calculadora
-            </button>
-          </div>
           </div>
         )}
         {!started && (
           <div className="mt-6 text-center text-xs text-slate-500">
-            Cuando estés listo, empieza el cálculo seleccionando tu ubicación.
+            💡 Toma 2 minutos. Resultados instantáneos.
+          </div>
+        )}
+        {!started && (
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 backdrop-blur">
+            <div className="container mx-auto max-w-3xl px-4 py-3">
+              <button
+                type="button"
+                className="w-full rounded-xl bg-orange-500 hover:bg-orange-600 px-8 py-5 text-lg font-bold text-white transition shadow-xl hover:shadow-2xl transform hover:scale-105"
+                onClick={() => setStarted(true)}
+              >
+                CALCULAR MI AHORRO →
+              </button>
+            </div>
           </div>
         )}
         {started && (
@@ -207,6 +228,7 @@ export default function QuizContainer() {
               {currentStep === 'country' && (
                 <CountryStep
                   value={quizData.country}
+                  onBack={() => setStarted(false)}
                   onSelect={(country) => {
                     updateData('country', country.name);
                     updateData('currency', country.currency);

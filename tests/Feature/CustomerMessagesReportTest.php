@@ -7,11 +7,14 @@ use App\Models\CustomerStatus;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Namu\WireChat\Models\Message;
 
 uses(RefreshDatabase::class);
 
 it('orders customers by message count', function () {
+    Carbon::setTestNow(Carbon::parse('2026-02-16 10:00:00'));
+
     $user = User::factory()->create([
         'role_id' => 1,
     ]);
@@ -142,6 +145,44 @@ it('orders customers by message count', function () {
         'body' => 'Palabra clave',
     ]);
 
+    $unassignedCustomer = Customer::create([
+        'name' => 'Cliente Sin Asesor',
+        'phone' => '+57 300 0000007',
+        'user_id' => null,
+        'status_id' => $status->id,
+    ]);
+
+    $unassignedConversation = $user->createConversationWith($unassignedCustomer);
+
+    Message::create([
+        'conversation_id' => $unassignedConversation->id,
+        'sendable_type' => $unassignedCustomer->getMorphClass(),
+        'sendable_id' => $unassignedCustomer->id,
+        'body' => 'Mensaje sin asesor',
+    ]);
+
+    $actionType = ActionType::query()->create([
+        'name' => 'Seguimiento',
+    ]);
+
+    Action::query()->create([
+        'customer_id' => $highVolumeCustomer->id,
+        'creator_user_id' => $user->id,
+        'type_id' => $actionType->id,
+        'note' => 'Accion reciente',
+        'created_at' => now()->subDays(5),
+        'updated_at' => now()->subDays(5),
+    ]);
+
+    Action::query()->create([
+        'customer_id' => $lowVolumeCustomer->id,
+        'creator_user_id' => $user->id,
+        'type_id' => $actionType->id,
+        'note' => 'Accion antigua',
+        'created_at' => now()->subDays(70),
+        'updated_at' => now()->subDays(70),
+    ]);
+
     $this->actingAs($user)
         ->get('/reports/views/customers_messages_count')
         ->assertSuccessful()
@@ -182,6 +223,15 @@ it('orders customers by message count', function () {
         ->get('/reports/views/customers_messages_count?tag_none=1')
         ->assertSee('Cliente Poco Mensajes')
         ->assertDontSee('Cliente Muchos Mensajes');
+
+    $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count?without_actions_last_60_days=1')
+        ->assertSee('Cliente Poco Mensajes')
+        ->assertSee('Cliente Filtrado')
+        ->assertDontSee('Cliente Muchos Mensajes')
+        ->assertDontSee('Cliente Sin Asesor');
+
+    Carbon::setTestNow();
 });
 
 it('renders multiline action note as a single action item', function () {
