@@ -747,6 +747,7 @@ class ReportController extends Controller
                         $subQuery->selectRaw('1')
                             ->from('actions')
                             ->whereColumn('actions.customer_id', 'customers.id')
+                            ->whereNotNull('actions.creator_user_id')
                             ->whereBetween('actions.created_at', [$last60DaysStart, $toDate]);
                     });
             })

@@ -183,6 +183,15 @@ it('orders customers by message count', function () {
         'updated_at' => now()->subDays(70),
     ]);
 
+    Action::query()->create([
+        'customer_id' => $filteredCustomer->id,
+        'creator_user_id' => null,
+        'type_id' => $actionType->id,
+        'note' => 'Accion automatica',
+        'created_at' => now()->subDays(2),
+        'updated_at' => now()->subDays(2),
+    ]);
+
     $this->actingAs($user)
         ->get('/reports/views/customers_messages_count')
         ->assertSuccessful()
