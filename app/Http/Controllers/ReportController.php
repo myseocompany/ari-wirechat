@@ -19,6 +19,7 @@ use App\Services\LeadClassifier\LeadConversationClassifier;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -1130,6 +1131,9 @@ class ReportController extends Controller
         $fromDate = null;
         $toDate = null;
         $calculatorRootIds = [3000, 30000];
+        $productionMetaId = 30010;
+        $manualRateMetaId = 30011;
+        $doughMetaId = 30015;
 
         if ($request->filled('from_date') && $request->filled('to_date')) {
             $fromDate = Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay();
@@ -1156,6 +1160,18 @@ class ReportController extends Controller
                 DB::raw("cast(json_unquote(json_extract(calc.value, '$.final_score')) as decimal(10,2)) as calculator_score"),
                 DB::raw("json_unquote(json_extract(calc.value, '$.completed_at')) as calculator_completed_at")
             )
+            ->selectSub(
+                $this->latestCalculatorAnswerTextSubquery($productionMetaId, 'calc_production'),
+                'manual_daily_production_text'
+            )
+            ->selectSub(
+                $this->latestCalculatorAnswerTextSubquery($manualRateMetaId, 'calc_manual_rate'),
+                'manual_empanadas_per_hour_text'
+            )
+            ->selectSub(
+                $this->latestCalculatorAnswerTextSubquery($doughMetaId, 'calc_dough'),
+                'dough_type_text'
+            )
             ->joinSub($latestCalculatorMetaIdQuery, 'latest_calc', function ($join) {
                 $join->on('latest_calc.customer_id', '=', 'customers.id');
             })
@@ -1172,9 +1188,85 @@ class ReportController extends Controller
             ->paginate(50)
             ->withQueryString();
 
+        $model->setCollection(
+            $model->getCollection()->map(function (Customer $customer): Customer {
+                $customer->manual_daily_production_value = $this->parseCalculatorNumericAnswer($customer->manual_daily_production_text);
+                $customer->manual_empanadas_per_hour_value = $this->parseCalculatorNumericAnswer($customer->manual_empanadas_per_hour_text);
+                $customer->dough_type_label = $this->normalizeCalculatorDoughType($customer->dough_type_text);
+
+                return $customer;
+            })
+        );
+
+        $productionValues = $model->getCollection()
+            ->pluck('manual_daily_production_value')
+            ->filter(static fn ($value): bool => $value !== null)
+            ->values();
+
+        $manualRateValues = $model->getCollection()
+            ->pluck('manual_empanadas_per_hour_value')
+            ->filter(static fn ($value): bool => $value !== null)
+            ->values();
+
+        $calculatorSummary = [
+            'avg_daily_production' => $productionValues->isNotEmpty() ? round((float) $productionValues->avg(), 1) : null,
+            'total_daily_production' => $productionValues->isNotEmpty() ? round((float) $productionValues->sum(), 1) : null,
+            'avg_manual_rate' => $manualRateValues->isNotEmpty() ? round((float) $manualRateValues->avg(), 1) : null,
+            'dough_preferences' => $model->getCollection()
+                ->pluck('dough_type_label')
+                ->filter(static fn (string $label): bool => $label !== 'Sin dato')
+                ->countBy()
+                ->sortDesc(),
+        ];
+
         $users = User::where('status_id', 1)->orderBy('name')->get();
 
-        return view('reports.views.customers_calculator', compact('model', 'fromDate', 'toDate', 'request', 'users'));
+        return view('reports.views.customers_calculator', compact('model', 'fromDate', 'toDate', 'request', 'users', 'calculatorSummary'));
+    }
+
+    private function latestCalculatorAnswerTextSubquery(int $metaDataId, string $alias): EloquentBuilder
+    {
+        return CustomerMeta::query()
+            ->from("customer_metas as {$alias}")
+            ->selectRaw("json_unquote(json_extract({$alias}.value, '$.answer_text'))")
+            ->whereColumn("{$alias}.customer_id", 'customers.id')
+            ->where("{$alias}.meta_data_id", $metaDataId)
+            ->orderByDesc("{$alias}.id")
+            ->limit(1);
+    }
+
+    private function parseCalculatorNumericAnswer(?string $answerText): ?float
+    {
+        if (! is_string($answerText) || trim($answerText) === '') {
+            return null;
+        }
+
+        $matches = [];
+        preg_match('/-?\d+(?:[.,]\d+)?/', $answerText, $matches);
+
+        if (! isset($matches[0])) {
+            return null;
+        }
+
+        $normalizedValue = str_replace(',', '.', $matches[0]);
+
+        if (! is_numeric($normalizedValue)) {
+            return null;
+        }
+
+        return (float) $normalizedValue;
+    }
+
+    private function normalizeCalculatorDoughType(?string $doughType): string
+    {
+        $normalizedValue = strtolower(trim((string) $doughType));
+
+        return match ($normalizedValue) {
+            'maiz' => 'Maiz',
+            'trigo' => 'Trigo',
+            'maiz-trigo', 'maiz + trigo', 'maiz y trigo' => 'Maiz + Trigo',
+            default => trim((string) $doughType) !== '' ? (string) $doughType : 'Sin dato',
+        };
     }
 
     public function scrollActive(Request $request)

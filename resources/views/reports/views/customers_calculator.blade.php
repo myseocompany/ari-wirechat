@@ -12,6 +12,47 @@
   </div>
 </div>
 
+@php
+  $summary = $calculatorSummary ?? [];
+  $formatNumber = static fn (?float $value): string => is_null($value)
+    ? 'Sin dato'
+    : rtrim(rtrim(number_format($value, 1, '.', ','), '0'), '.');
+  $doughPreferences = $summary['dough_preferences'] ?? collect();
+@endphp
+
+<div class="mb-4 grid gap-3 md:grid-cols-3">
+  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Produccion diaria promedio</div>
+    <div class="mt-2 text-2xl font-semibold text-slate-900">{{ $formatNumber($summary['avg_daily_production'] ?? null) }}</div>
+    <div class="text-xs text-slate-500">emp/dia</div>
+  </div>
+  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Produccion diaria total</div>
+    <div class="mt-2 text-2xl font-semibold text-slate-900">{{ $formatNumber($summary['total_daily_production'] ?? null) }}</div>
+    <div class="text-xs text-slate-500">emp/dia</div>
+  </div>
+  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Operario por hora promedio</div>
+    <div class="mt-2 text-2xl font-semibold text-slate-900">{{ $formatNumber($summary['avg_manual_rate'] ?? null) }}</div>
+    <div class="text-xs text-slate-500">emp/h</div>
+  </div>
+</div>
+
+<div class="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+  <div class="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Masas que quieren producir</div>
+  @if ($doughPreferences->isNotEmpty())
+    <div class="flex flex-wrap gap-2">
+      @foreach ($doughPreferences as $label => $count)
+        <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+          {{ $label }}: {{ $count }}
+        </span>
+      @endforeach
+    </div>
+  @else
+    <div class="text-xs text-slate-500">Sin datos de masa en esta pagina.</div>
+  @endif
+</div>
+
 <div class="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
   <form action="/reports/views/customers_calculator" method="GET" class="flex flex-col gap-4">
     <div class="grid gap-4 lg:grid-cols-[repeat(12,minmax(0,1fr))]">
@@ -49,6 +90,9 @@
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Cliente</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Asesor</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estado</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Produccion diaria</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Operario manual</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Masa</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Stage</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Score</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Completado</th>
@@ -95,6 +139,9 @@
                 <span class="text-xs text-slate-500">Sin estado</span>
               @endif
             </td>
+            <td class="px-4 py-3">{{ $item->manual_daily_production_text ?: 'Sin dato' }}</td>
+            <td class="px-4 py-3">{{ $item->manual_empanadas_per_hour_text ?: 'Sin dato' }}</td>
+            <td class="px-4 py-3">{{ $item->dough_type_label ?: 'Sin dato' }}</td>
             <td class="px-4 py-3">{{ $item->calculator_stage ?: 'Sin stage' }}</td>
             <td class="px-4 py-3">
               @if (! is_null($item->calculator_score))
