@@ -28,6 +28,7 @@ class CustomerMessagesReportRequest extends FormRequest
             'tag_none' => ['nullable', 'boolean'],
             'without_actions_last_30_days' => ['nullable', 'boolean'],
             'without_actions_last_60_days' => ['nullable', 'boolean'],
+            'with_actions_last_60_days' => ['nullable', 'boolean'],
         ];
     }
 

@@ -258,6 +258,12 @@ it('orders customers by message count', function () {
         ->assertSee('Cliente Filtrado')
         ->assertDontSee('Cliente Muchos Mensajes');
 
+    $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count?user_id='.$user->id.'&with_actions_last_60_days=1')
+        ->assertSee('Cliente Muchos Mensajes')
+        ->assertDontSee('Cliente Poco Mensajes')
+        ->assertDontSee('Cliente Filtrado');
+
     Carbon::setTestNow();
 });
 
