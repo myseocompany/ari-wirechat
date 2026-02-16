@@ -669,6 +669,9 @@ class ReportController extends Controller
             : now()->endOfDay();
         $last60DaysStart = $toDate->copy()->subDays(60)->startOfDay();
         $withoutActionsLast60Days = $request->boolean('without_actions_last_60_days') || $request->boolean('without_actions_last_30_days');
+        $filteredUserId = $request->filled('user_id') && ! $request->boolean('user_unassigned')
+            ? $request->integer('user_id')
+            : null;
 
         $messagesCountQuery = DB::table('wire_messages')
             ->selectRaw('count(*)')
@@ -741,13 +744,17 @@ class ReportController extends Controller
             ->when($request->filled('messages_max'), function ($query) use ($request) {
                 $query->having('messages_count', '<=', (int) $request->input('messages_max'));
             })
-            ->when($withoutActionsLast60Days, function ($query) use ($last60DaysStart, $toDate) {
+            ->when($withoutActionsLast60Days, function ($query) use ($last60DaysStart, $toDate, $filteredUserId) {
                 $query->whereNotNull('customers.user_id')
-                    ->whereNotExists(function ($subQuery) use ($last60DaysStart, $toDate) {
+                    ->whereNotExists(function ($subQuery) use ($last60DaysStart, $toDate, $filteredUserId) {
                         $subQuery->selectRaw('1')
                             ->from('actions')
                             ->whereColumn('actions.customer_id', 'customers.id')
-                            ->whereNotNull('actions.creator_user_id')
+                            ->when($filteredUserId !== null, function ($actionQuery) use ($filteredUserId) {
+                                $actionQuery->where('actions.creator_user_id', $filteredUserId);
+                            }, function ($actionQuery) {
+                                $actionQuery->whereNotNull('actions.creator_user_id');
+                            })
                             ->whereBetween('actions.created_at', [$last60DaysStart, $toDate]);
                     });
             })

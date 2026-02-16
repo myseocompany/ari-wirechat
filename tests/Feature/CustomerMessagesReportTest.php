@@ -18,6 +18,9 @@ it('orders customers by message count', function () {
     $user = User::factory()->create([
         'role_id' => 1,
     ]);
+    $otherUser = User::factory()->create([
+        'role_id' => 1,
+    ]);
 
     $status = CustomerStatus::create([
         'name' => 'Nuevo',
@@ -184,6 +187,15 @@ it('orders customers by message count', function () {
     ]);
 
     Action::query()->create([
+        'customer_id' => $lowVolumeCustomer->id,
+        'creator_user_id' => $otherUser->id,
+        'type_id' => $actionType->id,
+        'note' => 'Accion reciente de otro user',
+        'created_at' => now()->subDays(2),
+        'updated_at' => now()->subDays(2),
+    ]);
+
+    Action::query()->create([
         'customer_id' => $filteredCustomer->id,
         'creator_user_id' => null,
         'type_id' => $actionType->id,
@@ -239,6 +251,12 @@ it('orders customers by message count', function () {
         ->assertSee('Cliente Filtrado')
         ->assertDontSee('Cliente Muchos Mensajes')
         ->assertDontSee('Cliente Sin Asesor');
+
+    $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count?user_id='.$user->id.'&without_actions_last_60_days=1')
+        ->assertSee('Cliente Poco Mensajes')
+        ->assertSee('Cliente Filtrado')
+        ->assertDontSee('Cliente Muchos Mensajes');
 
     Carbon::setTestNow();
 });
