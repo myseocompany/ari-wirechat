@@ -117,7 +117,13 @@ class ActionService
                     });
                 }
                 if ($request->filled('action_search')) {
-                    $query->where('note', 'like', '%'.$request->action_search.'%');
+                    $searchTerms = preg_split('/\s+/', trim((string) $request->action_search)) ?: [];
+                    $searchTerms = array_values(array_filter($searchTerms, static fn ($term) => $term !== ''));
+
+                    if ($searchTerms !== []) {
+                        $searchPattern = '%'.implode('%', $searchTerms).'%';
+                        $query->where('note', 'like', $searchPattern);
+                    }
                 }
                 if ($request->boolean('has_audio')) {
                     $query->whereNotNull('url')
