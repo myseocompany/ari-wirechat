@@ -169,13 +169,13 @@
             </td>
             <td class="px-4 py-3">
               @php
-                $lastActions = $item->last_actions ? explode("\n", $item->last_actions) : [];
+                $lastActions = $item->last_actions ? explode("\x1E", $item->last_actions) : [];
               @endphp
               @if (count($lastActions))
                 <div class="flex flex-col gap-3 text-xs text-slate-500">
                   @foreach ($lastActions as $actionLine)
                     @php
-                      $parts = array_pad(explode('|||', $actionLine), 4, '');
+                      $parts = array_pad(explode("\x1F", $actionLine), 4, '');
                       [$note, $actionType, $actionUser, $actionDate] = $parts;
                       $userLabel = $actionUser ?: 'Automatico';
                       $userWords = preg_split('/\\s+/', trim($userLabel));

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Action;
+use App\Models\ActionType;
 use App\Models\Customer;
 use App\Models\CustomerStatus;
 use App\Models\Tag;
@@ -180,4 +182,50 @@ it('orders customers by message count', function () {
         ->get('/reports/views/customers_messages_count?tag_none=1')
         ->assertSee('Cliente Poco Mensajes')
         ->assertDontSee('Cliente Muchos Mensajes');
+});
+
+it('renders multiline action note as a single action item', function () {
+    $user = User::factory()->create([
+        'role_id' => 1,
+    ]);
+
+    $status = CustomerStatus::create([
+        'name' => 'Nuevo',
+        'stage_id' => 1,
+    ]);
+
+    $customer = Customer::create([
+        'name' => 'Cliente Con Nota Larga',
+        'phone' => '+57 300 0000004',
+        'user_id' => $user->id,
+        'status_id' => $status->id,
+    ]);
+
+    $conversation = $user->createConversationWith($customer);
+
+    Message::create([
+        'conversation_id' => $conversation->id,
+        'sendable_type' => $customer->getMorphClass(),
+        'sendable_id' => $customer->id,
+        'body' => 'Mensaje inicial',
+    ]);
+
+    $actionType = ActionType::query()->create([
+        'name' => 'Whatsapp de salida',
+    ]);
+
+    Action::query()->create([
+        'customer_id' => $customer->id,
+        'creator_user_id' => $user->id,
+        'type_id' => $actionType->id,
+        'note' => "Primera linea\nSegunda linea",
+    ]);
+
+    $response = $this->actingAs($user)->get('/reports/views/customers_messages_count');
+
+    $response->assertSuccessful()
+        ->assertSee('Primera linea')
+        ->assertSee('Segunda linea');
+
+    expect(substr_count($response->getContent(), 'rounded-full bg-[linear-gradient(135deg,#1c2640,#0f172a)]'))->toBe(1);
 });
