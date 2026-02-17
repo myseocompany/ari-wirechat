@@ -785,7 +785,7 @@ class ReportController extends Controller
             })
             ->orderByDesc('messages_count')
             ->orderByDesc('last_message_at')
-            ->paginate(50)
+            ->paginate(25)
             ->withQueryString();
 
         $statuses = CustomerStatus::orderBy('weight')->get();
