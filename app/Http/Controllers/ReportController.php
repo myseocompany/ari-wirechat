@@ -740,6 +740,16 @@ class ReportController extends Controller
             ->when($request->filled('status_ids'), function ($query) use ($request) {
                 $query->whereIn('customers.status_id', $request->input('status_ids', []));
             })
+            ->when($request->filled('action_note_search'), function ($query) use ($request) {
+                $searchTerm = '%'.$request->input('action_note_search').'%';
+
+                $query->whereExists(function ($subQuery) use ($searchTerm) {
+                    $subQuery->selectRaw('1')
+                        ->from('actions')
+                        ->whereColumn('actions.customer_id', 'customers.id')
+                        ->where('actions.note', 'like', $searchTerm);
+                });
+            })
             ->when($request->filled('messages_min'), function ($query) use ($request) {
                 $query->having('messages_count', '>=', (int) $request->input('messages_min'));
             })

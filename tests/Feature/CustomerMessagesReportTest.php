@@ -231,6 +231,12 @@ it('orders customers by message count', function () {
         ->assertDontSee('Cliente Poco Mensajes');
 
     $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count?action_note_search=automatica')
+        ->assertSee('Cliente Filtrado')
+        ->assertDontSee('Cliente Muchos Mensajes')
+        ->assertDontSee('Cliente Poco Mensajes');
+
+    $this->actingAs($user)
         ->get('/reports/views/customers_messages_count?status_ids[]='.$status->id)
         ->assertSee('Cliente Muchos Mensajes')
         ->assertDontSee('Cliente Poco Mensajes');

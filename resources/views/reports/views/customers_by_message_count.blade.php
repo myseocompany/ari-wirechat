@@ -36,6 +36,10 @@
         <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="message_search" name="message_search" value="{{ $request->message_search }}">
       </div>
       <div class="col-span-12 flex flex-col gap-1 lg:col-span-4">
+        <label for="action_note_search" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Buscar en notas de acciones</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="action_note_search" name="action_note_search" value="{{ $request->action_note_search }}">
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-4">
         <label for="user_id" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Asesor</label>
         <select id="user_id" name="user_id" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
           <option value="">Todos</option>

@@ -130,6 +130,53 @@
       };
     }
 
+    if (!window.initActionQuickSubmit) {
+      window.initActionQuickSubmit = function (scope) {
+        const $scope = scope ? $(scope) : $(document);
+        $scope.find('form[action*="/action/store"]').each(function () {
+          const form = this;
+          if (form.dataset.actionShortcutBound === '1') {
+            return;
+          }
+
+          const textarea = form.querySelector('textarea[name="note"]');
+          if (!textarea) {
+            return;
+          }
+
+          form.dataset.actionShortcutBound = '1';
+
+          textarea.addEventListener('keydown', function (event) {
+            if (event.isComposing) {
+              return;
+            }
+
+            if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+              event.preventDefault();
+              if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+                return;
+              }
+              form.submit();
+            }
+          });
+        });
+      };
+    }
+
+    const focusActionNote = function () {
+      const actionNoteTextarea = overlayBody.querySelector('form[action*="/action/store"] textarea[name="note"]');
+      if (!actionNoteTextarea) {
+        return;
+      }
+
+      window.requestAnimationFrame(function () {
+        actionNoteTextarea.focus();
+        const noteLength = actionNoteTextarea.value.length;
+        actionNoteTextarea.setSelectionRange(noteLength, noteLength);
+      });
+    };
+
     const overlay = document.getElementById('customer_overlay');
     const overlayBody = document.getElementById('customer_overlay_body');
     if (!overlay || !overlayBody) {
@@ -186,6 +233,10 @@
           if (window.initActionCreationTimer) {
             window.initActionCreationTimer($('#customer_overlay_body'));
           }
+          if (window.initActionQuickSubmit) {
+            window.initActionQuickSubmit($('#customer_overlay_body'));
+          }
+          focusActionNote();
         } else {
           window.location.href = url;
         }

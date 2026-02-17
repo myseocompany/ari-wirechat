@@ -156,12 +156,67 @@ if (!window.initActionCreationTimer) {
     };
 }
 
+if (!window.initActionQuickSubmit) {
+    window.initActionQuickSubmit = function(scope) {
+        const root = scope instanceof Element ? scope : document;
+        root.querySelectorAll('form[action*="/action/store"]').forEach(function(form) {
+            if (form.dataset.actionShortcutBound === '1') {
+                return;
+            }
+
+            const textarea = form.querySelector('textarea[name="note"]');
+            if (!textarea) {
+                return;
+            }
+
+            form.dataset.actionShortcutBound = '1';
+
+            textarea.addEventListener('keydown', function(event) {
+                if (event.isComposing) {
+                    return;
+                }
+
+                if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                    event.preventDefault();
+                    if (typeof form.requestSubmit === 'function') {
+                        form.requestSubmit();
+                        return;
+                    }
+                    form.submit();
+                }
+            });
+        });
+    };
+}
+
+if (!window.focusActionNoteTextarea) {
+    window.focusActionNoteTextarea = function(scope) {
+        const root = scope instanceof Element ? scope : document;
+        const textarea = root.querySelector('form[action*="/action/store"] textarea[name="note"]');
+        if (!textarea) {
+            return;
+        }
+
+        window.requestAnimationFrame(function() {
+            textarea.focus();
+            const noteLength = textarea.value.length;
+            textarea.setSelectionRange(noteLength, noteLength);
+        });
+    };
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     if (window.initActionDateToggle) {
         window.initActionDateToggle();
     }
     if (window.initActionCreationTimer) {
         window.initActionCreationTimer();
+    }
+    if (window.initActionQuickSubmit) {
+        window.initActionQuickSubmit();
+    }
+    if (window.focusActionNoteTextarea) {
+        window.focusActionNoteTextarea();
     }
 });
 </script>
