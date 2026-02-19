@@ -28,14 +28,19 @@
         <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="call_id" name="call_id" value="{{ $request->call_id }}">
       </div>
       <div class="col-span-12 flex flex-col gap-1 lg:col-span-2">
-        <label for="status" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Status</label>
+        <label for="status" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Status Retell</label>
         <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="status" name="status" value="{{ $request->status }}">
       </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-3">
+        <label for="event" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Evento</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="event" name="event" value="{{ $request->event }}">
+      </div>
+
       <div class="col-span-12 flex flex-col gap-1 lg:col-span-3">
         <label for="payload_search" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Buscar en payload</label>
         <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="payload_search" name="payload_search" value="{{ $request->payload_search }}">
       </div>
-      <div class="col-span-12 flex flex-col gap-1 lg:col-span-3">
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-2">
         <label for="process_state" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estado de proceso</label>
         <select id="process_state" name="process_state" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
           <option value="all" @if (($request->process_state ?? 'all') === 'all') selected @endif>Todos</option>
@@ -43,6 +48,49 @@
           <option value="processed" @if ($request->process_state === 'processed') selected @endif>Procesado</option>
           <option value="error" @if ($request->process_state === 'error') selected @endif>Error</option>
         </select>
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-2">
+        <label for="call_successful" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Llamada efectiva</label>
+        <select id="call_successful" name="call_successful" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
+          <option value="all" @if (($request->call_successful ?? 'all') === 'all') selected @endif>Todos</option>
+          <option value="yes" @if ($request->call_successful === 'yes') selected @endif>Sí</option>
+          <option value="no" @if ($request->call_successful === 'no') selected @endif>No</option>
+          <option value="unknown" @if ($request->call_successful === 'unknown') selected @endif>Sin dato</option>
+        </select>
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-2">
+        <label for="in_voicemail" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Buzón</label>
+        <select id="in_voicemail" name="in_voicemail" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
+          <option value="all" @if (($request->in_voicemail ?? 'all') === 'all') selected @endif>Todos</option>
+          <option value="yes" @if ($request->in_voicemail === 'yes') selected @endif>Sí</option>
+          <option value="no" @if ($request->in_voicemail === 'no') selected @endif>No</option>
+          <option value="unknown" @if ($request->in_voicemail === 'unknown') selected @endif>Sin dato</option>
+        </select>
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-2">
+        <label for="busca_automatizar" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Busca automatizar</label>
+        <select id="busca_automatizar" name="busca_automatizar" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
+          <option value="all" @if (($request->busca_automatizar ?? 'all') === 'all') selected @endif>Todos</option>
+          <option value="yes" @if ($request->busca_automatizar === 'yes') selected @endif>Sí</option>
+          <option value="no" @if ($request->busca_automatizar === 'no') selected @endif>No</option>
+          <option value="unknown" @if ($request->busca_automatizar === 'unknown') selected @endif>Sin dato</option>
+        </select>
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-2">
+        <label for="masses_used" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Masa</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="masses_used" name="masses_used" value="{{ $request->masses_used }}">
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-2">
+        <label for="live_attendance_status" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Asistencia en vivo</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="live_attendance_status" name="live_attendance_status" value="{{ $request->live_attendance_status }}">
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-1">
+        <label for="daily_volume_min" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Vol. min</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="0" id="daily_volume_min" name="daily_volume_min" value="{{ $request->daily_volume_min }}">
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-1">
+        <label for="daily_volume_max" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Vol. max</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="0" id="daily_volume_max" name="daily_volume_max" value="{{ $request->daily_volume_max }}">
       </div>
     </div>
     <div class="flex flex-wrap items-center justify-between gap-3">
@@ -68,10 +116,10 @@
         <tr>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Fecha</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Call ID</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Status Retell</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Resultado</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Proceso</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Datos técnicos</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Variables de negocio</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Cliente / Acción</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Resumen técnico</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
@@ -85,7 +133,6 @@
                 $normalizedPayload = $normalizedPayload['body'];
             }
             $call = $normalizedPayload['call'] ?? $normalizedPayload;
-            $event = $normalizedPayload['event'] ?? ($normalizedPayload['type'] ?? null);
             $from = $call['from_number'] ?? null;
             $to = $call['to_number'] ?? null;
             $durationSeconds = isset($call['duration_ms']) ? (int) round(((int) $call['duration_ms']) / 1000) : null;
@@ -93,6 +140,9 @@
             $createdAt = $item->created_at ? \Carbon\Carbon::parse($item->created_at) : null;
             $updatedAt = $item->updated_at ? \Carbon\Carbon::parse($item->updated_at) : null;
             $processedAt = $item->processed_at ? \Carbon\Carbon::parse($item->processed_at) : null;
+            $callSuccessfulLabel = is_null($item->call_successful) ? 'Sin dato' : ((int) $item->call_successful === 1 ? 'Sí' : 'No');
+            $voicemailLabel = is_null($item->in_voicemail) ? 'Sin dato' : ((int) $item->in_voicemail === 1 ? 'Sí' : 'No');
+            $automatizarLabel = is_null($item->busca_automatizar) ? 'Sin dato' : ((int) $item->busca_automatizar === 1 ? 'Sí' : 'No');
           @endphp
           <tr class="hover:bg-slate-50">
             <td class="px-4 py-3 align-top">
@@ -101,11 +151,7 @@
             </td>
             <td class="px-4 py-3 align-top">
               <div class="font-mono text-xs text-slate-700">{{ $item->call_id }}</div>
-            </td>
-            <td class="px-4 py-3 align-top">
-              <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
-                {{ $item->status ?: 'sin status' }}
-              </span>
+              <div class="mt-1 inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">{{ $item->status ?: 'sin status' }}</div>
             </td>
             <td class="px-4 py-3 align-top">
               @if ($item->error)
@@ -117,6 +163,21 @@
               @else
                 <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">Pendiente</span>
               @endif
+            </td>
+            <td class="px-4 py-3 align-top text-xs text-slate-600">
+              <div>Evento: {{ $item->event ?: '—' }}</div>
+              <div>From: {{ $from ?: '—' }}</div>
+              <div>To: {{ $to ?: '—' }}</div>
+              <div>Duración: {{ $durationSeconds !== null ? $durationSeconds.'s' : '—' }}</div>
+              <div>Sentimiento: {{ $item->user_sentiment ?: '—' }}</div>
+            </td>
+            <td class="px-4 py-3 align-top text-xs text-slate-600">
+              <div>Efectiva: {{ $callSuccessfulLabel }}</div>
+              <div>Buzón: {{ $voicemailLabel }}</div>
+              <div>Automatizar: {{ $automatizarLabel }}</div>
+              <div>Masa: {{ $item->masses_used ?: '—' }}</div>
+              <div>Volumen/día: {{ $item->daily_volume_empanadas !== null ? $item->daily_volume_empanadas : '—' }}</div>
+              <div>Asistencia en vivo: {{ $item->live_attendance_status ?: '—' }}</div>
             </td>
             <td class="px-4 py-3 align-top">
               @if ($customerId)
@@ -137,12 +198,6 @@
                   </a>
                 </div>
               @endif
-            </td>
-            <td class="px-4 py-3 align-top text-xs text-slate-600">
-              <div>Evento: {{ $event ?: '—' }}</div>
-              <div>From: {{ $from ?: '—' }}</div>
-              <div>To: {{ $to ?: '—' }}</div>
-              <div>Duración: {{ $durationSeconds !== null ? $durationSeconds.'s' : '—' }}</div>
             </td>
           </tr>
         @endforeach

@@ -817,6 +817,15 @@ class ReportController extends Controller
                 'ri.id',
                 'ri.call_id',
                 'ri.status',
+                'ri.event',
+                'ri.call_successful',
+                'ri.in_voicemail',
+                'ri.user_sentiment',
+                'ri.masses_used',
+                'ri.busca_automatizar',
+                'ri.products_mentioned',
+                'ri.daily_volume_empanadas',
+                'ri.live_attendance_status',
                 'ri.payload',
                 'ri.processed_at',
                 'ri.error',
@@ -839,8 +848,50 @@ class ReportController extends Controller
             ->when($request->filled('status'), function ($query) use ($request) {
                 $query->where('ri.status', 'like', '%'.$request->string('status').'%');
             })
+            ->when($request->filled('event'), function ($query) use ($request) {
+                $query->where('ri.event', 'like', '%'.$request->string('event').'%');
+            })
             ->when($request->filled('payload_search'), function ($query) use ($request) {
                 $query->whereRaw('CAST(ri.payload AS CHAR) like ?', ['%'.$request->string('payload_search').'%']);
+            })
+            ->when($request->input('call_successful') === 'yes', function ($query) {
+                $query->where('ri.call_successful', 1);
+            })
+            ->when($request->input('call_successful') === 'no', function ($query) {
+                $query->where('ri.call_successful', 0);
+            })
+            ->when($request->input('call_successful') === 'unknown', function ($query) {
+                $query->whereNull('ri.call_successful');
+            })
+            ->when($request->input('in_voicemail') === 'yes', function ($query) {
+                $query->where('ri.in_voicemail', 1);
+            })
+            ->when($request->input('in_voicemail') === 'no', function ($query) {
+                $query->where('ri.in_voicemail', 0);
+            })
+            ->when($request->input('in_voicemail') === 'unknown', function ($query) {
+                $query->whereNull('ri.in_voicemail');
+            })
+            ->when($request->input('busca_automatizar') === 'yes', function ($query) {
+                $query->where('ri.busca_automatizar', 1);
+            })
+            ->when($request->input('busca_automatizar') === 'no', function ($query) {
+                $query->where('ri.busca_automatizar', 0);
+            })
+            ->when($request->input('busca_automatizar') === 'unknown', function ($query) {
+                $query->whereNull('ri.busca_automatizar');
+            })
+            ->when($request->filled('masses_used'), function ($query) use ($request) {
+                $query->where('ri.masses_used', 'like', '%'.$request->string('masses_used').'%');
+            })
+            ->when($request->filled('daily_volume_min'), function ($query) use ($request) {
+                $query->where('ri.daily_volume_empanadas', '>=', $request->integer('daily_volume_min'));
+            })
+            ->when($request->filled('daily_volume_max'), function ($query) use ($request) {
+                $query->where('ri.daily_volume_empanadas', '<=', $request->integer('daily_volume_max'));
+            })
+            ->when($request->filled('live_attendance_status'), function ($query) use ($request) {
+                $query->where('ri.live_attendance_status', 'like', '%'.$request->string('live_attendance_status').'%');
             })
             ->when($request->input('process_state') === 'pending', function ($query) {
                 $query->whereNull('ri.processed_at')->whereNull('ri.error');

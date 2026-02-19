@@ -4090,19 +4090,118 @@ class APIController extends Controller
         // 4) Persistimos payload crudo para auditoría/diagnóstico (idempotente por call_id)
         try {
             $status = $call['call_status'] ?? ($data['event'] ?? ($data['type'] ?? null));
+            $event = $data['event'] ?? ($data['type'] ?? null);
             $payloadToStore = is_array($raw) ? $raw : ['raw' => $request->getContent()];
+            $analysis = isset($call['call_analysis']) && is_array($call['call_analysis']) ? $call['call_analysis'] : [];
+            $customAnalysisData = isset($analysis['custom_analysis_data']) && is_array($analysis['custom_analysis_data'])
+                ? $analysis['custom_analysis_data']
+                : [];
+
+            $normalizeBoolean = function ($value): ?bool {
+                if (is_bool($value)) {
+                    return $value;
+                }
+
+                if (is_numeric($value)) {
+                    if ((int) $value === 1) {
+                        return true;
+                    }
+
+                    if ((int) $value === 0) {
+                        return false;
+                    }
+                }
+
+                if (is_string($value)) {
+                    $normalized = mb_strtolower(trim($value));
+                    if (in_array($normalized, ['true', '1', 'si', 'sí', 'yes', 'confirmado'], true)) {
+                        return true;
+                    }
+
+                    if (in_array($normalized, ['false', '0', 'no', 'no confirmado'], true)) {
+                        return false;
+                    }
+                }
+
+                return null;
+            };
+
+            $normalizeString = function ($value): ?string {
+                if (! is_scalar($value)) {
+                    return null;
+                }
+
+                $normalized = trim((string) $value);
+
+                return $normalized === '' ? null : $normalized;
+            };
+
+            $normalizeDailyVolume = function ($value): ?int {
+                if (is_int($value)) {
+                    return $value >= 0 ? $value : null;
+                }
+
+                if (is_numeric($value)) {
+                    $numeric = (int) $value;
+
+                    return $numeric >= 0 ? $numeric : null;
+                }
+
+                if (is_string($value)) {
+                    $digits = preg_replace('/\D+/', '', $value);
+                    if ($digits === '') {
+                        return null;
+                    }
+
+                    return (int) $digits;
+                }
+
+                return null;
+            };
+
+            $extracted = [
+                'event' => $normalizeString($event),
+                'call_successful' => $normalizeBoolean($analysis['call_successful'] ?? null),
+                'in_voicemail' => $normalizeBoolean($analysis['in_voicemail'] ?? null),
+                'user_sentiment' => $normalizeString($analysis['user_sentiment'] ?? null),
+                'masses_used' => $normalizeString($customAnalysisData['masses_used'] ?? null),
+                'busca_automatizar' => $normalizeBoolean($customAnalysisData['busca_automatizar'] ?? null),
+                'products_mentioned' => $normalizeString($customAnalysisData['products_mentioned'] ?? null),
+                'daily_volume_empanadas' => $normalizeDailyVolume($customAnalysisData['daily_volume_empanadas'] ?? null),
+                'live_attendance_status' => $normalizeString($customAnalysisData['live_attendance_status'] ?? null),
+            ];
+
+            $existing = DB::table('retell_inbox')
+                ->select(array_keys($extracted))
+                ->where('call_id', $callId)
+                ->first();
+
+            foreach ($extracted as $key => $value) {
+                if ($value === null && $existing !== null && isset($existing->$key)) {
+                    $extracted[$key] = $existing->$key;
+                }
+            }
 
             DB::table('retell_inbox')->upsert(
                 [[
                     'call_id' => $callId,
                     'status' => is_scalar($status) ? (string) $status : null,
+                    'event' => $extracted['event'],
+                    'call_successful' => $extracted['call_successful'],
+                    'in_voicemail' => $extracted['in_voicemail'],
+                    'user_sentiment' => $extracted['user_sentiment'],
+                    'masses_used' => $extracted['masses_used'],
+                    'busca_automatizar' => $extracted['busca_automatizar'],
+                    'products_mentioned' => $extracted['products_mentioned'],
+                    'daily_volume_empanadas' => $extracted['daily_volume_empanadas'],
+                    'live_attendance_status' => $extracted['live_attendance_status'],
                     'payload' => json_encode($payloadToStore, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     'error' => null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]],
                 ['call_id'],
-                ['status', 'payload', 'error', 'updated_at']
+                ['status', 'event', 'call_successful', 'in_voicemail', 'user_sentiment', 'masses_used', 'busca_automatizar', 'products_mentioned', 'daily_volume_empanadas', 'live_attendance_status', 'payload', 'error', 'updated_at']
             );
         } catch (\Throwable $e) {
             Log::error('Retell inbox persist error: '.$e->getMessage(), [
