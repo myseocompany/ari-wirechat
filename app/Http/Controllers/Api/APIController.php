@@ -4087,7 +4087,30 @@ class APIController extends Controller
             return;
         }
 
-        // 4) Idempotencia al encolar (lock corto)
+        // 4) Persistimos payload crudo para auditoría/diagnóstico (idempotente por call_id)
+        try {
+            $status = $call['call_status'] ?? ($data['event'] ?? ($data['type'] ?? null));
+            $payloadToStore = is_array($raw) ? $raw : ['raw' => $request->getContent()];
+
+            DB::table('retell_inbox')->upsert(
+                [[
+                    'call_id' => $callId,
+                    'status' => is_scalar($status) ? (string) $status : null,
+                    'payload' => json_encode($payloadToStore, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    'error' => null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]],
+                ['call_id'],
+                ['status', 'payload', 'error', 'updated_at']
+            );
+        } catch (\Throwable $e) {
+            Log::error('Retell inbox persist error: '.$e->getMessage(), [
+                'call_id' => $callId,
+            ]);
+        }
+
+        // 5) Idempotencia al encolar (lock corto)
         try {
             $lock = Cache::lock("retell:enqueue:$callId", 30);
             if (! $lock->get()) {
@@ -4098,7 +4121,7 @@ class APIController extends Controller
             Log::notice('Retell enqueue lock not available: '.$e->getMessage());
         }
 
-        // 5) Encolar y salir (cola dedicada)
+        // 6) Encolar y salir (cola dedicada)
         RetellProcessCall::dispatch($data)->onQueue('webhooks');
     }
 }
