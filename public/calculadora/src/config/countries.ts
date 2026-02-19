@@ -62,7 +62,7 @@ export const COUNTRIES: CountryConfig[] = [
     name: 'Colombia',
     currency: 'COP',
     currencySymbol: '$',
-    suggestedHourlyWage: 10895,
+    suggestedHourlyWage: 12795,
     priceRegion: 'CO',
     phonePrefix: '+57',
   },
