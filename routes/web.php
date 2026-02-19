@@ -393,6 +393,7 @@ Route::middleware('auth')->prefix('reports')->group(function () {
     Route::get('/views/customers_followup', [ReportController::class, 'RFM_CustomersFollowups']);
     Route::get('/views/daily_customers_followup', [CustomerController::class, 'daily']);
     Route::get('/views/customers_messages_count', [ReportController::class, 'customersByMessageCount']);
+    Route::get('/views/retell_inbox', [ReportController::class, 'retellInbox']);
     Route::get('/views/customers_lead_classifications', [ReportController::class, 'customersLeadClassifications']);
     Route::post('/views/customers_lead_classifications/run', [ReportController::class, 'runCustomersLeadClassifications'])
         ->name('reports.customers_lead_classifications.run');

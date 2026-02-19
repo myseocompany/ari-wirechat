@@ -6,6 +6,7 @@ use App\Http\Requests\CalculatorCustomersReportRequest;
 use App\Http\Requests\CustomerMessagesReportRequest;
 use App\Http\Requests\LeadConversationClassificationReportRequest;
 use App\Http\Requests\LeadConversationClassificationRunRequest;
+use App\Http\Requests\RetellInboxReportRequest;
 use App\Models\Action;
 use App\Models\ActionType;
 use App\Models\Customer;
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class ReportController extends Controller
@@ -795,6 +797,68 @@ class ReportController extends Controller
         $users = User::where('status_id', 1)->orderBy('name')->get();
 
         return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
+    }
+
+    public function retellInbox(RetellInboxReportRequest $request): View
+    {
+        $fromDate = $request->filled('from_date')
+            ? Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay()
+            : now()->subDays(7)->startOfDay();
+        $toDate = $request->filled('to_date')
+            ? Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay()
+            : now()->endOfDay();
+
+        $hasActionsTable = Schema::hasTable('actions');
+        $hasRetellCallId = $hasActionsTable && Schema::hasColumn('actions', 'retell_call_id');
+        $hasCustomerJoin = $hasActionsTable && $hasRetellCallId && Schema::hasColumn('actions', 'customer_id');
+
+        $model = DB::table('retell_inbox as ri')
+            ->select([
+                'ri.id',
+                'ri.call_id',
+                'ri.status',
+                'ri.payload',
+                'ri.processed_at',
+                'ri.error',
+                'ri.created_at',
+                'ri.updated_at',
+            ])
+            ->when($hasRetellCallId, function ($query) use ($hasCustomerJoin) {
+                $query->leftJoin('actions as a', 'a.retell_call_id', '=', 'ri.call_id')
+                    ->addSelect(['a.id as action_id', 'a.customer_id']);
+
+                if ($hasCustomerJoin) {
+                    $query->leftJoin('customers as c', 'c.id', '=', 'a.customer_id')
+                        ->addSelect(['c.id as customer_id_ref', 'c.name as customer_name', 'c.phone as customer_phone']);
+                }
+            })
+            ->whereBetween('ri.created_at', [$fromDate, $toDate])
+            ->when($request->filled('call_id'), function ($query) use ($request) {
+                $query->where('ri.call_id', 'like', '%'.$request->string('call_id').'%');
+            })
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->where('ri.status', 'like', '%'.$request->string('status').'%');
+            })
+            ->when($request->filled('payload_search'), function ($query) use ($request) {
+                $query->whereRaw('CAST(ri.payload AS CHAR) like ?', ['%'.$request->string('payload_search').'%']);
+            })
+            ->when($request->input('process_state') === 'pending', function ($query) {
+                $query->whereNull('ri.processed_at')->whereNull('ri.error');
+            })
+            ->when($request->input('process_state') === 'processed', function ($query) {
+                $query->whereNotNull('ri.processed_at');
+            })
+            ->when($request->input('process_state') === 'error', function ($query) {
+                $query->whereNotNull('ri.error');
+            })
+            ->when($hasRetellCallId && $request->boolean('has_action'), function ($query) {
+                $query->whereNotNull('a.id');
+            })
+            ->orderByDesc('ri.created_at')
+            ->paginate(25)
+            ->withQueryString();
+
+        return view('reports.views.retell_inbox', compact('model', 'fromDate', 'toDate', 'request', 'hasRetellCallId'));
     }
 
     public function customersLeadClassifications(LeadConversationClassificationReportRequest $request): View
