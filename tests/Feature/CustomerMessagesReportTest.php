@@ -61,6 +61,14 @@ it('orders customers by message count', function () {
         'body' => 'Primer mensaje',
     ]);
 
+
+    Message::create([
+        'conversation_id' => $lowConversation->id,
+        'sendable_type' => $lowVolumeCustomer->getMorphClass(),
+        'sendable_id' => $lowVolumeCustomer->id,
+        'body' => 'Palabra',
+    ]);
+
     Message::create([
         'conversation_id' => $highConversation->id,
         'sendable_type' => $highVolumeCustomer->getMorphClass(),
@@ -229,6 +237,12 @@ it('orders customers by message count', function () {
         ->get('/reports/views/customers_messages_count?message_search=Palabra')
         ->assertSee('Cliente Filtrado')
         ->assertDontSee('Cliente Poco Mensajes');
+
+
+    $this->actingAs($user)
+        ->get('/reports/views/customers_messages_count?message_search=%22Palabra%22')
+        ->assertSee('Cliente Poco Mensajes')
+        ->assertDontSee('Cliente Filtrado');
 
     $this->actingAs($user)
         ->get('/reports/views/customers_messages_count?action_note_search=automatica')

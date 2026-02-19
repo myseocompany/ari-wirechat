@@ -694,8 +694,15 @@ class ReportController extends Controller
         $messagesExistQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
 
         if ($request->filled('message_search')) {
-            $searchTerm = '%'.$request->input('message_search').'%';
-            $messagesExistQuery->where('wire_messages.body', 'like', $searchTerm);
+            $messageSearch = trim((string) $request->input('message_search'));
+            $quotedMessageSearch = preg_match("/^(['\"])(.*)\\1$/", $messageSearch, $matches) === 1;
+
+            if ($quotedMessageSearch) {
+                $messagesExistQuery->where('wire_messages.body', $matches[2]);
+            } else {
+                $searchTerm = '%'.$messageSearch.'%';
+                $messagesExistQuery->where('wire_messages.body', 'like', $searchTerm);
+            }
         }
 
         $model = Customer::query()
