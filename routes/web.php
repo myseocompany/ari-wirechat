@@ -22,6 +22,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Madrid2025Controller;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\MessageSourceController;
 use App\Http\Controllers\MetaDataController;
 use App\Http\Controllers\OptimizerController;
 use App\Http\Controllers\OrderController;
@@ -237,6 +238,18 @@ Route::middleware('auth')->prefix('whatsapp-accounts')->name('whatsapp-accounts.
     Route::put('/{whatsappAccount}', [\App\Http\Controllers\WhatsAppAccountController::class, 'update'])->name('update');
     Route::post('/{whatsappAccount}/sync-templates', [\App\Http\Controllers\WhatsAppAccountController::class, 'syncTemplates'])->name('sync-templates');
 });
+
+Route::middleware('auth')
+    ->prefix('message-sources')
+    ->name('message-sources.')
+    ->group(function () {
+        Route::get('/', [MessageSourceController::class, 'index'])->name('index');
+        Route::get('/create', [MessageSourceController::class, 'create'])->name('create');
+        Route::post('/', [MessageSourceController::class, 'store'])->name('store');
+        Route::get('/{messageSource}/edit', [MessageSourceController::class, 'edit'])->name('edit');
+        Route::put('/{messageSource}', [MessageSourceController::class, 'update'])->name('update');
+        Route::delete('/{messageSource}', [MessageSourceController::class, 'destroy'])->name('destroy');
+    });
 
 Route::middleware('auth')
     ->prefix('whatsapp-broadcasts')

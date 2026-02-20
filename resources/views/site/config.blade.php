@@ -63,6 +63,11 @@
         <a href="{{ url('/whatsapp-accounts') }}" class="btn btn-light btn-sm">Administrar</a>
       </article>
       <article class="config-card">
+        <h3>Líneas WAToolBox</h3>
+        <p>Gestiona APIKEY, teléfono, estado y source_id por cada línea.</p>
+        <a href="{{ route('message-sources.index') }}" class="btn btn-light btn-sm">Administrar líneas</a>
+      </article>
+      <article class="config-card">
         <h3>FAQ</h3>
         <p>Mantén al día la base de conocimiento para el equipo.</p>
         <a href="{{ url('/faq') }}" class="btn btn-light btn-sm">Actualizar FAQ</a>
