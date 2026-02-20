@@ -104,6 +104,9 @@
         {{-- Info acción --}}
         <div class="text-sm text-gray-600">
           {{ $action->getTypeName() }} 
+          @if($action->created_at)
+            • Fecha {{ $action->created_at->format('d/m/Y H:i') }}
+          @endif
           @if($action->creator)
             • Creado por {{ $action->creator->name }}
           @endif
