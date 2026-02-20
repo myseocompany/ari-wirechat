@@ -67,20 +67,15 @@
 
   foreach ($chatMessages as $message) {
       $conversationName = optional($message->conversation->group)->name ?: 'Chat '.$message->conversation_id;
-      $sourceLabel = $messageSourceLabelsByConversation[$message->conversation_id] ?? 'WhatsApp';
       $isCustomerMessage = $message->sendable_type === $customer->getMorphClass()
           && (int) $message->sendable_id === (int) $customer->id;
-      $senderName = $message->sendable?->name ?? 'Sistema';
-
-      if (! $isCustomerMessage && $message->sendable instanceof \App\Models\MessageSource) {
-          $senderName = $sourceLabel;
-      }
+      $sourceLabel = $messageSourceLabelsByConversation[$message->conversation_id]
+          ?? (Str::startsWith($conversationName, 'Chat ') ? 'WhatsApp' : $conversationName);
 
       $timeline->push([
           'type' => 'chat',
           'date' => $message->created_at,
           'note' => $message->body ?: 'Mensaje sin texto',
-          'creator' => $senderName,
           'conversation' => $conversationName,
           'direction' => $isCustomerMessage ? 'Entrante' : 'Saliente',
           'color' => $isCustomerMessage ? '#10b981' : '#334155',
@@ -263,7 +258,6 @@
             <small class="text-slate-500">
               {{ $item['direction'] }}
             </small>
-            <div class="text-xs text-slate-400">{{ $item['creator'] }}</div>
             <div class="text-xs text-slate-400">{{ $item['source_label'] ?? 'WhatsApp' }}</div>
           </div>
           <div class="text-right text-xs text-slate-500">
