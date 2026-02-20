@@ -423,6 +423,7 @@ class ActionController extends Controller
     {
         $user = $request->user();
         $customer = $action->customer;
+        $download = $request->boolean('download');
 
         if (! $user || ! $customer || ! $customer->hasFullAccess($user)) {
             abort(403);
@@ -489,13 +490,22 @@ class ActionController extends Controller
             $contentType = $this->guessAudioMimeType($audioUrl);
         }
 
-        return response($twilioResponse->body(), $twilioResponse->status(), [
+        $headers = [
             'Content-Type' => $contentType,
             'Content-Length' => (string) $twilioResponse->header('Content-Length'),
             'Accept-Ranges' => (string) $twilioResponse->header('Accept-Ranges', 'bytes'),
             'Content-Range' => (string) $twilioResponse->header('Content-Range'),
             'Cache-Control' => 'private, max-age=300',
-        ]);
+        ];
+
+        if ($download) {
+            $headers['Content-Disposition'] = sprintf(
+                'attachment; filename="%s"',
+                sprintf('twilio-call-%d.mp3', $action->id)
+            );
+        }
+
+        return response($twilioResponse->body(), $twilioResponse->status(), $headers);
     }
 
     private function normalizeActionUrl(string $url): ?string

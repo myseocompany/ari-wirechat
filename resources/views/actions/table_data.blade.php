@@ -27,20 +27,23 @@
               $audioUrl = 'https://'.$audioUrl;
             }
             $lowerUrl = Str::lower($audioUrl);
+            $isTwilioRecording = Str::contains($lowerUrl, 'api.twilio.com')
+              && Str::contains($lowerUrl, '/recordings/');
             $isAudio = Str::contains($lowerUrl, [
               '.mp3', '.wav', '.ogg', '.oga', '.m4a', '.m4b', '.webm',
               'backend.channels.app/recording-files/',
-            ]);
+            ]) || $isTwilioRecording;
             $mime = Str::contains($lowerUrl, '.mp3') ? 'audio/mpeg' :
               (Str::contains($lowerUrl, '.wav') ? 'audio/wav' :
               (Str::contains($lowerUrl, ['.ogg', '.oga']) ? 'audio/ogg' :
               (Str::contains($lowerUrl, ['.m4a', '.m4b']) ? 'audio/mp4' :
               (Str::contains($lowerUrl, '.webm') ? 'audio/webm' : null))));
-            $isTwilioRecording = Str::contains($lowerUrl, 'api.twilio.com')
-              && Str::contains($lowerUrl, '/recordings/');
             if ($isTwilioRecording) {
               $audioUrl = route('actions.audio', $action);
             }
+            $downloadUrl = $isTwilioRecording
+              ? route('actions.audio', ['action' => $action, 'download' => 1])
+              : null;
           @endphp
           @if($isAudio)
             <audio controls class="mt-2" @if(! $mime) src="{{ $audioUrl }}" @endif>
@@ -49,6 +52,11 @@
               @endif
               Tu navegador no soporta el audio.
             </audio><br>
+            @if($downloadUrl)
+              <a href="{{ $downloadUrl }}" class="text-xs text-blue-600 hover:underline">
+                Descargar audio
+              </a>
+            @endif
           @endif
         @endif
         @if($action->isCall())
