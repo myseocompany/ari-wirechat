@@ -23,12 +23,14 @@ use App\Models\CustomerStatusPhase;
 use App\Models\DeletedCustomer;
 use App\Models\Email;
 use App\Models\Log;
+use App\Models\MessageSource;
 use App\Models\Product;
 use App\Models\RdStation;
 use App\Models\Reference;
 use App\Models\Tag;
 use App\Models\User;
 use App\Services\CustomerService;
+use App\Services\MessageSourceConversationService;
 use App\Services\MetaConversionsService;
 use App\Services\WhatsAppService;
 use Carbon;
@@ -43,9 +45,6 @@ use Illuminate\Support\Facades\Log as Logger;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Mail;
-use Namu\WireChat\Enums\ConversationType;
-use Namu\WireChat\Enums\ParticipantRole;
-use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;
 
 class CustomerController extends Controller
@@ -58,8 +57,10 @@ class CustomerController extends Controller
 
     protected $customerService;
 
-    public function __construct(CustomerService $customerService)
-    {
+    public function __construct(
+        CustomerService $customerService,
+        private readonly MessageSourceConversationService $messageSourceConversationService
+    ) {
         $this->customerService = $customerService;
     }
 
@@ -2361,99 +2362,54 @@ $message->to("mateogiraldo420@gmail.com");
 
     public function startConversationFromCRM2(Request $request)
     {
-
-        // dd($request->all());
         $customer = Customer::findOrFail($request->customer_id);
         $this->ensureCanAccessCustomer($customer);
-        // $customerUser = $customer->getChatUser(); // el User equivalente al Customer
-        $waUser = User::find(1); // Usuario con WA Toolbox activo
+        $adminUser = User::findOrFail(Auth::id());
+        $messageSource = $this->resolveMessageSourceForCRM($adminUser);
 
-        $adminUser = User::find(Auth::id());
-        // Usuario logueado en el CRM
+        $conversation = $this->messageSourceConversationService->resolveOrCreate($messageSource, $customer);
+        $this->messageSourceConversationService->syncAssignedAgentParticipant($conversation, $customer);
 
-        // Participantes
-        $participants = collect([$waUser, $adminUser, $customer]);
-
-        // Crear conversación o usar existente
-        $conversation = $waUser->createConversationWith($customer);
-
-        $existingConversation = $conversation::withParticipants($participants)->first();
-
-        if ($existingConversation) {
-            $conversation = $existingConversation;
-        } else {
-            // Crear conversación grupal
-            $conversation = $waUser->createGroup(
-                name: 'Chat con '.$customer->name,
-                description: 'Conversación iniciada desde CRM'
-            );
-
-            // Agregar participantes
+        if (! $conversation->participant($adminUser)) {
             $conversation->addParticipant($adminUser);
-            $conversation->addParticipant($customer);
         }
 
-        // Enviar mensaje como WAUser
-        $message = $waUser->sendMessageTo($customer, $request->mensaje);
+        if (filled($request->mensaje)) {
+            $adminUser->sendMessageTo($conversation, (string) $request->mensaje);
+        }
 
-        // Redirigir al chat en una nueva pestaña
-        $chatUrl = url("/chats/{$conversation->id}");
-
-        /*
-        return response()->json([
-            'success' => true,
-            'chat_url' => $chatUrl,
-            'conversation_id' => $conversation->id,
-        ]);
-*/
-        //        return redirect($chatUrl);
-
+        return redirect("/chats/{$conversation->id}");
     }
 
     public function startConversationFromCRM(Request $request)
     {
         $customer = Customer::findOrFail($request->customer_id);
         $this->ensureCanAccessCustomer($customer);
-        $waUser = User::find(1); // Usuario "robot" o herramienta WA Toolbox
-        $adminUser = User::find(auth()->id()); // Usuario actual logueado
+        $adminUser = User::findOrFail(auth()->id());
+        $messageSource = $this->resolveMessageSourceForCRM($adminUser);
 
-        // Buscar si ya existe un grupo con estos 3 participantes
+        $conversation = $this->messageSourceConversationService->resolveOrCreate($messageSource, $customer);
+        $this->messageSourceConversationService->syncAssignedAgentParticipant($conversation, $customer);
 
-        // Buscar conversaciones grupales existentes del waUser
-        $conversation = Conversation::where('type', ConversationType::GROUP)
-            ->whereHas('participants', function ($q) use ($waUser) {
-                $q->where('participantable_id', $waUser->id)
-                    ->where('participantable_type', $waUser->getMorphClass());
-            })
-            ->whereHas('participants', function ($q) use ($adminUser) {
-                $q->where('participantable_id', $adminUser->id)
-                    ->where('participantable_type', $adminUser->getMorphClass());
-            })
-            ->whereHas('participants', function ($q) use ($customer) {
-                $q->where('participantable_id', $customer->id)
-                    ->where('participantable_type', $customer->getMorphClass());
-            })
-            ->first();
-
-        // Si no existe, se crea
-        if (! $conversation) {
-            $conversation = $waUser->createGroup(
-                name: 'Chat con '.$customer->name,
-                description: 'Conversación iniciada desde CRM'
-            );
-
-            // Añadir participantes
-            $conversation->addParticipant($adminUser, ParticipantRole::ADMIN);
-            $conversation->addParticipant($customer, ParticipantRole::PARTICIPANT);
-            logger('No se encontró la conversación en grupo');
-        } else {
-            logger('Si se encontró la conversación en grupo');
+        if (! $conversation->participant($adminUser)) {
+            $conversation->addParticipant($adminUser);
         }
 
-        // Enviar mensaje inicial
-        $waUser->sendMessageTo($conversation, $request->mensaje);
+        if (filled($request->mensaje)) {
+            $adminUser->sendMessageTo($conversation, (string) $request->mensaje);
+        }
 
         // Redirigir al chat
         return redirect("/chats/{$conversation->id}");
+    }
+
+    private function resolveMessageSourceForCRM(User $adminUser): MessageSource
+    {
+        $messageSource = $adminUser->getUserDefaultMessageSource() ?: MessageSource::getDefaultMessageSource();
+        if (! $messageSource) {
+            abort(422, 'No hay canal de WhatsApp configurado.');
+        }
+
+        return $messageSource;
     }
 }

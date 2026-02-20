@@ -4,42 +4,37 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\WAMessageType;
 use App\Http\Controllers\Controller;
-use App\Models\Message;
+use App\Models\Customer;
 use App\Models\MessageSource;
 use App\Models\RequestLog;
-use App\Models\User;
 use App\Services\LeadAssignmentService;
-use App\Services\MessageService;
+use App\Services\MessageSourceConversationService;
 use Illuminate\Http\File as HttpFile;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator as FacadesValidator;
 use Namu\WireChat\Enums\MessageType;
 use Namu\WireChat\Events\MessageCreated;
 use Namu\WireChat\Jobs\NotifyParticipants;
+use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message as ModelsMessage;
 
 class WAToolBoxController extends Controller
 {
-    public $imageBase64 = '';
-
-    protected LeadAssignmentService $leadAssignmentService;
-
-    public function __construct(LeadAssignmentService $leadAssignmentService)
-    {
-        $this->leadAssignmentService = $leadAssignmentService;
-    }
+    public function __construct(
+        private readonly LeadAssignmentService $leadAssignmentService,
+        private readonly MessageSourceConversationService $messageSourceConversationService
+    ) {}
 
     public function receiveMessage(Request $request)
     {
         $this->saveRequestLog($request);
 
         Log::info('Receiving data at WAToolBoxController receiveMessage:', [$request->all()]);
-        // Validar los datos del request
+
         $validatedData = $request->validate([
             'id' => 'required|string',
             'type' => 'required|string',
@@ -52,199 +47,61 @@ class WAToolBoxController extends Controller
             'APIKEY' => 'required|string',
         ]);
 
-        Log::info('Validation data at WAToolBoxController validatedData:', [$validatedData]);
+        $messageSource = MessageSource::query()
+            ->where('APIKEY', $validatedData['APIKEY'])
+            ->first();
 
-        // Identificar el Message Source
-        $messageSource = MessageSource::where('APIKEY', $validatedData['APIKEY'])->first();
         if (! $messageSource) {
             return response()->json(['message' => 'Fuente del mensaje no encontrada'], 404);
         }
-        $reciver_phone = $messageSource->settings['phone_number']; // 57300...
 
-        $api = app(APIController::class);
-
-        // Armamos un objeto tipo request para que funcione con la lógica ya existente
-        $apiRequest = new \Illuminate\Http\Request;
-        $apiRequest->replace([
-            'name' => $validatedData['name'] ?? $validatedData['name2'],
-            'phone' => $validatedData['phone'],
-            'email' => null,
-            'source_id' => 76,
-            'status_id' => 1,
-            'image_url' => $validatedData['image'],
-            'content' => $validatedData['content'],
-        ]);
-
-        $sender = $api->getSimilarModel($apiRequest);
-        if (! $sender) {
-            $sender = $api->saveAPICustomer($apiRequest);
-            if (! $sender->user_id) {
-                $assignedUserId = $this->leadAssignmentService->getAssignableUserId();
-                if ($assignedUserId) {
-                    $sender->user_id = $assignedUserId;
-                    $sender->save();
-
-                    $this->leadAssignmentService->recordAssignment(
-                        $sender->user_id,
-                        $sender->id,
-                        'wa_toolbox',
-                        [
-                            'source_id' => $sender->source_id,
-                        ]
-                    );
-                }
-            }
-
-            $api->storeActionAPI($apiRequest, $sender->id);
+        if (! $messageSource->isActive()) {
+            return response()->json(['message' => 'Fuente del mensaje inactiva'], 422);
         }
 
-        logger(['image' => $validatedData['image']]);
-
-        logger(['customer' => $sender->name]);
-        $sender->image_url = $validatedData['image'];
-        $sender->save();
-
-        $receiver_user = User::findByPhone($reciver_phone);
-
-        if (! $receiver_user) {
-            Log::warning('No se encontró un usuario con el teléfono: '.$reciver_phone);
-
-            return response()->json(['message' => 'Usuario no encontrado'], 404);
-        }
-
-        Log::info('Usuario identificado: '.$receiver_user->name);
-
-        Log::info('Telefono Nicolas '.$reciver_phone);
-        $conversation = $sender->createConversationWith($receiver_user);
+        $sender = $this->resolveSender($validatedData, $messageSource);
+        $conversation = $this->messageSourceConversationService->resolveOrCreate($messageSource, $sender);
+        $this->messageSourceConversationService->syncAssignedAgentParticipant($conversation, $sender);
 
         $responseDetail = 'Mensaje procesado correctamente.';
 
-        if ($validatedData['type'] == 'chat') {
-            $message = $sender->sendMessageTo($receiver_user, $validatedData['content']);
+        if ($validatedData['type'] === 'chat') {
+            $message = $sender->sendMessageTo($conversation, $validatedData['content']);
+            if (! $message) {
+                return response()->json(['message' => 'No fue posible almacenar el mensaje'], 500);
+            }
+
+            $this->notifyParticipants($message);
             $responseDetail = 'Mensaje de chat procesado correctamente.';
-
-            // broadcast(new MessageCreated($message));
-            // NotifyParticipants::dispatch($message->conversation,$message);
-
-            // Get Participant from conversation
-            $participant = $message->conversation->participant($receiver_user);
-
-            Log::info('Telefono enviado '.$message);
-
-            // Broadcast message to chat
-            broadcast(new MessageCreated($message));
-
-            // Notify participant directly
-            broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
-        } elseif ($validatedData['type'] == 'image') {
+        } elseif ($validatedData['type'] === 'image') {
             try {
-                $tmpFileObject = $this->validateBase64($validatedData['content'], ['png,jpg,mp4,heic,HEIC']);
-                $tmpFileObjectPathName = $tmpFileObject->getPathname();
-
-                $file = new UploadedFile(
-                    $tmpFileObjectPathName,
-                    $tmpFileObject->getFilename(),
-                    $tmpFileObject->getMimeType(),
-                    0,
-                    true
+                $message = $this->storeAttachmentMessage(
+                    $validatedData['content'],
+                    ['png', 'jpg', 'jpeg', 'mp4', 'heic', 'HEIC'],
+                    $sender,
+                    $conversation
                 );
 
-                $path = $file->store(config('wirechat.attachments.storage_folder', 'attachments'),
-                    config('wirechat.attachments.storage_disk', 'public'));
-
-                logger('testing '.$conversation);
-                $message = ModelsMessage::create([
-                    'conversation_id' => $conversation->id,
-                    'sendable_type' => $sender->getMorphClass(), // Polymorphic sender type
-                    'sendable_id' => $sender->id, // Polymorphic sender ID
-                    'type' => MessageType::ATTACHMENT,
-                    // 'body' => $this->body, // Add body if required
-                ]);
-                $message->attachment()->create([
-                    'file_path' => $path,
-                    'file_name' => basename($path),
-                    'original_name' => $file->getClientOriginalName(),
-                    'mime_type' => $file->getMimeType(),
-                    'url' => Storage::url($path),
-                ]);
-                unlink($tmpFileObjectPathName); // delete temp file
-                //   broadcast(new MessageCreated($message))->toOthers();
-                // Get Participant from conversation
-                $participant = $message->conversation->participant($receiver_user);
-
-                Log::info('Telefono enviado '.$message);
-
-                // Broadcast message to chat
-                broadcast(new MessageCreated($message));
-
-                // Notify participant directly
-                broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
+                $this->notifyParticipants($message);
                 $responseDetail = 'Mensaje con imagen procesado correctamente.';
-
-                //   NotifyParticipants::dispatch($message->conversation,$message);
-
-            } catch (\Exception $e) {
-                logger('error '.$e);
+            } catch (\Throwable $exception) {
+                Log::error('Error al procesar imagen WAToolBox', ['error' => $exception->getMessage()]);
 
                 return response()->json(['message' => 'Error al procesar la imagen'], 500);
             }
-        } elseif ($validatedData['type'] == 'ptt') {
+        } elseif ($validatedData['type'] === 'ptt') {
             try {
-                // Validar y procesar el archivo base64 recibido
-                $tmpFileObject = $this->validateBase64($validatedData['content'], ['mp3', 'wav', 'ogg']);
-                if (! $tmpFileObject) {
-                    logger(['message' => 'Archivo de audio no válido']);
-
-                    return response()->json(['message' => 'Archivo de audio no válido'], 400);
-                }
-
-                // Obtener el path temporal
-                $tmpFileObjectPathName = $tmpFileObject->getPathname();
-
-                // Convertirlo en un UploadedFile para manejarlo con Laravel
-                $file = new UploadedFile(
-                    $tmpFileObjectPathName,
-                    $tmpFileObject->getFilename(),
-                    $tmpFileObject->getMimeType(),
-                    0,
-                    true
+                $message = $this->storeAttachmentMessage(
+                    $validatedData['content'],
+                    ['mp3', 'wav', 'ogg'],
+                    $sender,
+                    $conversation
                 );
 
-                // Guardar el archivo en el sistema de almacenamiento
-                $path = $file->store(config('wirechat.attachments.storage_folder', 'attachments'),
-                    config('wirechat.attachments.storage_disk', 'public'));
-
-                // Crear el mensaje en la conversación
-                $message = ModelsMessage::create([
-                    'conversation_id' => $conversation->id,
-                    'sendable_type' => $sender->getMorphClass(),
-                    'sendable_id' => $sender->id,
-                    'type' => MessageType::ATTACHMENT, // Indica que es un archivo adjunto
-                ]);
-
-                // Asociar el archivo adjunto al mensaje
-                $message->attachment()->create([
-                    'file_path' => $path,
-                    'file_name' => basename($path),
-                    'original_name' => $file->getClientOriginalName(),
-                    'mime_type' => $file->getMimeType(),
-                    'url' => Storage::url($path),
-                ]);
-
-                // Eliminar el archivo temporal
-                unlink($tmpFileObjectPathName);
-
-                // Notificar a los participantes
-                $participant = $message->conversation->participant($receiver_user);
-                broadcast(new MessageCreated($message))->toOthers();
-                broadcast(new \Namu\WireChat\Events\NotifyParticipant($participant, $message));
-                NotifyParticipants::dispatch($message->conversation, $message);
-
+                $this->notifyParticipants($message);
                 $responseDetail = 'Mensaje de audio procesado correctamente.';
-
-                Log::info('Mensaje de audio procesado correctamente.');
-            } catch (\Exception $e) {
-                Log::error('Error al procesar el audio: '.$e->getMessage());
+            } catch (\Throwable $exception) {
+                Log::error('Error al procesar audio WAToolBox', ['error' => $exception->getMessage()]);
 
                 return response()->json(['message' => 'Error al procesar el audio'], 500);
             }
@@ -265,96 +122,146 @@ class WAToolBoxController extends Controller
             'message_source' => $messageSource,
             'detail' => $responseDetail,
         ], 200);
+    }
 
-        // Si el lead existe pero no tiene nombre, actualizarlo
-        /*
-        if (is_null($sender->name)) {
-            $sender->name = $validatedData['name2'];
-            $sender->save();
-        }
+    private function resolveSender(array $validatedData, MessageSource $messageSource): Customer
+    {
+        $api = app(APIController::class);
+        $settings = is_array($messageSource->settings) ? $messageSource->settings : [];
 
+        $apiRequest = new Request;
+        $apiRequest->replace([
+            'name' => $validatedData['name'] ?? $validatedData['name2'] ?? $validatedData['phone'],
+            'phone' => $validatedData['phone'],
+            'email' => null,
+            'source_id' => (int) ($settings['source_id'] ?? 76),
+            'status_id' => 1,
+            'image_url' => $validatedData['image'] ?? null,
+            'content' => $validatedData['content'] ?? null,
+        ]);
 
-        // Almacenar la imagen si está presente
-        $imageUrl = null;
-        if (!empty($validatedData['image'])) {
-            try {
-                // Decodificar la imagen Base64 y guardarla
-                $imageData = base64_decode($validatedData['image']);
-                $tempFile = tempnam(sys_get_temp_dir(), 'img_'); // Crear un archivo temporal
-                file_put_contents($tempFile, $imageData);
-                $messageService = new MessageService();
-                // Usar el servicio MessageService para guardar la imagen
-                $imageUrl = $messageService->saveImage(new \Illuminate\Http\UploadedFile(
-                    $tempFile,
-                    'image.png'
-                ));
+        /** @var Customer|null $sender */
+        $sender = $api->getSimilarModel($apiRequest);
+        $isNewSender = false;
 
-                Log::info('Imagen almacenada con éxito: ' . $imageUrl);
-            } catch (\Exception $e) {
-                Log::error('Error al guardar la imagen: ' . $e->getMessage());
+        if (! $sender) {
+            $isNewSender = true;
+            /** @var Customer $sender */
+            $sender = $api->saveAPICustomer($apiRequest);
+
+            if (! $sender->user_id) {
+                $assignedUserId = $this->leadAssignmentService->getAssignableUserId();
+                if ($assignedUserId) {
+                    $sender->user_id = $assignedUserId;
+                    $sender->save();
+
+                    $this->leadAssignmentService->recordAssignment(
+                        $assignedUserId,
+                        $sender->id,
+                        'wa_toolbox',
+                        [
+                            'source_id' => $sender->source_id,
+                        ]
+                    );
+                }
             }
+
+            $api->storeActionAPI($apiRequest, $sender->id);
         }
 
-        // Crear el mensaje asociado al Lead
-        $type_id = $this->determineMessageType($validatedData['type']);
-        $message = $lead->messages()->create([
-            'lead_id' => $lead->id,
-            'type_id' => $type_id,
-            'content' => $validatedData['content'],
-            'message_source_id' => $messageSource->id, // Asocia la fuente del mensaje
-            'message_type_id' => 1,
-            'user_id' => 1, // Ajusta según corresponda el usuario relacionado
-            'is_outgoing' => false,
-            'media_url' => $imageUrl,
+        if (! empty($validatedData['image'])) {
+            $sender->image_url = $validatedData['image'];
+        }
+
+        if ($isNewSender && empty($sender->name) && ! empty($validatedData['name2'])) {
+            $sender->name = $validatedData['name2'];
+        }
+
+        $sender->save();
+
+        return $sender;
+    }
+
+    private function storeAttachmentMessage(
+        string $content,
+        array $allowedMimeTypes,
+        Customer $sender,
+        Conversation $conversation
+    ): ModelsMessage {
+        $tmpFileObject = $this->validateBase64($content, $allowedMimeTypes);
+        if (! $tmpFileObject) {
+            throw new \RuntimeException('Archivo adjunto inválido');
+        }
+
+        $tmpFileObjectPathName = $tmpFileObject->getPathname();
+
+        $file = new UploadedFile(
+            $tmpFileObjectPathName,
+            $tmpFileObject->getFilename(),
+            $tmpFileObject->getMimeType(),
+            0,
+            true
+        );
+
+        $path = $file->store(
+            config('wirechat.attachments.storage_folder', 'attachments'),
+            config('wirechat.attachments.storage_disk', 'public')
+        );
+
+        $message = ModelsMessage::create([
+            'conversation_id' => $conversation->id,
+            'sendable_type' => $sender->getMorphClass(),
+            'sendable_id' => $sender->id,
+            'type' => MessageType::ATTACHMENT,
         ]);
 
-        Log::info('Mensaje creado:', [
-            'team_id' => $teamId,
-            'message_source_id' => $messageSource->id,
-            'lead_id' => $lead->id,
-            'message_id' => $message->id,
+        $message->attachment()->create([
+            'file_path' => $path,
+            'file_name' => basename($path),
+            'original_name' => $file->getClientOriginalName(),
+            'mime_type' => $file->getMimeType(),
+            'url' => Storage::url($path),
         ]);
-        /*/
-        // Emitir el evento MessageReceived
-        // MessageReceived::dispatch($validatedData['content'], $validatedData['phone']);
 
+        unlink($tmpFileObjectPathName);
+
+        return $message;
+    }
+
+    private function notifyParticipants(ModelsMessage $message): void
+    {
+        broadcast(new MessageCreated($message));
+        NotifyParticipants::dispatch($message->conversation, $message);
     }
 
     private function validateBase64(string $base64data, array $allowedMimeTypes)
     {
-        // strip out data URI scheme information (see RFC 2397)
         if (str_contains($base64data, ';base64')) {
             [, $base64data] = explode(';', $base64data);
             [, $base64data] = explode(',', $base64data);
         }
 
-        // strict mode filters for non-base64 alphabet characters
         if (base64_decode($base64data, true) === false) {
             return false;
         }
 
-        // decoding and then re-encoding should not change the data
         if (base64_encode(base64_decode($base64data)) !== $base64data) {
             return false;
         }
 
         $fileBinaryData = base64_decode($base64data);
 
-        // temporarily store the decoded data on the filesystem to be able to use it later on
         $tmpFileName = tempnam(sys_get_temp_dir(), 'medialibrary');
         file_put_contents($tmpFileName, $fileBinaryData);
 
         $tmpFileObject = new HttpFile($tmpFileName);
 
-        // guard against invalid mime types
         $allowedMimeTypes = Arr::flatten($allowedMimeTypes);
 
-        // if there are no allowed mime types, then any type should be ok
         if (empty($allowedMimeTypes)) {
             return $tmpFileObject;
         }
 
-        // Check the mime types
         $validation = FacadesValidator::make(
             ['file' => $tmpFileObject],
             ['file' => 'mimes:'.implode(',', $allowedMimeTypes)]
@@ -367,44 +274,20 @@ class WAToolBoxController extends Controller
         return $tmpFileObject;
     }
 
-    private function determineMessageType($type)
-    {
-        // Asigna un tipo de acción según el tipo recibido en WAToolbox
-        // Ejemplo simple: chat, ptt, image
-        $type_id = '';
-        switch ($type) {
-            case 'text':
-                $type_id = 1;
-                break;
-            case 'image':
-                $type_id = 2;
-                break;
-            case 'audio':
-                $type_id = 3;
-                break;
-        }
-
-        return $type_id;
-    }
-
-    public function saveRequestLog(Request $request)
+    public function saveRequestLog(Request $request): void
     {
         $model = new RequestLog;
 
-        // Verificar si la solicitud es JSON
         if ($request->isJson()) {
             $requestData = $request->json()->all();
         } else {
-            // Si no es JSON, obtener todos los datos de la solicitud
             $requestData = $request->all();
         }
 
-        // Guardar la solicitud como JSON
         logger($requestData);
         if (isset($requestData['type']) && ($requestData['type'] != WAMessageType::IMAGE->value)) {
             $model->request = json_encode($requestData);
             $model->save();
-
         }
     }
 }
