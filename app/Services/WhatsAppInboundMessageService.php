@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Customer;
+use App\Models\MessageSource;
 use App\Models\User;
+use App\Models\WhatsAppAccount;
 use App\Models\WhatsAppMessageMap;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +18,8 @@ class WhatsAppInboundMessageService
 {
     public function __construct(
         private readonly WhatsAppWebhookParser $parser,
-        private readonly LeadAssignmentService $leadAssignmentService
+        private readonly LeadAssignmentService $leadAssignmentService,
+        private readonly MessageSourceConversationService $messageSourceConversationService
     ) {}
 
     public function handle(array $payload): int
@@ -34,11 +37,24 @@ class WhatsAppInboundMessageService
     }
 
     /**
-     * @param  array{external_message_id: string, wa_id: string, type: string, body: ?string, timestamp: int, raw_payload: array}  $message
+     * @param  array{
+     *     external_message_id: string,
+     *     wa_id: string,
+     *     type: string,
+     *     body: ?string,
+     *     timestamp: int,
+     *     phone_number_id: ?string,
+     *     display_phone_number: ?string,
+     *     business_account_id: ?string,
+     *     raw_payload: array
+     * }  $message
      */
     private function storeMessage(array $message): bool
     {
         return DB::transaction(function () use ($message): bool {
+            $messageSource = $this->resolveMessageSource($message);
+            $sourceId = $this->resolveSourceId($messageSource);
+
             $customer = Customer::findByPhoneInternational($message['wa_id']);
             if (! $customer) {
                 $customer = Customer::create([
@@ -49,7 +65,7 @@ class WhatsAppInboundMessageService
                 $assignedUserId = $this->leadAssignmentService->getAssignableUserId();
                 $customer->forceFill([
                     'status_id' => 1,
-                    'source_id' => 79,
+                    'source_id' => $sourceId,
                     'user_id' => $assignedUserId,
                 ])->save();
 
@@ -60,23 +76,29 @@ class WhatsAppInboundMessageService
                         'whatsapp_webhook',
                         [
                             'strategy' => 'auto',
-                            'source_id' => 79,
+                            'source_id' => $sourceId,
                         ]
                     );
                 }
             }
 
-            $systemUser = $this->resolveSystemUser();
-            if (! $systemUser) {
-                Log::warning('WhatsApp inbound message skipped: no system user configured', [
-                    'wa_id' => $message['wa_id'],
-                    'external_message_id' => $message['external_message_id'],
-                ]);
+            if ($messageSource) {
+                $conversation = $this->messageSourceConversationService->resolveOrCreate($messageSource, $customer);
+                $this->messageSourceConversationService->syncAssignedAgentParticipant($conversation, $customer);
+            } else {
+                $systemUser = $this->resolveSystemUser();
+                if (! $systemUser) {
+                    Log::warning('WhatsApp inbound message skipped: no message source and no system user configured', [
+                        'wa_id' => $message['wa_id'],
+                        'external_message_id' => $message['external_message_id'],
+                    ]);
 
-                return false;
+                    return false;
+                }
+
+                $conversation = $this->findOrCreateConversation($systemUser, $customer);
             }
 
-            $conversation = $this->findOrCreateConversation($systemUser, $customer);
             $timestamp = $this->resolveTimestamp($message['timestamp']);
 
             $wireMessage = Message::create([
@@ -158,5 +180,104 @@ class WhatsAppInboundMessageService
             'text' => MessageType::TEXT->value,
             default => MessageType::ATTACHMENT->value,
         };
+    }
+
+    /**
+     * @param  array{
+     *     phone_number_id: ?string,
+     *     display_phone_number: ?string,
+     *     business_account_id: ?string
+     * }  $message
+     */
+    private function resolveMessageSource(array $message): ?MessageSource
+    {
+        $phoneNumberId = $message['phone_number_id'] ?? null;
+        $businessAccountId = $message['business_account_id'] ?? null;
+        $displayPhoneNumber = $message['display_phone_number'] ?? null;
+
+        $whatsAppAccount = WhatsAppAccount::query()
+            ->when(
+                ! empty($phoneNumberId),
+                fn ($query) => $query->where('phone_number_id', $phoneNumberId)
+            )
+            ->when(
+                empty($phoneNumberId) && ! empty($businessAccountId),
+                fn ($query) => $query->where('business_account_id', $businessAccountId)
+            )
+            ->first();
+
+        if ($whatsAppAccount) {
+            $settings = is_array($whatsAppAccount->settings) ? $whatsAppAccount->settings : [];
+            $mappedMessageSourceId = data_get($settings, 'message_source_id');
+
+            if (is_numeric($mappedMessageSourceId)) {
+                $mapped = MessageSource::query()->find((int) $mappedMessageSourceId);
+                if ($mapped) {
+                    return $mapped;
+                }
+            }
+
+            $fromAccountPhone = $this->findMessageSourceByPhone($whatsAppAccount->phone_number);
+            if ($fromAccountPhone) {
+                return $fromAccountPhone;
+            }
+        }
+
+        $fromDisplayPhone = $this->findMessageSourceByPhone($displayPhoneNumber);
+        if ($fromDisplayPhone) {
+            return $fromDisplayPhone;
+        }
+
+        return MessageSource::getDefaultMessageSource();
+    }
+
+    private function resolveSourceId(?MessageSource $messageSource): int
+    {
+        if (! $messageSource || ! is_array($messageSource->settings)) {
+            return 79;
+        }
+
+        $sourceId = data_get($messageSource->settings, 'source_id');
+
+        return is_numeric($sourceId) && (int) $sourceId > 0
+            ? (int) $sourceId
+            : 79;
+    }
+
+    private function findMessageSourceByPhone(?string $phone): ?MessageSource
+    {
+        $normalized = $this->normalizePhone($phone);
+        if (! $normalized) {
+            return null;
+        }
+
+        $messageSource = MessageSource::query()
+            ->where('phone_number', $normalized)
+            ->orWhere('phone_number', '+'.$normalized)
+            ->first();
+
+        if ($messageSource) {
+            return $messageSource;
+        }
+
+        return MessageSource::query()
+            ->get()
+            ->first(function (MessageSource $source) use ($normalized) {
+                $settings = is_array($source->settings) ? $source->settings : [];
+                $settingsPhone = $this->normalizePhone((string) data_get($settings, 'phone_number', ''));
+
+                return $settingsPhone === $normalized;
+            });
+    }
+
+    private function normalizePhone(?string $phone): ?string
+    {
+        if (! $phone) {
+            return null;
+        }
+
+        $digits = preg_replace('/\D+/', '', $phone);
+
+        return $digits !== '' ? $digits : null;
     }
 }

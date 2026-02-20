@@ -67,9 +67,14 @@
 
   foreach ($chatMessages as $message) {
       $conversationName = optional($message->conversation->group)->name ?: 'Chat '.$message->conversation_id;
+      $sourceLabel = $messageSourceLabelsByConversation[$message->conversation_id] ?? 'WhatsApp';
+      $isCustomerMessage = $message->sendable_type === $customer->getMorphClass()
+          && (int) $message->sendable_id === (int) $customer->id;
       $senderName = $message->sendable?->name ?? 'Sistema';
-      $isCustomerMessage = $message->sendable_id === $customer->id;
-      $sourceLabel = $messageSourceLabelsByConversation[$message->conversation_id] ?? $conversationName;
+
+      if (! $isCustomerMessage && $message->sendable instanceof \App\Models\MessageSource) {
+          $senderName = $sourceLabel;
+      }
 
       $timeline->push([
           'type' => 'chat',
@@ -258,6 +263,7 @@
             <small class="text-slate-500">
               {{ $item['direction'] }}
             </small>
+            <div class="text-xs text-slate-400">{{ $item['creator'] }}</div>
             <div class="text-xs text-slate-400">{{ $item['source_label'] ?? 'WhatsApp' }}</div>
           </div>
           <div class="text-right text-xs text-slate-500">

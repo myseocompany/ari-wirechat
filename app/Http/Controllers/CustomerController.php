@@ -46,6 +46,7 @@ use Illuminate\Support\Facades\Log as Logger;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Mail;
+use Namu\WireChat\Models\Conversation;
 use Namu\WireChat\Models\Message;
 
 class CustomerController extends Controller
@@ -1114,19 +1115,33 @@ class CustomerController extends Controller
                 ],
             ];
         });
-        $chatMessages = Message::withoutGlobalScope(\Namu\WireChat\Models\Scopes\WithoutRemovedMessages::class)
-            ->with(['sendable', 'conversation.group'])
-            ->where('sendable_id', $model->id)
-            ->where('sendable_type', $model->getMorphClass())
-            ->orderByDesc('created_at')
-            ->limit(50)
-            ->get();
+        $customerConversationIds = Conversation::query()
+            ->whereHas('participants', function ($query) use ($model) {
+                $query->where('participantable_id', $model->id)
+                    ->where('participantable_type', $model->getMorphClass());
+            })
+            ->pluck('id');
 
-        $conversationIds = $chatMessages
-            ->pluck('conversation_id')
+        $conversationIds = $customerConversationIds
+            ->merge(
+                MessageSourceConversation::query()
+                    ->where('customer_id', $model->id)
+                    ->pluck('conversation_id')
+            )
             ->filter()
             ->unique()
             ->values();
+
+        $chatMessages = Message::withoutGlobalScope(\Namu\WireChat\Models\Scopes\WithoutRemovedMessages::class)
+            ->with(['sendable', 'conversation.group'])
+            ->when(
+                $conversationIds->isNotEmpty(),
+                fn ($query) => $query->whereIn('conversation_id', $conversationIds),
+                fn ($query) => $query->whereRaw('1 = 0')
+            )
+            ->orderByDesc('created_at')
+            ->limit(80)
+            ->get();
 
         $messageSourceLabelsByConversation = collect();
         if ($conversationIds->isNotEmpty()) {
@@ -1139,6 +1154,29 @@ class CustomerController extends Controller
                         $mapping->conversation_id => $this->resolveMessageSourceLabel($mapping->messageSource),
                     ];
                 });
+
+            $conversationIdsWithoutSourceLabel = $conversationIds->diff($messageSourceLabelsByConversation->keys());
+
+            if ($conversationIdsWithoutSourceLabel->isNotEmpty()) {
+                $labelsFromConversationParticipants = Conversation::query()
+                    ->with('participants.participantable')
+                    ->whereIn('id', $conversationIdsWithoutSourceLabel)
+                    ->get()
+                    ->mapWithKeys(function (Conversation $conversation) {
+                        $messageSourceParticipant = $conversation->participants
+                            ->first(fn ($participant) => $participant->participantable instanceof MessageSource);
+
+                        if (! $messageSourceParticipant || ! ($messageSourceParticipant->participantable instanceof MessageSource)) {
+                            return [];
+                        }
+
+                        return [
+                            $conversation->id => $this->resolveMessageSourceLabel($messageSourceParticipant->participantable),
+                        ];
+                    });
+
+                $messageSourceLabelsByConversation = $messageSourceLabelsByConversation->merge($labelsFromConversationParticipants);
+            }
         }
 
         Logger::info('Customer show WireChat messages', [

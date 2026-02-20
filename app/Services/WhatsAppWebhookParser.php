@@ -5,7 +5,17 @@ namespace App\Services;
 class WhatsAppWebhookParser
 {
     /**
-     * @return array<int, array{external_message_id: string, wa_id: string, type: string, body: ?string, timestamp: int, raw_payload: array}>
+     * @return array<int, array{
+     *     external_message_id: string,
+     *     wa_id: string,
+     *     type: string,
+     *     body: ?string,
+     *     timestamp: int,
+     *     phone_number_id: ?string,
+     *     display_phone_number: ?string,
+     *     business_account_id: ?string,
+     *     raw_payload: array
+     * }>
      */
     public function parse(array $payload): array
     {
@@ -13,11 +23,15 @@ class WhatsAppWebhookParser
         $entries = $payload['entry'] ?? [];
 
         foreach ($entries as $entry) {
+            $businessAccountId = isset($entry['id']) ? (string) $entry['id'] : null;
             $changes = $entry['changes'] ?? [];
 
             foreach ($changes as $change) {
                 $value = $change['value'] ?? [];
                 $incoming = $value['messages'] ?? [];
+                $metadata = $value['metadata'] ?? [];
+                $phoneNumberId = isset($metadata['phone_number_id']) ? (string) $metadata['phone_number_id'] : null;
+                $displayPhoneNumber = isset($metadata['display_phone_number']) ? (string) $metadata['display_phone_number'] : null;
 
                 foreach ($incoming as $message) {
                     $externalMessageId = $message['id'] ?? null;
@@ -37,6 +51,9 @@ class WhatsAppWebhookParser
                         'type' => $type,
                         'body' => $body,
                         'timestamp' => (int) $timestamp,
+                        'phone_number_id' => $phoneNumberId,
+                        'display_phone_number' => $displayPhoneNumber,
+                        'business_account_id' => $businessAccountId,
                         'raw_payload' => $payload,
                     ];
                 }
