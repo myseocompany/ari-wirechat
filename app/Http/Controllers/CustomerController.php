@@ -1194,7 +1194,7 @@ class CustomerController extends Controller
                 });
 
             $messageIdsWithoutLabel = $messageSourceLabelsByMessage
-                ->filter(fn ($label) => empty($label))
+                ->filter(fn ($label) => $this->isUnresolvedMessageSourceLabel($label))
                 ->keys();
 
             if ($messageIdsWithoutLabel->isNotEmpty()) {
@@ -1224,7 +1224,7 @@ class CustomerController extends Controller
                     ->whereIn('id', $messageIdsWithoutLabel)
                     ->mapWithKeys(function (Message $message) use ($customerMappings, $messageSourceLabelsByMessage) {
                         $existing = $messageSourceLabelsByMessage->get($message->id);
-                        if (! empty($existing)) {
+                        if (! $this->isUnresolvedMessageSourceLabel($existing)) {
                             return [$message->id => $existing];
                         }
 
@@ -1246,6 +1246,22 @@ class CustomerController extends Controller
                     });
 
                 $messageSourceLabelsByMessage = $messageSourceLabelsByMessage->merge($labelsFromCustomerTimeline);
+
+                $messageIdsWithoutLabelAfterResolution = $messageSourceLabelsByMessage
+                    ->filter(fn ($label) => $this->isUnresolvedMessageSourceLabel($label))
+                    ->keys();
+
+                if ($messageIdsWithoutLabelAfterResolution->isNotEmpty()) {
+                    $labelsFromIncomingNumber = $chatMessages
+                        ->whereIn('id', $messageIdsWithoutLabelAfterResolution)
+                        ->mapWithKeys(function (Message $message) use ($mapsByMessageId, $model) {
+                            $map = $mapsByMessageId->get($message->id);
+
+                            return [$message->id => $this->resolveIncomingMessageLabel($message, $model, $map)];
+                        });
+
+                    $messageSourceLabelsByMessage = $messageSourceLabelsByMessage->merge($labelsFromIncomingNumber);
+                }
             }
         }
 
@@ -1334,6 +1350,46 @@ class CustomerController extends Controller
         }
 
         return 'WhatsApp';
+    }
+
+    private function isUnresolvedMessageSourceLabel(mixed $label): bool
+    {
+        $value = (string) Str::of((string) $label)->squish()->lower();
+
+        return $value === '' || in_array($value, ['whatsapp', 'whats app'], true);
+    }
+
+    private function resolveIncomingMessageLabel(Message $message, Customer $customer, ?WhatsAppMessageMap $map): ?string
+    {
+        if (! $this->isIncomingCustomerMessage($message, $customer)) {
+            return null;
+        }
+
+        $waIdFromPayload = null;
+        if ($map && is_array($map->raw_payload)) {
+            $waIdFromPayload = data_get($map->raw_payload, 'entry.0.changes.0.value.contacts.0.wa_id');
+        }
+
+        $candidates = [
+            $map?->wa_id,
+            $waIdFromPayload,
+            $customer->phone,
+        ];
+
+        foreach ($candidates as $candidate) {
+            $normalizedPhone = $this->normalizePhone((string) $candidate);
+            if ($normalizedPhone) {
+                return 'WhatsApp +'.$normalizedPhone;
+            }
+        }
+
+        return null;
+    }
+
+    private function isIncomingCustomerMessage(Message $message, Customer $customer): bool
+    {
+        return $message->sendable_type === $customer->getMorphClass()
+            && (int) $message->sendable_id === (int) $customer->id;
     }
 
     private function resolveMetaEventName(Customer $customer): string
