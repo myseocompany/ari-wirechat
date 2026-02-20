@@ -24,6 +24,7 @@ use App\Models\DeletedCustomer;
 use App\Models\Email;
 use App\Models\Log;
 use App\Models\MessageSource;
+use App\Models\MessageSourceConversation;
 use App\Models\Product;
 use App\Models\RdStation;
 use App\Models\Reference;
@@ -1121,6 +1122,25 @@ class CustomerController extends Controller
             ->limit(50)
             ->get();
 
+        $conversationIds = $chatMessages
+            ->pluck('conversation_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $messageSourceLabelsByConversation = collect();
+        if ($conversationIds->isNotEmpty()) {
+            $messageSourceLabelsByConversation = MessageSourceConversation::query()
+                ->with('messageSource')
+                ->whereIn('conversation_id', $conversationIds)
+                ->get()
+                ->mapWithKeys(function (MessageSourceConversation $mapping) {
+                    return [
+                        $mapping->conversation_id => $this->resolveMessageSourceLabel($mapping->messageSource),
+                    ];
+                });
+        }
+
         Logger::info('Customer show WireChat messages', [
             'customer_id' => $model->id,
             'message_count' => $chatMessages->count(),
@@ -1172,9 +1192,39 @@ class CustomerController extends Controller
             'welcomeAlreadySent',
             'historyOwnerMap',
             'chatMessages',
+            'messageSourceLabelsByConversation',
             'productsByCountry',
             'productCountries'
         ));
+    }
+
+    private function resolveMessageSourceLabel(?MessageSource $messageSource): string
+    {
+        if (! $messageSource) {
+            return 'WhatsApp';
+        }
+
+        $settings = is_array($messageSource->settings) ? $messageSource->settings : [];
+        $candidates = [
+            $settings['channel_name'] ?? null,
+            $settings['name'] ?? null,
+            $messageSource->phone_number ?? null,
+            $settings['phone_number'] ?? null,
+        ];
+
+        foreach ($candidates as $candidate) {
+            $value = trim((string) $candidate);
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        $sourceType = trim((string) $messageSource->type);
+        if ($sourceType !== '') {
+            return Str::headline($sourceType);
+        }
+
+        return 'WhatsApp';
     }
 
     private function resolveMetaEventName(Customer $customer): string

@@ -5,6 +5,7 @@
 @php
   $timeline = collect();
   $chatMessages = $chatMessages ?? collect();
+  $messageSourceLabelsByConversation = $messageSourceLabelsByConversation ?? collect();
 
   $actions = $actions ?? $customer->actions ?? collect();
 
@@ -68,6 +69,7 @@
       $conversationName = optional($message->conversation->group)->name ?: 'Chat '.$message->conversation_id;
       $senderName = $message->sendable?->name ?? 'Sistema';
       $isCustomerMessage = $message->sendable_id === $customer->id;
+      $sourceLabel = $messageSourceLabelsByConversation[$message->conversation_id] ?? $conversationName;
 
       $timeline->push([
           'type' => 'chat',
@@ -78,6 +80,7 @@
           'direction' => $isCustomerMessage ? 'Entrante' : 'Saliente',
           'color' => $isCustomerMessage ? '#10b981' : '#334155',
           'url' => url('/chats/'.$message->conversation_id),
+          'source_label' => $sourceLabel,
       ]);
   }
 
@@ -255,7 +258,7 @@
             <small class="text-slate-500">
               {{ $item['direction'] }}
             </small>
-            <div class="text-xs text-slate-400">SellerChat</div>
+            <div class="text-xs text-slate-400">{{ $item['source_label'] ?? 'WhatsApp' }}</div>
           </div>
           <div class="text-right text-xs text-slate-500">
             {{ \Carbon\Carbon::parse($item['date'])->format('d M Y H:i') }}
