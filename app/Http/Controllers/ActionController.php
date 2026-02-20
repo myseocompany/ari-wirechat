@@ -7,6 +7,7 @@ use App\Models\Action;
 use App\Models\ActionTranscription;
 use App\Models\ActionType;
 use App\Models\Customer;
+use App\Models\CustomerFile;
 use App\Models\CustomerHistory;
 use App\Models\CustomerStatus;
 use App\Models\Email;
@@ -19,6 +20,8 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Mail;
 
 class ActionController extends Controller
@@ -438,6 +441,11 @@ class ActionController extends Controller
             abort(404);
         }
 
+        $storedAudioUrl = $this->getStoredAudioUrl($action, $download);
+        if ($storedAudioUrl !== null) {
+            return redirect()->away($storedAudioUrl);
+        }
+
         $accountSid = trim((string) config('services.twilio.account_sid'));
         $authToken = trim((string) config('services.twilio.auth_token'));
 
@@ -485,9 +493,13 @@ class ActionController extends Controller
             abort($twilioResponse->status() === 404 ? 404 : 502);
         }
 
-        $contentType = trim((string) $twilioResponse->header('Content-Type'));
-        if ($contentType === '') {
+        $contentType = $this->normalizeContentType((string) $twilioResponse->header('Content-Type'));
+        if ($contentType === null) {
             $contentType = $this->guessAudioMimeType($audioUrl);
+        }
+
+        if ($rangeHeader === '' && $twilioResponse->status() === 200) {
+            $this->storeTwilioAudioInSpaces($action, $twilioResponse->body(), $contentType, $audioUrl, (int) $user->id);
         }
 
         $headers = [
@@ -499,13 +511,205 @@ class ActionController extends Controller
         ];
 
         if ($download) {
+            $extension = $this->guessAudioExtension($contentType, $audioUrl);
             $headers['Content-Disposition'] = sprintf(
                 'attachment; filename="%s"',
-                sprintf('twilio-call-%d.mp3', $action->id)
+                sprintf('twilio-call-%d.%s', $action->id, $extension !== '' ? $extension : 'mp3')
             );
         }
 
         return response($twilioResponse->body(), $twilioResponse->status(), $headers);
+    }
+
+    private function getStoredAudioUrl(Action $action, bool $download): ?string
+    {
+        $storedFile = $this->getStoredAudioFile($action);
+        if (! $storedFile) {
+            return null;
+        }
+
+        $disk = Storage::disk('spaces');
+        $key = $this->getCustomerFileStorageKey($storedFile);
+        $fallbackExtension = $this->guessAudioExtension((string) $storedFile->mime_type, (string) $storedFile->url);
+        $defaultFilename = sprintf('twilio-call-%d.%s', $action->id, $fallbackExtension !== '' ? $fallbackExtension : 'mp3');
+        $filename = trim((string) $storedFile->name) !== '' ? (string) $storedFile->name : $defaultFilename;
+        $disposition = $download ? 'attachment' : 'inline';
+
+        try {
+            return $disk->temporaryUrl(
+                $key,
+                now()->addMinutes(20),
+                ['ResponseContentDisposition' => $disposition.'; filename="'.addslashes($filename).'"']
+            );
+        } catch (\Throwable $exception) {
+            try {
+                return $disk->url($key);
+            } catch (\Throwable $urlException) {
+                Log::warning('Stored audio URL generation failed.', [
+                    'action_id' => $action->id,
+                    'customer_file_id' => $storedFile->id,
+                    'error' => $urlException->getMessage(),
+                ]);
+
+                return null;
+            }
+        }
+    }
+
+    private function getStoredAudioFile(Action $action): ?CustomerFile
+    {
+        $files = CustomerFile::query()
+            ->where('action_id', $action->id)
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get();
+
+        foreach ($files as $file) {
+            if (! $this->isAudioCustomerFile($file)) {
+                continue;
+            }
+
+            if (! $this->customerFileExistsInSpaces($file)) {
+                continue;
+            }
+
+            return $file;
+        }
+
+        return null;
+    }
+
+    private function isAudioCustomerFile(CustomerFile $file): bool
+    {
+        $contentType = strtolower(trim((string) $file->mime_type));
+        if (str_starts_with($contentType, 'audio/')) {
+            return true;
+        }
+
+        $extension = strtolower((string) pathinfo((string) $file->url, PATHINFO_EXTENSION));
+
+        return in_array($extension, ['mp3', 'wav', 'ogg', 'oga', 'm4a', 'm4b', 'webm'], true);
+    }
+
+    private function customerFileExistsInSpaces(CustomerFile $file): bool
+    {
+        try {
+            return Storage::disk('spaces')->exists($this->getCustomerFileStorageKey($file));
+        } catch (\Throwable $exception) {
+            Log::warning('Stored audio existence check failed.', [
+                'customer_file_id' => $file->id,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    private function getCustomerFileStorageKey(CustomerFile $file): string
+    {
+        return sprintf('files/%d/%s', (int) $file->customer_id, (string) $file->url);
+    }
+
+    private function storeTwilioAudioInSpaces(Action $action, string $audioBody, string $contentType, string $audioUrl, int $userId): void
+    {
+        if ($audioBody === '' || ! $action->customer_id) {
+            return;
+        }
+
+        if ($this->getStoredAudioFile($action) !== null) {
+            return;
+        }
+
+        $extension = $this->guessAudioExtension($contentType, $audioUrl);
+        $storedName = (string) Str::uuid();
+        if ($extension !== '') {
+            $storedName .= '.'.$extension;
+        }
+
+        $disk = Storage::disk('spaces');
+        $key = sprintf('files/%d/%s', (int) $action->customer_id, $storedName);
+
+        try {
+            $disk->put($key, $audioBody, [
+                'visibility' => 'public',
+                'ContentType' => $contentType !== '' ? $contentType : 'audio/mpeg',
+            ]);
+        } catch (\Throwable $exception) {
+            Log::warning('Twilio audio cache store failed.', [
+                'action_id' => $action->id,
+                'key' => $key,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return;
+        }
+
+        $displayName = sprintf('twilio-call-%d.%s', $action->id, $extension !== '' ? $extension : 'mp3');
+
+        try {
+            CustomerFile::create([
+                'customer_id' => (int) $action->customer_id,
+                'action_id' => (int) $action->id,
+                'url' => $storedName,
+                'name' => $displayName,
+                'creator_user_id' => $userId > 0 ? $userId : $action->creator_user_id,
+                'uuid' => (string) Str::uuid(),
+                'filename' => $storedName,
+                'size' => strlen($audioBody),
+                'mime_type' => $contentType,
+            ]);
+        } catch (\Throwable $exception) {
+            Log::warning('Twilio audio cache metadata save failed.', [
+                'action_id' => $action->id,
+                'key' => $key,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    private function normalizeContentType(string $contentType): ?string
+    {
+        $normalized = trim(strtolower($contentType));
+        if ($normalized === '') {
+            return null;
+        }
+
+        $baseContentType = trim(explode(';', $normalized)[0]);
+
+        return $baseContentType !== '' ? $baseContentType : null;
+    }
+
+    private function guessAudioExtension(string $contentType, string $url): string
+    {
+        $normalizedContentType = $this->normalizeContentType($contentType);
+        if ($normalizedContentType === 'audio/wav' || $normalizedContentType === 'audio/x-wav') {
+            return 'wav';
+        }
+
+        if ($normalizedContentType === 'audio/ogg') {
+            return 'ogg';
+        }
+
+        if ($normalizedContentType === 'audio/mp4' || $normalizedContentType === 'audio/x-m4a') {
+            return 'm4a';
+        }
+
+        if ($normalizedContentType === 'audio/webm') {
+            return 'webm';
+        }
+
+        if ($normalizedContentType === 'audio/mpeg' || $normalizedContentType === 'audio/mp3') {
+            return 'mp3';
+        }
+
+        $path = strtolower((string) parse_url($url, PHP_URL_PATH));
+        $parsedExtension = strtolower((string) pathinfo($path, PATHINFO_EXTENSION));
+
+        if (in_array($parsedExtension, ['mp3', 'wav', 'ogg', 'oga', 'm4a', 'm4b', 'webm'], true)) {
+            return $parsedExtension === 'oga' ? 'ogg' : $parsedExtension;
+        }
+
+        return 'mp3';
     }
 
     private function normalizeActionUrl(string $url): ?string
