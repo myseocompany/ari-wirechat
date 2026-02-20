@@ -141,18 +141,41 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const filterSelect = document.getElementById('filter');
+                const rangeTypeInput = document.getElementById('range_type');
+                const fromDate = document.getElementById('from_date');
                 const fromTime = document.getElementById('from_time');
+                const toDate = document.getElementById('to_date');
                 const toTime = document.getElementById('to_time');
 
                 if (!filterSelect || !fromTime || !toTime) {
                     return;
                 }
 
+                const setManualRangeMode = function () {
+                    filterSelect.value = '';
+                    if (rangeTypeInput) {
+                        rangeTypeInput.value = 'all';
+                    }
+                };
+                window.setManualRangeMode = setManualRangeMode;
+
+                [fromDate, fromTime, toDate, toTime].forEach(function (field) {
+                    if (!field) {
+                        return;
+                    }
+
+                    field.addEventListener('change', setManualRangeMode);
+                });
+
                 const originalUpdate = window.update;
 
                 window.update = function () {
                     if (typeof originalUpdate === 'function') {
                         originalUpdate.apply(this, arguments);
+                    }
+
+                    if (rangeTypeInput) {
+                        rangeTypeInput.value = 'all';
                     }
 
                     if (!filterSelect.value) {
