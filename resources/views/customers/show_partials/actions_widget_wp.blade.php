@@ -6,6 +6,7 @@
   $timeline = collect();
   $chatMessages = $chatMessages ?? collect();
   $messageSourceLabelsByConversation = $messageSourceLabelsByConversation ?? collect();
+  $messageSourceLabelsByMessage = $messageSourceLabelsByMessage ?? collect();
 
   $actions = $actions ?? $customer->actions ?? collect();
 
@@ -69,7 +70,8 @@
       $conversationName = optional($message->conversation->group)->name ?: 'Chat '.$message->conversation_id;
       $isCustomerMessage = $message->sendable_type === $customer->getMorphClass()
           && (int) $message->sendable_id === (int) $customer->id;
-      $sourceLabel = $messageSourceLabelsByConversation[$message->conversation_id]
+      $sourceLabel = $messageSourceLabelsByMessage[$message->id]
+          ?? $messageSourceLabelsByConversation[$message->conversation_id]
           ?? (Str::startsWith($conversationName, 'Chat ') ? 'WhatsApp' : $conversationName);
 
       $timeline->push([

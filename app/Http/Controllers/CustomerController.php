@@ -30,6 +30,8 @@ use App\Models\RdStation;
 use App\Models\Reference;
 use App\Models\Tag;
 use App\Models\User;
+use App\Models\WhatsAppAccount;
+use App\Models\WhatsAppMessageMap;
 use App\Services\CustomerService;
 use App\Services\MessageSourceConversationService;
 use App\Services\MetaConversionsService;
@@ -1179,6 +1181,74 @@ class CustomerController extends Controller
             }
         }
 
+        $messageSourceLabelsByMessage = collect();
+
+        if ($chatMessages->isNotEmpty()) {
+            $messageSourceLabelsByMessage = $chatMessages
+                ->mapWithKeys(function (Message $message) use ($messageSourceLabelsByConversation) {
+                    $conversationLabel = $messageSourceLabelsByConversation->get($message->conversation_id);
+
+                    return [
+                        $message->id => $conversationLabel ?: null,
+                    ];
+                });
+
+            $messageIdsWithoutLabel = $messageSourceLabelsByMessage
+                ->filter(fn ($label) => empty($label))
+                ->keys();
+
+            if ($messageIdsWithoutLabel->isNotEmpty()) {
+                $mapsByMessageId = WhatsAppMessageMap::query()
+                    ->whereIn('wire_message_id', $messageIdsWithoutLabel)
+                    ->get()
+                    ->keyBy('wire_message_id');
+
+                $labelsFromWebhookMetadata = $messageIdsWithoutLabel->mapWithKeys(function ($messageId) use ($mapsByMessageId) {
+                    $map = $mapsByMessageId->get($messageId);
+                    if (! $map || ! is_array($map->raw_payload)) {
+                        return [$messageId => null];
+                    }
+
+                    return [$messageId => $this->resolveMessageSourceLabelFromWebhookPayload($map->raw_payload)];
+                });
+
+                $messageSourceLabelsByMessage = $messageSourceLabelsByMessage->merge($labelsFromWebhookMetadata);
+
+                $customerMappings = MessageSourceConversation::query()
+                    ->with('messageSource')
+                    ->where('customer_id', $model->id)
+                    ->orderBy('created_at')
+                    ->get();
+
+                $labelsFromCustomerTimeline = $chatMessages
+                    ->whereIn('id', $messageIdsWithoutLabel)
+                    ->mapWithKeys(function (Message $message) use ($customerMappings, $messageSourceLabelsByMessage) {
+                        $existing = $messageSourceLabelsByMessage->get($message->id);
+                        if (! empty($existing)) {
+                            return [$message->id => $existing];
+                        }
+
+                        $mapping = $customerMappings
+                            ->filter(function (MessageSourceConversation $item) use ($message) {
+                                if (! $item->created_at) {
+                                    return false;
+                                }
+
+                                return $item->created_at->lessThanOrEqualTo($message->created_at);
+                            })
+                            ->last();
+
+                        if (! $mapping?->messageSource) {
+                            return [$message->id => null];
+                        }
+
+                        return [$message->id => $this->resolveMessageSourceLabel($mapping->messageSource)];
+                    });
+
+                $messageSourceLabelsByMessage = $messageSourceLabelsByMessage->merge($labelsFromCustomerTimeline);
+            }
+        }
+
         Logger::info('Customer show WireChat messages', [
             'customer_id' => $model->id,
             'message_count' => $chatMessages->count(),
@@ -1231,6 +1301,7 @@ class CustomerController extends Controller
             'historyOwnerMap',
             'chatMessages',
             'messageSourceLabelsByConversation',
+            'messageSourceLabelsByMessage',
             'productsByCountry',
             'productCountries'
         ));
@@ -1275,6 +1346,95 @@ class CustomerController extends Controller
         $slug = Str::slug($statusName, '_');
 
         return $slug !== '' ? $slug : 'lead';
+    }
+
+    private function resolveMessageSourceLabelFromWebhookPayload(array $rawPayload): ?string
+    {
+        $entries = $rawPayload['entry'] ?? [];
+
+        foreach ($entries as $entry) {
+            $businessAccountId = $entry['id'] ?? null;
+            $changes = $entry['changes'] ?? [];
+
+            foreach ($changes as $change) {
+                $value = $change['value'] ?? [];
+                $metadata = $value['metadata'] ?? [];
+                $phoneNumberId = $metadata['phone_number_id'] ?? null;
+                $displayPhoneNumber = $metadata['display_phone_number'] ?? null;
+
+                $account = WhatsAppAccount::query()
+                    ->when(
+                        ! empty($phoneNumberId),
+                        fn ($query) => $query->where('phone_number_id', (string) $phoneNumberId)
+                    )
+                    ->when(
+                        empty($phoneNumberId) && ! empty($businessAccountId),
+                        fn ($query) => $query->where('business_account_id', (string) $businessAccountId)
+                    )
+                    ->first();
+
+                if ($account) {
+                    $settings = is_array($account->settings) ? $account->settings : [];
+                    $mappedSourceId = data_get($settings, 'message_source_id');
+
+                    if (is_numeric($mappedSourceId)) {
+                        $mapped = MessageSource::query()->find((int) $mappedSourceId);
+                        if ($mapped) {
+                            return $this->resolveMessageSourceLabel($mapped);
+                        }
+                    }
+
+                    $fromAccountPhone = $this->findMessageSourceByPhone($account->phone_number);
+                    if ($fromAccountPhone) {
+                        return $this->resolveMessageSourceLabel($fromAccountPhone);
+                    }
+                }
+
+                $fromDisplayPhone = $this->findMessageSourceByPhone((string) $displayPhoneNumber);
+                if ($fromDisplayPhone) {
+                    return $this->resolveMessageSourceLabel($fromDisplayPhone);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function findMessageSourceByPhone(?string $phone): ?MessageSource
+    {
+        $normalized = $this->normalizePhone($phone);
+        if (! $normalized) {
+            return null;
+        }
+
+        $direct = MessageSource::query()
+            ->where('phone_number', $normalized)
+            ->orWhere('phone_number', '+'.$normalized)
+            ->first();
+
+        if ($direct) {
+            return $direct;
+        }
+
+        return MessageSource::query()
+            ->get()
+            ->first(function (MessageSource $source) use ($normalized) {
+                $settings = is_array($source->settings) ? $source->settings : [];
+                $settingsPhone = $this->normalizePhone((string) data_get($settings, 'phone_number', ''));
+
+                return $settingsPhone === $normalized;
+            });
+    }
+
+    private function normalizePhone(?string $phone): ?string
+    {
+        if (! $phone) {
+            return null;
+        }
+
+        $digits = preg_replace('/\D+/', '', $phone);
+
+        return $digits !== '' ? $digits : null;
     }
 
     private function resolveMetaCustomData(Customer $customer): array
