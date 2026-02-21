@@ -235,6 +235,27 @@ class ChannelsCallRecoveryController extends Controller
             ->flip()
             ->all();
 
+        $recoveredCalls = ChannelsCallRecovery::query()
+            ->select(['call_id', 'recording_url'])
+            ->where('status', ChannelsCallRecovery::STATUS_RECOVERED)
+            ->whereNotNull('call_id')
+            ->get();
+
+        $recoveredCallIds = [];
+        $recoveredRecordingUrls = [];
+
+        foreach ($recoveredCalls as $recoveredCall) {
+            $normalizedCallId = strtolower(trim((string) $recoveredCall->call_id));
+            if ($normalizedCallId !== '') {
+                $recoveredCallIds[$normalizedCallId] = true;
+            }
+
+            $normalizedRecordingUrl = $normalizer->normalizeUrlForMatch((string) $recoveredCall->recording_url);
+            if ($normalizedRecordingUrl !== null) {
+                $recoveredRecordingUrls[$normalizedRecordingUrl] = true;
+            }
+        }
+
         $rows = [];
         $existing = 0;
         $missing = 0;
@@ -246,8 +267,14 @@ class ChannelsCallRecoveryController extends Controller
             $existsByCallId = $callId !== '' && isset($knownCallIds[$callId]);
             $existsByWebhookUrl = $recordingUrl !== null && isset($knownRecordingUrls[$recordingUrl]);
             $existsByActionUrl = $recordingUrl !== null && isset($knownActionUrls[$recordingUrl]);
+            $existsByRecoveredCallId = $callId !== '' && isset($recoveredCallIds[$callId]);
+            $existsByRecoveredRecordingUrl = $recordingUrl !== null && isset($recoveredRecordingUrls[$recordingUrl]);
 
-            $localExists = $existsByCallId || $existsByWebhookUrl || $existsByActionUrl;
+            $localExists = $existsByCallId
+                || $existsByWebhookUrl
+                || $existsByActionUrl
+                || $existsByRecoveredCallId
+                || $existsByRecoveredRecordingUrl;
             $isMissing = (bool) ($call['recording_exists'] ?? false) && ! $localExists;
 
             if ($localExists) {
@@ -267,6 +294,12 @@ class ChannelsCallRecoveryController extends Controller
             }
             if ($existsByActionUrl) {
                 $sources[] = 'action_url';
+            }
+            if ($existsByRecoveredCallId) {
+                $sources[] = 'recovery_call_id';
+            }
+            if ($existsByRecoveredRecordingUrl) {
+                $sources[] = 'recovery_recording_url';
             }
 
             $rows[] = [
