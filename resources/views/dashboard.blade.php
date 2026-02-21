@@ -409,6 +409,7 @@
             'Ayer': [moment().subtract(1, 'day'), moment().subtract(1, 'day')],
             'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
             'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
+            'Últimos 60 días': [moment().subtract(59, 'days'), moment()],
             'Últimos 90 días': [moment().subtract(89, 'days'), moment()],
             'Esta semana': [moment().startOf('isoWeek'), moment().endOf('isoWeek')],
             'Semana pasada': [moment().subtract(1,'week').startOf('isoWeek'), moment().subtract(1,'week').endOf('isoWeek')],

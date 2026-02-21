@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Tag;
-use App\Models\CustomerStatus;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
@@ -125,6 +124,7 @@ class DashboardController extends Controller
             try {
                 $start = Carbon::parse($custom['start'])->startOfDay();
                 $end = Carbon::parse($custom['end'])->endOfDay();
+
                 return [$start, $end, 'custom', $custom];
             } catch (\Throwable $e) {
                 $start = $end = null;
@@ -151,6 +151,10 @@ class DashboardController extends Controller
                 break;
             case 'last30':
                 $start = $now->copy()->subDays(29)->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
+            case 'last60':
+                $start = $now->copy()->subDays(59)->startOfDay();
                 $end = $now->copy()->endOfDay();
                 break;
             case 'last90':
@@ -185,6 +189,7 @@ class DashboardController extends Controller
             'weekly' => 'Semana',
             'monthly' => 'Mes',
             'last30' => 'Últimos 30',
+            'last60' => 'Últimos 60',
             'last90' => 'Últimos 90',
             'all' => 'Todo',
         ];
@@ -254,10 +259,12 @@ class DashboardController extends Controller
                 ->sortBy('weight')
                 ->map(function ($segment) {
                     unset($segment['weight']);
+
                     return $segment;
                 })
                 ->values()
                 ->all();
+
             return $user;
         });
 
