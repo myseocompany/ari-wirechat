@@ -6,8 +6,8 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        width: 360px;
         margin: 12px;
+        min-width: 420px;
       }
       input {
         width: 100%;
@@ -30,10 +30,30 @@
         font-size: 12px;
         white-space: pre-wrap;
       }
+      .events-box {
+        margin-top: 10px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background: #ffffff;
+        font-size: 12px;
+        white-space: pre-wrap;
+        max-height: 320px;
+        overflow: auto;
+      }
+      .title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .mini-btn {
+        font-size: 11px;
+        padding: 4px 6px;
+      }
     </style>
   </head>
   <body>
-    <h3>Config WhatsApp CRM</h3>
+    <h3>Monitor WhatsApp CRM</h3>
     <div class="row">
       <label>
         Instancia detectada:
@@ -60,8 +80,14 @@
     </div>
     <div class="row">
       <label>
-        CRM User ID (opcional):
+        Asesor User ID (opcional):
         <input id="crm_user_id" placeholder="123" />
+      </label>
+    </div>
+    <div class="row">
+      <label>
+        Customer ID objetivo (opcional):
+        <input id="crm_customer_id" placeholder="675780" />
       </label>
     </div>
     <div class="actions">
@@ -70,6 +96,11 @@
     </div>
     <p id="status"></p>
     <div id="runtime" class="debug-box">Sin actividad registrada.</div>
+    <div class="title-row">
+      <h4>Eventos salientes</h4>
+      <button id="clear_logs" class="mini-btn">Limpiar log</button>
+    </div>
+    <div id="events" class="events-box">Sin eventos registrados.</div>
 
     <script src="options.js"></script>
   </body>

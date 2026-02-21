@@ -6,7 +6,6 @@ use App\Models\Customer;
 use App\Models\MessageSource;
 use App\Models\User;
 use App\Models\WhatsAppMessageMap;
-use App\Services\LeadAssignmentService;
 use App\Services\MessageSourceConversationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -37,7 +36,8 @@ class ProcessWhatsAppCrmOutgoingMessage implements ShouldQueue
      *     phone: string,
      *     content: string,
      *     APIKEY: string,
-     *     crm_user_id?: int
+     *     crm_user_id?: int,
+     *     crm_customer_id?: int
      * }  $payload
      */
     public function __construct(public array $payload)
@@ -45,10 +45,8 @@ class ProcessWhatsAppCrmOutgoingMessage implements ShouldQueue
         $this->onQueue('whatsapp_outgoing');
     }
 
-    public function handle(
-        LeadAssignmentService $leadAssignmentService,
-        MessageSourceConversationService $messageSourceConversationService
-    ): void {
+    public function handle(MessageSourceConversationService $messageSourceConversationService): void
+    {
         $externalMessageId = trim((string) ($this->payload['id'] ?? ''));
         if ($externalMessageId === '') {
             Log::warning('WhatsApp CRM outgoing skipped: empty message id', [
@@ -120,7 +118,6 @@ class ProcessWhatsAppCrmOutgoingMessage implements ShouldQueue
             $phone,
             $body,
             $messageSource,
-            $leadAssignmentService,
             $messageSourceConversationService
         ): void {
             if (WhatsAppMessageMap::query()
@@ -130,59 +127,39 @@ class ProcessWhatsAppCrmOutgoingMessage implements ShouldQueue
                 return;
             }
 
-            $customer = Customer::findByPhoneInternational($phone);
+            $customer = $this->resolveCustomer(
+                $phone,
+                $this->payload['crm_customer_id'] ?? null,
+                $externalMessageId
+            );
+            $requestedUserId = $this->resolveRequestedUserId();
             if (! $customer) {
                 $customer = Customer::query()->create([
                     'name' => 'WhatsApp CRM '.$phone,
                     'phone' => $phone,
                 ]);
 
-                $assignedUserId = $leadAssignmentService->getAssignableUserId();
                 $customer->forceFill([
                     'status_id' => 1,
                     'source_id' => $this->resolveSourceId($messageSource),
-                    'user_id' => $assignedUserId,
+                    'user_id' => $requestedUserId,
                 ])->save();
-
-                if ($assignedUserId) {
-                    $leadAssignmentService->recordAssignment(
-                        $assignedUserId,
-                        $customer->id,
-                        'wa_crm_outgoing',
-                        [
-                            'source_id' => $customer->source_id,
-                            'message_source_id' => $messageSource->id,
-                        ]
-                    );
-                }
+            } elseif ($requestedUserId && ! $customer->user_id) {
+                $customer->forceFill([
+                    'user_id' => $requestedUserId,
+                ])->save();
             }
 
             $conversation = $messageSourceConversationService->resolveOrCreate($messageSource, $customer);
             $messageSourceConversationService->syncAssignedAgentParticipant($conversation, $customer);
 
-            $advisor = $this->resolveAdvisor($customer, $messageSource);
-            if (! $advisor) {
-                Log::warning('WhatsApp CRM outgoing skipped: advisor unresolved', [
-                    'external_message_id' => $externalMessageId,
-                    'customer_id' => $customer->id,
-                    'message_source_id' => $messageSource->id,
-                ]);
-
-                return;
+            if (! $conversation->participant($messageSource)) {
+                $conversation->addParticipant($messageSource);
             }
 
-            if (! $conversation->participant($advisor)) {
-                $conversation->addParticipant($advisor);
-            }
-
-            $message = $advisor->sendMessageTo($conversation, $body);
+            $message = $messageSource->sendMessageTo($conversation, $body);
             if (! $message) {
                 throw new \RuntimeException('No fue posible almacenar el mensaje saliente.');
-            }
-
-            if (! $customer->user_id) {
-                $customer->user_id = $advisor->id;
-                $customer->save();
             }
 
             WhatsAppMessageMap::query()->create([
@@ -201,7 +178,9 @@ class ProcessWhatsAppCrmOutgoingMessage implements ShouldQueue
                 'wire_message_id' => $message->id,
                 'conversation_id' => $conversation->id,
                 'customer_id' => $customer->id,
-                'advisor_user_id' => $advisor->id,
+                'sender_type' => $message->sendable_type,
+                'sender_id' => $message->sendable_id,
+                'customer_user_id' => $customer->user_id,
             ]);
         }, 3);
     }
@@ -224,37 +203,60 @@ class ProcessWhatsAppCrmOutgoingMessage implements ShouldQueue
             : 79;
     }
 
-    private function resolveAdvisor(Customer $customer, MessageSource $messageSource): ?User
+    private function resolveRequestedUserId(): ?int
     {
         $requestedUserId = $this->payload['crm_user_id'] ?? null;
-        if (is_numeric($requestedUserId)) {
-            $requestedUser = User::query()->find((int) $requestedUserId);
-            if ($requestedUser) {
-                return $requestedUser;
-            }
+
+        if (! is_numeric($requestedUserId)) {
+            return null;
         }
 
-        if (! empty($customer->user_id)) {
-            $owner = User::query()->find((int) $customer->user_id);
-            if ($owner) {
-                return $owner;
-            }
-        }
+        $id = (int) $requestedUserId;
 
-        $userFromSource = $messageSource->users()
-            ->orderByDesc('user_message_sources.is_default')
-            ->orderBy('users.id')
-            ->first();
-
-        if ($userFromSource) {
-            return $userFromSource;
-        }
-
-        return User::query()->orderBy('id')->first();
+        return User::query()->whereKey($id)->exists() ? $id : null;
     }
 
     private function normalizePhone(string $phone): string
     {
         return preg_replace('/\D+/', '', $phone) ?? '';
+    }
+
+    private function resolveCustomer(string $phone, mixed $crmCustomerId, string $externalMessageId): ?Customer
+    {
+        if (is_numeric($crmCustomerId)) {
+            $customerById = Customer::query()->find((int) $crmCustomerId);
+            if ($customerById) {
+                if (! $this->customerMatchesPhone($customerById, $phone)) {
+                    Log::warning('WhatsApp CRM outgoing: crm_customer_id does not match phone', [
+                        'external_message_id' => $externalMessageId,
+                        'crm_customer_id' => $customerById->id,
+                        'phone' => $phone,
+                        'customer_phone' => (string) $customerById->phone,
+                    ]);
+                }
+
+                return $customerById;
+            }
+
+            Log::warning('WhatsApp CRM outgoing: crm_customer_id not found, fallback by phone', [
+                'external_message_id' => $externalMessageId,
+                'crm_customer_id' => (int) $crmCustomerId,
+                'phone' => $phone,
+            ]);
+        }
+
+        return Customer::findByPhoneInternational($phone);
+    }
+
+    private function customerMatchesPhone(Customer $customer, string $phone): bool
+    {
+        $last9 = substr($phone, -9);
+        $candidates = [
+            (string) ($customer->phone_last9 ?? ''),
+            (string) ($customer->phone2_last9 ?? ''),
+            (string) ($customer->contact_phone2_last9 ?? ''),
+        ];
+
+        return in_array($last9, $candidates, true);
     }
 }

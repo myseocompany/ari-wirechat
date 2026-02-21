@@ -5,8 +5,7 @@
   "description": "Captura mensajes salientes en WhatsApp Web y los envia a tu endpoint CRM",
   "permissions": ["storage"],
   "action": {
-    "default_title": "WhatsApp CRM Config",
-    "default_popup": "options.html"
+    "default_title": "WhatsApp CRM Monitor"
   },
   "host_permissions": [
     "https://web.whatsapp.com/*",

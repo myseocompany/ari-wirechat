@@ -1,13 +1,15 @@
 const DEFAULT_SETTINGS = {
   endpoint: "https://arichat.co/api/whatsapp/outgoing",
-  phone: "573206945548",
+  phone: "573004410097",
   APIKEY: "II([:{~Lm}+FXA}$Hmc+90`ZBVca[Wo42}a.(bg1sX!Oo5)X",
-  crm_user_id: ""
+  crm_user_id: "",
+  crm_customer_id: ""
 };
 
-const SETTINGS_KEYS = ["endpoint", "phone", "APIKEY", "crm_user_id"];
+const SETTINGS_KEYS = ["endpoint", "phone", "APIKEY", "crm_user_id", "crm_customer_id"];
 const INSTANCE_SETTINGS_KEY = "wa_crm_instance_settings";
 const LAST_INSTANCE_KEY = "wa_crm_last_instance_key";
+const RUNTIME_HISTORY_KEY = "wa_crm_runtime_history";
 const DEFAULT_INSTANCE_KEY = "__default__";
 const LOG_PREFIX = "[wa-crm-popup]";
 
@@ -41,6 +43,7 @@ const normalizeSettings = (settings) => {
   }
 
   normalized.crm_user_id = String(normalized.crm_user_id || "").trim();
+  normalized.crm_customer_id = String(normalized.crm_customer_id || "").trim();
 
   return normalized;
 };
@@ -141,12 +144,36 @@ const renderRuntime = async (runtimeElement) => {
   ].join("\n");
 };
 
+const formatHistoryEvent = (entry) => {
+  const timestamp = String(entry?.at || "").trim() || "-";
+  const type = String(entry?.type || "unknown");
+  const reason = String(entry?.reason || "-");
+  const instance = String(entry?.instanceKey || "-");
+  const phone = String(entry?.phone || "-");
+  const status = String(entry?.status || "-");
+  const messageId = String(entry?.messageId || "-");
+  return `[${timestamp}] type=${type} reason=${reason} instance=${instance} phone=${phone} http=${status} id=${messageId}`;
+};
+
+const renderHistory = async (historyElement) => {
+  const stored = await chrome.storage.local.get([RUNTIME_HISTORY_KEY]);
+  const entries = Array.isArray(stored[RUNTIME_HISTORY_KEY]) ? stored[RUNTIME_HISTORY_KEY] : [];
+  if (!entries.length) {
+    historyElement.textContent = "Sin eventos registrados.";
+    return;
+  }
+
+  const lines = [...entries].reverse().slice(0, 120).map(formatHistoryEvent);
+  historyElement.textContent = lines.join("\n");
+};
+
 const renderSettings = (settings, key, elements) => {
   elements.instanceInput.value = key;
   elements.endpointInput.value = settings.endpoint;
   elements.phoneInput.value = settings.phone;
   elements.apiInput.value = settings.APIKEY;
   elements.crmUserInput.value = settings.crm_user_id;
+  elements.crmCustomerInput.value = settings.crm_customer_id;
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -156,8 +183,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     phoneInput: document.getElementById("phone"),
     apiInput: document.getElementById("APIKEY"),
     crmUserInput: document.getElementById("crm_user_id"),
+    crmCustomerInput: document.getElementById("crm_customer_id"),
     status: document.getElementById("status"),
-    runtime: document.getElementById("runtime")
+    runtime: document.getElementById("runtime"),
+    events: document.getElementById("events")
   };
 
   const initial = await getSettingsForInstance();
@@ -165,13 +194,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderSettings(initial.settings, initial.key, elements);
   await saveSettingsForInstance(activeInstanceKey, initial.settings);
   await renderRuntime(elements.runtime);
+  await renderHistory(elements.events);
 
   console.info(`${LOG_PREFIX} Config cargada`, {
     instanceKey: activeInstanceKey,
     endpoint: initial.settings.endpoint,
     phone: initial.settings.phone,
     apiKey: maskApiKey(initial.settings.APIKEY),
-    crm_user_id: initial.settings.crm_user_id || null
+    crm_user_id: initial.settings.crm_user_id || null,
+    crm_customer_id: initial.settings.crm_customer_id || null
   });
 
   document.getElementById("save").onclick = async () => {
@@ -185,7 +216,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       endpoint: endpointValue,
       phone: elements.phoneInput.value.trim(),
       APIKEY: elements.apiInput.value.trim(),
-      crm_user_id: elements.crmUserInput.value.trim()
+      crm_user_id: elements.crmUserInput.value.trim(),
+      crm_customer_id: elements.crmCustomerInput.value.trim()
     };
 
     const saved = await saveSettingsForInstance(activeInstanceKey, toSave);
@@ -194,7 +226,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       reloaded.settings.endpoint === saved.settings.endpoint &&
       reloaded.settings.phone === saved.settings.phone &&
       reloaded.settings.APIKEY === saved.settings.APIKEY &&
-      reloaded.settings.crm_user_id === saved.settings.crm_user_id;
+      reloaded.settings.crm_user_id === saved.settings.crm_user_id &&
+      reloaded.settings.crm_customer_id === saved.settings.crm_customer_id;
 
     renderSettings(reloaded.settings, reloaded.key, elements);
 
@@ -206,13 +239,15 @@ document.addEventListener("DOMContentLoaded", async () => {
           endpoint: saved.settings.endpoint,
           phone: saved.settings.phone,
           apiKey: maskApiKey(saved.settings.APIKEY),
-          crm_user_id: saved.settings.crm_user_id || null
+          crm_user_id: saved.settings.crm_user_id || null,
+          crm_customer_id: saved.settings.crm_customer_id || null
         },
         actual: {
           endpoint: reloaded.settings.endpoint,
           phone: reloaded.settings.phone,
           apiKey: maskApiKey(reloaded.settings.APIKEY),
-          crm_user_id: reloaded.settings.crm_user_id || null
+          crm_user_id: reloaded.settings.crm_user_id || null,
+          crm_customer_id: reloaded.settings.crm_customer_id || null
         }
       });
       return;
@@ -224,10 +259,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       endpoint: saved.settings.endpoint,
       phone: saved.settings.phone,
       apiKey: maskApiKey(saved.settings.APIKEY),
-      crm_user_id: saved.settings.crm_user_id || null
+      crm_user_id: saved.settings.crm_user_id || null,
+      crm_customer_id: saved.settings.crm_customer_id || null
     });
 
     await renderRuntime(elements.runtime);
+    await renderHistory(elements.events);
     setTimeout(() => (elements.status.textContent = ""), 1500);
   };
 
@@ -236,6 +273,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const APIKEY = elements.apiInput.value.trim();
     const phone = elements.phoneInput.value.trim();
     const crmUserId = elements.crmUserInput.value.trim();
+    const crmCustomerId = elements.crmCustomerInput.value.trim();
 
     if (!/^https?:\/\//i.test(endpoint)) {
       elements.status.textContent = "Endpoint invalido. Debe iniciar con http:// o https://";
@@ -268,6 +306,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       payload.crm_user_id = Number(crmUserId);
     }
 
+    if (/^\d+$/.test(crmCustomerId)) {
+      payload.crm_customer_id = Number(crmCustomerId);
+    }
+
     try {
       const response = await fetch(endpoint, {
         method: "POST",
@@ -287,9 +329,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         instanceKey: activeInstanceKey,
         endpoint,
         phone,
-        apiKey: maskApiKey(APIKEY)
+        apiKey: maskApiKey(APIKEY),
+        crm_customer_id: /^\d+$/.test(crmCustomerId) ? Number(crmCustomerId) : null
       });
       await renderRuntime(elements.runtime);
+      await renderHistory(elements.events);
     } catch (error) {
       elements.status.textContent = "Sin conexion al endpoint.";
       console.error(`${LOG_PREFIX} Test endpoint error`, {
@@ -298,7 +342,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         error: String(error)
       });
       await renderRuntime(elements.runtime);
+      await renderHistory(elements.events);
     }
+  };
+
+  document.getElementById("clear_logs").onclick = async () => {
+    await chrome.storage.local.set({
+      last_runtime_status: null,
+      [RUNTIME_HISTORY_KEY]: []
+    });
+    console.info(`${LOG_PREFIX} Log limpiado`, {
+      instanceKey: activeInstanceKey
+    });
+    await renderRuntime(elements.runtime);
+    await renderHistory(elements.events);
   };
 
   chrome.storage.onChanged.addListener(async (changes, areaName) => {
@@ -317,6 +374,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (changes.last_runtime_status) {
       await renderRuntime(elements.runtime);
+    }
+
+    if (changes[RUNTIME_HISTORY_KEY]) {
+      await renderHistory(elements.events);
     }
   });
 });

@@ -23,6 +23,7 @@ class StoreWhatsAppCrmOutgoingRequest extends FormRequest
             'content' => ['required', 'string', 'max:65000'],
             'APIKEY' => ['required', 'string', 'max:255'],
             'crm_user_id' => ['nullable', 'integer', 'min:1'],
+            'crm_customer_id' => ['nullable', 'integer', 'min:1'],
         ];
     }
 

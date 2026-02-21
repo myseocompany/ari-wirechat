@@ -4,6 +4,14 @@
   const SEEN_MAX = 5000;
   const seenQueue = [];
   const seenSet = new Set();
+  let attachedStore = null;
+
+  const normalizePhone = (value) => String(value || "").replace(/\D+/g, "");
+  const normalizeContent = (value) =>
+    String(value || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 4000);
 
   const emitStatus = (status, detail = {}) => {
     window.dispatchEvent(
@@ -18,55 +26,44 @@
   };
 
   const markSeen = (id) => {
-    if (!id || seenSet.has(id)) {
+    const key = String(id || "").trim();
+    if (!key || seenSet.has(key)) {
       return false;
     }
 
-    seenSet.add(id);
-    seenQueue.push(id);
+    seenSet.add(key);
+    seenQueue.push(key);
 
     if (seenQueue.length > SEEN_MAX) {
       const old = seenQueue.shift();
-      seenSet.delete(old);
+      if (old) {
+        seenSet.delete(old);
+      }
     }
 
     return true;
   };
 
-  const normalizePhone = (value) => String(value || "").replace(/\D+/g, "");
-
-  const pickMessageText = (msg) =>
-    String(
-      msg?.body ??
-        msg?.text ??
-        msg?.caption ??
-        msg?.__x_body ??
-        msg?.__x_text ??
-        msg?.__x_caption ??
-        ""
-    ).trim();
-
-  const pickMessageType = (msg) =>
-    String(msg?.type ?? msg?.__x_type ?? "").toLowerCase().trim();
-
   const pickExternalId = (msg) =>
-    String(
-      msg?.id?._serialized ??
-        msg?.id?.id ??
-        msg?.id ??
-        msg?.__x_id?._serialized ??
-        ""
-    ).trim();
+    String(msg?.id?._serialized ?? msg?.id?.id ?? msg?.id ?? msg?.__x_id?._serialized ?? "").trim();
+
+  const pickMessageType = (msg) => String(msg?.type ?? msg?.__x_type ?? "chat").toLowerCase().trim() || "chat";
+
+  const pickMessageText = (msg) => {
+    const baseText = normalizeContent(
+      msg?.body ?? msg?.text ?? msg?.caption ?? msg?.__x_body ?? msg?.__x_text ?? msg?.__x_caption ?? ""
+    );
+
+    if (baseText) {
+      return baseText;
+    }
+
+    const type = pickMessageType(msg);
+    return type === "chat" ? "" : `[${type}]`;
+  };
 
   const pickIsFromMe = (msg) =>
-    Boolean(
-      msg?.id?.fromMe ??
-        msg?.fromMe ??
-        msg?.isSentByMe ??
-        msg?.__x_isSentByMe ??
-        msg?.__x_fromMe ??
-        false
-    );
+    Boolean(msg?.id?.fromMe ?? msg?.fromMe ?? msg?.isSentByMe ?? msg?.__x_isSentByMe ?? msg?.__x_fromMe ?? false);
 
   const pickTargetPhone = (msg) => {
     const raw =
@@ -77,22 +74,16 @@
       msg?.chat?._serialized ??
       "";
 
-    const phone = normalizePhone(raw);
-    return phone;
+    return normalizePhone(raw);
   };
 
   const emitOutgoingMessage = (msg) => {
-    const externalId = pickExternalId(msg);
-    if (!externalId || !markSeen(externalId)) {
-      return;
-    }
-
     if (!pickIsFromMe(msg)) {
       return;
     }
 
-    const type = pickMessageType(msg);
-    if (type !== "chat" && type !== "buttons_response" && type !== "template_button_reply") {
+    const externalId = pickExternalId(msg);
+    if (!externalId || !markSeen(externalId)) {
       return;
     }
 
@@ -101,71 +92,41 @@
       return;
     }
 
-    const phone = pickTargetPhone(msg);
-
     window.dispatchEvent(
       new CustomEvent(EVENT_MESSAGE, {
         detail: {
           source: "internal_store",
           id: externalId,
-          type: "chat",
-          user: "wa_crm_extension",
-          phone,
+          type: pickMessageType(msg),
+          phone: pickTargetPhone(msg),
           content
         }
       })
     );
   };
 
-  const pickCandidateStores = (requireRef) => {
-    const stores = [];
-    const modules = Object.values(requireRef?.c || {});
-
-    for (const module of modules) {
-      const exportsObj = module?.exports;
-      if (!exportsObj) {
-        continue;
-      }
-
-      const candidates = [exportsObj, exportsObj.default];
-      for (const candidate of candidates) {
-        if (!candidate || typeof candidate !== "object") {
-          continue;
-        }
-
-        const hasEvents = typeof candidate.on === "function";
-        const hasModelsArray = Array.isArray(candidate.models) || Array.isArray(candidate._models);
-        if (!hasEvents || !hasModelsArray) {
-          continue;
-        }
-
-        const sample = (candidate.models || candidate._models || [])[0];
-        const looksLikeMessageModel =
-          sample &&
-          (sample.id || sample.__x_id) &&
-          (sample.body !== undefined ||
-            sample.__x_body !== undefined ||
-            sample.type !== undefined ||
-            sample.__x_type !== undefined);
-
-        if (looksLikeMessageModel) {
-          stores.push(candidate);
-        }
+  const resolveWebpackChunkName = () => {
+    const keys = Object.keys(window);
+    for (const key of keys) {
+      if (key.startsWith("webpackChunk") && Array.isArray(window[key])) {
+        return key;
       }
     }
 
-    return stores;
+    return "";
   };
 
   const getWebpackRequire = () => {
     try {
-      if (!Array.isArray(window.webpackChunkwhatsapp_web_client)) {
+      const chunkName = resolveWebpackChunkName();
+      if (!chunkName) {
+        emitStatus("waiting_chunk");
         return null;
       }
 
       let requireRef = null;
-      const chunkId = "wa_crm_probe_" + Date.now();
-      window.webpackChunkwhatsapp_web_client.push([
+      const chunkId = `wa_crm_probe_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+      window[chunkName].push([
         [chunkId],
         {},
         (requireFn) => {
@@ -180,9 +141,76 @@
     }
   };
 
+  const scoreStoreCandidate = (candidate) => {
+    if (!candidate || typeof candidate !== "object") {
+      return 0;
+    }
+
+    if (typeof candidate.on !== "function") {
+      return 0;
+    }
+
+    const models = candidate.models || candidate._models;
+    if (!Array.isArray(models)) {
+      return 1;
+    }
+
+    const sample = models[0];
+    if (!sample || typeof sample !== "object") {
+      return 2;
+    }
+
+    let score = 2;
+    if (sample.id || sample.__x_id) {
+      score += 2;
+    }
+    if (
+      sample.body !== undefined ||
+      sample.__x_body !== undefined ||
+      sample.caption !== undefined ||
+      sample.__x_caption !== undefined
+    ) {
+      score += 2;
+    }
+    if (sample.type !== undefined || sample.__x_type !== undefined) {
+      score += 1;
+    }
+
+    return score;
+  };
+
+  const findMsgStore = (requireRef) => {
+    const modules = Object.values(requireRef?.c || {});
+    let best = null;
+    let bestScore = 0;
+
+    for (const module of modules) {
+      const exportsObj = module?.exports;
+      const candidates = [exportsObj, exportsObj?.default];
+
+      for (const candidate of candidates) {
+        const score = scoreStoreCandidate(candidate);
+        if (score > bestScore) {
+          best = candidate;
+          bestScore = score;
+        }
+      }
+    }
+
+    if (bestScore < 3) {
+      return null;
+    }
+
+    return best;
+  };
+
   const attachToStore = (store) => {
     if (!store || typeof store.on !== "function") {
       return false;
+    }
+
+    if (attachedStore === store) {
+      return true;
     }
 
     try {
@@ -194,6 +222,7 @@
         }
       });
 
+      attachedStore = store;
       emitStatus("attached", {
         hasModels: Array.isArray(store.models) || Array.isArray(store._models)
       });
@@ -205,47 +234,49 @@
     }
   };
 
-  let attached = false;
   const tryAttach = () => {
-    if (attached) {
-      return;
-    }
-
     try {
       if (window.Store?.Msg && typeof window.Store.Msg.on === "function") {
-        attached = attachToStore(window.Store.Msg);
-        if (attached) {
-          return;
+        if (attachToStore(window.Store.Msg)) {
+          return true;
         }
       }
 
       const requireRef = getWebpackRequire();
       if (!requireRef) {
-        emitStatus("waiting_require");
-        return;
+        return false;
       }
 
-      const stores = pickCandidateStores(requireRef);
-      for (const store of stores) {
-        attached = attachToStore(store);
-        if (attached) {
-          return;
-        }
+      const store = findMsgStore(requireRef);
+      if (!store) {
+        emitStatus("waiting_store");
+        return false;
       }
 
-      emitStatus("waiting_store", { candidates: stores.length });
+      return attachToStore(store);
     } catch (error) {
       emitStatus("try_attach_error", { error: String(error) });
+      return false;
     }
   };
 
   emitStatus("boot");
-  tryAttach();
+  if (tryAttach()) {
+    return;
+  }
 
+  let retries = 0;
+  const maxRetries = 180;
   const interval = setInterval(() => {
-    tryAttach();
-    if (attached) {
+    retries += 1;
+    if (tryAttach()) {
       clearInterval(interval);
+      return;
     }
-  }, 3000);
+
+    if (retries >= maxRetries) {
+      clearInterval(interval);
+      emitStatus("attach_timeout", { retries: maxRetries });
+    }
+  }, 1000);
 })();

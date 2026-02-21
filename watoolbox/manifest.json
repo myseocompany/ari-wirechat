@@ -1,0 +1,36 @@
+{
+   "action": {
+      "default_title": "__MSG_name__"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "content_scripts": [ {
+      "css": [ "assets/style.css" ],
+      "matches": [ "*://web.whatsapp.com/*" ]
+   }, {
+      "js": [ "vendor.min.js" ],
+      "matches": [ "*://web.whatsapp.com/*" ],
+      "run_at": "document_idle"
+   } ],
+   "default_locale": "en",
+   "description": "__MSG_description__",
+   "homepage_url": "https://watoolbox.com",
+   "host_permissions": [ "*://web.whatsapp.com/*", "*://*.firebaseio.com/*", "*://*.googleapis.com/*", "*://*.wa-toolbox.web.app/*", "*://*.watoolbox.com/*", "*://*.vercel.app/*", "*://*.openai.com/*" ],
+   "icons": {
+      "128": "assets/icon_128.png",
+      "16": "assets/icon_16.png",
+      "48": "assets/icon_48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmw2JSeiKJfb7lEsmDIlnzv8Mg3iDQ5Uu7nPe0ymf6jjBTipSYnmt5gQaaubUohCYU0vfDw/f6/U0bvUYOsXAIj6Fbp/uQUJ53cde9UcvhmW+AonNzq+XR6Mt5n/J+WzxlB2iW2ejAUG/lX7yLFZYemFjS2jvLRkHAfDctAKIqy3W2xhiEieZOxNp7voG8SN2s8dFs0l/pdILsl7h8vyZRRB6WPgcDqZZLBTgDcVigVaKPRYikcY65Ez1XX4rY4v3wOOParXvGGcwmOEktYbGOZATP44Tzg1C970DCJbkkPihzUAbG0JzI138c5IbZmTJVpLV9OkLBm1stOsz9/pN4wIDAQAB",
+   "manifest_version": 3,
+   "name": "__MSG_name__",
+   "permissions": [ "activeTab", "identity", "identity.email", "storage" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "2.1.6.3",
+   "web_accessible_resources": [ {
+      "extension_ids": [ "loghhaklnjjcadamhdelnijifegndfkh" ],
+      "matches": [ "*://web.whatsapp.com/*" ],
+      "resources": [ "/*" ]
+   } ]
+}

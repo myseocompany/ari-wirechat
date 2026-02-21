@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Mensajes Salientes</title>
+    <style>
+      :root {
+        --bg: #f4f6f8;
+        --card: #ffffff;
+        --ink: #1f2937;
+        --muted: #6b7280;
+        --border: #d1d5db;
+        --queued: #0f766e;
+        --captured: #1d4ed8;
+        --error: #b91c1c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+      }
+
+      .app {
+        padding: 12px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+      }
+
+      .title {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .summary {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      button,
+      select {
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 8px;
+        padding: 6px 8px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      button.primary {
+        border-color: #b9d8f5;
+        background: #eaf4ff;
+      }
+
+      .table-wrap {
+        max-height: calc(100vh - 118px);
+        overflow: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid var(--border);
+        padding: 8px 10px;
+        text-align: left;
+        vertical-align: top;
+        font-size: 12px;
+      }
+
+      th {
+        position: sticky;
+        top: 0;
+        background: #f9fafb;
+        z-index: 1;
+      }
+
+      .message {
+        max-width: 320px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .state-queued {
+        background: var(--queued);
+      }
+
+      .state-captured {
+        background: var(--captured);
+      }
+
+      .state-error {
+        background: var(--error);
+      }
+
+      .empty {
+        padding: 18px;
+        text-align: center;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="card header">
+        <div>
+          <h1 class="title">Mensajes salientes</h1>
+          <div id="summary" class="summary">Sin eventos</div>
+        </div>
+
+        <div class="controls">
+          <select id="instance_filter">
+            <option value="__active__">Instancia activa</option>
+            <option value="__all__">Todas</option>
+          </select>
+          <button id="open_config" class="primary">Configuracion</button>
+          <button id="clear">Limpiar</button>
+        </div>
+      </div>
+
+      <div class="card table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Hora</th>
+              <th>Estado</th>
+              <th>Telefono</th>
+              <th>Mensaje</th>
+              <th>Instancia</th>
+              <th>ID</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div id="empty" class="empty">Aun no hay mensajes salientes.</div>
+      </div>
+    </div>
+
+    <script src="monitor.js"></script>
+  </body>
+</html>

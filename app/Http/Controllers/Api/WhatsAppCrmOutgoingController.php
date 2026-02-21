@@ -23,6 +23,7 @@ class WhatsAppCrmOutgoingController extends Controller
             'type' => $validated['type'],
             'instance_key' => $validated['instance_key'] ?? null,
             'crm_user_id' => $validated['crm_user_id'] ?? null,
+            'crm_customer_id' => $validated['crm_customer_id'] ?? null,
         ]);
 
         return response()->json([
