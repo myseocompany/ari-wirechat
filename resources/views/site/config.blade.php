@@ -125,6 +125,11 @@
         <p>Monitorea acciones del CRM como ediciones, archivos y pedidos.</p>
         <a href="{{ url('/activity-logs') }}" class="btn btn-light btn-sm">Ver actividad</a>
       </article>
+      <article class="config-card">
+        <h3>Recuperación Channels</h3>
+        <p>Busca llamadas faltantes de Channels y encola la recuperación de audios.</p>
+        <a href="{{ route('reports.channels_calls_recovery') }}" class="btn btn-light btn-sm">Abrir recuperación</a>
+      </article>
     </div>
   </section>
 </div>
