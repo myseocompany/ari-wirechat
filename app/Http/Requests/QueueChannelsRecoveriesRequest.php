@@ -30,7 +30,7 @@ class QueueChannelsRecoveriesRequest extends FormRequest
             'from_date' => ['nullable', 'date'],
             'to_date' => ['nullable', 'date'],
             'call_id' => ['nullable', 'string', 'max:191'],
-            'agent_id' => ['nullable', 'string', 'max:100'],
+            'agent_id' => ['nullable', 'string', 'max:191'],
             'msisdn' => ['nullable', 'string', 'max:64'],
             'only_missing' => ['nullable', 'boolean'],
         ];

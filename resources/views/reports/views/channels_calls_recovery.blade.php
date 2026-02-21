@@ -46,8 +46,8 @@
           <input id="call_id" name="call_id" type="text" class="form-control" value="{{ $filters['call_id'] }}" placeholder="Opcional">
         </div>
         <div class="form-group col-md-2">
-          <label for="agent_id">Agent ID</label>
-          <input id="agent_id" name="agent_id" type="text" class="form-control" value="{{ $filters['agent_id'] }}" placeholder="Opcional">
+          <label for="agent_id">Agent ID / Username</label>
+          <input id="agent_id" name="agent_id" type="text" class="form-control" value="{{ $filters['agent_id'] }}" placeholder="ID o correo/username">
         </div>
         <div class="form-group col-md-3">
           <label for="msisdn">MSISDN / Teléfono</label>

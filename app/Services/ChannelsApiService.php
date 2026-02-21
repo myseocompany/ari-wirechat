@@ -261,7 +261,7 @@ class ChannelsApiService
             $query['id'] = $callId;
         }
 
-        if ($agentId !== '') {
+        if ($agentId !== '' && preg_match('/^\d+$/', $agentId) === 1) {
             $query['agentId'] = $agentId;
             $query['agent_id'] = $agentId;
         }

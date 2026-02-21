@@ -163,7 +163,7 @@ class ChannelsCallRecoveryController extends Controller
     private function applyLocalFilters(array $calls, array $filters): array
     {
         $callFilter = strtolower(trim((string) ($filters['call_id'] ?? '')));
-        $agentFilter = trim((string) ($filters['agent_id'] ?? ''));
+        $agentFilter = strtolower(trim((string) ($filters['agent_id'] ?? '')));
         $phoneFilter = preg_replace('/\D+/', '', (string) ($filters['msisdn'] ?? ''));
         $phoneFilter = is_string($phoneFilter) ? $phoneFilter : '';
 
@@ -172,8 +172,20 @@ class ChannelsCallRecoveryController extends Controller
                 return false;
             }
 
-            if ($agentFilter !== '' && (string) ($call['agent_id'] ?? '') !== $agentFilter) {
-                return false;
+            if ($agentFilter !== '') {
+                $agentId = trim((string) ($call['agent_id'] ?? ''));
+                $agentUsername = strtolower(trim((string) ($call['agent_username'] ?? '')));
+
+                $matchesByNumericAgentId = preg_match('/^\d+$/', $agentFilter) === 1
+                    && $agentId !== ''
+                    && $agentId === $agentFilter;
+
+                $matchesByAgentIdentifier = str_contains(strtolower($agentId), $agentFilter)
+                    || str_contains($agentUsername, $agentFilter);
+
+                if (! $matchesByNumericAgentId && ! $matchesByAgentIdentifier) {
+                    return false;
+                }
             }
 
             if ($phoneFilter !== '') {
