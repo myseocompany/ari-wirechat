@@ -1,4 +1,17 @@
 const ENDPOINT = "https://arichat.co/api/sellerchat/outgoing";
+const LOG_PREFIX = "[sellerchat-extension]";
+
+const notifyTab = (sender, level, text) => {
+  const tabId = sender?.tab?.id;
+  if (typeof tabId !== "number") {
+    return;
+  }
+
+  chrome.tabs.sendMessage(tabId, {
+    type: "SELLERCHAT_STATUS",
+    payload: { level, text }
+  });
+};
 
 chrome.runtime.onMessage.addListener(async (message, sender) => {
   if (message?.type !== "OUTGOING_MESSAGE") return;
@@ -10,13 +23,15 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
   ]);
 
   if (!APIKEY) {
-    console.warn("Config incompleta: falta APIKEY en storage.");
+    console.warn(`${LOG_PREFIX} Config incompleta: falta APIKEY en storage.`);
+    notifyTab(sender, "error", "Extensión sellerChat sin APIKEY configurado.");
     return;
   }
 
   const targetPhone = (message.payload?.phone || fallbackPhone || "").trim();
   if (!targetPhone) {
-    console.warn("No se pudo resolver phone destino para el mensaje.");
+    console.warn(`${LOG_PREFIX} No se pudo resolver phone destino para el mensaje.`);
+    notifyTab(sender, "error", "No se pudo identificar el teléfono destino.");
     return;
   }
 
@@ -34,6 +49,11 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
   }
 
   try {
+    console.info(`${LOG_PREFIX} Enviando mensaje`, {
+      id: payload.id,
+      phone: payload.phone
+    });
+
     const response = await fetch(ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -42,9 +62,18 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error("Webhook sellerChat respondió con error:", response.status, errorBody);
+      console.error(`${LOG_PREFIX} Webhook sellerChat respondió con error:`, response.status, errorBody);
+      notifyTab(sender, "error", `Error ${response.status} al encolar mensaje sellerChat.`);
+      return;
     }
+
+    console.info(`${LOG_PREFIX} Mensaje encolado correctamente`, {
+      id: payload.id,
+      status: response.status
+    });
+    notifyTab(sender, "info", `Mensaje encolado (${payload.id.slice(0, 12)}...)`);
   } catch (err) {
-    console.error("Error enviando webhook:", err);
+    console.error(`${LOG_PREFIX} Error enviando webhook:`, err);
+    notifyTab(sender, "error", "No se pudo conectar con el webhook sellerChat.");
   }
 });

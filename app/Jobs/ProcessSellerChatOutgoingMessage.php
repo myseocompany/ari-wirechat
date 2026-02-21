@@ -15,6 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ProcessSellerChatOutgoingMessage implements ShouldQueue
 {
@@ -57,6 +58,10 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
         }
 
         if (WhatsAppMessageMap::query()->where('external_message_id', $externalMessageId)->exists()) {
+            Log::info('SellerChat outgoing skipped: duplicate external_message_id', [
+                'external_message_id' => $externalMessageId,
+            ]);
+
             return;
         }
 
@@ -98,6 +103,11 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
 
             return;
         }
+
+        Log::info('SellerChat outgoing processing started', [
+            'external_message_id' => $externalMessageId,
+            'phone' => $phone,
+        ]);
 
         DB::transaction(function () use (
             $externalMessageId,
@@ -179,7 +189,23 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
                     'payload' => $this->payload,
                 ],
             ]);
+
+            Log::info('SellerChat outgoing stored successfully', [
+                'external_message_id' => $externalMessageId,
+                'wire_message_id' => $message->id,
+                'conversation_id' => $conversation->id,
+                'customer_id' => $customer->id,
+                'advisor_user_id' => $advisor->id,
+            ]);
         }, 3);
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        Log::error('SellerChat outgoing job failed', [
+            'payload' => $this->payload,
+            'error' => $exception->getMessage(),
+        ]);
     }
 
     private function resolveSourceId(MessageSource $messageSource): int
