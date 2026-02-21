@@ -131,6 +131,7 @@
               <th>Call ID</th>
               <th>MSISDN</th>
               <th>Agent</th>
+              <th>Duración</th>
               <th>Grabación</th>
               <th>Local</th>
               <th>URL grabación</th>
@@ -156,6 +157,7 @@
                   <input type="hidden" name="calls[{{ $index }}][agent_name]" value="{{ $call['agent_name'] }}">
                   <input type="hidden" name="calls[{{ $index }}][agent_surname]" value="{{ $call['agent_surname'] }}">
                   <input type="hidden" name="calls[{{ $index }}][agent_msisdn]" value="{{ $call['agent_msisdn'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][call_duration_seconds]" value="{{ $call['call_duration_seconds'] }}">
                   <input type="hidden" name="calls[{{ $index }}][recording_exists]" value="{{ $call['recording_exists'] ? '1' : '0' }}">
                   <input type="hidden" name="calls[{{ $index }}][recording_url]" value="{{ $call['recording_url'] }}">
                 </td>
@@ -166,6 +168,19 @@
                   <div>{{ $call['agent_id'] ?: '—' }}</div>
                   @if (!empty($call['agent_username']))
                     <div class="small text-muted">{{ $call['agent_username'] }}</div>
+                  @endif
+                </td>
+                <td>
+                  @if (isset($call['call_duration_seconds']) && $call['call_duration_seconds'] !== null)
+                    @php
+                      $durationSeconds = max(0, (int) $call['call_duration_seconds']);
+                      $durationFormatted = $durationSeconds >= 3600
+                        ? gmdate('H:i:s', $durationSeconds)
+                        : gmdate('i:s', $durationSeconds);
+                    @endphp
+                    <span>{{ $durationFormatted }}</span>
+                  @else
+                    <span class="text-muted">—</span>
                   @endif
                 </td>
                 <td>

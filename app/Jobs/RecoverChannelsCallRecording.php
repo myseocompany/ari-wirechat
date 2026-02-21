@@ -100,27 +100,61 @@ class RecoverChannelsCallRecording implements ShouldQueue
             return;
         }
 
-        $exists = Action::query()
+        $creatorUserId = $this->resolveCreatorUserId($recovery);
+        $callDurationSeconds = $this->resolveCallDurationSeconds($recovery);
+        $numericCallId = ctype_digit((string) $recovery->call_id) ? (int) $recovery->call_id : null;
+        $noteSuffix = $callDurationSeconds !== null ? ' duration: '.$callDurationSeconds.'s' : '';
+
+        $existingAction = Action::query()
             ->where('customer_id', $customer->id)
             ->where(function ($query) use ($recordingUrl, $recovery): void {
                 $query->where('url', $recordingUrl)
                     ->orWhere('note', 'like', '%'.$recovery->call_id.'%');
             })
-            ->exists();
+            ->latest('id')
+            ->first();
 
-        if ($exists) {
+        if ($existingAction !== null) {
+            if ($existingAction->delivery_date === null && $recovery->call_created_at !== null) {
+                $existingAction->delivery_date = $recovery->call_created_at;
+            }
+
+            if ($existingAction->creator_user_id === null && $creatorUserId !== null) {
+                $existingAction->creator_user_id = $creatorUserId;
+            }
+
+            if ($existingAction->creation_seconds === null && $callDurationSeconds !== null) {
+                $existingAction->creation_seconds = $callDurationSeconds;
+            }
+
+            if ($existingAction->object_id === null && $numericCallId !== null) {
+                $existingAction->object_id = $numericCallId;
+            }
+
+            if ($existingAction->url === null || trim((string) $existingAction->url) === '') {
+                $existingAction->url = $recordingUrl;
+            }
+
+            if (! str_contains((string) $existingAction->note, (string) $recovery->call_id)) {
+                $existingAction->note = trim((string) $existingAction->note.' | call_id: '.$recovery->call_id.$noteSuffix);
+            }
+
+            if ($existingAction->isDirty()) {
+                $existingAction->save();
+            }
+
             return;
         }
-
-        $creatorUserId = $this->resolveCreatorUserId($recovery);
 
         Action::query()->create([
             'customer_id' => $customer->id,
             'type_id' => 21,
             'creator_user_id' => $creatorUserId ?: 1,
             'delivery_date' => $recovery->call_created_at ?? now(),
+            'object_id' => $numericCallId,
+            'creation_seconds' => $callDurationSeconds,
             'url' => $recordingUrl,
-            'note' => 'Llamada de Channels (backfill) call_id: '.$recovery->call_id,
+            'note' => 'Llamada de Channels (backfill) call_id: '.$recovery->call_id.$noteSuffix,
         ]);
     }
 
@@ -215,5 +249,26 @@ class RecoverChannelsCallRecording implements ShouldQueue
         }
 
         return null;
+    }
+
+    private function resolveCallDurationSeconds(ChannelsCallRecovery $recovery): ?int
+    {
+        $payload = is_array($recovery->payload) ? $recovery->payload : [];
+        $duration = data_get($payload, 'call_duration_seconds');
+
+        if ($duration === null || $duration === '') {
+            $duration = data_get($payload, 'duration_seconds')
+                ?? data_get($payload, 'duration')
+                ?? data_get($payload, 'callDuration')
+                ?? data_get($payload, 'call_duration');
+        }
+
+        if (! is_numeric($duration)) {
+            return null;
+        }
+
+        $seconds = (int) floor((float) $duration);
+
+        return $seconds >= 0 ? $seconds : null;
     }
 }

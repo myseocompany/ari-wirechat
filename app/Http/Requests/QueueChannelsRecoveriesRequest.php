@@ -25,6 +25,7 @@ class QueueChannelsRecoveriesRequest extends FormRequest
             'calls.*.agent_name' => ['nullable', 'string', 'max:120'],
             'calls.*.agent_surname' => ['nullable', 'string', 'max:120'],
             'calls.*.agent_msisdn' => ['nullable', 'string', 'max:64'],
+            'calls.*.call_duration_seconds' => ['nullable', 'integer', 'min:0'],
             'calls.*.recording_exists' => ['nullable', 'boolean'],
             'calls.*.recording_url' => ['nullable', 'string', 'max:2048'],
             'from_date' => ['nullable', 'date'],

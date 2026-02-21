@@ -39,15 +39,7 @@ class ChannelsCallNormalizer
 
         return [
             'call_id' => $callId,
-            'call_created_at' => $this->parseDate($this->firstStringValue($call, [
-                'createdAt',
-                'created_at',
-                'startedAt',
-                'started_at',
-                'startAt',
-                'start_at',
-                'date',
-            ])),
+            'call_created_at' => $this->extractCallCreatedAt($call),
             'msisdn' => $this->normalizePhone($this->firstStringValue($call, [
                 'msisdn',
                 'phoneNumber',
@@ -61,6 +53,7 @@ class ChannelsCallNormalizer
             'agent_name' => $this->extractAgentName($call),
             'agent_surname' => $this->extractAgentSurname($call),
             'agent_msisdn' => $this->normalizePhone($this->extractAgentMsisdn($call)),
+            'call_duration_seconds' => $this->extractDurationSeconds($call),
             'recording_exists' => $recordingExists,
             'recording_url' => $recordingUrl,
             'status' => $this->firstStringValue($call, [
@@ -245,8 +238,29 @@ class ChannelsCallNormalizer
             return null;
         }
 
+        $trimmed = trim($value);
+
+        if (is_numeric($trimmed)) {
+            $numeric = (float) $trimmed;
+            if ($numeric <= 0) {
+                return null;
+            }
+
+            // Channels puede enviar unix epoch en segundos o milisegundos.
+            $seconds = $numeric > 9999999999 ? (int) floor($numeric / 1000) : (int) floor($numeric);
+            if ($seconds < 946684800) { // 2000-01-01 UTC
+                return null;
+            }
+
+            try {
+                return CarbonImmutable::createFromTimestampUTC($seconds);
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+
         try {
-            return CarbonImmutable::parse($value)->utc();
+            return CarbonImmutable::parse($trimmed)->utc();
         } catch (\Throwable) {
             return null;
         }
@@ -504,6 +518,134 @@ class ChannelsCallNormalizer
             if ($url !== null) {
                 return $url;
             }
+        }
+
+        return null;
+    }
+
+    private function extractCallCreatedAt(array $payload): ?CarbonImmutable
+    {
+        $candidate = $this->firstStringValue($payload, [
+            'createdAt',
+            'created_at',
+            'startedAt',
+            'started_at',
+            'startAt',
+            'start_at',
+            'date',
+            'createdOn',
+            'creationDate',
+            'callDate',
+            'call_date',
+            'timestamp',
+            'eventTime',
+            'time',
+            'call.createdAt',
+            'call.created_at',
+            'call.startedAt',
+            'call.started_at',
+            'call.startAt',
+            'call.start_at',
+            'call.date',
+            'data.createdAt',
+            'data.created_at',
+            'data.startedAt',
+            'data.started_at',
+            'data.startAt',
+            'data.start_at',
+            'data.date',
+        ]);
+
+        $parsed = $this->parseDate($candidate);
+        if ($parsed !== null) {
+            return $parsed;
+        }
+
+        return $this->searchDateByKeyPattern($payload);
+    }
+
+    private function searchDateByKeyPattern(array $payload): ?CarbonImmutable
+    {
+        foreach ($payload as $key => $value) {
+            if (is_array($value)) {
+                $nested = $this->searchDateByKeyPattern($value);
+                if ($nested !== null) {
+                    return $nested;
+                }
+
+                continue;
+            }
+
+            if (! is_string($key) || (! is_scalar($value) && $value !== null)) {
+                continue;
+            }
+
+            if (preg_match('/(date|time|created|start|timestamp)/i', $key) !== 1) {
+                continue;
+            }
+
+            $parsed = $this->parseDate((string) $value);
+            if ($parsed !== null) {
+                return $parsed;
+            }
+        }
+
+        return null;
+    }
+
+    private function extractDurationSeconds(array $payload): ?int
+    {
+        $raw = $this->firstStringValue($payload, [
+            'duration',
+            'durationSeconds',
+            'duration_seconds',
+            'callDuration',
+            'call_duration',
+            'talkDuration',
+            'talk_duration',
+            'conversationDuration',
+            'conversation_duration',
+            'call.duration',
+            'call.durationSeconds',
+            'call.duration_seconds',
+            'data.duration',
+            'data.durationSeconds',
+            'data.duration_seconds',
+        ]);
+
+        if ($raw === null) {
+            return null;
+        }
+
+        return $this->parseDurationToSeconds($raw);
+    }
+
+    private function parseDurationToSeconds(string $raw): ?int
+    {
+        $trimmed = trim($raw);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        if (is_numeric($trimmed)) {
+            $seconds = (int) floor((float) $trimmed);
+
+            return $seconds >= 0 ? $seconds : null;
+        }
+
+        if (preg_match('/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/', $trimmed, $matches) === 1) {
+            if (isset($matches[3]) && $matches[3] !== '') {
+                $hours = (int) $matches[1];
+                $minutes = (int) $matches[2];
+                $seconds = (int) $matches[3];
+
+                return ($hours * 3600) + ($minutes * 60) + $seconds;
+            }
+
+            $minutes = (int) $matches[1];
+            $seconds = (int) $matches[2];
+
+            return ($minutes * 60) + $seconds;
         }
 
         return null;

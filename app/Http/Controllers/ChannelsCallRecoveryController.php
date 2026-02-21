@@ -331,6 +331,7 @@ class ChannelsCallRecoveryController extends Controller
                 'agent_name' => $call['agent_name'] ?? null,
                 'agent_surname' => $call['agent_surname'] ?? null,
                 'agent_msisdn' => $call['agent_msisdn'] ?? null,
+                'call_duration_seconds' => isset($call['call_duration_seconds']) ? (int) $call['call_duration_seconds'] : null,
                 'recording_exists' => (bool) ($call['recording_exists'] ?? false),
                 'recording_url' => $call['recording_url'] ?? null,
                 'status' => $call['status'] ?? null,
