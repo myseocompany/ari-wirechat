@@ -56,11 +56,7 @@ class ChannelsCallNormalizer
                 'toNumber',
                 'contact.msisdns.0',
             ])),
-            'agent_id' => $this->firstStringValue($call, [
-                'agentId',
-                'agent_id',
-                'agent.id',
-            ]),
+            'agent_id' => $this->extractAgentId($call),
             'recording_exists' => $recordingExists,
             'recording_url' => $recordingUrl,
             'status' => $this->firstStringValue($call, [
@@ -166,6 +162,26 @@ class ChannelsCallNormalizer
             'data.token',
             'data.recordingToken',
             'data.archiveToken',
+        ]);
+    }
+
+    public function extractAgentId(array $payload): ?string
+    {
+        return $this->firstStringValue($payload, [
+            'agentId',
+            'agent_id',
+            'agent.id',
+            'userId',
+            'user_id',
+            'user.id',
+            'ownerId',
+            'owner_id',
+            'assignedUserId',
+            'assigned_user_id',
+            'assignedAgentId',
+            'sellerId',
+            'seller_id',
+            'agent',
         ]);
     }
 
@@ -280,6 +296,27 @@ class ChannelsCallNormalizer
 
         if (preg_match('/"(?:recordingLink|recordingUrl|recording_url|audioUrl|audio_url)"\s*:\s*"([^"]+)"/i', $payloadRaw, $matches) === 1) {
             return $this->normalizePotentialUrl((string) ($matches[1] ?? ''));
+        }
+
+        return null;
+    }
+
+    public function extractAgentIdFromWebhook(mixed $payload, ?string $payloadRaw = null): ?string
+    {
+        $data = $this->unwrapWebhookPayload($payload);
+        $agentId = $this->extractAgentId($data);
+        if ($agentId !== null) {
+            return $agentId;
+        }
+
+        if ($payloadRaw === null || $payloadRaw === '') {
+            return null;
+        }
+
+        if (preg_match('/"(?:agentId|agent_id|userId|user_id|ownerId|owner_id|sellerId|seller_id)"\s*:\s*"?(.*?)"?(,|\})/i', $payloadRaw, $matches) === 1) {
+            $value = trim((string) ($matches[1] ?? ''));
+
+            return $value !== '' ? trim($value, '"') : null;
         }
 
         return null;

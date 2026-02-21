@@ -199,11 +199,17 @@ class ChannelsCallRecoveryController extends Controller
 
         $knownCallIds = [];
         $knownRecordingUrls = [];
+        $agentIdByCallId = [];
 
         foreach ($webhookLogs as $log) {
             $callId = $normalizer->extractCallIdFromWebhook($log->payload, (string) $log->payload_raw);
             if ($callId !== null) {
                 $knownCallIds[strtolower($callId)] = true;
+
+                $agentId = $normalizer->extractAgentIdFromWebhook($log->payload, (string) $log->payload_raw);
+                if ($agentId !== null) {
+                    $agentIdByCallId[strtolower($callId)] = $agentId;
+                }
             }
 
             $recordingUrl = $normalizer->extractRecordingUrlFromWebhook($log->payload, (string) $log->payload_raw);
@@ -269,7 +275,7 @@ class ChannelsCallRecoveryController extends Controller
                     ? $call['call_created_at']->format('Y-m-d H:i:s')
                     : null,
                 'msisdn' => $call['msisdn'] ?? null,
-                'agent_id' => $call['agent_id'] ?? null,
+                'agent_id' => $call['agent_id'] ?? ($agentIdByCallId[$callId] ?? null),
                 'recording_exists' => (bool) ($call['recording_exists'] ?? false),
                 'recording_url' => $call['recording_url'] ?? null,
                 'status' => $call['status'] ?? null,
