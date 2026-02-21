@@ -134,6 +134,7 @@
               <th>Grabación</th>
               <th>Local</th>
               <th>URL grabación</th>
+              <th>Debug llamada</th>
             </tr>
           </thead>
           <tbody>
@@ -151,13 +152,22 @@
                   <input type="hidden" name="calls[{{ $index }}][call_created_at]" value="{{ $call['call_created_at'] }}">
                   <input type="hidden" name="calls[{{ $index }}][msisdn]" value="{{ $call['msisdn'] }}">
                   <input type="hidden" name="calls[{{ $index }}][agent_id]" value="{{ $call['agent_id'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][agent_username]" value="{{ $call['agent_username'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][agent_name]" value="{{ $call['agent_name'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][agent_surname]" value="{{ $call['agent_surname'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][agent_msisdn]" value="{{ $call['agent_msisdn'] }}">
                   <input type="hidden" name="calls[{{ $index }}][recording_exists]" value="{{ $call['recording_exists'] ? '1' : '0' }}">
                   <input type="hidden" name="calls[{{ $index }}][recording_url]" value="{{ $call['recording_url'] }}">
                 </td>
                 <td>{{ $call['call_created_at'] ?: '—' }}</td>
                 <td><code>{{ $call['call_id'] }}</code></td>
                 <td>{{ $call['msisdn'] ?: '—' }}</td>
-                <td>{{ $call['agent_id'] ?: '—' }}</td>
+                <td>
+                  <div>{{ $call['agent_id'] ?: '—' }}</div>
+                  @if (!empty($call['agent_username']))
+                    <div class="small text-muted">{{ $call['agent_username'] }}</div>
+                  @endif
+                </td>
                 <td>
                   @if ($call['recording_exists'])
                     <span class="badge badge-success">Sí</span>
@@ -183,6 +193,22 @@
                   @else
                     <span class="text-muted">—</span>
                   @endif
+                </td>
+                <td style="min-width: 280px;">
+                  <details>
+                    <summary class="small" style="cursor: pointer;">Ver payload</summary>
+                    <div class="small mt-2">
+                      @if (!empty($call['agent_debug_fields']))
+                        <div class="mb-2"><strong>Campos posibles de agente/usuario:</strong></div>
+                        @foreach ($call['agent_debug_fields'] as $fieldPath => $fieldValue)
+                          <div><code>{{ $fieldPath }}</code>: <strong>{{ $fieldValue }}</strong></div>
+                        @endforeach
+                      @else
+                        <div class="text-muted mb-2">No se detectaron claves tipo agent/user/owner/seller.</div>
+                      @endif
+                      <pre class="mb-0 p-2 bg-light border rounded" style="max-height: 180px; overflow: auto; white-space: pre-wrap; word-break: break-word;">{{ $call['raw_json'] }}</pre>
+                    </div>
+                  </details>
                 </td>
               </tr>
             @endforeach

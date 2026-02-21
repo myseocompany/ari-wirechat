@@ -112,15 +112,13 @@ class RecoverChannelsCallRecording implements ShouldQueue
             return;
         }
 
-        $creatorUserId = is_numeric($recovery->agent_id)
-            ? User::getIdFromChannelsId((int) $recovery->agent_id)
-            : null;
+        $creatorUserId = $this->resolveCreatorUserId($recovery);
 
         Action::query()->create([
             'customer_id' => $customer->id,
             'type_id' => 21,
             'creator_user_id' => $creatorUserId ?: 1,
-            'delivery_date' => now(),
+            'delivery_date' => $recovery->call_created_at ?? now(),
             'url' => $recordingUrl,
             'note' => 'Llamada de Channels (backfill) call_id: '.$recovery->call_id,
         ]);
@@ -187,5 +185,35 @@ class RecoverChannelsCallRecording implements ShouldQueue
             str_contains($contentType, 'audio/webm') => 'webm',
             default => 'mp3',
         };
+    }
+
+    private function resolveCreatorUserId(ChannelsCallRecovery $recovery): ?int
+    {
+        if (is_numeric($recovery->agent_id)) {
+            $fromChannelsId = User::getIdFromChannelsId((int) $recovery->agent_id);
+            if ($fromChannelsId !== null) {
+                return $fromChannelsId;
+            }
+        }
+
+        $payload = is_array($recovery->payload) ? $recovery->payload : [];
+        $candidateUsername = strtolower(trim((string) (
+            data_get($payload, 'agent_username')
+            ?? data_get($payload, 'agentUsername')
+            ?? data_get($payload, 'agent.email')
+            ?? ''
+        )));
+
+        if ($candidateUsername !== '') {
+            $user = User::query()
+                ->whereRaw('LOWER(channels_email) = ?', [$candidateUsername])
+                ->first();
+
+            if ($user) {
+                return (int) $user->id;
+            }
+        }
+
+        return null;
     }
 }

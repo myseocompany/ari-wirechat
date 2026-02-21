@@ -28,6 +28,10 @@
         <label for="channels_id">Channels ID:</label>
         <input type="text" class="form-control" id="channels_id" name="channels_id" placeholder="Channels ID" value="{{ $user->channels_id }}" readonly>
      </div>
+     <div class="form-group">
+        <label for="channels_email">Channels Email / Username:</label>
+        <input type="text" class="form-control" id="channels_email" name="channels_email" placeholder="Channels Email / Username" value="{{ $user->channels_email }}" readonly>
+     </div>
       <div class="form-group">
         <label for="customer_status">Estado:</label>
               <input type="text" class="form-control" id="email" name="status_id" placeholder="Estado"  @if (isset($user->status_id) && ($user->status_id != ''))

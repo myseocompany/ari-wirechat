@@ -57,6 +57,10 @@ class ChannelsCallNormalizer
                 'contact.msisdns.0',
             ])),
             'agent_id' => $this->extractAgentId($call),
+            'agent_username' => $this->extractAgentUsername($call),
+            'agent_name' => $this->extractAgentName($call),
+            'agent_surname' => $this->extractAgentSurname($call),
+            'agent_msisdn' => $this->normalizePhone($this->extractAgentMsisdn($call)),
             'recording_exists' => $recordingExists,
             'recording_url' => $recordingUrl,
             'status' => $this->firstStringValue($call, [
@@ -182,6 +186,56 @@ class ChannelsCallNormalizer
             'sellerId',
             'seller_id',
             'agent',
+        ]);
+    }
+
+    public function extractAgentUsername(array $payload): ?string
+    {
+        return $this->firstStringValue($payload, [
+            'agentUsername',
+            'agent_username',
+            'agent.username',
+            'agent.email',
+            'user.email',
+            'owner.email',
+            'seller.email',
+        ]);
+    }
+
+    public function extractAgentName(array $payload): ?string
+    {
+        return $this->firstStringValue($payload, [
+            'agentName',
+            'agent_name',
+            'agent.name',
+            'user.name',
+            'owner.name',
+            'seller.name',
+        ]);
+    }
+
+    public function extractAgentSurname(array $payload): ?string
+    {
+        return $this->firstStringValue($payload, [
+            'agentSurname',
+            'agent_surname',
+            'agent.surname',
+            'user.surname',
+            'owner.surname',
+            'seller.surname',
+            'agent.lastName',
+            'agent.last_name',
+        ]);
+    }
+
+    public function extractAgentMsisdn(array $payload): ?string
+    {
+        return $this->firstStringValue($payload, [
+            'agentMsisdn',
+            'agent_msisdn',
+            'agent.msisdn',
+            'agent.phone',
+            'agent.phoneNumber',
         ]);
     }
 

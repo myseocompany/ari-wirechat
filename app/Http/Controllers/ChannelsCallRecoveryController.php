@@ -8,6 +8,7 @@ use App\Jobs\RecoverChannelsCallRecording;
 use App\Models\Action;
 use App\Models\ChannelsCallRecovery;
 use App\Models\ChannelsWebhookLog;
+use App\Models\User;
 use App\Services\ChannelsApiService;
 use App\Services\ChannelsCallNormalizer;
 use Carbon\CarbonImmutable;
@@ -259,6 +260,7 @@ class ChannelsCallRecoveryController extends Controller
         $rows = [];
         $existing = 0;
         $missing = 0;
+        $agentUserMapByUsername = $this->resolveUsersByChannelsUsername($calls);
 
         foreach ($calls as $call) {
             $callId = strtolower((string) ($call['call_id'] ?? ''));
@@ -308,13 +310,23 @@ class ChannelsCallRecoveryController extends Controller
                     ? $call['call_created_at']->format('Y-m-d H:i:s')
                     : null,
                 'msisdn' => $call['msisdn'] ?? null,
-                'agent_id' => $call['agent_id'] ?? ($agentIdByCallId[$callId] ?? null),
+                'agent_id' => $this->resolveAgentIdentifier(
+                    $call,
+                    $agentIdByCallId[$callId] ?? null,
+                    $agentUserMapByUsername
+                ),
+                'agent_username' => $call['agent_username'] ?? null,
+                'agent_name' => $call['agent_name'] ?? null,
+                'agent_surname' => $call['agent_surname'] ?? null,
+                'agent_msisdn' => $call['agent_msisdn'] ?? null,
                 'recording_exists' => (bool) ($call['recording_exists'] ?? false),
                 'recording_url' => $call['recording_url'] ?? null,
                 'status' => $call['status'] ?? null,
                 'local_exists' => $localExists,
                 'local_sources' => implode(', ', $sources),
                 'is_missing' => $isMissing,
+                'agent_debug_fields' => $this->collectAgentDebugFields($call['raw'] ?? []),
+                'raw_json' => $this->encodePrettyJson($call['raw'] ?? []),
             ];
         }
 
@@ -364,5 +376,118 @@ class ChannelsCallRecoveryController extends Controller
             'only_missing' => $validated['only_missing'] ?? false,
             'search' => 1,
         ];
+    }
+
+    private function resolveAgentIdentifier(
+        array $call,
+        ?string $fallbackWebhookAgentId,
+        array $agentUserMapByUsername
+    ): ?string {
+        $agentId = trim((string) ($call['agent_id'] ?? ''));
+        if ($agentId !== '') {
+            return $agentId;
+        }
+
+        $fallback = trim((string) $fallbackWebhookAgentId);
+        if ($fallback !== '') {
+            return $fallback;
+        }
+
+        $normalizedUsername = $this->normalizeChannelsUsername((string) ($call['agent_username'] ?? ''));
+        if ($normalizedUsername !== '' && isset($agentUserMapByUsername[$normalizedUsername])) {
+            $matchedChannelsId = $agentUserMapByUsername[$normalizedUsername]['channels_id'] ?? null;
+            if ($matchedChannelsId !== null) {
+                return (string) $matchedChannelsId;
+            }
+        }
+
+        return null;
+    }
+
+    private function resolveUsersByChannelsUsername(array $calls): array
+    {
+        $usernames = collect($calls)
+            ->map(fn (array $call): string => $this->normalizeChannelsUsername((string) ($call['agent_username'] ?? '')))
+            ->filter(fn (string $value): bool => $value !== '')
+            ->unique()
+            ->values();
+
+        if ($usernames->isEmpty()) {
+            return [];
+        }
+
+        return User::query()
+            ->whereNotNull('channels_email')
+            ->whereIn('channels_email', $usernames->all())
+            ->select(['id', 'channels_id', 'channels_email'])
+            ->get()
+            ->mapWithKeys(function (User $user): array {
+                $normalized = $this->normalizeChannelsUsername((string) $user->channels_email);
+                if ($normalized === '') {
+                    return [];
+                }
+
+                return [
+                    $normalized => [
+                        'id' => (int) $user->id,
+                        'channels_id' => $user->channels_id !== null ? (int) $user->channels_id : null,
+                    ],
+                ];
+            })
+            ->all();
+    }
+
+    private function normalizeChannelsUsername(string $username): string
+    {
+        return strtolower(trim($username));
+    }
+
+    private function collectAgentDebugFields(mixed $payload): array
+    {
+        $results = [];
+        $this->collectAgentDebugFieldsRecursive($payload, '', $results);
+
+        ksort($results);
+
+        return $results;
+    }
+
+    private function collectAgentDebugFieldsRecursive(mixed $payload, string $prefix, array &$results): void
+    {
+        if (! is_array($payload)) {
+            return;
+        }
+
+        foreach ($payload as $key => $value) {
+            $segment = is_string($key) ? $key : (string) $key;
+            $path = $prefix === '' ? $segment : $prefix.'.'.$segment;
+
+            if (is_array($value)) {
+                $this->collectAgentDebugFieldsRecursive($value, $path, $results);
+
+                continue;
+            }
+
+            if (! is_scalar($value) || ! is_string($segment)) {
+                continue;
+            }
+
+            if (preg_match('/(agent|user|owner|seller|advisor|assignee)/i', $segment) !== 1) {
+                continue;
+            }
+
+            $results[$path] = (string) $value;
+        }
+    }
+
+    private function encodePrettyJson(mixed $value): string
+    {
+        if (! is_array($value)) {
+            return '{}';
+        }
+
+        $encoded = json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        return is_string($encoded) ? $encoded : '{}';
     }
 }

@@ -49,6 +49,10 @@
             Channels ID
             <input type="number" id="channels_id" name="channels_id" value="{{ old('channels_id', $user->channels_id) }}" placeholder="Ej. 2345" class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-[color:var(--ds-coral)] focus:outline-none focus:ring-2 focus:ring-[color:var(--ds-blush)]">
           </label>
+          <label class="flex flex-col gap-2 text-sm font-medium text-slate-700">
+            Channels Email / Username
+            <input type="text" id="channels_email" name="channels_email" value="{{ old('channels_email', $user->channels_email) }}" placeholder="agent@channels.app o usuario" class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm text-slate-700 shadow-sm focus:border-[color:var(--ds-coral)] focus:outline-none focus:ring-2 focus:ring-[color:var(--ds-blush)]">
+          </label>
         </div>
       </x-design.section>
 

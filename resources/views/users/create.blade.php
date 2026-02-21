@@ -26,6 +26,10 @@
     <input type="number" class="form-control" id="channels_id" name="channels_id" placeholder="Channels ID" value="{{ old('channels_id') }}">
   </div>
   <div class="form-group">
+    <label for="channels_email">Channels Email / Username:</label>
+    <input type="text" class="form-control" id="channels_email" name="channels_email" placeholder="agent@channels.app o usuario" value="{{ old('channels_email') }}">
+  </div>
+  <div class="form-group">
     <label for="budget">Contraseña:</label>
     <input type="password" class="form-control" id="password" name="password" placeholder="Password">  
   </div>

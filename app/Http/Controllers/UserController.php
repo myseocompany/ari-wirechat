@@ -46,6 +46,7 @@ class UserController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:6'],
             'channels_id' => ['nullable', 'integer'],
+            'channels_email' => ['nullable', 'string', 'max:191'],
             'status_id' => ['nullable', 'integer', 'exists:user_statuses,id'],
             'role_id' => ['nullable', 'integer', 'exists:roles,id'],
             'profile_photo' => ['nullable', 'image', 'max:4096'],
@@ -55,6 +56,7 @@ class UserController extends Controller
         $model->name = $validated['name'];
         $model->email = $validated['email'];
         $model->channels_id = $validated['channels_id'] ?? null;
+        $model->channels_email = isset($validated['channels_email']) ? strtolower(trim((string) $validated['channels_email'])) : null;
         $model->status_id = $validated['status_id'] ?? null;
         $model->role_id = $validated['role_id'] ?? null;
         $model->password = bcrypt($validated['password']);
@@ -99,6 +101,7 @@ class UserController extends Controller
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($model->id)],
             'password' => ['nullable', 'string', 'min:6'],
             'channels_id' => ['nullable', 'integer'],
+            'channels_email' => ['nullable', 'string', 'max:191'],
             'status_id' => ['nullable', 'integer', 'exists:user_statuses,id'],
             'role_id' => ['nullable', 'integer', 'exists:roles,id'],
             'profile_photo' => ['nullable', 'image', 'max:4096'],
@@ -107,6 +110,7 @@ class UserController extends Controller
         $model->name = $validated['name'];
         $model->email = $validated['email'];
         $model->channels_id = $validated['channels_id'] ?? null;
+        $model->channels_email = isset($validated['channels_email']) ? strtolower(trim((string) $validated['channels_email'])) : null;
         $model->status_id = $validated['status_id'] ?? null;
         if (! empty($validated['password'])) {
             $model->password = bcrypt($validated['password']);
