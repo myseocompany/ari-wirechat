@@ -1151,6 +1151,7 @@ class CustomerController extends Controller
                 ->with('messageSource')
                 ->whereIn('conversation_id', $conversationIds)
                 ->get()
+                ->toBase()
                 ->mapWithKeys(function (MessageSourceConversation $mapping) {
                     return [
                         $mapping->conversation_id => $this->resolveMessageSourceLabel($mapping->messageSource),
@@ -1164,6 +1165,7 @@ class CustomerController extends Controller
                     ->with('participants.participantable')
                     ->whereIn('id', $conversationIdsWithoutSourceLabel)
                     ->get()
+                    ->toBase()
                     ->mapWithKeys(function (Conversation $conversation) {
                         $messageSourceParticipant = $conversation->participants
                             ->first(fn ($participant) => $participant->participantable instanceof MessageSource);
@@ -1185,6 +1187,7 @@ class CustomerController extends Controller
 
         if ($chatMessages->isNotEmpty()) {
             $messageSourceLabelsByMessage = $chatMessages
+                ->toBase()
                 ->mapWithKeys(function (Message $message) use ($messageSourceLabelsByConversation) {
                     $conversationLabel = $messageSourceLabelsByConversation->get($message->conversation_id);
 
@@ -1222,6 +1225,7 @@ class CustomerController extends Controller
 
                 $labelsFromCustomerTimeline = $chatMessages
                     ->whereIn('id', $messageIdsWithoutLabel)
+                    ->toBase()
                     ->mapWithKeys(function (Message $message) use ($customerMappings, $messageSourceLabelsByMessage) {
                         $existing = $messageSourceLabelsByMessage->get($message->id);
                         if (! $this->isUnresolvedMessageSourceLabel($existing)) {
@@ -1254,6 +1258,7 @@ class CustomerController extends Controller
                 if ($messageIdsWithoutLabelAfterResolution->isNotEmpty()) {
                     $labelsFromIncomingNumber = $chatMessages
                         ->whereIn('id', $messageIdsWithoutLabelAfterResolution)
+                        ->toBase()
                         ->mapWithKeys(function (Message $message) use ($mapsByMessageId, $model) {
                             $map = $mapsByMessageId->get($message->id);
 
