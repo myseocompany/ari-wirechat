@@ -1,0 +1,279 @@
+@extends('layout')
+
+@section('content')
+<h1 class="mb-3">Recuperación de llamadas Twilio</h1>
+
+@if (session('status'))
+  <div class="alert alert-success">{{ session('status') }}</div>
+@endif
+
+@if ($searchError)
+  <div class="alert alert-danger">
+    Error consultando Twilio: {{ $searchError }}
+  </div>
+@endif
+
+@if ($errors->any())
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+      @endforeach
+    </ul>
+  </div>
+@endif
+
+@if (! $twilioConfigured)
+  <div class="alert alert-warning">
+    Configura <code>TWILIO_ACCOUNT_SID</code> y <code>TWILIO_AUTH_TOKEN</code> para habilitar la búsqueda y recuperación.
+  </div>
+@endif
+
+<div class="card mb-4">
+  <div class="card-body">
+    <form method="GET" action="{{ route('reports.twilio_calls_recovery') }}">
+      <div class="form-row">
+        <div class="form-group col-md-2">
+          <label for="from_date">Desde</label>
+          <input id="from_date" name="from_date" type="date" class="form-control" value="{{ $filters['from_date'] }}">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="to_date">Hasta</label>
+          <input id="to_date" name="to_date" type="date" class="form-control" value="{{ $filters['to_date'] }}">
+        </div>
+        <div class="form-group col-md-3">
+          <label for="call_sid">Call SID</label>
+          <input id="call_sid" name="call_sid" type="text" class="form-control" value="{{ $filters['call_sid'] }}" placeholder="Opcional">
+        </div>
+        <div class="form-group col-md-2">
+          <label for="status">Estado</label>
+          <input id="status" name="status" type="text" class="form-control" value="{{ $filters['status'] }}" placeholder="completed, failed, ...">
+        </div>
+        <div class="form-group col-md-3">
+          <label for="msisdn">MSISDN / Teléfono</label>
+          <input id="msisdn" name="msisdn" type="text" class="form-control" value="{{ $filters['msisdn'] }}" placeholder="Opcional">
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="form-check mb-2">
+          <input id="only_missing" name="only_missing" type="checkbox" value="1" class="form-check-input" @checked($filters['only_missing'])>
+          <label class="form-check-label" for="only_missing">Mostrar solo faltantes</label>
+        </div>
+        <button type="submit" class="btn btn-primary mb-2">Buscar (últimos 30 días por defecto)</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+@if ($searched)
+  <div class="row mb-3">
+    <div class="col-md-3 mb-2">
+      <div class="card">
+        <div class="card-body py-3">
+          <div class="text-muted small">Llamadas remotas</div>
+          <div class="h4 mb-0">{{ $summary['remote_total'] }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-2">
+      <div class="card">
+        <div class="card-body py-3">
+          <div class="text-muted small">Ya existen localmente</div>
+          <div class="h4 mb-0 text-success">{{ $summary['existing_local'] }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-2">
+      <div class="card">
+        <div class="card-body py-3">
+          <div class="text-muted small">Faltantes</div>
+          <div class="h4 mb-0 text-warning">{{ $summary['missing_local'] }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-2">
+      <div class="card">
+        <div class="card-body py-3">
+          <div class="text-muted small">Mostradas</div>
+          <div class="h4 mb-0">{{ $summary['displayed'] }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (count($calls) > 0)
+    <form method="POST" action="{{ route('reports.twilio_calls_recovery.queue') }}">
+      @csrf
+
+      <input type="hidden" name="from_date" value="{{ $filters['from_date'] }}">
+      <input type="hidden" name="to_date" value="{{ $filters['to_date'] }}">
+      <input type="hidden" name="call_sid" value="{{ $filters['call_sid'] }}">
+      <input type="hidden" name="msisdn" value="{{ $filters['msisdn'] }}">
+      <input type="hidden" name="status" value="{{ $filters['status'] }}">
+      <input type="hidden" name="only_missing" value="{{ $filters['only_missing'] ? '1' : '0' }}">
+
+      <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+        <div class="small text-muted">Selecciona llamadas faltantes para encolarlas.</div>
+        <div>
+          <button type="button" class="btn btn-outline-secondary btn-sm mr-1" onclick="toggleTwilioMissing(true)">Seleccionar faltantes</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm mr-2" onclick="toggleTwilioMissing(false)">Limpiar</button>
+          <button type="submit" class="btn btn-success btn-sm">Encolar seleccionadas</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover">
+          <thead class="thead-light">
+            <tr>
+              <th style="width: 70px;">Sel</th>
+              <th>Fecha</th>
+              <th>Call SID</th>
+              <th>Dirección</th>
+              <th>Desde</th>
+              <th>Hacia</th>
+              <th>Contacto</th>
+              <th>Duración</th>
+              <th>Estado</th>
+              <th>Grabación</th>
+              <th>Local</th>
+              <th>URL grabación</th>
+              <th>Debug</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach ($calls as $index => $call)
+              @php
+                $isMissing = (bool) ($call['is_missing'] ?? false);
+              @endphp
+              <tr class="{{ $isMissing ? 'table-warning' : '' }}">
+                <td>
+                  @if ($isMissing)
+                    <input type="checkbox" name="selected_indexes[]" value="{{ $index }}" class="js-twilio-selector">
+                  @endif
+
+                  <input type="hidden" name="calls[{{ $index }}][call_sid]" value="{{ $call['call_sid'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][call_created_at]" value="{{ $call['call_created_at'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][from_number]" value="{{ $call['from_number'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][to_number]" value="{{ $call['to_number'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][contact_msisdn]" value="{{ $call['contact_msisdn'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][direction]" value="{{ $call['direction'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][status_text]" value="{{ $call['status_text'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][duration_seconds]" value="{{ $call['duration_seconds'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][recording_exists]" value="{{ $call['recording_exists'] ? '1' : '0' }}">
+                  <input type="hidden" name="calls[{{ $index }}][recording_sid]" value="{{ $call['recording_sid'] }}">
+                  <input type="hidden" name="calls[{{ $index }}][recording_url]" value="{{ $call['recording_url'] }}">
+                </td>
+                <td>{{ $call['call_created_at'] ?: '—' }}</td>
+                <td><code>{{ $call['call_sid'] }}</code></td>
+                <td>{{ $call['direction'] ?: '—' }}</td>
+                <td>{{ $call['from_number'] ?: '—' }}</td>
+                <td>{{ $call['to_number'] ?: '—' }}</td>
+                <td>{{ $call['contact_msisdn'] ?: '—' }}</td>
+                <td>
+                  @if (isset($call['duration_seconds']) && $call['duration_seconds'] !== null)
+                    @php
+                      $durationSeconds = max(0, (int) $call['duration_seconds']);
+                      $durationFormatted = $durationSeconds >= 3600
+                        ? gmdate('H:i:s', $durationSeconds)
+                        : gmdate('i:s', $durationSeconds);
+                    @endphp
+                    <span>{{ $durationFormatted }}</span>
+                  @else
+                    <span class="text-muted">—</span>
+                  @endif
+                </td>
+                <td>{{ $call['status_text'] ?: '—' }}</td>
+                <td>
+                  @if ($call['recording_exists'])
+                    <span class="badge badge-success">Sí</span>
+                  @else
+                    <span class="badge badge-secondary">No</span>
+                  @endif
+                </td>
+                <td>
+                  @if ($call['local_exists'])
+                    <span class="badge badge-success">Existe</span>
+                    <div class="small text-muted">{{ $call['local_sources'] ?: 'detectado' }}</div>
+                  @elseif ($isMissing)
+                    <span class="badge badge-warning">Faltante</span>
+                  @else
+                    <span class="badge badge-secondary">Sin audio</span>
+                  @endif
+                </td>
+                <td style="max-width: 320px; word-break: break-word;">
+                  @if (!empty($call['recording_url']))
+                    <a href="{{ $call['recording_url'] }}" target="_blank" rel="noopener noreferrer">
+                      {{ \Illuminate\Support\Str::limit($call['recording_url'], 90) }}
+                    </a>
+                  @else
+                    <span class="text-muted">—</span>
+                  @endif
+                </td>
+                <td style="min-width: 250px;">
+                  <details>
+                    <summary class="small" style="cursor: pointer;">Ver payload</summary>
+                    <pre class="mb-0 p-2 bg-light border rounded mt-2" style="max-height: 160px; overflow: auto; white-space: pre-wrap; word-break: break-word;">{{ $call['raw_json'] }}</pre>
+                  </details>
+                </td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    </form>
+  @else
+    <div class="alert alert-info">No se encontraron llamadas con esos filtros.</div>
+  @endif
+@endif
+
+<h2 class="mt-4 mb-3">Recuperaciones recientes</h2>
+<div class="table-responsive">
+  <table class="table table-sm table-striped table-hover">
+    <thead class="thead-light">
+      <tr>
+        <th>Fecha</th>
+        <th>Call SID</th>
+        <th>Estado</th>
+        <th>Archivo local</th>
+        <th>Tamaño</th>
+        <th>Error</th>
+      </tr>
+    </thead>
+    <tbody>
+      @forelse ($recoveries as $recovery)
+        @php
+          $statusClass = match ($recovery->status) {
+            \App\Models\TwilioCallRecovery::STATUS_RECOVERED => 'badge-success',
+            \App\Models\TwilioCallRecovery::STATUS_PROCESSING => 'badge-primary',
+            \App\Models\TwilioCallRecovery::STATUS_QUEUED => 'badge-info',
+            \App\Models\TwilioCallRecovery::STATUS_NO_RECORDING => 'badge-secondary',
+            default => 'badge-danger',
+          };
+        @endphp
+        <tr>
+          <td>{{ optional($recovery->updated_at)->format('Y-m-d H:i:s') }}</td>
+          <td><code>{{ $recovery->call_sid }}</code></td>
+          <td><span class="badge {{ $statusClass }}">{{ $recovery->status }}</span></td>
+          <td style="max-width: 280px; word-break: break-word;">{{ $recovery->local_file_path ?: '—' }}</td>
+          <td>{{ $recovery->local_file_size ? number_format((int) $recovery->local_file_size) : '—' }}</td>
+          <td style="max-width: 320px; word-break: break-word;">{{ $recovery->error ?: '—' }}</td>
+        </tr>
+      @empty
+        <tr>
+          <td colspan="6" class="text-center text-muted">Aún no hay recuperaciones en cola.</td>
+        </tr>
+      @endforelse
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function toggleTwilioMissing(state) {
+    const checkboxes = document.querySelectorAll('.js-twilio-selector');
+    checkboxes.forEach((checkbox) => {
+      checkbox.checked = state;
+    });
+  }
+</script>
+@endsection

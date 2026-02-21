@@ -36,6 +36,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\TwilioCallRecoveryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoipController;
 use App\Http\Controllers\WhatsAppAPIController;
@@ -410,6 +411,8 @@ Route::middleware('auth')->prefix('reports')->group(function () {
     Route::get('/views/retell_inbox', [ReportController::class, 'retellInbox']);
     Route::get('/views/channels_calls_recovery', [ChannelsCallRecoveryController::class, 'index'])->name('reports.channels_calls_recovery');
     Route::post('/views/channels_calls_recovery/queue', [ChannelsCallRecoveryController::class, 'queue'])->name('reports.channels_calls_recovery.queue');
+    Route::get('/views/twilio_calls_recovery', [TwilioCallRecoveryController::class, 'index'])->name('reports.twilio_calls_recovery');
+    Route::post('/views/twilio_calls_recovery/queue', [TwilioCallRecoveryController::class, 'queue'])->name('reports.twilio_calls_recovery.queue');
     Route::get('/views/customers_lead_classifications', [ReportController::class, 'customersLeadClassifications']);
     Route::post('/views/customers_lead_classifications/run', [ReportController::class, 'runCustomersLeadClassifications'])
         ->name('reports.customers_lead_classifications.run');

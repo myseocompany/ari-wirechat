@@ -130,6 +130,11 @@
         <p>Busca llamadas faltantes de Channels y encola la recuperación de audios.</p>
         <a href="{{ route('reports.channels_calls_recovery') }}" class="btn btn-light btn-sm">Abrir recuperación</a>
       </article>
+      <article class="config-card">
+        <h3>Recuperación Twilio</h3>
+        <p>Busca llamadas faltantes de Twilio y encola la recuperación de audios.</p>
+        <a href="{{ route('reports.twilio_calls_recovery') }}" class="btn btn-light btn-sm">Abrir recuperación</a>
+      </article>
     </div>
   </section>
 </div>
