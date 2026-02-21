@@ -1,12 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "WhatsApp Outgoing -> arichat webhook",
+  "name": "WhatsApp CRM Sync",
   "version": "0.2.0",
-  "description": "Captura mensajes salientes en WhatsApp Web y los envía a https://arichat.co/api/sellerchat/outgoing",
+  "description": "Captura mensajes salientes en WhatsApp Web y los envia a tu endpoint CRM",
   "permissions": ["storage"],
+  "action": {
+    "default_title": "WhatsApp CRM Config",
+    "default_popup": "options.html"
+  },
   "host_permissions": [
     "https://web.whatsapp.com/*",
-    "https://arichat.co/*"
+    "https://*/*",
+    "http://*/*"
   ],
   "background": {
     "service_worker": "background.js",
@@ -19,5 +24,10 @@
       "run_at": "document_idle"
     }
   ],
-  "options_page": "options.html"
+  "web_accessible_resources": [
+    {
+      "resources": ["injected.js"],
+      "matches": ["https://web.whatsapp.com/*"]
+    }
+  ]
 }

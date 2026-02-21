@@ -3,27 +3,73 @@
   <head>
     <meta charset="utf-8" />
     <title>Config</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        width: 360px;
+        margin: 12px;
+      }
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 4px;
+      }
+      .row {
+        margin-bottom: 10px;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
+      .debug-box {
+        margin-top: 10px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background: #f7f7f7;
+        font-size: 12px;
+        white-space: pre-wrap;
+      }
+    </style>
   </head>
   <body>
-    <h3>Config arichat webhook</h3>
-    <label>
-      Phone fallback (opcional):
-      <input id="phone" placeholder="+57..." />
-    </label>
-    <br />
-    <label>
-      APIKEY:
-      <input id="APIKEY" placeholder="AWB_..." style="width: 480px" />
-    </label>
-    <br />
-    <label>
-      CRM User ID (opcional):
-      <input id="crm_user_id" placeholder="123" />
-    </label>
-    <br />
-    <button id="save">Guardar</button>
-    <button id="test">Probar endpoint</button>
+    <h3>Config WhatsApp CRM</h3>
+    <div class="row">
+      <label>
+        Instancia detectada:
+        <input id="instance_key" readonly />
+      </label>
+    </div>
+    <div class="row">
+      <label>
+        Endpoint:
+        <input id="endpoint" placeholder="https://arichat.co/api/whatsapp/outgoing" />
+      </label>
+    </div>
+    <div class="row">
+      <label>
+        Phone fallback (opcional):
+        <input id="phone" placeholder="+57..." />
+      </label>
+    </div>
+    <div class="row">
+      <label>
+        APIKEY:
+        <input id="APIKEY" placeholder="AWB_..." />
+      </label>
+    </div>
+    <div class="row">
+      <label>
+        CRM User ID (opcional):
+        <input id="crm_user_id" placeholder="123" />
+      </label>
+    </div>
+    <div class="actions">
+      <button id="save">Guardar</button>
+      <button id="test">Probar endpoint</button>
+    </div>
     <p id="status"></p>
+    <div id="runtime" class="debug-box">Sin actividad registrada.</div>
 
     <script src="options.js"></script>
   </body>

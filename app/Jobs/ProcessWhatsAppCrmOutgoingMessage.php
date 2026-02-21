@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class ProcessSellerChatOutgoingMessage implements ShouldQueue
+class ProcessWhatsAppCrmOutgoingMessage implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;
@@ -33,6 +33,7 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
      *     id: string,
      *     type: string,
      *     user: string,
+     *     instance_key?: string,
      *     phone: string,
      *     content: string,
      *     APIKEY: string,
@@ -50,7 +51,7 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
     ): void {
         $externalMessageId = trim((string) ($this->payload['id'] ?? ''));
         if ($externalMessageId === '') {
-            Log::warning('WhatsApp outgoing skipped: empty message id', [
+            Log::warning('WhatsApp CRM outgoing skipped: empty message id', [
                 'payload' => $this->payload,
             ]);
 
@@ -58,7 +59,7 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
         }
 
         if (WhatsAppMessageMap::query()->where('external_message_id', $externalMessageId)->exists()) {
-            Log::info('WhatsApp outgoing skipped: duplicate external_message_id', [
+            Log::info('WhatsApp CRM outgoing skipped: duplicate external_message_id', [
                 'external_message_id' => $externalMessageId,
             ]);
 
@@ -72,7 +73,7 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
             ->first();
 
         if (! $messageSource) {
-            Log::warning('WhatsApp outgoing skipped: message source not found', [
+            Log::warning('WhatsApp CRM outgoing skipped: message source not found', [
                 'external_message_id' => $externalMessageId,
                 'apikey_prefix' => mb_substr($incomingApiKey, 0, 6),
                 'apikey_length' => mb_strlen($incomingApiKey),
@@ -82,7 +83,7 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
         }
 
         if (! $messageSource->isActive()) {
-            Log::warning('WhatsApp outgoing skipped: message source inactive', [
+            Log::warning('WhatsApp CRM outgoing skipped: message source inactive', [
                 'external_message_id' => $externalMessageId,
                 'message_source_id' => $messageSource->id,
             ]);
@@ -92,7 +93,7 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
 
         $phone = $this->normalizePhone((string) ($this->payload['phone'] ?? ''));
         if ($phone === '') {
-            Log::warning('WhatsApp outgoing skipped: invalid phone', [
+            Log::warning('WhatsApp CRM outgoing skipped: invalid phone', [
                 'external_message_id' => $externalMessageId,
             ]);
 
@@ -101,16 +102,17 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
 
         $body = trim((string) ($this->payload['content'] ?? ''));
         if ($body === '') {
-            Log::warning('WhatsApp outgoing skipped: empty content', [
+            Log::warning('WhatsApp CRM outgoing skipped: empty content', [
                 'external_message_id' => $externalMessageId,
             ]);
 
             return;
         }
 
-        Log::info('WhatsApp outgoing processing started', [
+        Log::info('WhatsApp CRM outgoing processing started', [
             'external_message_id' => $externalMessageId,
             'phone' => $phone,
+            'instance_key' => $this->payload['instance_key'] ?? null,
         ]);
 
         DB::transaction(function () use (
@@ -160,7 +162,7 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
 
             $advisor = $this->resolveAdvisor($customer, $messageSource);
             if (! $advisor) {
-                Log::warning('WhatsApp outgoing skipped: advisor unresolved', [
+                Log::warning('WhatsApp CRM outgoing skipped: advisor unresolved', [
                     'external_message_id' => $externalMessageId,
                     'customer_id' => $customer->id,
                     'message_source_id' => $messageSource->id,
@@ -194,7 +196,7 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
                 ],
             ]);
 
-            Log::info('WhatsApp outgoing stored successfully', [
+            Log::info('WhatsApp CRM outgoing stored successfully', [
                 'external_message_id' => $externalMessageId,
                 'wire_message_id' => $message->id,
                 'conversation_id' => $conversation->id,
@@ -206,7 +208,7 @@ class ProcessSellerChatOutgoingMessage implements ShouldQueue
 
     public function failed(Throwable $exception): void
     {
-        Log::error('WhatsApp outgoing job failed', [
+        Log::error('WhatsApp CRM outgoing job failed', [
             'payload' => $this->payload,
             'error' => $exception->getMessage(),
         ]);
