@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "WhatsApp Outgoing -> arichat webhook",
+  "version": "0.2.0",
+  "description": "Captura mensajes salientes en WhatsApp Web y los envía a https://arichat.co/api/sellerchat/outgoing",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://web.whatsapp.com/*",
+    "https://arichat.co/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html"
+}

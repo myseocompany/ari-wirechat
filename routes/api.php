@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\Api\CustomerApiController;
 use App\Http\Controllers\Api\MachineReportController;
 use App\Http\Controllers\Api\QuizController;
+use App\Http\Controllers\Api\SellerChatOutgoingController;
 use App\Http\Controllers\Api\WAToolBoxController;
 use App\Http\Controllers\Api\WhatsAppWebhookController;
 use App\Http\Controllers\VoipController;
@@ -24,6 +25,7 @@ Route::middleware('api')->group(
         Route::post('/watoolbox/testping', function () {
             return response()->json(['pong' => true]);
         });
+        Route::post('/sellerchat/outgoing', [SellerChatOutgoingController::class, 'store']);
 
         Route::post('/campaigns/{campaign_id}/send-to/{customer_id}', [APIController::class, 'sendCampaign']);
 
