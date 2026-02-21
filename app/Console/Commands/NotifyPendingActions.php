@@ -112,16 +112,6 @@ TXT;
                 }
             });
 
-        Log::info('actions:notify finished', [
-            'window_minutes' => $windowMinutes,
-            'sent' => $sent,
-            'skipped_no_email' => $skippedNoEmail,
-            'total_found' => $total,
-            'window_start' => $now->toDateTimeString(),
-            'window_end' => $windowEnd->toDateTimeString(),
-            'system_now' => now()->toDateTimeString(),
-        ]);
-
         $this->info("actions:notify sent={$sent} skipped_no_email={$skippedNoEmail} total_found={$total} window_start={$now} window_end={$windowEnd} system_now=".now());
 
         return self::SUCCESS;

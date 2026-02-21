@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\MachineAdminController;
 use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\AudienceController;
 use App\Http\Controllers\CampaignController;
+use App\Http\Controllers\ChannelsCallRecoveryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerFileController;
 use App\Http\Controllers\CustomerStatusController;
@@ -407,6 +408,8 @@ Route::middleware('auth')->prefix('reports')->group(function () {
     Route::get('/views/daily_customers_followup', [CustomerController::class, 'daily']);
     Route::get('/views/customers_messages_count', [ReportController::class, 'customersByMessageCount']);
     Route::get('/views/retell_inbox', [ReportController::class, 'retellInbox']);
+    Route::get('/views/channels_calls_recovery', [ChannelsCallRecoveryController::class, 'index'])->name('reports.channels_calls_recovery');
+    Route::post('/views/channels_calls_recovery/queue', [ChannelsCallRecoveryController::class, 'queue'])->name('reports.channels_calls_recovery.queue');
     Route::get('/views/customers_lead_classifications', [ReportController::class, 'customersLeadClassifications']);
     Route::post('/views/customers_lead_classifications/run', [ReportController::class, 'runCustomersLeadClassifications'])
         ->name('reports.customers_lead_classifications.run');

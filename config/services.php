@@ -46,6 +46,14 @@ return [
         'test_event_code' => env('META_CONVERSIONS_TEST_EVENT_CODE'),
     ],
 
+    'channels' => [
+        'base_url' => env('CHANNELS_API_BASE_URL', 'https://api.channels.app'),
+        'api_token' => env('CHANNELS_API_TOKEN'),
+        'account' => env('CHANNELS_ACCOUNT'),
+        'secret' => env('CHANNELS_WEBHOOK_SECRET'),
+        'timeout' => (int) env('CHANNELS_API_TIMEOUT', 30),
+    ],
+
     'twilio' => [
         'account_sid' => env('TWILIO_ACCOUNT_SID'),
         'auth_token' => env('TWILIO_AUTH_TOKEN'),

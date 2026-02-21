@@ -1,0 +1,420 @@
+<?php
+
+namespace App\Services;
+
+use Carbon\CarbonImmutable;
+
+class ChannelsCallNormalizer
+{
+    public function extractCallItems(array $response): array
+    {
+        $items = $this->extractList($response);
+        $calls = [];
+
+        foreach ($items as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $calls[] = $this->normalizeCall($item);
+        }
+
+        return $this->uniqueCalls($calls);
+    }
+
+    public function normalizeCall(array $call): array
+    {
+        $callId = $this->extractCallId($call) ?? 'unknown-'.substr(sha1((string) json_encode($call)), 0, 16);
+        $recordingUrl = $this->extractRecordingUrl($call);
+        $recordingExists = $this->firstBooleanValue($call, [
+            'recordingExists',
+            'recording.exists',
+            'hasRecording',
+            'has_recording',
+        ]);
+
+        if ($recordingExists === null) {
+            $recordingExists = $recordingUrl !== null;
+        }
+
+        return [
+            'call_id' => $callId,
+            'call_created_at' => $this->parseDate($this->firstStringValue($call, [
+                'createdAt',
+                'created_at',
+                'startedAt',
+                'started_at',
+                'startAt',
+                'start_at',
+                'date',
+            ])),
+            'msisdn' => $this->normalizePhone($this->firstStringValue($call, [
+                'msisdn',
+                'phoneNumber',
+                'phone',
+                'to',
+                'toNumber',
+                'contact.msisdns.0',
+            ])),
+            'agent_id' => $this->firstStringValue($call, [
+                'agentId',
+                'agent_id',
+                'agent.id',
+            ]),
+            'recording_exists' => $recordingExists,
+            'recording_url' => $recordingUrl,
+            'status' => $this->firstStringValue($call, [
+                'status',
+                'callStatus',
+                'call_status',
+                'lastEventType',
+            ]),
+            'raw' => $call,
+        ];
+    }
+
+    public function uniqueCalls(array $calls): array
+    {
+        $unique = [];
+
+        foreach ($calls as $call) {
+            if (! is_array($call)) {
+                continue;
+            }
+
+            $key = strtolower((string) ($call['call_id'] ?? ''));
+            if ($key === '') {
+                $key = 'unknown-'.substr(sha1((string) json_encode($call)), 0, 16);
+            }
+
+            $unique[$key] = $call;
+        }
+
+        $rows = array_values($unique);
+        usort($rows, function (array $left, array $right): int {
+            $leftDate = $left['call_created_at'] ?? null;
+            $rightDate = $right['call_created_at'] ?? null;
+
+            if ($leftDate instanceof CarbonImmutable && $rightDate instanceof CarbonImmutable) {
+                return $rightDate->getTimestamp() <=> $leftDate->getTimestamp();
+            }
+
+            if ($leftDate instanceof CarbonImmutable) {
+                return -1;
+            }
+
+            if ($rightDate instanceof CarbonImmutable) {
+                return 1;
+            }
+
+            return strcmp((string) ($right['call_id'] ?? ''), (string) ($left['call_id'] ?? ''));
+        });
+
+        return $rows;
+    }
+
+    public function extractCallId(array $payload): ?string
+    {
+        $callId = $this->firstStringValue($payload, [
+            'callId',
+            'call_id',
+            'id',
+            'call.id',
+            'conversationId',
+            'conversation_id',
+        ]);
+
+        if ($callId !== null) {
+            return $callId;
+        }
+
+        return $this->searchStringByKeyPattern($payload, 'call', true);
+    }
+
+    public function extractRecordingUrl(array $payload): ?string
+    {
+        $url = $this->firstStringValue($payload, [
+            'recordingLink',
+            'recordingUrl',
+            'recording_url',
+            'recording.url',
+            'recording.link',
+            'audio.url',
+            'audioUrl',
+            'link',
+            'url',
+            'data.recordingUrl',
+            'data.recordingLink',
+            'data.link',
+            'data.url',
+        ]);
+
+        $normalized = $this->normalizePotentialUrl($url);
+        if ($normalized !== null) {
+            return $normalized;
+        }
+
+        return $this->searchStringByKeyPattern($payload, 'recording', false);
+    }
+
+    public function extractToken(array $payload): ?string
+    {
+        return $this->firstStringValue($payload, [
+            'token',
+            'recordingToken',
+            'archiveToken',
+            'data.token',
+            'data.recordingToken',
+            'data.archiveToken',
+        ]);
+    }
+
+    public function parseDate(?string $value): ?CarbonImmutable
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        try {
+            return CarbonImmutable::parse($value)->utc();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    public function normalizePhone(?string $phone): ?string
+    {
+        if ($phone === null) {
+            return null;
+        }
+
+        $digits = preg_replace('/\D+/', '', $phone);
+        if (! is_string($digits) || $digits === '') {
+            return null;
+        }
+
+        return $digits;
+    }
+
+    public function normalizeUrlForMatch(?string $url): ?string
+    {
+        $normalized = $this->normalizePotentialUrl($url);
+        if ($normalized === null) {
+            return null;
+        }
+
+        $scheme = strtolower((string) parse_url($normalized, PHP_URL_SCHEME));
+        $host = strtolower((string) parse_url($normalized, PHP_URL_HOST));
+        $path = (string) parse_url($normalized, PHP_URL_PATH);
+
+        if ($host === '') {
+            $fallback = preg_replace('/[?#].*$/', '', trim($normalized));
+            if (! is_string($fallback) || $fallback === '') {
+                return null;
+            }
+
+            return strtolower(rtrim($fallback, '/'));
+        }
+
+        $path = rtrim($path, '/');
+        if ($path === '') {
+            $path = '/';
+        }
+
+        return sprintf('%s://%s%s', $scheme === '' ? 'https' : $scheme, $host, $path);
+    }
+
+    public function unwrapWebhookPayload(mixed $payload): array
+    {
+        if (is_string($payload)) {
+            $decoded = json_decode($payload, true);
+            $payload = is_array($decoded) ? $decoded : [];
+        }
+
+        if (! is_array($payload)) {
+            return [];
+        }
+
+        $data = $payload;
+        if (array_is_list($data) && isset($data[0]) && is_array($data[0])) {
+            $data = $data[0];
+        }
+
+        if (isset($data['body']) && is_array($data['body'])) {
+            $data = $data['body'];
+        }
+
+        return $data;
+    }
+
+    public function extractCallIdFromWebhook(mixed $payload, ?string $payloadRaw = null): ?string
+    {
+        $data = $this->unwrapWebhookPayload($payload);
+        $callId = $this->extractCallId($data);
+        if ($callId !== null) {
+            return $callId;
+        }
+
+        if ($payloadRaw === null || $payloadRaw === '') {
+            return null;
+        }
+
+        if (preg_match('/"(?:callId|call_id|conversationId|conversation_id)"\s*:\s*"([^"]+)"/i', $payloadRaw, $matches) === 1) {
+            return trim((string) ($matches[1] ?? '')) ?: null;
+        }
+
+        return null;
+    }
+
+    public function extractRecordingUrlFromWebhook(mixed $payload, ?string $payloadRaw = null): ?string
+    {
+        $data = $this->unwrapWebhookPayload($payload);
+        $url = $this->extractRecordingUrl($data);
+        if ($url !== null) {
+            return $url;
+        }
+
+        if ($payloadRaw === null || $payloadRaw === '') {
+            return null;
+        }
+
+        if (preg_match('/"(?:recordingLink|recordingUrl|recording_url|audioUrl|audio_url)"\s*:\s*"([^"]+)"/i', $payloadRaw, $matches) === 1) {
+            return $this->normalizePotentialUrl((string) ($matches[1] ?? ''));
+        }
+
+        return null;
+    }
+
+    private function extractList(array $response): array
+    {
+        $candidates = [
+            data_get($response, 'calls'),
+            data_get($response, 'data.calls'),
+            data_get($response, 'data.items'),
+            data_get($response, 'items'),
+            data_get($response, 'results'),
+            data_get($response, 'data'),
+            $response,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (! is_array($candidate) || ! array_is_list($candidate)) {
+                continue;
+            }
+
+            if ($candidate === [] || is_array($candidate[0] ?? null)) {
+                return $candidate;
+            }
+        }
+
+        return [];
+    }
+
+    private function firstStringValue(array $payload, array $paths): ?string
+    {
+        foreach ($paths as $path) {
+            $value = data_get($payload, $path);
+
+            if (is_string($value)) {
+                $trimmed = trim($value);
+                if ($trimmed !== '') {
+                    return $trimmed;
+                }
+            }
+
+            if (is_numeric($value)) {
+                return (string) $value;
+            }
+        }
+
+        return null;
+    }
+
+    private function firstBooleanValue(array $payload, array $paths): ?bool
+    {
+        foreach ($paths as $path) {
+            $value = data_get($payload, $path);
+
+            if (is_bool($value)) {
+                return $value;
+            }
+
+            if (is_numeric($value)) {
+                return (int) $value === 1;
+            }
+
+            if (is_string($value)) {
+                $normalized = strtolower(trim($value));
+                if (in_array($normalized, ['1', 'true', 'yes'], true)) {
+                    return true;
+                }
+
+                if (in_array($normalized, ['0', 'false', 'no'], true)) {
+                    return false;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function normalizePotentialUrl(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        if (str_starts_with($trimmed, '//')) {
+            $trimmed = 'https:'.$trimmed;
+        }
+
+        if (filter_var($trimmed, FILTER_VALIDATE_URL) === false) {
+            return null;
+        }
+
+        return $trimmed;
+    }
+
+    private function searchStringByKeyPattern(array $payload, string $needle, bool $allowAnyValue): ?string
+    {
+        foreach ($payload as $key => $value) {
+            if (is_array($value)) {
+                $nested = $this->searchStringByKeyPattern($value, $needle, $allowAnyValue);
+                if ($nested !== null) {
+                    return $nested;
+                }
+
+                continue;
+            }
+
+            if (! is_string($key) || ! is_string($value)) {
+                continue;
+            }
+
+            if (! str_contains(strtolower($key), strtolower($needle))) {
+                continue;
+            }
+
+            if ($allowAnyValue) {
+                $trimmed = trim($value);
+                if ($trimmed !== '') {
+                    return $trimmed;
+                }
+
+                continue;
+            }
+
+            $url = $this->normalizePotentialUrl($value);
+            if ($url !== null) {
+                return $url;
+            }
+        }
+
+        return null;
+    }
+}
