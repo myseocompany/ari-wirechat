@@ -135,6 +135,11 @@
         <p>Busca llamadas faltantes de Twilio y encola la recuperación de audios.</p>
         <a href="{{ route('reports.twilio_calls_recovery') }}" class="btn btn-light btn-sm">Abrir recuperación</a>
       </article>
+      <article class="config-card">
+        <h3>Listado llamadas Twilio</h3>
+        <p>Consulta llamadas Twilio con filtros por fecha, asesor, estado, SID y audio.</p>
+        <a href="{{ route('reports.twilio_calls') }}" class="btn btn-light btn-sm">Ver llamadas</a>
+      </article>
     </div>
   </section>
 </div>

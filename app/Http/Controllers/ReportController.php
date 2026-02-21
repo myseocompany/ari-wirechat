@@ -7,6 +7,7 @@ use App\Http\Requests\CustomerMessagesReportRequest;
 use App\Http\Requests\LeadConversationClassificationReportRequest;
 use App\Http\Requests\LeadConversationClassificationRunRequest;
 use App\Http\Requests\RetellInboxReportRequest;
+use App\Http\Requests\TwilioCallsReportRequest;
 use App\Models\Action;
 use App\Models\ActionType;
 use App\Models\Customer;
@@ -797,6 +798,89 @@ class ReportController extends Controller
         $users = User::where('status_id', 1)->orderBy('name')->get();
 
         return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
+    }
+
+    public function twilioCalls(TwilioCallsReportRequest $request): View
+    {
+        $fromDate = $request->filled('from_date')
+            ? Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay()
+            : now()->subDays(30)->startOfDay();
+        $toDate = $request->filled('to_date')
+            ? Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay()
+            : now()->endOfDay();
+
+        $model = Action::query()
+            ->select(
+                'actions.*',
+                'customers.name as customer_name',
+                'customers.phone as customer_phone',
+                'customers.phone2 as customer_phone2',
+                'customers.contact_phone2 as customer_contact_phone2',
+                'users.name as user_name'
+            )
+            ->leftJoin('customers', 'customers.id', '=', 'actions.customer_id')
+            ->leftJoin('users', 'users.id', '=', 'actions.creator_user_id')
+            ->where('actions.type_id', 21)
+            ->whereBetween('actions.created_at', [$fromDate, $toDate])
+            ->where(function ($query): void {
+                $query->where('actions.note', 'like', '%twilio_call_sid:%')
+                    ->orWhere('actions.note', 'like', '%Twilio%')
+                    ->orWhere('actions.url', 'like', '%api.twilio.com%/Recordings/%');
+            })
+            ->when($request->filled('call_sid'), function ($query) use ($request) {
+                $callSid = trim((string) $request->string('call_sid'));
+                $query->where(function ($subQuery) use ($callSid): void {
+                    $subQuery->where('actions.note', 'like', '%twilio_call_sid:'.$callSid.'%')
+                        ->orWhere('actions.note', 'like', '%call_sid: '.$callSid.'%')
+                        ->orWhere('actions.note', 'like', '%'.$callSid.'%')
+                        ->orWhere('actions.url', 'like', '%'.$callSid.'%');
+                });
+            })
+            ->when($request->filled('customer_search'), function ($query) use ($request) {
+                $term = '%'.trim((string) $request->string('customer_search')).'%';
+                $query->where('customers.name', 'like', $term);
+            })
+            ->when($request->filled('phone'), function ($query) use ($request) {
+                $digits = preg_replace('/\D+/', '', (string) $request->string('phone'));
+                $digits = is_string($digits) ? $digits : '';
+                if ($digits === '') {
+                    return;
+                }
+
+                $query->where(function ($subQuery) use ($digits): void {
+                    $subQuery
+                        ->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(customers.phone,' ',''),'-',''),'(',''),')',''),'+','') LIKE ?", ["%{$digits}%"])
+                        ->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(customers.phone2,' ',''),'-',''),'(',''),')',''),'+','') LIKE ?", ["%{$digits}%"])
+                        ->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(customers.contact_phone2,' ',''),'-',''),'(',''),')',''),'+','') LIKE ?", ["%{$digits}%"]);
+                });
+            })
+            ->when($request->filled('user_id'), function ($query) use ($request) {
+                $query->where('actions.creator_user_id', $request->integer('user_id'));
+            })
+            ->when($request->filled('twilio_status'), function ($query) use ($request) {
+                $status = trim((string) $request->string('twilio_status'));
+                $query->where('actions.note', 'like', '%Estado Twilio:%'.$status.'%');
+            })
+            ->when($request->input('has_recording') === 'yes', function ($query) {
+                $query->whereNotNull('actions.url')
+                    ->where('actions.url', '<>', '');
+            })
+            ->when($request->input('has_recording') === 'no', function ($query) {
+                $query->where(function ($subQuery): void {
+                    $subQuery->whereNull('actions.url')
+                        ->orWhere('actions.url', '=', '');
+                });
+            })
+            ->orderByDesc('actions.created_at')
+            ->paginate(25)
+            ->withQueryString();
+
+        $users = User::query()
+            ->where('status_id', 1)
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return view('reports.views.twilio_calls_list', compact('model', 'fromDate', 'toDate', 'request', 'users'));
     }
 
     public function retellInbox(RetellInboxReportRequest $request): View
