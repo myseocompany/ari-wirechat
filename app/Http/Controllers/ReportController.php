@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AssociateRetellInboxCustomerRequest;
 use App\Http\Requests\CalculatorCustomersReportRequest;
 use App\Http\Requests\CustomerMessagesReportRequest;
 use App\Http\Requests\LeadConversationClassificationReportRequest;
@@ -994,6 +995,88 @@ class ReportController extends Controller
             ->withQueryString();
 
         return view('reports.views.retell_inbox', compact('model', 'fromDate', 'toDate', 'request', 'hasRetellCallId'));
+    }
+
+    public function associateRetellInboxCustomer(AssociateRetellInboxCustomerRequest $request): RedirectResponse
+    {
+        if (! Schema::hasTable('actions') || ! Schema::hasColumn('actions', 'retell_call_id')) {
+            return back()->withErrors([
+                'customer_id' => 'No se puede asociar la llamada porque la columna actions.retell_call_id no existe.',
+            ], 'retellAssociation');
+        }
+
+        $validated = $request->validated();
+        $callId = (string) $validated['call_id'];
+        $customerId = (int) $validated['customer_id'];
+
+        $action = Action::query()
+            ->withTrashed()
+            ->where('retell_call_id', $callId)
+            ->first();
+
+        if ($action?->trashed()) {
+            $action->restore();
+        }
+
+        if (! $action) {
+            $action = new Action;
+            $action->retell_call_id = $callId;
+            $action->type_id = 104;
+            $action->creator_user_id = auth()->id() ?? 1;
+            $action->note = 'Llamada (Retell) - Asociacion manual desde Retell Inbox.';
+            $action->url = $this->resolveRetellCallUrl($callId);
+        }
+
+        if (! $action->type_id) {
+            $action->type_id = 104;
+        }
+
+        if (! $action->creator_user_id) {
+            $action->creator_user_id = auth()->id() ?? 1;
+        }
+
+        $action->customer_id = $customerId;
+        $action->save();
+
+        return back()->with('retell_association_success', "La llamada {$callId} quedo asociada al cliente #{$customerId}.");
+    }
+
+    private function resolveRetellCallUrl(string $callId): ?string
+    {
+        $payload = DB::table('retell_inbox')
+            ->where('call_id', $callId)
+            ->value('payload');
+
+        if (! is_string($payload) || trim($payload) === '') {
+            return null;
+        }
+
+        $decodedPayload = json_decode($payload, true);
+        if (! is_array($decodedPayload)) {
+            return null;
+        }
+
+        $normalizedPayload = isset($decodedPayload[0]) && is_array($decodedPayload[0]) ? $decodedPayload[0] : $decodedPayload;
+
+        if (isset($normalizedPayload['body']) && is_array($normalizedPayload['body'])) {
+            $normalizedPayload = $normalizedPayload['body'];
+        }
+
+        $callPayload = isset($normalizedPayload['call']) && is_array($normalizedPayload['call'])
+            ? $normalizedPayload['call']
+            : $normalizedPayload;
+
+        $recordingUrl = data_get($callPayload, 'recording_url');
+        if (is_string($recordingUrl) && trim($recordingUrl) !== '') {
+            return $recordingUrl;
+        }
+
+        $publicLogUrl = data_get($callPayload, 'public_log_url');
+        if (is_string($publicLogUrl) && trim($publicLogUrl) !== '') {
+            return $publicLogUrl;
+        }
+
+        return null;
     }
 
     public function customersLeadClassifications(LeadConversationClassificationReportRequest $request): View

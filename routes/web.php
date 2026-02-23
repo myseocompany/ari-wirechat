@@ -410,6 +410,7 @@ Route::middleware('auth')->prefix('reports')->group(function () {
     Route::get('/views/customers_messages_count', [ReportController::class, 'customersByMessageCount']);
     Route::get('/views/twilio_calls', [ReportController::class, 'twilioCalls'])->name('reports.twilio_calls');
     Route::get('/views/retell_inbox', [ReportController::class, 'retellInbox']);
+    Route::post('/views/retell_inbox/associate-customer', [ReportController::class, 'associateRetellInboxCustomer'])->name('reports.retell_inbox.associate_customer');
     Route::get('/views/channels_calls_recovery', [ChannelsCallRecoveryController::class, 'index'])->name('reports.channels_calls_recovery');
     Route::post('/views/channels_calls_recovery/queue', [ChannelsCallRecoveryController::class, 'queue'])->name('reports.channels_calls_recovery.queue');
     Route::get('/views/twilio_calls_recovery', [TwilioCallRecoveryController::class, 'index'])->name('reports.twilio_calls_recovery');

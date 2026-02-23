@@ -12,6 +12,18 @@
   </div>
 </div>
 
+@if (session('retell_association_success'))
+  <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+    {{ session('retell_association_success') }}
+  </div>
+@endif
+
+@if ($errors->retellAssociation->any())
+  <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+    {{ $errors->retellAssociation->first() }}
+  </div>
+@endif
+
 <div class="mb-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
   <form action="/reports/views/retell_inbox" method="GET" class="flex flex-col gap-4">
     <div class="grid gap-4 lg:grid-cols-[repeat(12,minmax(0,1fr))]">
@@ -143,6 +155,7 @@
             $callSuccessfulLabel = is_null($item->call_successful) ? 'Sin dato' : ((int) $item->call_successful === 1 ? 'Sí' : 'No');
             $voicemailLabel = is_null($item->in_voicemail) ? 'Sin dato' : ((int) $item->in_voicemail === 1 ? 'Sí' : 'No');
             $automatizarLabel = is_null($item->busca_automatizar) ? 'Sin dato' : ((int) $item->busca_automatizar === 1 ? 'Sí' : 'No');
+            $manualCustomerInput = old('call_id') === $item->call_id ? old('customer_id') : $customerId;
           @endphp
           <tr class="hover:bg-slate-50">
             <td class="px-4 py-3 align-top">
@@ -197,6 +210,24 @@
                     Acción #{{ $item->action_id }}
                   </a>
                 </div>
+              @endif
+
+              @if($hasRetellCallId)
+                <form action="{{ route('reports.retell_inbox.associate_customer') }}" method="POST" class="mt-2 flex flex-wrap items-center gap-2">
+                  @csrf
+                  <input type="hidden" name="call_id" value="{{ $item->call_id }}">
+                  <input
+                    type="number"
+                    name="customer_id"
+                    min="1"
+                    placeholder="customer_id"
+                    value="{{ $manualCustomerInput }}"
+                    class="w-28 rounded-lg border border-slate-200 px-2 py-1 text-xs text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none"
+                  >
+                  <button type="submit" class="inline-flex items-center rounded-lg bg-slate-800 px-3 py-1 text-xs font-semibold text-white">
+                    {{ $customerId ? 'Actualizar' : 'Asociar' }}
+                  </button>
+                </form>
               @endif
             </td>
           </tr>

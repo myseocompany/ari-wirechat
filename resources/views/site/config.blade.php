@@ -140,6 +140,11 @@
         <p>Consulta llamadas Twilio con filtros por fecha, asesor, estado, SID y audio.</p>
         <a href="{{ route('reports.twilio_calls') }}" class="btn btn-light btn-sm">Ver llamadas</a>
       </article>
+      <article class="config-card">
+        <h3>Reporte Retell Inbox</h3>
+        <p>Consulta eventos de Retell, estado de procesamiento y acciones asociadas.</p>
+        <a href="{{ url('/reports/views/retell_inbox') }}" class="btn btn-light btn-sm">Ver reporte</a>
+      </article>
     </div>
   </section>
 </div>
