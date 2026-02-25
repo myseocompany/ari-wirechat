@@ -25,7 +25,7 @@
 
 @if (! $twilioConfigured)
   <div class="alert alert-warning">
-    Configura <code>TWILIO_ACCOUNT_SID</code> y <code>TWILIO_AUTH_TOKEN</code> para habilitar la búsqueda y recuperación.
+    Twilio está deshabilitado o incompleto. Verifica <code>configs.key=twilio_enabled</code> (valor 1), o <code>TWILIO_ENABLED=true</code>, además de <code>TWILIO_ACCOUNT_SID</code> y <code>TWILIO_AUTH_TOKEN</code>.
   </div>
 @endif
 

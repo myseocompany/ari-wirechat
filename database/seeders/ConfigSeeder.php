@@ -16,5 +16,13 @@ class ConfigSeeder extends Seeder
                 'type' => 'integer',
             ]
         );
+
+        Config::updateOrCreate(
+            ['key' => 'twilio_enabled'],
+            [
+                'value' => '1',
+                'type' => 'boolean',
+            ]
+        );
     }
 }

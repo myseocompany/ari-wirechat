@@ -78,9 +78,20 @@ class TwilioCallRecoveryController extends Controller
         ]);
     }
 
-    public function queue(QueueTwilioRecoveriesRequest $request): RedirectResponse
-    {
+    public function queue(
+        QueueTwilioRecoveriesRequest $request,
+        TwilioRecoveryApiService $twilioRecoveryApiService
+    ): RedirectResponse {
         $validated = $request->validated();
+
+        if (! $twilioRecoveryApiService->isConfigured()) {
+            return redirect()
+                ->route('reports.twilio_calls_recovery', $this->buildRedirectQuery($validated))
+                ->withErrors([
+                    'twilio' => 'Twilio está deshabilitado o incompleto. Activa configs.twilio_enabled (1) o TWILIO_ENABLED=true y configura credenciales.',
+                ]);
+        }
+
         $selectedIndexes = collect($validated['selected_indexes'] ?? [])
             ->map(fn ($value): int => (int) $value)
             ->unique()

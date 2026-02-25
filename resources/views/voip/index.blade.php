@@ -1,6 +1,9 @@
 @extends('layouts.guest')
 
 @section('content')
+    @php
+        $twilioEnabled = app_feature_enabled('twilio_enabled', (bool) config('services.twilio.enabled', true));
+    @endphp
     <div class="flex min-h-screen items-center justify-center px-1 py-1">
         <div class="w-full max-w-[320px] rounded-2xl border border-slate-200 bg-white p-3 shadow-lg shadow-slate-300/30">
             <div class="space-y-1">
@@ -26,6 +29,9 @@
                     </button>
                 </div>
                 <p id="voip-status" class="text-center text-[11px] font-medium text-slate-600">Listo para llamar</p>
+                @if (! $twilioEnabled)
+                    <p class="text-center text-[11px] font-semibold text-rose-600">Twilio está deshabilitado en este entorno.</p>
+                @endif
             </div>
 
             <div class="mt-2 grid grid-cols-3 gap-1">
@@ -46,6 +52,7 @@
             <button
                 id="voip-action"
                 type="button"
+                @disabled(! $twilioEnabled)
                 class="mt-2 inline-flex w-full items-center justify-center rounded-xl bg-emerald-500 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300"
             >
                 Iniciar llamada
@@ -62,6 +69,7 @@
             const actionButton = document.getElementById('voip-action');
             const keypadButtons = document.querySelectorAll('[data-keypad]');
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const twilioEnabled = @json($twilioEnabled);
             const urlParams = new URLSearchParams(window.location.search);
             const prefilledDestination = (urlParams.get('to') || '').trim();
             const shouldAutoCall = urlParams.get('autocall') === '1';
@@ -350,6 +358,11 @@
             }
 
             async function startWebCall() {
+                if (!twilioEnabled) {
+                    setStatus('Twilio está deshabilitado en la configuración.', 'warning');
+                    return;
+                }
+
                 if (isPlacingCall || activeCall) {
                     return;
                 }
@@ -434,6 +447,11 @@
             if (prefilledDestination !== '') {
                 destinationInput.value = prefilledDestination;
                 setStatus('Destino cargado desde CRM.', 'info');
+            }
+
+            if (!twilioEnabled) {
+                setStatus('Twilio deshabilitado', 'warning');
+                setActionEnabled(false);
             }
 
             if (shouldAutoCall && prefilledDestination !== '') {

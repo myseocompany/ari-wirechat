@@ -446,6 +446,10 @@ class ActionController extends Controller
             return redirect()->away($storedAudioUrl);
         }
 
+        if (! $this->isTwilioEnabled()) {
+            abort(503, 'Twilio está deshabilitado en la configuración.');
+        }
+
         $accountSid = trim((string) config('services.twilio.account_sid'));
         $authToken = trim((string) config('services.twilio.auth_token'));
 
@@ -735,6 +739,11 @@ class ActionController extends Controller
 
         return $host === 'api.twilio.com'
             && str_contains($path, '/recordings/');
+    }
+
+    private function isTwilioEnabled(): bool
+    {
+        return app_feature_enabled('twilio_enabled', (bool) config('services.twilio.enabled', true));
     }
 
     private function ensureAudioExtension(string $url): string

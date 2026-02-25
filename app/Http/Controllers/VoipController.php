@@ -27,6 +27,12 @@ class VoipController extends Controller
 
     public function token(GenerateTokenRequest $request, TwilioAccessTokenFactory $factory): JsonResponse
     {
+        if (! $this->isTwilioEnabled()) {
+            return response()->json([
+                'message' => 'Twilio está deshabilitado en la configuración.',
+            ], 503);
+        }
+
         $identity = $request->resolvedIdentity();
 
         try {
@@ -54,6 +60,12 @@ class VoipController extends Controller
 
     public function twiml(RenderTwimlRequest $request): Response
     {
+        if (! $this->isTwilioEnabled()) {
+            return $this->xmlResponse(
+                '<Response><Say voice="alice">Twilio está deshabilitado en este entorno.</Say></Response>'
+            );
+        }
+
         $destinationNumber = $request->explicitDestinationNumber();
         $actionId = $request->actionId();
 
@@ -131,6 +143,12 @@ XML;
 
     public function call(PlaceCallRequest $request): JsonResponse
     {
+        if (! $this->isTwilioEnabled()) {
+            return response()->json([
+                'message' => 'Twilio está deshabilitado en la configuración.',
+            ], 503);
+        }
+
         $accountSid = (string) config('services.twilio.account_sid');
         $authToken = (string) config('services.twilio.auth_token');
         $callerId = (string) config('services.twilio.caller_id');
@@ -184,6 +202,12 @@ XML;
 
     public function callCustomer(Customer $customer, PlaceCustomerCallRequest $request): JsonResponse
     {
+        if (! $this->isTwilioEnabled()) {
+            return response()->json([
+                'message' => 'Twilio está deshabilitado en la configuración.',
+            ], 503);
+        }
+
         $user = $request->user();
 
         if (! $customer->hasFullAccess($user)) {
@@ -304,6 +328,16 @@ XML;
 
     public function statusCallback(TwilioStatusCallbackRequest $request): Response
     {
+        if (! $this->isTwilioEnabled()) {
+            Log::info('Twilio status callback ignored because Twilio is disabled.', [
+                'request_url' => $request->fullUrl(),
+                'action_id' => $request->actionId(),
+                'call_sid' => $request->callSid(),
+            ]);
+
+            return response('OK', 200);
+        }
+
         $this->logTwilioCallback('Twilio status callback received.', $request);
 
         if (! $this->isValidCallback($request->accountSid(), $request->webhookToken())) {
@@ -367,6 +401,16 @@ XML;
 
     public function recordingCallback(TwilioRecordingCallbackRequest $request): Response
     {
+        if (! $this->isTwilioEnabled()) {
+            Log::info('Twilio recording callback ignored because Twilio is disabled.', [
+                'request_url' => $request->fullUrl(),
+                'action_id' => $request->actionId(),
+                'call_sid' => $request->callSid(),
+            ]);
+
+            return response('OK', 200);
+        }
+
         $this->logTwilioCallback('Twilio recording callback received.', $request);
 
         if (! $this->isValidCallback($request->accountSid(), $request->webhookToken())) {
@@ -533,6 +577,11 @@ XML;
         $secret = trim((string) config('services.twilio.webhook_secret'));
 
         return $secret === '' ? null : $secret;
+    }
+
+    private function isTwilioEnabled(): bool
+    {
+        return app_feature_enabled('twilio_enabled', (bool) config('services.twilio.enabled', true));
     }
 
     private function isValidE164Phone(?string $value): bool

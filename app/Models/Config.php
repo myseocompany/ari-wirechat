@@ -23,9 +23,32 @@ class Config extends Model
 
         return match ($config->type) {
             'integer' => intval($value),
-            'boolean' => boolval($value),
-            'json'    => $value !== null ? json_decode($value, true) : null,
-            default   => $value,
+            'boolean' => self::toBoolean($value, $default),
+            'json' => $value !== null ? json_decode($value, true) : null,
+            default => $value,
         };
+    }
+
+    private static function toBoolean(mixed $value, mixed $default = null): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return ((int) $value) === 1;
+        }
+
+        $normalized = strtolower(trim((string) $value));
+
+        if (in_array($normalized, ['1', 'true', 'yes', 'on'], true)) {
+            return true;
+        }
+
+        if (in_array($normalized, ['0', 'false', 'no', 'off', ''], true)) {
+            return false;
+        }
+
+        return (bool) $default;
     }
 }

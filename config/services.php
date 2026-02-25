@@ -55,6 +55,7 @@ return [
     ],
 
     'twilio' => [
+        'enabled' => env('TWILIO_ENABLED', true),
         'account_sid' => env('TWILIO_ACCOUNT_SID'),
         'auth_token' => env('TWILIO_AUTH_TOKEN'),
         'api_key_sid' => env('TWILIO_API_KEY_SID'),

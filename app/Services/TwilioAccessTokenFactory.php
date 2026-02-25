@@ -8,6 +8,10 @@ class TwilioAccessTokenFactory
 {
     public function makeVoiceToken(string $identity): string
     {
+        if (! $this->isTwilioEnabled()) {
+            throw new InvalidArgumentException('Twilio está deshabilitado en la configuración.');
+        }
+
         $accountSid = (string) config('services.twilio.account_sid');
         $apiKeySid = (string) config('services.twilio.api_key_sid');
         $apiKeySecret = (string) config('services.twilio.api_key_secret');
@@ -61,5 +65,10 @@ class TwilioAccessTokenFactory
     protected function base64UrlEncode(string $value): string
     {
         return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
+    }
+
+    private function isTwilioEnabled(): bool
+    {
+        return app_feature_enabled('twilio_enabled', (bool) config('services.twilio.enabled', true));
     }
 }

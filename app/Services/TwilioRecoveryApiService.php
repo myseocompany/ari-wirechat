@@ -13,7 +13,7 @@ class TwilioRecoveryApiService
 {
     public function isConfigured(): bool
     {
-        return $this->accountSid() !== '' && $this->authToken() !== '';
+        return $this->isEnabled() && $this->accountSid() !== '' && $this->authToken() !== '';
     }
 
     public function listCalls(CarbonInterface $fromDate, CarbonInterface $toDate, array $filters = []): array
@@ -548,6 +548,11 @@ class TwilioRecoveryApiService
     private function accountSid(): string
     {
         return trim((string) config('services.twilio.account_sid', ''));
+    }
+
+    private function isEnabled(): bool
+    {
+        return app_feature_enabled('twilio_enabled', (bool) config('services.twilio.enabled', true));
     }
 
     private function authToken(): string
