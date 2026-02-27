@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Role;
-use DB;
-use App\Models\UserStatus;
 use App\Models\Menu;
+use App\Models\Role;
+use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
-    
     /**
      * Create a new controller instance.
      *
@@ -30,6 +27,7 @@ class RoleController extends Controller
     {
         //
         $model = Role::all();
+
         return view('roles.index', compact('model'));
     }
 
@@ -47,7 +45,6 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -56,7 +53,7 @@ class RoleController extends Controller
         $model = new Role;
         $model->id = $request->id;
         $model->name = $request->name;
-        
+
         $model->save();
 
         return redirect('/roles');
@@ -68,7 +65,8 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id) {
+    public function show($id)
+    {
         $role = Role::with(['menus', 'users'])->findOrFail($id);
         $menus = Menu::orderBy('name')->get();
 
@@ -92,7 +90,6 @@ class RoleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
@@ -102,8 +99,7 @@ class RoleController extends Controller
         $model = Role::find($id);
 
         $model->name = $request->name;
-       
-        
+
         $model->save();
 
         return redirect('/roles');
@@ -117,29 +113,39 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
-         $model = Role::find($id);
+        $model = Role::find($id);
         if ($model->delete()) {
-            return redirect('/roles')->with('statustwo', 'El Rol <strong>'.$model->name.'</strong> fué eliminado con éxito!'); 
+            return redirect('/roles')->with('statustwo', 'El Rol <strong>'.$model->name.'</strong> fué eliminado con éxito!');
         }
     }
 
     public function updatePermissions(Request $request, Role $role)
     {
-        $data = $request->input('permissions', []);
+        $validated = $request->validate([
+            'permissions' => ['nullable', 'array'],
+            'permissions.*.create' => ['nullable', 'in:1'],
+            'permissions.*.read' => ['nullable', 'in:1'],
+            'permissions.*.update' => ['nullable', 'in:1'],
+            'permissions.*.delete' => ['nullable', 'in:1'],
+            'can_view_all_customers' => ['nullable', 'boolean'],
+        ]);
+
+        $data = $validated['permissions'] ?? [];
         $syncData = [];
 
         foreach ($data as $menuId => $perms) {
             $syncData[$menuId] = [
                 'create' => isset($perms['create']) ? 1 : 0,
-                'read'   => isset($perms['read']) ? 1 : 0,
+                'read' => isset($perms['read']) ? 1 : 0,
                 'update' => isset($perms['update']) ? 1 : 0,
                 'delete' => isset($perms['delete']) ? 1 : 0,
             ];
         }
 
         $role->menus()->sync($syncData);
+        $role->can_view_all_customers = $request->boolean('can_view_all_customers');
+        $role->save();
 
         return redirect()->back()->with('success', 'Permisos actualizados');
     }
-
 }

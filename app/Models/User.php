@@ -56,6 +56,12 @@ class User extends Authenticatable
 
     public function canViewAllCustomers(): bool
     {
+        $role = $this->relationLoaded('role') ? $this->getRelation('role') : $this->role;
+
+        if ($role && array_key_exists('can_view_all_customers', $role->getAttributes())) {
+            return (bool) $role->can_view_all_customers;
+        }
+
         $allowedRoles = array_map(
             'intval',
             config('permissions.customer_view_all_roles', config('permissions.customer_assign_roles', []))
