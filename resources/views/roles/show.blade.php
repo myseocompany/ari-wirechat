@@ -38,7 +38,9 @@
     </div>
   @endif
 
-  <form method="POST" action="{{ route('roles.updatePermissions', $role->id) }}" class="space-y-6">
+  <div id="customer-access-toast" class="fixed right-4 top-24 z-50 hidden rounded-xl border px-4 py-3 text-sm font-semibold shadow-lg transition"></div>
+
+  <form method="POST" action="{{ route('roles.updatePermissions', $role->id) }}" class="space-y-6" data-role-permissions-form data-ajax-url="{{ route('roles.updatePermissions', $role->id) }}" data-csrf="{{ csrf_token() }}">
     @csrf
     @method('PUT')
 
@@ -60,6 +62,7 @@
               name="can_view_all_customers"
               value="1"
               class="peer sr-only"
+              data-live-toggle
               @checked($role->can_view_all_customers)
             >
             <span class="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-[color:var(--ds-coral)] peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[color:var(--ds-blush)]"></span>
@@ -141,3 +144,80 @@
   </x-design.section>
 </div>
 @endsection
+
+@push('scripts')
+  <script>
+    (function () {
+      var form = document.querySelector('[data-role-permissions-form]');
+      var toggle = document.querySelector('[data-live-toggle]');
+      var toast = document.getElementById('customer-access-toast');
+
+      if (!form || !toggle || !toast) {
+        return;
+      }
+
+      var toastTimer = null;
+
+      function showToast(message, kind) {
+        var successClasses = 'border-emerald-200 bg-emerald-50 text-emerald-700';
+        var errorClasses = 'border-rose-200 bg-rose-50 text-rose-700';
+
+        toast.className = 'fixed right-4 top-24 z-50 rounded-xl border px-4 py-3 text-sm font-semibold shadow-lg transition ' + (kind === 'error' ? errorClasses : successClasses);
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+
+        if (toastTimer) {
+          clearTimeout(toastTimer);
+        }
+
+        toastTimer = setTimeout(function () {
+          toast.classList.add('hidden');
+        }, 2200);
+      }
+
+      toggle.addEventListener('change', function () {
+        var previousValue = !toggle.checked;
+        var payload = {
+          can_view_all_customers: toggle.checked ? 1 : 0
+        };
+
+        toggle.disabled = true;
+
+        fetch(form.dataset.ajaxUrl, {
+          method: 'PUT',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': form.dataset.csrf,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify(payload),
+          credentials: 'same-origin'
+        })
+        .then(function (response) {
+          return response.json().then(function (data) {
+            return { ok: response.ok, data: data };
+          }).catch(function () {
+            return { ok: response.ok, data: {} };
+          });
+        })
+        .then(function (result) {
+          if (!result.ok) {
+            throw new Error(result.data.message || 'No se pudo guardar el permiso');
+          }
+
+          var persistedValue = result.data.can_view_all_customers;
+          toggle.checked = persistedValue === true || persistedValue === 1 || persistedValue === '1';
+          showToast(result.data.message || 'Permiso guardado correctamente', 'success');
+        })
+        .catch(function (error) {
+          toggle.checked = previousValue;
+          showToast(error.message || 'Error guardando el permiso', 'error');
+        })
+        .finally(function () {
+          toggle.disabled = false;
+        });
+      });
+    })();
+  </script>
+@endpush

@@ -130,21 +130,30 @@ class RoleController extends Controller
             'can_view_all_customers' => ['nullable', 'boolean'],
         ]);
 
-        $data = $validated['permissions'] ?? [];
-        $syncData = [];
+        if (array_key_exists('permissions', $validated)) {
+            $data = $validated['permissions'] ?? [];
+            $syncData = [];
 
-        foreach ($data as $menuId => $perms) {
-            $syncData[$menuId] = [
-                'create' => isset($perms['create']) ? 1 : 0,
-                'read' => isset($perms['read']) ? 1 : 0,
-                'update' => isset($perms['update']) ? 1 : 0,
-                'delete' => isset($perms['delete']) ? 1 : 0,
-            ];
+            foreach ($data as $menuId => $perms) {
+                $syncData[$menuId] = [
+                    'create' => isset($perms['create']) ? 1 : 0,
+                    'read' => isset($perms['read']) ? 1 : 0,
+                    'update' => isset($perms['update']) ? 1 : 0,
+                    'delete' => isset($perms['delete']) ? 1 : 0,
+                ];
+            }
+
+            $role->menus()->sync($syncData);
         }
-
-        $role->menus()->sync($syncData);
         $role->can_view_all_customers = $request->boolean('can_view_all_customers');
         $role->save();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'message' => 'Permiso guardado correctamente',
+                'can_view_all_customers' => (bool) $role->can_view_all_customers,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Permisos actualizados');
     }

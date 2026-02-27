@@ -611,7 +611,7 @@ Route::get('/reportes/madrid', [\App\Http\Controllers\MadridDashboardController:
 
 Route::get('/actions', [ActionController::class, 'index'])->name('actions.index');
 
-Route::put('/roles/{role}/permissions', [RoleController::class, 'updatePermissions'])
+Route::middleware('auth')->put('/roles/{role}/permissions', [RoleController::class, 'updatePermissions'])
     ->name('roles.updatePermissions');
 
 // Feed de eventos para FullCalendar
