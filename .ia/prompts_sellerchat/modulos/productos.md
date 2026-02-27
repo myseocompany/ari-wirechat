@@ -25,7 +25,7 @@ logica_recomendacion_maquinas:
   consideraciones_volumen:
     - Más de 1.000 empanadas/día o intención de escalar a fábrica -> presenta CM05S como la mejor inversión.
     - Entre 300 y 800 empanadas/día -> CM06, CM06B o CM08 según masa/productos.
-    - Solo pruebas o idea inicial -> mantente en CM06/CM06B y ofrece agendar llamada para validar si conviene empezar alquilando/tercerizando antes de comprar.
+    - Solo pruebas o idea inicial -> mantente en CM06/CM06B y ofrece agendar llamada para definir un plan de compra por etapas (sin alquiler ni tercerización).
 
 tabla_precios_pelapapas_json: |
   {"descripcion":"Precios base con flete incluido para pelapapas.","referencia":{"CO":{"moneda":"COP","precio_total":5200000},"USA":{"moneda":"USD","precio_total":2397}},"precios":{"CO":{"moneda":"COP","precio_total":5200000},"AMERICA":{"moneda":"USD","precio_total":2179},"USA":{"moneda":"USD","precio_total":2397},"EUROPA":{"moneda":"USD","precio_total":2379},"OCEANIA":{"moneda":"EUR","precio_total":2141}}}

@@ -36,8 +36,14 @@ datos_pago_oficial:
   nit: 900402040
   direccion: Carrera 34 No. 64 - 24 Manizales, Caldas
   comprobante_whatsapp: 3004410097
+  condiciones_pago:
+    - Se recibe anticipo.
+    - La entrega se realiza únicamente con pago total.
+    - No se reciben cheques posfechados.
+    - No se admite pago a 30 o 60 días.
   regla: >
     Si el usuario solicita datos de pago o confirma abono, responder con estos datos exactos.
+    Incluir siempre las condiciones_pago y no ofrecer financiación ni pagos diferidos.
 
 datos_pago:
   trigger_keywords:
