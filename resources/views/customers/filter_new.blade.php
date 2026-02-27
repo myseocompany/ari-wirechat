@@ -1,7 +1,7 @@
 
 @php
 $pid=substr($request->path(), -1);
-
+$canViewAllCustomers = auth()->user()?->canViewAllCustomers() ?? false;
 @endphp
 <form action="/customers/{{$pid}}" method="GET" id="filter_form">
     <input type="hidden" name="search" id="search" @if(isset($request->search))value="{{$request->search}}"@endif>
@@ -39,16 +39,20 @@ $pid=substr($request->path(), -1);
 *    Combo de usuarios
 *
 -->
-      <select name="user_id" class="custom-select" id="user_id" onchange="submit();">
-        <option value="">Usuario...</option>
-        <option value="null">Sin asignar</option>
-        @foreach($users as $user)
-          <option value="{{$user->id}}" @if ($request->user_id == $user->id) selected="selected" @endif>
-             <?php echo substr($user->name, 0, 10); ?>
-            
-          </option>
-        @endforeach
-      </select>
+      @if($canViewAllCustomers)
+        <select name="user_id" class="custom-select" id="user_id" onchange="submit();">
+          <option value="">Usuario...</option>
+          <option value="null">Sin asignar</option>
+          @foreach($users as $user)
+            <option value="{{$user->id}}" @if ($request->user_id == $user->id) selected="selected" @endif>
+               <?php echo substr($user->name, 0, 10); ?>
+              
+            </option>
+          @endforeach
+        </select>
+      @else
+        <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+      @endif
 
       <!--  
 *

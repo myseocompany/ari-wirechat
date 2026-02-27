@@ -1,7 +1,8 @@
 <form action="/{{ $model->action }}" method="GET" id="filter_form" class="flex flex-col gap-4">
   <input type="hidden" name="sort" value="{{ $sort ?? $request->sort }}">
+  @php $canViewAllCustomers = auth()->user()?->canViewAllCustomers() ?? false; @endphp
 
-  @if (Auth::user()->role_id !== 2)
+  @if ($canViewAllCustomers)
     <div class="flex flex-col gap-2">
       <label for="user_id" class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Usuario</label>
       <select name="user_id" id="user_id" onchange="this.form.submit();" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-[color:var(--ds-coral)] focus:outline-none focus:ring-2 focus:ring-[color:var(--ds-blush)]">
@@ -13,6 +14,14 @@
           </option>
         @endforeach
       </select>
+    </div>
+  @else
+    <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+    <div class="flex flex-col gap-2">
+      <label class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Usuario</label>
+      <div class="w-full rounded-xl border border-slate-300 bg-slate-100 px-3 py-2 text-sm text-slate-500">
+        Solo tus clientes
+      </div>
     </div>
   @endif
 
