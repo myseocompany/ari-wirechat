@@ -35,6 +35,7 @@ $statusName = function($id) use ($statuses) {
   return $item->name ?? $id;
 };
 $userName = function($id) use ($users) {
+  if ($id === 'all') return 'Todos';
   if ($id === 'null') return 'Sin asignar';
   if (empty($id) || empty($users)) return $id;
   $item = collect($users)->firstWhere('id', (int)$id);

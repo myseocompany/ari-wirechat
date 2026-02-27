@@ -111,7 +111,7 @@ use App\Services\CustomerService;
       <label for="user_id" class="ds-mono text-xs uppercase tracking-[0.3em] text-slate-500">Usuario</label>
       @if($canViewAll)
         <select name="user_id" class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-[color:var(--ds-coral)] focus:outline-none focus:ring-2 focus:ring-[color:var(--ds-blush)]" id="user_id">
-          <option value="">Todos</option>
+          <option value="all" @selected($request->user_id === 'all')>Todos</option>
           <option value="null" @selected($request->user_id === 'null')>Sin asignar</option>
           @foreach($users as $user)
             <option value="{{ $user->id }}" @selected($request->user_id == $user->id)>{{ Str::limit($user->name, 15) }}</option>

@@ -68,9 +68,9 @@ class CustomerService
                 $query->whereBetween('customers.created_at', $dates);
             }
 
-            if ($forceOwnCustomers && (empty($searchTerm) || (int) $authUser->role_id === 2)) {
+            if ($forceOwnCustomers) {
                 $query->where('customers.user_id', $authUser->id);
-            } elseif (! $forceOwnCustomers && ! empty($request->user_id)) {
+            } elseif (! $forceOwnCustomers && ! empty($request->user_id) && $request->user_id !== 'all') {
                 $query->where('customers.user_id', $request->user_id === 'null' ? null : $request->user_id);
             }
 
