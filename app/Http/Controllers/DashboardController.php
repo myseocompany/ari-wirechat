@@ -246,6 +246,7 @@ class DashboardController extends Controller
             $count = (int) $row->total;
             $grouped[$row->user_id]['segments'][] = [
                 'slug' => 'status_'.$row->status_id,
+                'status_id' => (int) $row->status_id,
                 'label' => $row->status_name,
                 'count' => $count,
                 'color' => $row->status_color ?: '#64748b',

@@ -151,6 +151,7 @@
     .user-breakdown-chart canvas {
         width: 100% !important;
         height: 100% !important;
+        cursor: pointer;
     }
 
     @media (max-width: 768px) {
@@ -439,6 +440,7 @@
     });
 
     const breakdownData = @json($userBreakdown);
+    const customersIndexUrl = @json(route('customers.index'));
     if (breakdownData.length && window.Chart) {
         const ctx = document.getElementById('userBreakdownChart');
         if (ctx) {
@@ -449,6 +451,7 @@
                         slugMap[segment.slug] = {
                             label: segment.label,
                             color: segment.color || '#64748b',
+                            statusId: segment.status_id || null,
                         };
                     }
                 });
@@ -464,6 +467,7 @@
                         return segment ? segment.count : 0;
                     }),
                     backgroundColor: info.color,
+                    statusId: info.statusId,
                     borderWidth: 1,
                     borderColor: 'rgba(255, 255, 255, 0.5)',
                     borderRadius: 8,
@@ -471,7 +475,7 @@
                 };
             });
 
-            new Chart(ctx, {
+            const userBreakdownChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels,
@@ -481,6 +485,11 @@
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
+                    onHover(event, activeElements) {
+                        if (event && event.native && event.native.target) {
+                            event.native.target.style.cursor = activeElements.length ? 'pointer' : 'default';
+                        }
+                    },
                     scales: {
                         x: {
                             stacked: true,
@@ -513,6 +522,67 @@
                         },
                     },
                 },
+            });
+
+            ctx.addEventListener('click', function (event) {
+                const activePoints = userBreakdownChart.getElementsAtEventForMode(
+                    event,
+                    'nearest',
+                    { intersect: true },
+                    true
+                );
+
+                if (!activePoints.length) {
+                    console.log('[dashboard] userBreakdownChart click sin barra', {
+                        offsetX: event.offsetX,
+                        offsetY: event.offsetY,
+                    });
+
+                    return;
+                }
+
+                const activePoint = activePoints[0];
+                const clickedRow = breakdownData[activePoint.index] || null;
+                const clickedDataset = datasets[activePoint.datasetIndex] || null;
+                const clickedStatusId = clickedDataset ? Number(clickedDataset.statusId || 0) : 0;
+                const clickedValue = clickedDataset && Array.isArray(clickedDataset.data)
+                    ? Number(clickedDataset.data[activePoint.index] || 0)
+                    : 0;
+
+                console.log('[dashboard] userBreakdownChart click barra', {
+                    userId: clickedRow ? clickedRow.user_id : null,
+                    userName: clickedRow ? clickedRow.name : null,
+                    statusId: clickedStatusId,
+                    statusLabel: clickedDataset ? clickedDataset.label : null,
+                    value: clickedValue,
+                });
+
+                if (!clickedRow || !clickedStatusId || clickedValue <= 0) {
+                    return;
+                }
+
+                const targetUrl = new URL(customersIndexUrl, window.location.origin);
+                targetUrl.searchParams.set('status_id', String(clickedStatusId));
+
+                if (Number(clickedRow.user_id) > 0) {
+                    targetUrl.searchParams.set('user_id', String(clickedRow.user_id));
+                } else {
+                    targetUrl.searchParams.set('user_id', 'null');
+                }
+
+                const fromDate = String($fromField.val() || '').trim();
+                const toDate = String($toField.val() || '').trim();
+                if (fromDate && toDate) {
+                    targetUrl.searchParams.set('from_date', fromDate);
+                    targetUrl.searchParams.set('to_date', toDate);
+                }
+
+                const selectedRange = String($rangeField.val() || '').trim();
+                if (selectedRange && selectedRange !== 'all') {
+                    targetUrl.searchParams.set('range', selectedRange);
+                }
+
+                window.location.assign(targetUrl.toString());
             });
         }
     }
