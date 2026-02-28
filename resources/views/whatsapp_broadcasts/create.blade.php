@@ -104,6 +104,7 @@
                 <strong>Audiencia</strong>
                 <span class="text-muted d-block small">Selecciona desde el CRM qué leads entran a este envío.</span>
             </div>
+            <a href="{{ route('audiences.segment.create') }}" class="btn btn-sm btn-outline-primary mr-2">Crear audiencia por variables</a>
             <span class="badge badge-light" id="audienceCounter">Pendiente de cálculo</span>
         </div>
         <div class="card-body">

@@ -3,6 +3,7 @@
 
 <h2>Audiencias</h2>
 <div><a href="/audiences/create">Crear <i class="fa fa-plus-square"></i></a></div>
+<div><a href="{{ route('audiences.segment.create') }}">Crear por variables (SQL)</a></div>
 <div class="table-responsive-sm">
 	<table class="table">
 		<tr>

@@ -524,6 +524,9 @@ Route::post('metadata/{id}/store/poe', [MetaDataController::class, 'storepoe'])-
 // Audience Routes
 Route::middleware('auth')->prefix('audiences')->group(function () {
     Route::get('/', [AudienceController::class, 'index']);
+    Route::get('/segment/create', [AudienceController::class, 'createSegment'])->name('audiences.segment.create');
+    Route::post('/segment/preview', [AudienceController::class, 'previewSegment'])->name('audiences.segment.preview');
+    Route::post('/segment', [AudienceController::class, 'storeSegment'])->name('audiences.segment.store');
     Route::get('/{id}/show', [AudienceController::class, 'show']);
     Route::get('/{id}/whatsapp', [AudienceController::class, 'whatsapp']);
     Route::get('/{id}/send', [AudienceController::class, 'send']);

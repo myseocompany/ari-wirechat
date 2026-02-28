@@ -1,6 +1,7 @@
 @extends('layout')
 @section('content')
 <h1>Crear Audiencia</h1>
+<p><a href="{{ route('audiences.segment.create') }}">Crear audiencia por segmentación avanzada (variables + SQL)</a></p>
 
 <form action="/audiences" method="POST">
 	{{ csrf_field() }}
