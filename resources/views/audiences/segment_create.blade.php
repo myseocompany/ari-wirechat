@@ -237,6 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function getDefaultValue(field, operator) {
         const fieldConfig = fieldCatalog[field] || {};
         const type = fieldConfig.type;
+        const options = Array.isArray(fieldConfig.options) ? fieldConfig.options : [];
 
         if (operator === 'between') {
             return ['', ''];
@@ -248,6 +249,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (type === 'boolean') {
             return true;
+        }
+
+        if (type === 'select') {
+            if (options.length === 0) {
+                return '';
+            }
+
+            return String(options[0].value);
         }
 
         return '';
@@ -419,6 +428,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 select.appendChild(option);
             });
+
+            if (type === 'select' && (condition.value === '' || condition.value === null || condition.value === undefined) && options.length > 0) {
+                condition.value = String(options[0].value);
+                select.value = condition.value;
+                syncSegmentInput();
+            }
 
             if (type === 'boolean') {
                 select.value = String(Boolean(condition.value));
