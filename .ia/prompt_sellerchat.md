@@ -143,8 +143,18 @@ regla_prioritaria_volumen:
 resolucion_pais_critica:
   reglas:
     - Si el texto del usuario contiene "colombia", "medellín", "bogotá", "manizales", "barranquilla" o "cali", fijar país=CO.
+    - Si el texto contiene "estados unidos", "usa", "eeuu", "u.s.a" o "united states", fijar país=USA.
+    - Si el texto contiene "chile", fijar país=CL.
+    - Si el texto contiene un país listado en catalogo_paises_region_json.AMERICA (ej: "guatemala"), fijar país=AMERICA.
+    - Si el texto contiene un país listado en catalogo_paises_region_json.EUROPA, fijar país=EUROPA.
+    - Si el texto contiene un país listado en catalogo_paises_region_json.OCEANIA, fijar país=OCEANIA.
     - Si país=CO, usar siempre configuracion_paises_json del código CO para moneda, precio y salario_hora_sugerido.
+    - Si país=USA/CL/AMERICA/EUROPA/OCEANIA, usar siempre configuracion_paises_json de ese código para moneda, precio y salario_hora_sugerido.
+    - Prohibido responder "no tengo precio específico para {país}" cuando el país mapea a una región válida (AMERICA/EUROPA/OCEANIA); usar el precio regional.
     - Nunca mezclar precio de Colombia con salario_hora de otra región.
+
+catalogo_paises_region_json: |
+  {"AMERICA":["mexico","guatemala","belice","honduras","el salvador","nicaragua","costa rica","panama","ecuador","peru","bolivia","paraguay","uruguay","argentina","brasil","venezuela","republica dominicana","cuba","puerto rico","jamaica"],"EUROPA":["espana","portugal","francia","alemania","italia","reino unido","irlanda","paises bajos","belgica","suiza","austria","suecia","noruega","dinamarca","finlandia","polonia","rumania","grecia","ucrania"],"OCEANIA":["australia","nueva zelanda","new zealand","fiyi","fiji","papua nueva guinea"]}
 
 tabla_precios_por_pais_json: |
   {"CO":{"moneda":"COP","precios":{"CM05S":34886280,"CM06":13026822,"CM06B":17892000,"CM07":15450000,"CM08":19252296}},"CL":{"moneda":"USD","precios":{"CM05S":11461,"CM06":4731,"CM06B":6162,"CM07":5444,"CM08":6562}},"AMERICA":{"moneda":"USD","precios":{"CM05S":11061,"CM06":4481,"CM06B":5912,"CM07":5194,"CM08":6312}},"USA":{"moneda":"USD","precios":{"CM05S":12167,"CM06":4930,"CM06B":6504,"CM07":5714,"CM08":6944}},"EUROPA":{"moneda":"USD","precios":{"CM05S":11461,"CM06":4597,"CM06B":6028,"CM07":5310,"CM08":6428}},"OCEANIA":{"moneda":"EUR","precios":{"CM05S":10315,"CM06":4138,"CM06B":5426,"CM07":4779,"CM08":5786}}}
@@ -181,6 +191,7 @@ regla_resolucion_pais_productos:
     - Si tiene_ubicacion == true y ya existe país detectado, reutilizarlo para cotizar.
     - Si el usuario corrige el país en su mensaje, actualizar país detectado y usar el nuevo.
     - Si no hay país detectado, preguntar configuracion_pais_productos_json.pregunta_pais.
+    - Antes de fallback, intentar mapear el país textual a CO/CL/USA/AMERICA/EUROPA/OCEANIA usando resolucion_pais_critica + catalogo_paises_region_json.
     - Si el país no existe en la tabla del producto: aplicar fallback según tipo de producto (con referencia o sin referencia).
 
 regla_precio_pelapapas:
