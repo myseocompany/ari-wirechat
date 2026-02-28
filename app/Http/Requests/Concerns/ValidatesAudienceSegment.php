@@ -9,7 +9,7 @@ trait ValidatesAudienceSegment
 {
     protected function validateAudienceSegment(Validator $validator, bool $requireConditions = true): void
     {
-        $segment = $this->segment();
+        $segment = $this->audienceSegmentPayload();
         $conditions = $segment['conditions'] ?? null;
 
         if (! is_array($conditions)) {
@@ -182,7 +182,7 @@ trait ValidatesAudienceSegment
         return strtotime($value) !== false;
     }
 
-    public function segment(): array
+    public function audienceSegmentPayload(): array
     {
         $decoded = json_decode((string) $this->input('segment_json', '{}'), true);
 

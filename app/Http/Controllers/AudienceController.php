@@ -52,7 +52,7 @@ class AudienceController extends Controller
         PreviewAudienceSegmentRequest $request,
         AudienceSegmentService $segmentService
     ): JsonResponse {
-        $preview = $segmentService->preview($request->segment());
+        $preview = $segmentService->preview($request->audienceSegmentPayload());
 
         return response()->json($preview);
     }
@@ -69,7 +69,7 @@ class AudienceController extends Controller
             ? (int) $request->input('max_recipients')
             : null;
 
-        $customerIds = $segmentService->collectCustomerIds($request->segment(), $limit);
+        $customerIds = $segmentService->collectCustomerIds($request->audienceSegmentPayload(), $limit);
 
         if ($customerIds->isNotEmpty()) {
             foreach ($customerIds->chunk(1000) as $chunk) {
@@ -584,6 +584,6 @@ class AudienceController extends Controller
             ->whereNull('sended_at')
             ->get();
 
-        return view('audiences.show_rpa', compact('model','audience','campaign', 'campaignMessage'));
+        return view('audiences.show_rpa', compact('model', 'audience', 'campaign', 'campaignMessage'));
     }
 }
