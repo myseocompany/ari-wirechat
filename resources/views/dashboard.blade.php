@@ -561,23 +561,24 @@
                     return;
                 }
 
-                const targetUrl = new URL(customersIndexUrl, window.location.origin);
-                targetUrl.searchParams.set('status_id', String(clickedStatusId));
-
-                if (Number(clickedRow.user_id) > 0) {
-                    targetUrl.searchParams.set('user_id', String(clickedRow.user_id));
-                } else {
-                    targetUrl.searchParams.set('user_id', 'null');
-                }
-
                 const fromDate = String($fromField.val() || '').trim();
                 const toDate = String($toField.val() || '').trim();
-                if (fromDate && toDate) {
-                    targetUrl.searchParams.set('from_date', fromDate);
-                    targetUrl.searchParams.set('to_date', toDate);
-                }
+                const selectedRange = String(new URLSearchParams(window.location.search).get('range') || '').trim();
+                const selectedUserId = Number(clickedRow.user_id) > 0 ? String(clickedRow.user_id) : 'null';
+                const targetUrl = new URL(customersIndexUrl, window.location.origin);
+                targetUrl.searchParams.set('parent_status_id', '');
+                targetUrl.searchParams.set('search', '');
+                targetUrl.searchParams.set('from_date', fromDate);
+                targetUrl.searchParams.set('to_date', toDate);
+                targetUrl.searchParams.set('scoring_profile', '');
+                targetUrl.searchParams.set('scoring_interest', '');
+                targetUrl.searchParams.set('country', '');
+                targetUrl.searchParams.set('status_id', String(clickedStatusId));
+                targetUrl.searchParams.set('user_id', selectedUserId);
+                targetUrl.searchParams.set('source_id', '');
+                targetUrl.searchParams.set('tag_id', '');
+                targetUrl.searchParams.set('created_updated', 'created');
 
-                const selectedRange = String($rangeField.val() || '').trim();
                 if (selectedRange && selectedRange !== 'all') {
                     targetUrl.searchParams.set('range', selectedRange);
                 }
