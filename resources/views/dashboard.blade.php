@@ -239,7 +239,7 @@
 @php($rangeUserCustomers = $rangeUserCustomers ?? collect())
 <div class="container py-4">
     <div class="dashboard-wrapper">
-        <form id="dashboard-filter" method="GET" class="time-filter-card">
+        <form id="dashboard-filter" method="GET" class="time-filter-card" data-loading-overlay data-loading-message="Cargando...">
             <input type="hidden" name="from_date" value="{{ $fromDate }}">
             <input type="hidden" name="to_date" value="{{ $toDate }}">
             <div class="quick-range-pills">
@@ -581,6 +581,10 @@
 
                 if (selectedRange && selectedRange !== 'all') {
                     targetUrl.searchParams.set('range', selectedRange);
+                }
+
+                if (window.showPageLoadingOverlay) {
+                    window.showPageLoadingOverlay('Cargando...');
                 }
 
                 window.location.assign(targetUrl.toString());

@@ -18,6 +18,60 @@
 
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   @stack('styles')
+  <style>
+    .page-loading-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-loading-overlay__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      backdrop-filter: blur(1px);
+    }
+
+    .page-loading-overlay__content {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      border-radius: 9999px;
+      background: #111322;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      box-shadow: 0 16px 30px rgba(17, 19, 34, 0.35);
+    }
+
+    .page-loading-overlay__spinner {
+      width: 1.05rem;
+      height: 1.05rem;
+      border-radius: 9999px;
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #fff;
+      animation: page-loading-spin 0.9s linear infinite;
+    }
+
+    .page-loading-overlay__text {
+      margin: 0;
+    }
+
+    @keyframes page-loading-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    body.page-loading-open {
+      cursor: progress;
+    }
+  </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
   @include('layouts.navigation_tailwind')
@@ -25,6 +79,14 @@
   <main class="mx-auto max-w-7xl px-4 pb-10 pt-20 sm:px-6 lg:px-8">
     @yield('content')
   </main>
+
+  <div id="page_loading_overlay" class="page-loading-overlay" aria-hidden="true" hidden>
+    <div class="page-loading-overlay__backdrop"></div>
+    <div class="page-loading-overlay__content" role="status" aria-live="polite">
+      <span class="page-loading-overlay__spinner" aria-hidden="true"></span>
+      <p class="page-loading-overlay__text" data-page-loading-label>Cargando...</p>
+    </div>
+  </div>
 
   @include('layouts.footer')
 
@@ -115,6 +177,56 @@
           overlay.setAttribute('aria-hidden', 'true');
           document.body.classList.remove('filter-overlay-open');
         }
+      });
+
+      var pageLoadingOverlay = document.getElementById('page_loading_overlay');
+      var pageLoadingLabel = pageLoadingOverlay ? pageLoadingOverlay.querySelector('[data-page-loading-label]') : null;
+
+      var showPageLoadingOverlay = function (message) {
+        if (!pageLoadingOverlay) {
+          return;
+        }
+        if (pageLoadingLabel) {
+          pageLoadingLabel.textContent = message || 'Cargando...';
+        }
+        pageLoadingOverlay.removeAttribute('hidden');
+        pageLoadingOverlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('page-loading-open');
+      };
+
+      var hidePageLoadingOverlay = function () {
+        if (!pageLoadingOverlay) {
+          return;
+        }
+        pageLoadingOverlay.setAttribute('aria-hidden', 'true');
+        pageLoadingOverlay.setAttribute('hidden', '');
+        document.body.classList.remove('page-loading-open');
+      };
+
+      window.showPageLoadingOverlay = showPageLoadingOverlay;
+      window.hidePageLoadingOverlay = hidePageLoadingOverlay;
+
+      document.addEventListener('submit', function (event) {
+        var form = event.target;
+        if (!(form instanceof HTMLFormElement)) {
+          return;
+        }
+        if (!form.hasAttribute('data-loading-overlay')) {
+          return;
+        }
+        showPageLoadingOverlay(form.getAttribute('data-loading-message') || 'Cargando...');
+      });
+
+      document.addEventListener('click', function (event) {
+        var trigger = event.target.closest('[data-loading-overlay-trigger]');
+        if (!trigger) {
+          return;
+        }
+        showPageLoadingOverlay(trigger.getAttribute('data-loading-message') || 'Cargando...');
+      });
+
+      window.addEventListener('pageshow', function () {
+        hidePageLoadingOverlay();
       });
     })();
   </script>

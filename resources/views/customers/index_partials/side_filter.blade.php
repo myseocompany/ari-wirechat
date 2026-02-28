@@ -10,7 +10,7 @@ use App\Services\CustomerService;
   'tags'            => $tags ?? [],
 ])
 
-<form action="/customers" method="GET" id="filter_form" class="flex flex-col gap-4">
+<form action="/customers" method="GET" id="filter_form" class="flex flex-col gap-4" data-loading-overlay data-loading-message="Cargando...">
   @if(request()->boolean('no_date'))
     <input type="hidden" name="no_date" value="1">
   @endif
