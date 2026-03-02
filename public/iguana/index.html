@@ -184,38 +184,6 @@
     font-weight: 700;
   }
 
-  .test-panel {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px dashed rgba(242,234,216,.2);
-    text-align: center;
-  }
-
-  .test-btn {
-    border: 1px solid rgba(93,255,138,.35);
-    background: rgba(93,255,138,.12);
-    color: var(--crema);
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: .3px;
-    cursor: pointer;
-    transition: all .2s;
-  }
-
-  .test-btn:hover {
-    border-color: var(--verde-neon);
-    transform: translateY(-1px);
-  }
-
-  .test-status {
-    margin-top: 8px;
-    min-height: 16px;
-    font-size: 11px;
-    color: rgba(242,234,216,.6);
-  }
-
   #stateActive { display: none; }
 
   .phone-wrapper {
@@ -341,6 +309,53 @@
     animation: fadeUp .6s ease .4s both;
   }
 
+  .whatsapp-float {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 60;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 999px;
+    border: 1px solid #25d366;
+    background: #25d366;
+    color: #0f3d20;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 12px 16px;
+    box-shadow: 0 12px 28px rgba(37, 211, 102, .35);
+    transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+  }
+
+  .whatsapp-float:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px rgba(37, 211, 102, .4);
+  }
+
+  .whatsapp-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(15, 61, 32, .16);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  @media (max-width: 560px) {
+    .whatsapp-float {
+      right: 12px;
+      left: 12px;
+      bottom: 12px;
+      justify-content: center;
+      padding: 12px;
+    }
+  }
+
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(18px); }
     to { opacity: 1; transform: translateY(0); }
@@ -455,16 +470,22 @@
       </div>
     </div>
 
-    <div class="test-panel">
-      <button type="button" class="test-btn" id="simulateUnlockBtn" onclick="toggleSimulacionHora()">
-        Probar: simular que falta 1 hora
-      </button>
-      <p class="test-status" id="testStatus"></p>
-    </div>
   </div>
 
   <footer>Evento exclusivo · Maquiempanadas x IGUANA 🦎</footer>
 </div>
+
+<a
+  id="whatsappSalesBtn"
+  class="whatsapp-float"
+  href="https://wa.me/573004410097?text=Hola%2C%20quiero%20hablar%20con%20un%20comercial%20sobre%20el%20evento%20en%20vivo%20de%20Iguana."
+  target="_blank"
+  rel="noopener"
+  aria-label="Hablar por WhatsApp con un comercial"
+>
+  <span class="whatsapp-icon">WA</span>
+  <span>Hablar con un comercial</span>
+</a>
 
 <script>
 const EVENT_NAME = 'Foco y Estandarización para Crecer';
@@ -472,10 +493,12 @@ const EVENT_TIMEZONE = 'America/Bogota';
 const EVENT_WEEKDAY = 2;
 const EVENT_HOUR = 10;
 const EVENT_MINUTE = 0;
-const ENABLE_BEFORE_MINUTES = 60;
+const ENABLE_BEFORE_MINUTES = 1440;
 const BOGOTA_UTC_OFFSET_HOURS = 5;
 const CRM_API_BASE_URL = 'https://arichat.co';
 const CRM_ATTENDANCE_ENDPOINT = `${CRM_API_BASE_URL}/api/customers/save_customer`;
+const SALES_WHATSAPP_NUMBER = '573004410097';
+const SALES_WHATSAPP_TEXT = 'Hola, quiero hablar con un comercial sobre el evento en vivo de Iguana.';
 
 const DEFAULT_MEET = {
   url: 'https://meet.google.com/pms-njmk-zei',
@@ -486,7 +509,16 @@ const DEFAULT_MEET = {
 
 let eventUtcMs = 0;
 let eventKey = '';
-let forceUnlockForTest = false;
+
+function initWhatsAppSalesButton() {
+  const button = document.getElementById('whatsappSalesBtn');
+  if (!button) {
+    return;
+  }
+
+  const encodedText = encodeURIComponent(SALES_WHATSAPP_TEXT);
+  button.href = `https://wa.me/${SALES_WHATSAPP_NUMBER}?text=${encodedText}`;
+}
 
 function capitalize(text) {
   if (!text) {
@@ -618,7 +650,7 @@ function actualizarEstado() {
   const unlockAt = eventUtcMs - (ENABLE_BEFORE_MINUTES * 60000);
   const locked = document.getElementById('stateLocked');
   const active = document.getElementById('stateActive');
-  const unlocked = forceUnlockForTest || nowMs >= unlockAt;
+  const unlocked = nowMs >= unlockAt;
 
   if (unlocked) {
     locked.style.display = 'none';
@@ -638,26 +670,6 @@ function actualizarEstado() {
 
     lockTimer.textContent = `Se habilita en ${h > 0 ? `${h}h ` : ''}${m}min ${s}seg`;
   }
-}
-
-function updateTestStatusUi() {
-  const testStatus = document.getElementById('testStatus');
-  const testButton = document.getElementById('simulateUnlockBtn');
-
-  if (forceUnlockForTest) {
-    testStatus.textContent = 'Modo prueba activo: formulario habilitado.';
-    testButton.textContent = 'Desactivar prueba';
-    return;
-  }
-
-  testStatus.textContent = 'Modo prueba inactivo.';
-  testButton.textContent = 'Probar: simular que falta 1 hora';
-}
-
-function toggleSimulacionHora() {
-  forceUnlockForTest = !forceUnlockForTest;
-  updateTestStatusUi();
-  actualizarEstado();
 }
 
 function showFormMessage(text, type = '') {
@@ -787,7 +799,7 @@ document.getElementById('phoneInput').addEventListener('keypress', function hand
 syncEventMetadata();
 actualizarContador();
 actualizarEstado();
-updateTestStatusUi();
+initWhatsAppSalesButton();
 
 setInterval(() => {
   actualizarContador();
