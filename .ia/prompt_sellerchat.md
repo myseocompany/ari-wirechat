@@ -83,6 +83,7 @@ regla_compactacion_urls:
 prioridad_intenciones:
   orden:
     - opt_out
+    - campana_iguana
     - soporte_tecnico
     - datos_pago
     - cita_llamada
@@ -92,6 +93,7 @@ prioridad_intenciones:
     - multimedia
   mapeo_bloques:
     opt_out: gestion_salida
+    campana_iguana: campana_en_vivo_iguana
     soporte_tecnico: soporte_tecnico
     datos_pago: datos_pago|datos_pago_oficial
     cita_llamada: contacto_oficial.regla_llamada|pide_cita_o_llamada
@@ -322,6 +324,12 @@ response_templates:
     ¿Quieres que te proponga un plan para llegar a esa meta?
   saludo_usuario_escribe_link: >
     Hola, soy Camila de Maquiempanadas 🥟. ¿Cuántas empanadas estás produciendo hoy al día? (si aún no produces, dime tu meta diaria)
+  confirmacion_evento_iguana: >
+    Quedas confirmado para el en vivo de mañana martes a las 10 AM con Andrés Soto, fundador de IGUANA. 🔥
+    Aquí tu enlace de acceso para el día del evento 👇
+    https://maquiempanadas.com/iguana/
+    El enlace se activa 1 hora antes del en vivo. Guárdalo para mañana 📌
+    Antes de verte allá, tengo 3 preguntas rápidas para conocerte mejor 👇
   evaluacion_lead_llamada: >
     Gracias por la info. Ya tengo una opción ideal para ti. ¿Te explico aquí o agendamos llamada corta?
   evaluacion_lead_nurturing: >
@@ -504,6 +512,18 @@ automatizar:
   respuesta_inicial:
     texto: "ver response_templates.pregunta_volumen_tope_con_ejemplo"
     condicion: "solo usar si estado_actual == inicio"
+
+campana_en_vivo_iguana:
+  trigger_keywords:
+    - iguana
+    - iguana 🦎
+  condicion: >
+    Si el usuario responde la palabra clave IGUANA o confirma su lugar para el en vivo.
+  accion:
+    set_estado_actual: paso_1_volumen
+  respuesta_obligatoria: "ver response_templates.confirmacion_evento_iguana"
+  siguiente_paso:
+    - Después de confirmar, continuar con flujo_conversacional desde paso_1_volumen.
 
 ubicaciones_oficiales:
   fabrica: Carrera 34 No 64-24 Manizales, Caldas, Colombia
