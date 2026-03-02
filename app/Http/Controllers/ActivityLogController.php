@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,8 +31,8 @@ class ActivityLogController extends Controller
         $search = trim((string) $request->get('q'));
         $action = trim((string) $request->get('action'));
         $userId = $request->get('user_id');
-        $fromDate = $request->get('from_date');
-        $toDate = $request->get('to_date');
+        $fromDateTime = $request->get('from_datetime');
+        $toDateTime = $request->get('to_datetime');
 
         $query = ActivityLog::with('user')->orderByDesc('id');
 
@@ -51,15 +53,19 @@ class ActivityLogController extends Controller
             $query->where('user_id', (int) $userId);
         }
 
-        if ($fromDate) {
-            $query->whereDate('created_at', '>=', $fromDate);
-        }
-
-        if ($toDate) {
-            $query->whereDate('created_at', '<=', $toDate);
+        if ($fromDateTime && $toDateTime) {
+            $query->whereBetween('created_at', [
+                Carbon::parse($fromDateTime),
+                Carbon::parse($toDateTime),
+            ]);
+        } elseif ($fromDateTime) {
+            $query->where('created_at', '>=', Carbon::parse($fromDateTime));
+        } elseif ($toDateTime) {
+            $query->where('created_at', '<=', Carbon::parse($toDateTime));
         }
 
         $actions = $this->getAvailableActions();
+        $users = $this->getAvailableUsers();
 
         $logs = $query->paginate($perPage)->withQueryString();
 
@@ -70,8 +76,9 @@ class ActivityLogController extends Controller
             'perPage' => $perPage,
             'action' => $action,
             'userId' => $userId,
-            'fromDate' => $fromDate,
-            'toDate' => $toDate,
+            'fromDateTime' => $fromDateTime,
+            'toDateTime' => $toDateTime,
+            'users' => $users,
         ]);
     }
 
@@ -100,5 +107,13 @@ class ActivityLogController extends Controller
             ->distinct()
             ->orderBy('action')
             ->pluck('action');
+    }
+
+    private function getAvailableUsers(): Collection
+    {
+        return User::query()
+            ->select(['id', 'name'])
+            ->orderBy('name')
+            ->get();
     }
 }
