@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('api')->group(
     function () {
         Route::get('/customers/saveCustomer', [APIController::class, 'saveApi']);
+        Route::post('/customers/save_customer', [APIController::class, 'saveApi']);
         Route::post('/google-ads/leads', [APIController::class, 'saveFromGoogleAds']);
         // Route::post('/customers/update', [APIController::class, 'saveApi']);
         Route::post('/customers/update', [APIController::class, 'updateFromRD']);

@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>En Vivo · Foco y Estandarización para Crecer</title>
+<link rel="icon" href="https://maquiempanadas.com/wp-content/uploads/2025/02/cropped-favicon-1-192x192-1-150x150.png" sizes="32x32">
+<link rel="icon" href="https://maquiempanadas.com/wp-content/uploads/2025/02/cropped-favicon-1-192x192-1.png" sizes="192x192">
+<link rel="apple-touch-icon" href="https://maquiempanadas.com/wp-content/uploads/2025/02/cropped-favicon-1-192x192-1.png">
+<meta name="msapplication-TileImage" content="https://maquiempanadas.com/wp-content/uploads/2025/02/cropped-favicon-1-192x192-1.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #0f3d20;
+    --verde-mid: #1a5c30;
+    --verde-neon: #5dff8a;
+    --crema: #f2ead8;
+    --blanco: #ffffff;
+    --naranja: #ff8c42;
+    --rojo: #ff4c4c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { min-height: 100%; font-family: 'Nunito', sans-serif; background: var(--verde); color: var(--crema); overflow-x: hidden; }
+
+  .bg-layer {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 90%, rgba(93,255,138,.09) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 50% at 90% 5%, rgba(255,140,66,.06) 0%, transparent 55%);
+  }
+
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(93,255,138,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(93,255,138,.03) 1px, transparent 1px);
+    background-size: 52px 52px;
+  }
+
+  .page {
+    position: relative; z-index: 10;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 36px 20px 56px; gap: 26px;
+  }
+
+  .logos {
+    display: flex; align-items: center; gap: 16px;
+    animation: fadeDown .6s ease both;
+  }
+
+  .logo-mqi {
+    height: 36px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
+
+  .logo-sep  {
+    width: 1px;
+    height: 28px;
+    background: rgba(242,234,216,.2);
+  }
+
+  .logo-iguana {
+    height: 48px;
+    width: 48px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid rgba(93,255,138,.35);
+    box-shadow: 0 0 16px rgba(93,255,138,.12);
+  }
+
+  .live-badge {
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(255,76,76,.12); border: 1px solid rgba(255,76,76,.3);
+    padding: 5px 16px; border-radius: 100px;
+    font-size: 10px; font-weight: 800; letter-spacing: 2.5px;
+    text-transform: uppercase; color: #ff7a7a;
+    animation: fadeDown .6s ease .1s both;
+  }
+
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--rojo);
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
+  @keyframes blink {
+    0%,100% { opacity: 1; }
+    50% { opacity: .2; }
+  }
+
+  .countdown-section {
+    text-align: center;
+    animation: fadeDown .6s ease .15s both;
+  }
+
+  .countdown-label {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--verde-neon); margin-bottom: 12px; font-weight: 700;
+  }
+
+  .countdown {
+    display: flex; gap: 6px; align-items: flex-start; justify-content: center;
+  }
+
+  .time-block {
+    display: flex; flex-direction: column; align-items: center; min-width: 56px;
+  }
+
+  .time-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 60px; line-height: 1;
+    color: var(--blanco); letter-spacing: 2px;
+    text-shadow: 0 0 30px rgba(93,255,138,.15);
+  }
+
+  .time-unit {
+    font-size: 8px; letter-spacing: 2.5px; text-transform: uppercase;
+    color: rgba(242,234,216,.4); margin-top: 4px; font-weight: 700;
+  }
+
+  .time-sep {
+    font-family: 'Bebas Neue', sans-serif; font-size: 48px;
+    color: var(--verde-neon); opacity: .5; margin-top: 4px;
+  }
+
+  .countdown.urgent .time-num {
+    color: var(--verde-neon);
+    animation: pulse .9s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: .35; }
+  }
+
+  .ended-label {
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+    color: var(--verde-neon); letter-spacing: 2px;
+  }
+
+  .card {
+    width: 100%; max-width: 460px;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(93,255,138,.12);
+    border-radius: 28px; padding: 38px 30px;
+    backdrop-filter: blur(14px);
+    animation: fadeUp .7s ease .25s both;
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 36px; line-height: 1.05;
+    letter-spacing: 1px; color: var(--blanco); margin-bottom: 6px; text-align: center;
+  }
+
+  .card-sub {
+    font-size: 13px; color: rgba(242,234,216,.55); text-align: center;
+    line-height: 1.6; margin-bottom: 28px;
+  }
+
+  #stateLocked { text-align: center; }
+
+  .lock-icon {
+    font-size: 48px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .lock-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 24px;
+    letter-spacing: 1px; color: rgba(242,234,216,.45); margin-bottom: 8px;
+  }
+
+  .lock-sub {
+    font-size: 13px; color: rgba(242,234,216,.38); line-height: 1.65;
+  }
+
+  .lock-open {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--naranja);
+    font-weight: 700;
+  }
+
+  .test-panel {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(242,234,216,.2);
+    text-align: center;
+  }
+
+  .test-btn {
+    border: 1px solid rgba(93,255,138,.35);
+    background: rgba(93,255,138,.12);
+    color: var(--crema);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .3px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .test-btn:hover {
+    border-color: var(--verde-neon);
+    transform: translateY(-1px);
+  }
+
+  .test-status {
+    margin-top: 8px;
+    min-height: 16px;
+    font-size: 11px;
+    color: rgba(242,234,216,.6);
+  }
+
+  #stateActive { display: none; }
+
+  .phone-wrapper {
+    display: flex; border: 1.5px solid rgba(93,255,138,.25); border-radius: 14px;
+    overflow: hidden; transition: border-color .3s, box-shadow .3s; margin-bottom: 12px;
+  }
+
+  .phone-wrapper:focus-within {
+    border-color: var(--verde-neon);
+    box-shadow: 0 0 0 3px rgba(93,255,138,.1);
+  }
+
+  .prefix-select {
+    background: rgba(93,255,138,.08); border: none;
+    border-right: 1px solid rgba(93,255,138,.2);
+    color: var(--crema); font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700;
+    padding: 0 14px; cursor: pointer; outline: none; min-width: 84px;
+  }
+
+  .prefix-select option { background: var(--verde); }
+
+  .phone-input {
+    flex: 1; background: transparent; border: none;
+    color: var(--blanco); font-family: 'Nunito', sans-serif;
+    font-size: 16px; padding: 16px 18px; outline: none; letter-spacing: 1px;
+  }
+
+  .phone-input::placeholder {
+    color: rgba(242,234,216,.3);
+    font-size: 14px;
+  }
+
+  .form-message {
+    min-height: 18px;
+    margin-bottom: 12px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .2px;
+  }
+
+  .form-message.error { color: #ff9b9b; }
+  .form-message.success { color: var(--verde-neon); }
+
+  .btn-enter {
+    width: 100%; background: var(--verde-neon); color: var(--verde);
+    border: none; border-radius: 14px; padding: 18px;
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800;
+    cursor: pointer; transition: all .25s;
+  }
+
+  .btn-enter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(93,255,138,.25);
+  }
+
+  .btn-enter:active { transform: translateY(0); }
+  .btn-enter.loading { opacity: .6; pointer-events: none; }
+
+  #resMeet {
+    display: none;
+    margin-top: 18px;
+    background: rgba(93,255,138,.08);
+    border: 1px solid rgba(93,255,138,.22);
+    border-radius: 18px;
+    padding: 24px;
+    text-align: center;
+    animation: fadeUp .4s ease both;
+  }
+
+  .meet-icon  { font-size: 36px; margin-bottom: 10px; }
+
+  .meet-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 1px;
+    color: var(--verde-neon);
+    margin-bottom: 6px;
+  }
+
+  .meet-sub {
+    font-size: 13px;
+    color: rgba(242,234,216,.6);
+    margin-bottom: 18px;
+    line-height: 1.6;
+  }
+
+  .meet-link-btn {
+    display: inline-block;
+    background: var(--verde-neon);
+    color: var(--verde);
+    padding: 13px 28px;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    letter-spacing: .3px;
+    transition: all .2s;
+    margin-bottom: 14px;
+  }
+
+  .meet-link-btn:hover { opacity: .9; transform: scale(1.02); }
+
+  .meet-details {
+    font-size: 11px;
+    color: rgba(242,234,216,.4);
+    line-height: 1.8;
+  }
+
+  .meet-details a {
+    color: rgba(93,255,138,.6);
+    text-decoration: none;
+  }
+
+  footer {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(242,234,216,.22);
+    text-align: center;
+    animation: fadeUp .6s ease .4s both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 380px) {
+    .card { padding: 26px 16px; }
+    .card-title { font-size: 28px; }
+    .time-num { font-size: 46px; }
+    .time-block { min-width: 44px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="bg-grid"></div>
+
+<div class="page">
+  <div class="logos">
+    <img class="logo-mqi" src="img/logo_mqe.png" alt="Maquiempanadas">
+    <div class="logo-sep"></div>
+    <img
+      class="logo-iguana"
+      src="img/logo_iguana.png"
+      alt="IGUANA"
+      onerror="this.onerror=null;this.src='img/logo_mqe.png';"
+    >
+  </div>
+
+  <div class="live-badge">
+    <span class="live-dot"></span>
+    <span id="badgeEventText">En Vivo · Martes · 10:00 AM (Colombia)</span>
+  </div>
+
+  <div class="countdown-section" id="countdownSection">
+    <p class="countdown-label">El en vivo comienza en</p>
+    <div class="countdown" id="countdown">
+      <div class="time-block">
+        <span class="time-num" id="cd-days">00</span>
+        <span class="time-unit">días</span>
+      </div>
+      <span class="time-sep">:</span>
+      <div class="time-block">
+        <span class="time-num" id="cd-hours">00</span>
+        <span class="time-unit">horas</span>
+      </div>
+      <span class="time-sep">:</span>
+      <div class="time-block">
+        <span class="time-num" id="cd-min">00</span>
+        <span class="time-unit">min</span>
+      </div>
+      <span class="time-sep">:</span>
+      <div class="time-block">
+        <span class="time-num" id="cd-sec">00</span>
+        <span class="time-unit">seg</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Foco y Estandarización<br>para Crecer</div>
+
+    <div id="stateLocked">
+      <span class="lock-icon">🔒</span>
+      <div class="lock-title">Acceso no disponible aún</div>
+      <p class="lock-sub">El enlace del en vivo se habilitará<br>1 hora antes del evento.</p>
+    </div>
+
+    <div id="stateActive">
+      <div class="phone-wrapper">
+        <select class="prefix-select" id="prefix">
+          <option value="57">🇨🇴 +57</option>
+          <option value="1">🇺🇸 +1</option>
+          <option value="52">🇲🇽 +52</option>
+          <option value="34">🇪🇸 +34</option>
+          <option value="54">🇦🇷 +54</option>
+          <option value="56">🇨🇱 +56</option>
+          <option value="51">🇵🇪 +51</option>
+          <option value="58">🇻🇪 +58</option>
+          <option value="593">🇪🇨 +593</option>
+        </select>
+        <input
+          type="tel"
+          class="phone-input"
+          id="phoneInput"
+          placeholder="3001234567"
+          maxlength="15"
+          inputmode="numeric"
+        >
+      </div>
+
+      <p id="formMessage" class="form-message" aria-live="polite"></p>
+
+      <button class="btn-enter" id="submitBtn" onclick="verificar()">
+        Obtener enlace del en vivo 🚀
+      </button>
+
+      <div id="resMeet">
+        <div class="meet-icon">🎉</div>
+        <div class="meet-title">¡Ya puedes entrar!</div>
+        <p class="meet-sub">Haz clic para unirte al en vivo ahora mismo.</p>
+        <a class="meet-link-btn" id="meetLinkBtn" href="#" target="_blank" rel="noopener">
+          Entrar al en vivo →
+        </a>
+        <div class="meet-details" id="meetDetails"></div>
+      </div>
+    </div>
+
+    <div class="test-panel">
+      <button type="button" class="test-btn" id="simulateUnlockBtn" onclick="toggleSimulacionHora()">
+        Probar: simular que falta 1 hora
+      </button>
+      <p class="test-status" id="testStatus"></p>
+    </div>
+  </div>
+
+  <footer>Evento exclusivo · Maquiempanadas x IGUANA 🦎</footer>
+</div>
+
+<script>
+const EVENT_NAME = 'Foco y Estandarización para Crecer';
+const EVENT_TIMEZONE = 'America/Bogota';
+const EVENT_WEEKDAY = 2;
+const EVENT_HOUR = 10;
+const EVENT_MINUTE = 0;
+const ENABLE_BEFORE_MINUTES = 60;
+const BOGOTA_UTC_OFFSET_HOURS = 5;
+const CRM_API_BASE_URL = 'https://arichat.co';
+const CRM_ATTENDANCE_ENDPOINT = `${CRM_API_BASE_URL}/api/customers/save_customer`;
+
+const DEFAULT_MEET = {
+  url: 'https://meet.google.com/pms-njmk-zei',
+  dial_in: '(CO) +57 601 895 6869',
+  pin: '424 243 483#',
+  phone_url: 'https://tel.meet/pms-njmk-zei?pin=8255781862403'
+};
+
+let eventUtcMs = 0;
+let eventKey = '';
+let forceUnlockForTest = false;
+
+function capitalize(text) {
+  if (!text) {
+    return '';
+  }
+
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function getBogotaNowPseudoUtc() {
+  return new Date(Date.now() - (BOGOTA_UTC_OFFSET_HOURS * 3600000));
+}
+
+function nextEventUtcMs() {
+  const bogotaNow = getBogotaNowPseudoUtc();
+  const year = bogotaNow.getUTCFullYear();
+  const month = bogotaNow.getUTCMonth();
+  const day = bogotaNow.getUTCDate();
+  const weekday = bogotaNow.getUTCDay();
+  const hour = bogotaNow.getUTCHours();
+  const minute = bogotaNow.getUTCMinutes();
+  const second = bogotaNow.getUTCSeconds();
+
+  let daysUntilEvent = (EVENT_WEEKDAY - weekday + 7) % 7;
+
+  if (daysUntilEvent === 0) {
+    const alreadyStarted = hour > EVENT_HOUR ||
+      (hour === EVENT_HOUR && (minute > EVENT_MINUTE || (minute === EVENT_MINUTE && second > 0)));
+
+    if (alreadyStarted) {
+      daysUntilEvent = 7;
+    }
+  }
+
+  const eventBogotaPseudoUtcMs = Date.UTC(
+    year,
+    month,
+    day + daysUntilEvent,
+    EVENT_HOUR,
+    EVENT_MINUTE,
+    0
+  );
+
+  return eventBogotaPseudoUtcMs + (BOGOTA_UTC_OFFSET_HOURS * 3600000);
+}
+
+function getBogotaDateParts(date) {
+  const formatter = new Intl.DateTimeFormat('es-CO', {
+    timeZone: EVENT_TIMEZONE,
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+
+  const parts = formatter.formatToParts(date);
+  const map = {};
+
+  for (const part of parts) {
+    if (part.type !== 'literal') {
+      map[part.type] = part.value;
+    }
+  }
+
+  return map;
+}
+
+function syncEventMetadata() {
+  eventUtcMs = nextEventUtcMs();
+
+  const eventDate = new Date(eventUtcMs);
+  const endDate = new Date(eventUtcMs + 3600000);
+
+  const eventParts = getBogotaDateParts(eventDate);
+  const endParts = getBogotaDateParts(endDate);
+
+  const weekday = capitalize(eventParts.weekday || 'martes');
+  const month = eventParts.month || '';
+  const day = eventParts.day || '';
+  const startHour = `${eventParts.hour || '10'}:${eventParts.minute || '00'} ${(eventParts.dayPeriod || 'a. m.').toUpperCase()}`;
+  const endHour = `${endParts.hour || '11'}:${endParts.minute || '00'} ${(endParts.dayPeriod || 'a. m.').toUpperCase()}`;
+
+  document.getElementById('badgeEventText').textContent = `En Vivo · ${weekday} ${day} de ${month} · ${startHour} (Colombia)`;
+
+  const keyDateFormatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: EVENT_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+
+  const keyDateParts = keyDateFormatter.formatToParts(eventDate);
+  const year = keyDateParts.find((part) => part.type === 'year')?.value ?? '0000';
+  const monthNumber = keyDateParts.find((part) => part.type === 'month')?.value ?? '00';
+  const dayNumber = keyDateParts.find((part) => part.type === 'day')?.value ?? '00';
+
+  eventKey = `iguana-live-${year}${monthNumber}${dayNumber}-${String(EVENT_HOUR).padStart(2, '0')}${String(EVENT_MINUTE).padStart(2, '0')}`;
+}
+
+function actualizarContador() {
+  const diff = eventUtcMs - Date.now();
+  const countdownSection = document.getElementById('countdownSection');
+
+  if (diff <= 0) {
+    countdownSection.innerHTML = '<p class="ended-label">🔴 ¡El en vivo está en curso!</p>';
+    return;
+  }
+
+  const dias = Math.floor(diff / 86400000);
+  const horas = Math.floor((diff % 86400000) / 3600000);
+  const minutos = Math.floor((diff % 3600000) / 60000);
+  const segundos = Math.floor((diff % 60000) / 1000);
+
+  document.getElementById('cd-days').textContent = String(dias).padStart(2, '0');
+  document.getElementById('cd-hours').textContent = String(horas).padStart(2, '0');
+  document.getElementById('cd-min').textContent = String(minutos).padStart(2, '0');
+  document.getElementById('cd-sec').textContent = String(segundos).padStart(2, '0');
+
+  if (diff < 600000) {
+    document.getElementById('countdown').classList.add('urgent');
+  }
+}
+
+function actualizarEstado() {
+  const nowMs = Date.now();
+  const unlockAt = eventUtcMs - (ENABLE_BEFORE_MINUTES * 60000);
+  const locked = document.getElementById('stateLocked');
+  const active = document.getElementById('stateActive');
+  const unlocked = forceUnlockForTest || nowMs >= unlockAt;
+
+  if (unlocked) {
+    locked.style.display = 'none';
+    active.style.display = 'block';
+    return;
+  }
+
+  locked.style.display = 'block';
+  active.style.display = 'none';
+
+  const lockTimer = document.getElementById('lockTimer');
+  if (lockTimer) {
+    const msParaAbrir = unlockAt - nowMs;
+    const h = Math.floor(msParaAbrir / 3600000);
+    const m = Math.floor((msParaAbrir % 3600000) / 60000);
+    const s = Math.floor((msParaAbrir % 60000) / 1000);
+
+    lockTimer.textContent = `Se habilita en ${h > 0 ? `${h}h ` : ''}${m}min ${s}seg`;
+  }
+}
+
+function updateTestStatusUi() {
+  const testStatus = document.getElementById('testStatus');
+  const testButton = document.getElementById('simulateUnlockBtn');
+
+  if (forceUnlockForTest) {
+    testStatus.textContent = 'Modo prueba activo: formulario habilitado.';
+    testButton.textContent = 'Desactivar prueba';
+    return;
+  }
+
+  testStatus.textContent = 'Modo prueba inactivo.';
+  testButton.textContent = 'Probar: simular que falta 1 hora';
+}
+
+function toggleSimulacionHora() {
+  forceUnlockForTest = !forceUnlockForTest;
+  updateTestStatusUi();
+  actualizarEstado();
+}
+
+function showFormMessage(text, type = '') {
+  const el = document.getElementById('formMessage');
+  el.textContent = text;
+  el.className = `form-message ${type}`.trim();
+}
+
+function renderMeet(meetData) {
+  const meet = {
+    ...DEFAULT_MEET,
+    ...(meetData || {})
+  };
+
+  const meetLinkBtn = document.getElementById('meetLinkBtn');
+  meetLinkBtn.href = meet.url;
+
+  const details = [];
+
+  if (meet.dial_in || meet.pin) {
+    const dialIn = meet.dial_in ? `<strong>${meet.dial_in}</strong>` : '';
+    const pin = meet.pin ? ` · PIN: <strong>${meet.pin}</strong>` : '';
+    details.push(`También puedes marcar al:<br>${dialIn}${pin}`);
+  }
+
+  if (meet.phone_url) {
+    details.push(`<a href="${meet.phone_url}" target="_blank" rel="noopener">Más números de teléfono</a>`);
+  }
+
+  document.getElementById('meetDetails').innerHTML = details.join('<br>');
+}
+
+async function registrarAsistente(payload) {
+  const response = await fetch(CRM_ATTENDANCE_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  let data = {};
+
+  try {
+    data = await response.json();
+  } catch (_error) {
+    data = {};
+  }
+
+  if (!response.ok) {
+    if (typeof data.message === 'string' && data.message.length > 0) {
+      throw new Error(data.message);
+    }
+
+    if (typeof data.error === 'string' && data.error.length > 0) {
+      throw new Error(data.error);
+    }
+
+    throw new Error('No fue posible registrar la asistencia.');
+  }
+
+  return data;
+}
+
+async function verificar() {
+  const rawPhone = document.getElementById('phoneInput').value.trim();
+  const submitButton = document.getElementById('submitBtn');
+  const wrapper = document.querySelector('.phone-wrapper');
+
+  showFormMessage('');
+
+  const phoneLocal = rawPhone.replace(/[^0-9]/g, '');
+
+  if (phoneLocal.length < 6 || phoneLocal.length > 15) {
+    wrapper.style.borderColor = 'var(--rojo)';
+    showFormMessage('Ingresa un teléfono válido (6 a 15 dígitos).', 'error');
+
+    setTimeout(() => {
+      wrapper.style.borderColor = '';
+    }, 1200);
+
+    return;
+  }
+
+  const phoneCountryCode = document.getElementById('prefix').value;
+  const phoneE164 = `${phoneCountryCode}${phoneLocal}`;
+
+  submitButton.textContent = 'Registrando...';
+  submitButton.classList.add('loading');
+
+  try {
+    const eventText = `Asistió evento [${eventKey}] ${EVENT_NAME} | Inicio: ${new Date(eventUtcMs).toISOString()} | Tel: +${phoneCountryCode}${phoneLocal}`;
+    const payload = {
+      phone: phoneLocal,
+      phone2: phoneE164,
+      name: `Asistente evento ${phoneLocal}`,
+      action_type_id: 102,
+      creator_user_id: 0,
+      event_text: eventText,
+      notes: '#iguana-live'
+    };
+
+    const data = await registrarAsistente(payload);
+
+    renderMeet(data.meet || DEFAULT_MEET);
+    showFormMessage('Asistencia registrada. Ya puedes ingresar.', 'success');
+
+    const meetResult = document.getElementById('resMeet');
+    meetResult.style.display = 'block';
+    meetResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (error) {
+    showFormMessage(error.message || 'No fue posible registrar la asistencia.', 'error');
+  } finally {
+    submitButton.textContent = 'Obtener enlace del en vivo 🚀';
+    submitButton.classList.remove('loading');
+  }
+}
+
+document.getElementById('phoneInput').addEventListener('input', function handleInput() {
+  this.value = this.value.replace(/[^0-9]/g, '');
+});
+
+document.getElementById('phoneInput').addEventListener('keypress', function handleKeyPress(event) {
+  if (event.key === 'Enter') {
+    verificar();
+  }
+});
+
+syncEventMetadata();
+actualizarContador();
+actualizarEstado();
+updateTestStatusUi();
+
+setInterval(() => {
+  actualizarContador();
+  actualizarEstado();
+}, 1000);
+</script>
+</body>
+</html>

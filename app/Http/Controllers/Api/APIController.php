@@ -1916,6 +1916,8 @@ class APIController extends Controller
     {
 
         $model = new Action;
+        $eventText = trim((string) ($request->input('event_text') ?? ''));
+        $contentText = trim((string) ($request->input('content') ?? ''));
 
         $str = '';
         if (isset($request->phone)) {
@@ -1939,14 +1941,25 @@ class APIController extends Controller
         }
 
         $model->type_id = 16; // actualización
-        if (isset($request->content)) {
+        if ($contentText !== '') {
             $model->type_id = 8; // WhatsApp de entrada
             $model->creator_user_id = 96;
             if (isset($request->type_id) && ($request->type_id != '')) {
                 $model->type_id = $request->type_id;
                 $model->creator_user_id = $request->creator_user_id;
             }
-            $str .= 'WP Mensaje:'.$request->content;
+            $str .= 'WP Mensaje:'.$contentText;
+        }
+
+        if (isset($request->action_type_id) && ($request->action_type_id != '')) {
+            $model->type_id = (int) $request->action_type_id;
+            if (isset($request->creator_user_id) && ($request->creator_user_id != '')) {
+                $model->creator_user_id = (int) $request->creator_user_id;
+            }
+        }
+
+        if ($eventText !== '') {
+            $str .= ' Evento:'.$eventText;
         }
 
         $model->note .= $str;
