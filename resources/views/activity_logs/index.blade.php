@@ -56,6 +56,153 @@
     .muted {
         color: #9ca3af;
     }
+    .monitor-shell {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .monitor-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px;
+        border-bottom: 1px solid #eef2f7;
+    }
+    .monitor-header h5 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: #111827;
+    }
+    .monitor-header p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 13px;
+    }
+    .monitor-range {
+        font-size: 12px;
+        font-weight: 600;
+        color: #0f766e;
+        background: #ecfeff;
+        padding: 6px 10px;
+        border-radius: 10px;
+        border: 1px solid #99f6e4;
+        white-space: nowrap;
+    }
+    .pulse-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+        gap: 12px;
+        padding: 16px 18px 18px 18px;
+    }
+    .pulse-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        background: #ffffff;
+        overflow: hidden;
+    }
+    .pulse-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .pulse-card-head strong {
+        font-size: 17px;
+        color: #111827;
+    }
+    .pulse-total {
+        font-size: 13px;
+        color: #14b8a6;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .pulse-card-body {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .pulse-action {
+        font-size: 17px;
+        font-weight: 700;
+        color: #1f2937;
+        line-height: 1.2;
+        overflow-wrap: anywhere;
+    }
+    .pulse-meta {
+        font-size: 13px;
+        color: #6b7280;
+    }
+    .status-dot {
+        width: 13px;
+        height: 13px;
+        border-radius: 999px;
+        display: inline-block;
+        margin-right: 8px;
+        border: 2px solid transparent;
+    }
+    .status-online {
+        background: #0284c7;
+        border-color: rgba(2, 132, 199, 0.2);
+    }
+    .status-range {
+        background: #94a3b8;
+        border-color: rgba(148, 163, 184, 0.2);
+    }
+    .monitor-chart-card {
+        padding: 14px 16px;
+    }
+    .monitor-chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+    .monitor-chart-header h6 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+        color: #111827;
+    }
+    .monitor-chart-header span {
+        font-size: 12px;
+        color: #6b7280;
+    }
+    .monitor-chart-body {
+        height: 360px;
+        position: relative;
+    }
+    .monitor-empty {
+        border: 1px dashed #d1d5db;
+        border-radius: 12px;
+        background: #f9fafb;
+        color: #6b7280;
+        text-align: center;
+        padding: 36px 16px;
+        font-size: 14px;
+    }
+    @media (max-width: 991px) {
+        .monitor-chart-body {
+            height: 300px;
+        }
+    }
+    @media (max-width: 767px) {
+        .monitor-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .monitor-range {
+            white-space: normal;
+        }
+        .monitor-chart-header h6 {
+            font-size: 20px;
+        }
+    }
 </style>
 @endpush
 
@@ -100,7 +247,75 @@
         </form>
     </div>
 
-    <div class="logs-card mt-2">
+    <div class="monitor-shell mt-2">
+        <div class="logs-card">
+            <div class="monitor-header">
+                <div>
+                    <h5>Pulse de usuarios</h5>
+                    <p>Usuarios activos en este momento o con actividad dentro del rango filtrado.</p>
+                </div>
+                <div class="monitor-range">{{ $dashboardRangeLabel }}</div>
+            </div>
+
+            <div class="pulse-grid">
+                @forelse($activityCards as $card)
+                    <div class="pulse-card">
+                        <div class="pulse-card-head">
+                            <div class="d-flex align-items-center">
+                                <span class="status-dot status-{{ $card['status'] }}"></span>
+                                <strong>{{ $card['name'] }}</strong>
+                            </div>
+                            <span class="pulse-total">{{ number_format($card['total_logs']) }} logs</span>
+                        </div>
+                        <div class="pulse-card-body">
+                            <div class="pulse-action">{{ $card['last_action'] }}</div>
+                            <div class="pulse-meta">{{ $card['status_label'] }} · {{ $card['last_activity_at_human'] }}</div>
+                            <div class="pulse-meta">Tiempo activo: {{ $card['active_time_label'] }}</div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="monitor-empty">
+                        No hay actividad de usuarios para el rango seleccionado.
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-7 mb-3 mb-lg-0">
+                <div class="logs-card monitor-chart-card h-100">
+                    <div class="monitor-chart-header">
+                        <h6>Eventos por día (apilado por usuario)</h6>
+                        <span>{{ $dashboardRangeLabel }}</span>
+                    </div>
+                    <div class="monitor-chart-body">
+                        @if(count($eventsByDayChart['labels']) > 0 && count($eventsByDayChart['datasets']) > 0)
+                            <canvas id="eventsByUserChart"></canvas>
+                        @else
+                            <div class="monitor-empty">No hay eventos para construir la gráfica en este rango.</div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="logs-card monitor-chart-card h-100">
+                    <div class="monitor-chart-header">
+                        <h6>Top usuarios</h6>
+                        <span>Acciones totales + minutos activos</span>
+                    </div>
+                    <div class="monitor-chart-body">
+                        @if(count($topUsersChart['labels']) > 0)
+                            <canvas id="topUsersActivityChart"></canvas>
+                        @else
+                            <div class="monitor-empty">No hay usuarios con actividad para este período.</div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="logs-card mt-3">
         <div class="table-responsive">
             <table class="table logs-table mb-0">
                 <thead>
@@ -173,3 +388,185 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    if (!window.Chart) {
+        return;
+    }
+
+    const eventsByDayChartData = @json($eventsByDayChart);
+    const topUsersChartData = @json($topUsersChart);
+    const colorPalette = [
+        { border: 'rgb(20, 184, 166)', fill: 'rgba(20, 184, 166, 0.22)' },
+        { border: 'rgb(59, 130, 246)', fill: 'rgba(59, 130, 246, 0.22)' },
+        { border: 'rgb(236, 72, 153)', fill: 'rgba(236, 72, 153, 0.22)' },
+        { border: 'rgb(245, 158, 11)', fill: 'rgba(245, 158, 11, 0.22)' },
+        { border: 'rgb(139, 92, 246)', fill: 'rgba(139, 92, 246, 0.22)' },
+        { border: 'rgb(14, 165, 233)', fill: 'rgba(14, 165, 233, 0.22)' },
+        { border: 'rgb(107, 114, 128)', fill: 'rgba(107, 114, 128, 0.18)' },
+    ];
+
+    const eventsCanvas = document.getElementById('eventsByUserChart');
+    if (
+        eventsCanvas &&
+        Array.isArray(eventsByDayChartData.labels) &&
+        eventsByDayChartData.labels.length > 0 &&
+        Array.isArray(eventsByDayChartData.datasets) &&
+        eventsByDayChartData.datasets.length > 0
+    ) {
+        const datasets = eventsByDayChartData.datasets.map((dataset, index) => {
+            const color = colorPalette[index % colorPalette.length];
+
+            return {
+                label: dataset.label,
+                data: Array.isArray(dataset.data) ? dataset.data : [],
+                borderColor: color.border,
+                backgroundColor: color.fill,
+                fill: true,
+                tension: 0.32,
+                pointRadius: 2,
+                pointHoverRadius: 5,
+                borderWidth: 2,
+                stack: 'events',
+            };
+        });
+
+        new Chart(eventsCanvas, {
+            type: 'line',
+            data: {
+                labels: eventsByDayChartData.labels,
+                datasets,
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                        },
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                        },
+                    },
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                const value = context.parsed.y ?? 0;
+                                return `${context.dataset.label}: ${value} eventos`;
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    }
+
+    const topUsersCanvas = document.getElementById('topUsersActivityChart');
+    if (
+        topUsersCanvas &&
+        Array.isArray(topUsersChartData.labels) &&
+        topUsersChartData.labels.length > 0
+    ) {
+        const activeTimeLabels = Array.isArray(topUsersChartData.active_time_labels)
+            ? topUsersChartData.active_time_labels
+            : [];
+
+        new Chart(topUsersCanvas, {
+            type: 'bar',
+            data: {
+                labels: topUsersChartData.labels,
+                datasets: [
+                    {
+                        label: 'Acciones totales',
+                        data: Array.isArray(topUsersChartData.actions) ? topUsersChartData.actions : [],
+                        backgroundColor: 'rgba(20, 184, 166, 0.86)',
+                        borderRadius: 8,
+                        barThickness: 18,
+                        xAxisID: 'x',
+                    },
+                    {
+                        label: 'Minutos activos',
+                        data: Array.isArray(topUsersChartData.active_minutes) ? topUsersChartData.active_minutes : [],
+                        backgroundColor: 'rgba(59, 130, 246, 0.82)',
+                        borderRadius: 8,
+                        barThickness: 18,
+                        xAxisID: 'x1',
+                    },
+                ],
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Acciones',
+                        },
+                        ticks: {
+                            precision: 0,
+                        },
+                    },
+                    x1: {
+                        beginAtZero: true,
+                        position: 'top',
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                        title: {
+                            display: true,
+                            text: 'Minutos activos',
+                        },
+                        ticks: {
+                            precision: 0,
+                        },
+                    },
+                    y: {
+                        grid: {
+                            display: false,
+                        },
+                    },
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                if (context.dataset.label === 'Minutos activos') {
+                                    const label = activeTimeLabels[context.dataIndex] || `${context.parsed.x}m`;
+                                    return `${context.dataset.label}: ${label}`;
+                                }
+
+                                return `${context.dataset.label}: ${context.parsed.x}`;
+                            },
+                        },
+                    },
+                },
+            },
+        });
+    }
+})();
+</script>
+@endpush
