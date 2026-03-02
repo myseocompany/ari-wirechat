@@ -75,14 +75,21 @@
                     @endforeach
                 </select>
             </div>
-            <div style="flex:1; min-width: 170px;">
-                <input type="date" name="from_date" value="{{ $fromDate }}" placeholder="Desde">
+            <div style="flex:1; min-width: 220px;">
+                <input type="datetime-local" name="from_datetime" value="{{ $fromDateTime }}" placeholder="Desde">
             </div>
-            <div style="flex:1; min-width: 170px;">
-                <input type="date" name="to_date" value="{{ $toDate }}" placeholder="Hasta">
+            <div style="flex:1; min-width: 220px;">
+                <input type="datetime-local" name="to_datetime" value="{{ $toDateTime }}" placeholder="Hasta">
             </div>
-            <div style="flex:1; min-width: 140px;">
-                <input type="number" name="user_id" value="{{ $userId }}" placeholder="User ID">
+            <div style="flex:1; min-width: 220px;">
+                <select name="user_id" class="form-control form-control-sm">
+                    <option value="">Todos los usuarios</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}" @selected((string) $user->id === (string) $userId)>
+                            {{ $user->name }} (#{{ $user->id }})
+                        </option>
+                    @endforeach
+                </select>
             </div>
             <select name="per_page" class="form-control form-control-sm" onchange="this.form.submit()" style="max-width: 110px;">
                 @foreach([10,25,50,100] as $size)
