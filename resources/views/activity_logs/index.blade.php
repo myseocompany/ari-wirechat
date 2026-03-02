@@ -9,11 +9,15 @@
     }
     .logs-header {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        align-items: stretch;
         gap: 12px;
-        padding: 16px 18px 0 18px;
-        flex-wrap: wrap;
+        padding: 4px 0 0 0;
+    }
+    .logs-filter-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
     }
     .logs-search {
         display: flex;
@@ -27,6 +31,59 @@
         border: 1px solid #d1d5db;
         padding: 10px 14px;
         width: 100%;
+    }
+    .time-filter-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 0.5rem;
+        border: 1px solid rgba(17, 19, 34, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.05);
+        flex-wrap: wrap;
+    }
+    .quick-range-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        align-items: center;
+        width: 100%;
+    }
+    .quick-range-pills .range-pill {
+        background: #fff;
+        padding: 0.4rem 1rem;
+        border-radius: 999px;
+        font-weight: 500;
+        color: #475467;
+        transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        border: none;
+    }
+    .quick-range-pills .range-pill.active {
+        background: #111322;
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(17, 19, 34, 0.25);
+    }
+    .date-picker-pill {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid #e4e7ec;
+        border-radius: 999px;
+        padding: 0.35rem 0.9rem;
+        background: #fff;
+    }
+    .date-picker-pill .form-control {
+        border: none;
+        background: transparent;
+        padding: 0;
+        width: 170px;
+        height: auto;
+    }
+    .time-filter-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
     .logs-table thead th {
         font-size: 13px;
@@ -43,7 +100,7 @@
     .logs-table tbody tr:hover {
         background: #f9fafb;
     }
-    .pill {
+    .action-pill {
         display: inline-flex;
         align-items: center;
         padding: 6px 10px;
@@ -202,6 +259,9 @@
         .monitor-chart-header h6 {
             font-size: 20px;
         }
+        .time-filter-actions {
+            margin-left: 0 !important;
+        }
     }
 </style>
 @endpush
@@ -209,41 +269,68 @@
 @section('content')
 <div class="mt-4">
     <div class="logs-header">
-        <div class="text-muted small mb-2 mb-md-0">Actividad de usuarios</div>
-        <form method="get" class="logs-search">
-            <div style="flex:2; min-width: 220px;">
-                <input type="text" name="q" value="{{ $search }}" placeholder="Buscar en acción, sujeto o meta...">
+        <div class="text-muted small">Actividad de usuarios</div>
+        <form method="get" id="activity-logs-filter" class="logs-filter-form">
+            <input type="hidden" name="from_date" value="{{ $fromDate }}">
+            <input type="hidden" name="to_date" value="{{ $toDate }}">
+            <input type="hidden" name="range" id="activity_logs_range_type" value="{{ $selectedRange }}">
+
+            <div class="time-filter-card">
+                <div class="quick-range-pills">
+                    @foreach($filterOptions as $value => $label)
+                        <button type="submit" name="range" value="{{ $value }}" class="range-pill quick-range-button {{ $selectedRange === $value ? 'active' : '' }}">
+                            {{ $label }}
+                        </button>
+                    @endforeach
+
+                    <div class="date-picker-pill">
+                        <i class="fa fa-calendar text-muted"></i>
+                        <input
+                            type="text"
+                            id="activity_logs_range"
+                            class="form-control"
+                            placeholder="Seleccionar rango"
+                            value="{{ (!empty($fromDate) && !empty($toDate)) ? \Carbon\Carbon::parse($fromDate)->format('d-m-Y').' - '.\Carbon\Carbon::parse($toDate)->format('d-m-Y') : '' }}"
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div class="time-filter-actions ml-auto">
+                        <button type="submit" class="btn btn-dark rounded-pill px-4">Aplicar</button>
+                        <button type="button" class="btn btn-link text-dark" id="activity_logs_range_clear">Limpiar</button>
+                    </div>
+                </div>
             </div>
-            <div style="flex:1; min-width: 180px;">
-                <select name="action" class="form-control form-control-sm">
-                    <option value="">Todas las acciones</option>
-                    @foreach($actions as $actionOption)
-                        <option value="{{ $actionOption }}" @selected($actionOption === $action)>{{ $actionOption }}</option>
+
+            <div class="logs-search">
+                <div style="flex:2; min-width: 220px;">
+                    <input type="text" name="q" value="{{ $search }}" placeholder="Buscar en acción, sujeto o meta...">
+                </div>
+                <div style="flex:1; min-width: 180px;">
+                    <select name="action" class="form-control form-control-sm">
+                        <option value="">Todas las acciones</option>
+                        @foreach($actions as $actionOption)
+                            <option value="{{ $actionOption }}" @selected($actionOption === $action)>{{ $actionOption }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div style="flex:1; min-width: 220px;">
+                    <select name="user_id" class="form-control form-control-sm">
+                        <option value="">Todos los usuarios</option>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}" @selected((string) $user->id === (string) $userId)>
+                                {{ $user->name }} (#{{ $user->id }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <select name="per_page" class="form-control form-control-sm" onchange="this.form.submit()" style="max-width: 110px;">
+                    @foreach([10,25,50,100] as $size)
+                        <option value="{{ $size }}" @selected($perPage == $size)>{{ $size }} / pág.</option>
                     @endforeach
                 </select>
+                <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
             </div>
-            <div style="flex:1; min-width: 220px;">
-                <input type="datetime-local" name="from_datetime" value="{{ $fromDateTime }}" placeholder="Desde">
-            </div>
-            <div style="flex:1; min-width: 220px;">
-                <input type="datetime-local" name="to_datetime" value="{{ $toDateTime }}" placeholder="Hasta">
-            </div>
-            <div style="flex:1; min-width: 220px;">
-                <select name="user_id" class="form-control form-control-sm">
-                    <option value="">Todos los usuarios</option>
-                    @foreach($users as $user)
-                        <option value="{{ $user->id }}" @selected((string) $user->id === (string) $userId)>
-                            {{ $user->name }} (#{{ $user->id }})
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <select name="per_page" class="form-control form-control-sm" onchange="this.form.submit()" style="max-width: 110px;">
-                @foreach([10,25,50,100] as $size)
-                    <option value="{{ $size }}" @selected($perPage == $size)>{{ $size }} / pág.</option>
-                @endforeach
-            </select>
-            <button class="btn btn-primary btn-sm" type="submit">Filtrar</button>
         </form>
     </div>
 
@@ -336,7 +423,7 @@
                                 <a href="{{ route('activity_logs.show', $log->id) }}">#{{ $log->id }}</a>
                             </td>
                             <td>
-                                <span class="pill">{{ $log->action }}</span>
+                                <span class="action-pill">{{ $log->action }}</span>
                             </td>
                             <td>
                                 @if($log->user)
@@ -393,6 +480,95 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 (function () {
+    const $filterForm = $('#activity-logs-filter');
+    if ($filterForm.length) {
+        const $rangeInput = $('#activity_logs_range');
+        const $fromField = $filterForm.find('input[name="from_date"]');
+        const $toField = $filterForm.find('input[name="to_date"]');
+        const $rangeField = $('#activity_logs_range_type');
+        const $clearButton = $('#activity_logs_range_clear');
+        const $quickButtons = $filterForm.find('.quick-range-button');
+        const hasDateRangePicker = typeof $rangeInput.daterangepicker === 'function' && typeof window.moment !== 'undefined';
+
+        function setCustomRange(startDate, endDate, syncPicker = true) {
+            $fromField.val(startDate.format('YYYY-MM-DD'));
+            $toField.val(endDate.format('YYYY-MM-DD'));
+            $rangeField.val('custom');
+            $rangeInput.val(startDate.format('DD-MM-YYYY') + ' - ' + endDate.format('DD-MM-YYYY'));
+
+            if (syncPicker && $rangeInput.data('daterangepicker')) {
+                $rangeInput.data('daterangepicker').setStartDate(startDate);
+                $rangeInput.data('daterangepicker').setEndDate(endDate);
+            }
+        }
+
+        function clearCustomRange(setAllRange = false) {
+            $fromField.val('');
+            $toField.val('');
+            $rangeInput.val('');
+
+            if (setAllRange) {
+                $rangeField.val('all');
+            }
+        }
+
+        if (hasDateRangePicker) {
+            const defaultStart = moment().startOf('month');
+            const defaultEnd = moment().endOf('month');
+            const inputStart = $fromField.val() ? moment($fromField.val(), 'YYYY-MM-DD') : defaultStart;
+            const inputEnd = $toField.val() ? moment($toField.val(), 'YYYY-MM-DD') : defaultEnd;
+
+            $rangeInput.daterangepicker({
+                startDate: inputStart,
+                endDate: inputEnd,
+                autoUpdateInput: false,
+                opens: 'center',
+                locale: {
+                    format: 'DD-MM-YYYY',
+                    applyLabel: 'Aplicar',
+                    cancelLabel: 'Cancelar',
+                    daysOfWeek: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+                    monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    firstDay: 1,
+                },
+                ranges: {
+                    'Hoy': [moment(), moment()],
+                    'Ayer': [moment().subtract(1, 'day'), moment().subtract(1, 'day')],
+                    'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
+                    'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
+                    'Últimos 60 días': [moment().subtract(59, 'days'), moment()],
+                    'Últimos 90 días': [moment().subtract(89, 'days'), moment()],
+                    'Esta semana': [moment().startOf('isoWeek'), moment().endOf('isoWeek')],
+                    'Semana pasada': [moment().subtract(1, 'week').startOf('isoWeek'), moment().subtract(1, 'week').endOf('isoWeek')],
+                    'Este mes': [moment().startOf('month'), moment().endOf('month')],
+                    'Mes anterior': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    'Máximo': [moment('2015-01-01', 'YYYY-MM-DD'), moment()],
+                },
+            }, function (startDate, endDate) {
+                setCustomRange(startDate, endDate, false);
+            }).on('apply.daterangepicker', function (event, picker) {
+                setCustomRange(picker.startDate, picker.endDate, false);
+            }).on('cancel.daterangepicker', function () {
+                clearCustomRange(true);
+            });
+
+            if ($fromField.val() && $toField.val()) {
+                setCustomRange(inputStart, inputEnd, false);
+            }
+        }
+
+        $quickButtons.on('click', function () {
+            const selectedQuickRange = String($(this).val() || 'today');
+            $rangeField.val(selectedQuickRange);
+            clearCustomRange(false);
+        });
+
+        $clearButton.on('click', function (event) {
+            event.preventDefault();
+            clearCustomRange(true);
+        });
+    }
+
     if (!window.Chart) {
         return;
     }

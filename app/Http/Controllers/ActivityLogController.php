@@ -33,10 +33,7 @@ class ActivityLogController extends Controller
         $search = trim((string) $request->get('q'));
         $action = trim((string) $request->get('action'));
         $userId = $request->get('user_id');
-        $fromDateTime = (string) $request->get('from_datetime');
-        $toDateTime = (string) $request->get('to_datetime');
-        $parsedFromDateTime = $this->parseDateTime($fromDateTime);
-        $parsedToDateTime = $this->parseDateTime($toDateTime);
+        [$parsedFromDateTime, $parsedToDateTime, $selectedRange, $fromDate, $toDate] = $this->resolveDateRange($request);
 
         $query = ActivityLog::with('user')->orderByDesc('id');
         $this->applyFilters($query, $search, $action, $userId, $parsedFromDateTime, $parsedToDateTime);
@@ -45,13 +42,13 @@ class ActivityLogController extends Controller
         $users = $this->getAvailableUsers();
 
         $logs = $query->paginate($perPage)->withQueryString();
-        [$dashboardFromDateTime, $dashboardToDateTime] = $this->resolveDashboardRange($parsedFromDateTime, $parsedToDateTime);
         $dashboardMetrics = $this->buildDashboardMetrics(
             $search,
             $action,
             $userId,
-            $dashboardFromDateTime,
-            $dashboardToDateTime
+            $parsedFromDateTime,
+            $parsedToDateTime,
+            $selectedRange
         );
 
         return view('activity_logs.index', [
@@ -61,8 +58,10 @@ class ActivityLogController extends Controller
             'perPage' => $perPage,
             'action' => $action,
             'userId' => $userId,
-            'fromDateTime' => $fromDateTime,
-            'toDateTime' => $toDateTime,
+            'selectedRange' => $selectedRange,
+            'filterOptions' => $this->filterOptions(),
+            'fromDate' => $fromDate,
+            'toDate' => $toDate,
             'users' => $users,
             'activityCards' => $dashboardMetrics['activity_cards'],
             'eventsByDayChart' => $dashboardMetrics['events_by_day_chart'],
@@ -160,29 +159,124 @@ class ActivityLogController extends Controller
     }
 
     /**
-     * @return array{0: Carbon, 1: Carbon}
+     * @return array{0: ?Carbon, 1: ?Carbon, 2: string, 3: ?string, 4: ?string}
      */
-    private function resolveDashboardRange(?Carbon $fromDateTime, ?Carbon $toDateTime): array
+    private function resolveDateRange(Request $request): array
     {
-        if ($fromDateTime && $toDateTime) {
-            $from = $fromDateTime->copy();
-            $to = $toDateTime->copy();
-        } elseif ($fromDateTime) {
-            $from = $fromDateTime->copy();
-            $to = now();
-        } elseif ($toDateTime) {
-            $to = $toDateTime->copy();
-            $from = $to->copy()->subDays(6)->startOfDay();
-        } else {
-            $to = now();
-            $from = $to->copy()->subDays(6)->startOfDay();
+        $range = trim((string) $request->get('range', 'today'));
+        $fromDateValue = trim((string) $request->input('from_date'));
+        $toDateValue = trim((string) $request->input('to_date'));
+
+        if ($fromDateValue !== '' && $toDateValue !== '') {
+            try {
+                $start = Carbon::parse($fromDateValue)->startOfDay();
+                $end = Carbon::parse($toDateValue)->endOfDay();
+
+                return [
+                    $start,
+                    $end,
+                    'custom',
+                    $start->toDateString(),
+                    $end->toDateString(),
+                ];
+            } catch (Throwable) {
+                $fromDateValue = '';
+                $toDateValue = '';
+            }
         }
 
-        if ($from->greaterThan($to)) {
-            [$from, $to] = [$to, $from];
+        if ($fromDateValue === '' && $toDateValue === '') {
+            $legacyFromDateTime = trim((string) $request->input('from_datetime'));
+            $legacyToDateTime = trim((string) $request->input('to_datetime'));
+            $legacyFrom = $this->parseDateTime($legacyFromDateTime);
+            $legacyTo = $this->parseDateTime($legacyToDateTime);
+
+            if ($legacyFrom || $legacyTo) {
+                if ($legacyFrom && $legacyTo) {
+                    if ($legacyFrom->greaterThan($legacyTo)) {
+                        [$legacyFrom, $legacyTo] = [$legacyTo, $legacyFrom];
+                    }
+                } elseif ($legacyFrom) {
+                    $legacyTo = $legacyFrom->copy()->endOfDay();
+                } else {
+                    $legacyFrom = $legacyTo?->copy()->startOfDay();
+                }
+
+                return [
+                    $legacyFrom,
+                    $legacyTo,
+                    'custom',
+                    $legacyFrom?->toDateString(),
+                    $legacyTo?->toDateString(),
+                ];
+            }
         }
 
-        return [$from, $to];
+        $now = now();
+        $start = null;
+        $end = null;
+
+        switch ($range) {
+            case 'today':
+                $start = $now->copy()->subDay()->setTime(17, 0, 0);
+                $end = $now->copy()->endOfDay();
+                break;
+            case 'yesterday':
+                $start = $now->copy()->subDay()->startOfDay();
+                $end = $now->copy()->subDay()->endOfDay();
+                break;
+            case 'weekly':
+                $start = $now->copy()->startOfWeek();
+                $end = $now->copy()->endOfWeek();
+                break;
+            case 'monthly':
+                $start = $now->copy()->startOfMonth();
+                $end = $now->copy()->endOfMonth();
+                break;
+            case 'last30':
+                $start = $now->copy()->subDays(29)->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
+            case 'last60':
+                $start = $now->copy()->subDays(59)->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
+            case 'last90':
+                $start = $now->copy()->subDays(89)->startOfDay();
+                $end = $now->copy()->endOfDay();
+                break;
+            case 'all':
+                $start = null;
+                $end = null;
+                break;
+            default:
+                $range = 'today';
+                $start = $now->copy()->subDay()->setTime(17, 0, 0);
+                $end = $now->copy()->endOfDay();
+                break;
+        }
+
+        return [
+            $start,
+            $end,
+            $range,
+            $start?->toDateString(),
+            $end?->toDateString(),
+        ];
+    }
+
+    private function filterOptions(): array
+    {
+        return [
+            'today' => 'Hoy',
+            'yesterday' => 'Ayer',
+            'weekly' => 'Semana',
+            'monthly' => 'Mes',
+            'last30' => 'Últimos 30',
+            'last60' => 'Últimos 60',
+            'last90' => 'Últimos 90',
+            'all' => 'Todo',
+        ];
     }
 
     /**
@@ -197,8 +291,9 @@ class ActivityLogController extends Controller
         string $search,
         string $action,
         mixed $userId,
-        Carbon $fromDateTime,
-        Carbon $toDateTime
+        ?Carbon $fromDateTime,
+        ?Carbon $toDateTime,
+        string $selectedRange
     ): array {
         $summaryQuery = ActivityLog::query()
             ->selectRaw('user_id, COUNT(*) as total_logs, MAX(created_at) as last_activity_at')
@@ -230,7 +325,7 @@ class ActivityLogController extends Controller
                     'active_minutes' => [],
                     'active_time_labels' => [],
                 ],
-                'range_label' => $fromDateTime->format('d/m/Y H:i').' - '.$toDateTime->format('d/m/Y H:i'),
+                'range_label' => $this->buildRangeLabel($fromDateTime, $toDateTime, $selectedRange),
             ];
         }
 
@@ -287,16 +382,6 @@ class ActivityLogController extends Controller
             ];
         }
 
-        $dateKeys = [];
-        $dateLabels = [];
-        $cursor = $fromDateTime->copy()->startOfDay();
-        $lastDate = $toDateTime->copy()->startOfDay();
-        while ($cursor->lessThanOrEqualTo($lastDate)) {
-            $dateKeys[] = $cursor->format('Y-m-d');
-            $dateLabels[] = $cursor->format('d/m');
-            $cursor->addDay();
-        }
-
         $eventsByDayQuery = ActivityLog::query()
             ->selectRaw('DATE(created_at) as log_date, user_id, COUNT(*) as total_logs')
             ->whereNotNull('user_id');
@@ -306,6 +391,34 @@ class ActivityLogController extends Controller
             ->groupBy('log_date', 'user_id')
             ->orderBy('log_date')
             ->get();
+
+        $dateKeys = [];
+        $dateLabels = [];
+        if ($fromDateTime && $toDateTime) {
+            $cursor = $fromDateTime->copy()->startOfDay();
+            $lastDate = $toDateTime->copy()->startOfDay();
+            while ($cursor->lessThanOrEqualTo($lastDate)) {
+                $dateKeys[] = $cursor->format('Y-m-d');
+                $dateLabels[] = $cursor->format('d/m');
+                $cursor->addDay();
+            }
+        } else {
+            $dateKeys = $eventsByDayRows
+                ->pluck('log_date')
+                ->filter()
+                ->unique()
+                ->sort()
+                ->values()
+                ->map(fn ($date): string => (string) $date)
+                ->all();
+            $dateLabels = array_map(function (string $date): string {
+                try {
+                    return Carbon::parse($date)->format('d/m');
+                } catch (Throwable) {
+                    return $date;
+                }
+            }, $dateKeys);
+        }
 
         $eventsByUserAndDay = [];
         foreach ($eventsByDayRows as $row) {
@@ -375,8 +488,21 @@ class ActivityLogController extends Controller
                 'active_minutes' => $topUsersActiveMinutes,
                 'active_time_labels' => $topUsersActiveTimeLabels,
             ],
-            'range_label' => $fromDateTime->format('d/m/Y H:i').' - '.$toDateTime->format('d/m/Y H:i'),
+            'range_label' => $this->buildRangeLabel($fromDateTime, $toDateTime, $selectedRange),
         ];
+    }
+
+    private function buildRangeLabel(?Carbon $fromDateTime, ?Carbon $toDateTime, string $selectedRange): string
+    {
+        if ($fromDateTime && $toDateTime) {
+            return $fromDateTime->format('d/m/Y').' - '.$toDateTime->format('d/m/Y');
+        }
+
+        if ($selectedRange === 'all') {
+            return 'Todo el histórico';
+        }
+
+        return 'Rango sin fecha';
     }
 
     private function formatActiveMinutes(int $minutes): string
