@@ -433,12 +433,18 @@ class ActionController extends Controller
         }
 
         $audioUrl = $this->normalizeActionUrl((string) $action->url);
-        if ($audioUrl === null) {
+        $retellAudioUrl = $this->resolveRetellAudioUrl($action, $audioUrl);
+
+        if ($audioUrl === null && $retellAudioUrl === null) {
             abort(404);
         }
 
-        if (! $this->isTwilioRecordingUrl($audioUrl)) {
-            abort(404);
+        if ($audioUrl === null || ! $this->isTwilioRecordingUrl($audioUrl)) {
+            if ($retellAudioUrl === null) {
+                abort(404);
+            }
+
+            return redirect()->away($retellAudioUrl);
         }
 
         $storedAudioUrl = $this->getStoredAudioUrl($action, $download);
@@ -730,6 +736,60 @@ class ActionController extends Controller
         }
 
         return $normalized;
+    }
+
+    private function resolveRetellAudioUrl(Action $action, ?string $fallbackUrl): ?string
+    {
+        if ((int) $action->type_id !== 104 && blank($action->retell_call_id)) {
+            return null;
+        }
+
+        $recordingUrlFromInbox = $this->resolveRetellRecordingUrlFromInbox($action);
+        if ($recordingUrlFromInbox !== null) {
+            return $recordingUrlFromInbox;
+        }
+
+        return $fallbackUrl;
+    }
+
+    private function resolveRetellRecordingUrlFromInbox(Action $action): ?string
+    {
+        $callId = trim((string) $action->retell_call_id);
+        if ($callId === '') {
+            return null;
+        }
+
+        $payload = DB::table('retell_inbox')
+            ->where('call_id', $callId)
+            ->value('payload');
+
+        if (! is_string($payload) || trim($payload) === '') {
+            return null;
+        }
+
+        $decodedPayload = json_decode($payload, true);
+        if (! is_array($decodedPayload)) {
+            return null;
+        }
+
+        $normalizedPayload = isset($decodedPayload[0]) && is_array($decodedPayload[0])
+            ? $decodedPayload[0]
+            : $decodedPayload;
+
+        if (isset($normalizedPayload['body']) && is_array($normalizedPayload['body'])) {
+            $normalizedPayload = $normalizedPayload['body'];
+        }
+
+        $callPayload = isset($normalizedPayload['call']) && is_array($normalizedPayload['call'])
+            ? $normalizedPayload['call']
+            : $normalizedPayload;
+
+        $recordingUrl = data_get($callPayload, 'recording_url');
+        if (! is_string($recordingUrl) || trim($recordingUrl) === '') {
+            return null;
+        }
+
+        return $this->normalizeActionUrl($recordingUrl);
     }
 
     private function isTwilioRecordingUrl(string $url): bool

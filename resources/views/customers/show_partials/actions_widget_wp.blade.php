@@ -21,6 +21,7 @@
           'icon' => $action->type->icon ?? 'fa-sticky-note',
           'color' => $action->type->color ?? '#0d6efd',
           'url' => $action->url,
+          'retell_call_id' => $action->retell_call_id,
           'type_name' => $action->getTypeName() ?? 'Acción',
           'is_pending' => $action->isPending(),
           'due_date' => $action->due_date,
@@ -111,34 +112,54 @@
             </strong><br>
 
             {{-- 🎧 Reproductor si es llamada --}}
-            @if(!empty($item['url']) && (int) $item['type_id'] === 21)
+            @php
+              $isTwilioCallType = (int) $item['type_id'] === 21;
+              $isRetellCallType = (int) $item['type_id'] === 104;
+              $isRetellSuccessful = $isRetellCallType && Str::contains(
+                Str::lower((string) $item['note']),
+                ['exitosa: sí', 'exitosa: si']
+              );
+              $hasRetellSource = !empty($item['url']) || !empty($item['retell_call_id']);
+              $shouldRenderAudio = ($isTwilioCallType && !empty($item['url']))
+                || ($isRetellCallType && $isRetellSuccessful && $hasRetellSource);
+            @endphp
+            @if($shouldRenderAudio)
               @php
-                $audioUrl = trim((string) $item['url']);
-                if (Str::startsWith($audioUrl, '//')) {
-                  $audioUrl = 'https:'.$audioUrl;
-                }
-                if (! Str::startsWith($audioUrl, ['http://', 'https://'])) {
-                  $audioUrl = 'https://'.$audioUrl;
-                }
-                $lowerUrl = Str::lower($audioUrl);
-                $isTwilioRecording = Str::contains($lowerUrl, 'api.twilio.com')
-                  && Str::contains($lowerUrl, '/recordings/');
-                if ($isTwilioRecording) {
+                $audioUrl = null;
+                $mime = 'audio/mpeg';
+
+                if ($isRetellCallType && !empty($item['id'])) {
                   $audioUrl = route('actions.audio', $item['id']);
+                } else {
+                  $audioUrl = trim((string) $item['url']);
+                  if (Str::startsWith($audioUrl, '//')) {
+                    $audioUrl = 'https:'.$audioUrl;
+                  }
+                  if (! Str::startsWith($audioUrl, ['http://', 'https://'])) {
+                    $audioUrl = 'https://'.$audioUrl;
+                  }
+                  $lowerUrl = Str::lower($audioUrl);
+                  $isTwilioRecording = Str::contains($lowerUrl, 'api.twilio.com')
+                    && Str::contains($lowerUrl, '/recordings/');
+                  if ($isTwilioRecording && !empty($item['id'])) {
+                    $audioUrl = route('actions.audio', $item['id']);
+                  }
+                  $mime = Str::contains($lowerUrl, '.mp3') ? 'audio/mpeg' :
+                    (Str::contains($lowerUrl, '.wav') ? 'audio/wav' :
+                    (Str::contains($lowerUrl, ['.ogg', '.oga']) ? 'audio/ogg' :
+                    (Str::contains($lowerUrl, ['.m4a', '.m4b']) ? 'audio/mp4' :
+                    (Str::contains($lowerUrl, '.webm') ? 'audio/webm' : 'audio/mpeg'))));
                 }
-                $mime = Str::contains($lowerUrl, '.mp3') ? 'audio/mpeg' :
-                  (Str::contains($lowerUrl, '.wav') ? 'audio/wav' :
-                  (Str::contains($lowerUrl, ['.ogg', '.oga']) ? 'audio/ogg' :
-                  (Str::contains($lowerUrl, ['.m4a', '.m4b']) ? 'audio/mp4' :
-                  (Str::contains($lowerUrl, '.webm') ? 'audio/webm' : 'audio/mpeg'))));
               @endphp
-              <audio controls class="mt-2 w-full max-w-full">
-                <source src="{{ $audioUrl }}" type="{{ $mime }}">
-                Tu navegador no soporta el audio.
-              </audio><br>
+              @if(!empty($audioUrl))
+                <audio controls class="mt-2 w-full max-w-full">
+                  <source src="{{ $audioUrl }}" type="{{ $mime }}">
+                  Tu navegador no soporta el audio.
+                </audio><br>
+              @endif
             @endif
 
-            @if(!empty($item['url']) && (int) $item['type_id'] === 21)
+            @if(!empty($item['url']) && $isTwilioCallType)
               <div class="mt-2 space-y-2">
                 @if(($item['transcription_status'] ?? null) === 'done' && ! empty($item['transcription_text']))
                   <div class="whitespace-pre-line break-words rounded-md border border-slate-200 bg-slate-50 p-2 text-sm text-slate-700">
