@@ -397,37 +397,22 @@
   </div>
 
   <div class="countdown-section" id="countdownSection">
-    <p class="countdown-label">El en vivo comienza en</p>
-    <div class="countdown" id="countdown">
-      <div class="time-block">
-        <span class="time-num" id="cd-days">00</span>
-        <span class="time-unit">días</span>
-      </div>
-      <span class="time-sep">:</span>
-      <div class="time-block">
-        <span class="time-num" id="cd-hours">00</span>
-        <span class="time-unit">horas</span>
-      </div>
-      <span class="time-sep">:</span>
-      <div class="time-block">
-        <span class="time-num" id="cd-min">00</span>
-        <span class="time-unit">min</span>
-      </div>
-      <span class="time-sep">:</span>
-      <div class="time-block">
-        <span class="time-num" id="cd-sec">00</span>
-        <span class="time-unit">seg</span>
-      </div>
-    </div>
+    <p class="countdown-label">Ya está disponible aquí</p>
+    <a class="meet-link-btn" href="https://www.instagram.com/p/DVbWdHgjSjf/" target="_blank" rel="noopener">
+      Ver en Instagram →
+    </a>
   </div>
 
   <div class="card">
     <div class="card-title">Foco y Estandarización<br>para Crecer</div>
 
     <div id="stateLocked">
-      <span class="lock-icon">🔒</span>
-      <div class="lock-title">Acceso no disponible aún</div>
-      <p class="lock-sub">El enlace del en vivo se habilitará<br>1 hora antes del evento.</p>
+      <span class="lock-icon">✅</span>
+      <div class="lock-title">Contenido disponible</div>
+      <p class="lock-sub">Revísalo aquí:</p>
+      <a class="meet-link-btn" href="https://www.instagram.com/p/DVbWdHgjSjf/" target="_blank" rel="noopener">
+        Ver publicación →
+      </a>
     </div>
 
     <div id="stateActive">
@@ -624,6 +609,15 @@ function syncEventMetadata() {
 function actualizarContador() {
   const diff = eventUtcMs - Date.now();
   const countdownSection = document.getElementById('countdownSection');
+  const countdown = document.getElementById('countdown');
+  const daysElement = document.getElementById('cd-days');
+  const hoursElement = document.getElementById('cd-hours');
+  const minutesElement = document.getElementById('cd-min');
+  const secondsElement = document.getElementById('cd-sec');
+
+  if (!countdownSection || !countdown || !daysElement || !hoursElement || !minutesElement || !secondsElement) {
+    return;
+  }
 
   if (diff <= 0) {
     countdownSection.innerHTML = '<p class="ended-label">🔴 ¡El en vivo está en curso!</p>';
@@ -635,13 +629,13 @@ function actualizarContador() {
   const minutos = Math.floor((diff % 3600000) / 60000);
   const segundos = Math.floor((diff % 60000) / 1000);
 
-  document.getElementById('cd-days').textContent = String(dias).padStart(2, '0');
-  document.getElementById('cd-hours').textContent = String(horas).padStart(2, '0');
-  document.getElementById('cd-min').textContent = String(minutos).padStart(2, '0');
-  document.getElementById('cd-sec').textContent = String(segundos).padStart(2, '0');
+  daysElement.textContent = String(dias).padStart(2, '0');
+  hoursElement.textContent = String(horas).padStart(2, '0');
+  minutesElement.textContent = String(minutos).padStart(2, '0');
+  secondsElement.textContent = String(segundos).padStart(2, '0');
 
   if (diff < 600000) {
-    document.getElementById('countdown').classList.add('urgent');
+    countdown.classList.add('urgent');
   }
 }
 
