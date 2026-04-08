@@ -373,6 +373,9 @@ it('has emails', function (string $email) {
 - Always use Tailwind CSS v3 - verify you're using only classes supported by this version.
 </laravel-boost-guidelines>
 
+## Language
+- The CRM UI is in English. All routes, view file names, method names, column labels, button text, page titles, and user-facing strings must be in English. Spanish is only acceptable in business-domain content (e.g. product names, customer notes, prompt files).
+
 ## Tareas Pendientes Operativas
 
 - [ ] Implementar colas para los mensajes de `sellerChat` (webhook + procesamiento), para desacoplarlos del CRM y evitar caídas/desconexiones cuando el CRM esté fuera de línea.

@@ -1052,7 +1052,7 @@ class ReportController extends Controller
         return back()->with('retell_association_success', "La llamada {$callId} quedo asociada al cliente #{$customerId}.");
     }
 
-    public function simuladorSpin(Request $request): View
+    public function spinSimulator(Request $request): View
     {
         $fromDate = $request->filled('from_date')
             ? Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay()
@@ -1092,7 +1092,7 @@ class ReportController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('reports.views.simulador_spin', compact('model', 'fromDate', 'toDate', 'request'));
+        return view('reports.views.spin_simulator', compact('model', 'fromDate', 'toDate', 'request'));
     }
 
     private function resolveRetellCallUrl(string $callId): ?string
