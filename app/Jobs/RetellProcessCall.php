@@ -4,11 +4,13 @@ namespace App\Jobs;
 
 use App\Models\Action;
 use App\Models\Customer;
+use App\Services\WhatsAppService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class RetellProcessCall implements ShouldQueue
@@ -21,7 +23,7 @@ class RetellProcessCall implements ShouldQueue
 
     public function __construct(public array $data) {}
 
-    public function handle(): void
+    public function handle(WhatsAppService $whatsAppService): void
     {
         // 1) Normaliza payload
         $data = isset($this->data[0]) ? $this->data[0] : $this->data;
@@ -142,7 +144,10 @@ class RetellProcessCall implements ShouldQueue
 
         $action->save();
 
-        // 5) (Opcional) mover estado del cliente si fue exitosa
+        // 5) Si el agente directo acordó una demo, enviar Calendly por WhatsApp
+        $this->maybeSendCalendlyLink($customer, $callId, $whatsAppService);
+
+        // 6) (Opcional) mover estado del cliente si fue exitosa
         // if ($successful && in_array($customer->status_id, [1,36,28])) {
         //     $cHistory = new \App\Models\CustomerHistory;
         //     $cHistory->saveFromModel($customer);
@@ -151,6 +156,40 @@ class RetellProcessCall implements ShouldQueue
         // }
 
         Log::info('Retell job done', ['call_id' => $callId, 'customer_id' => $customer->id]);
+    }
+
+    private function maybeSendCalendlyLink(Customer $customer, string $callId, WhatsAppService $whatsAppService): void
+    {
+        $demoAcordada = DB::table('retell_inbox')
+            ->where('call_id', $callId)
+            ->value('demo_acordada');
+
+        if (! $demoAcordada) {
+            return;
+        }
+
+        $name = trim((string) ($customer->name ?? ''));
+
+        $components = [];
+        if ($name !== '') {
+            $components = [
+                [
+                    'type' => 'body',
+                    'parameters' => [
+                        ['type' => 'text', 'text' => $name],
+                    ],
+                ],
+            ];
+        }
+
+        $whatsAppService->sendTemplateToCustomer(
+            $customer,
+            'booking_calendly',
+            $components,
+            'es',
+            null,
+            ['retell_call_id' => $callId]
+        );
     }
 
     /**

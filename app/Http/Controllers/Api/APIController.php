@@ -4184,6 +4184,7 @@ class APIController extends Controller
                 'products_mentioned' => $normalizeString($customAnalysisData['products_mentioned'] ?? null),
                 'daily_volume_empanadas' => $normalizeDailyVolume($customAnalysisData['daily_volume_empanadas'] ?? null),
                 'live_attendance_status' => $normalizeString($customAnalysisData['live_attendance_status'] ?? null),
+                'demo_acordada' => $normalizeBoolean($customAnalysisData['demo_acordada'] ?? null),
                 // SPIN simulator fields
                 'escenario_detectado' => $normalizeString($customAnalysisData['escenario_detectado'] ?? null),
                 'hizo_apertura_correcta' => $normalizeBoolean($customAnalysisData['hizo_apertura_correcta'] ?? null),
@@ -4224,6 +4225,7 @@ class APIController extends Controller
                     'products_mentioned' => $extracted['products_mentioned'],
                     'daily_volume_empanadas' => $extracted['daily_volume_empanadas'],
                     'live_attendance_status' => $extracted['live_attendance_status'],
+                    'demo_acordada' => $extracted['demo_acordada'],
                     'escenario_detectado' => $extracted['escenario_detectado'],
                     'hizo_apertura_correcta' => $extracted['hizo_apertura_correcta'],
                     'preguntas_situacion' => $extracted['preguntas_situacion'],
@@ -4241,7 +4243,7 @@ class APIController extends Controller
                     'updated_at' => now(),
                 ]],
                 ['call_id'],
-                ['agent_id', 'agent_name', 'status', 'event', 'call_successful', 'in_voicemail', 'user_sentiment', 'masses_used', 'busca_automatizar', 'products_mentioned', 'daily_volume_empanadas', 'live_attendance_status', 'escenario_detectado', 'hizo_apertura_correcta', 'preguntas_situacion', 'identifico_problema', 'hizo_implicacion', 'cliente_dijo_beneficio', 'cerro_con_paso_concreto', 'puntaje_spin', 'resumen_llamada', 'principal_error', 'recomendacion', 'payload', 'error', 'updated_at']
+                ['agent_id', 'agent_name', 'status', 'event', 'call_successful', 'in_voicemail', 'user_sentiment', 'masses_used', 'busca_automatizar', 'products_mentioned', 'daily_volume_empanadas', 'live_attendance_status', 'demo_acordada', 'escenario_detectado', 'hizo_apertura_correcta', 'preguntas_situacion', 'identifico_problema', 'hizo_implicacion', 'cliente_dijo_beneficio', 'cerro_con_paso_concreto', 'puntaje_spin', 'resumen_llamada', 'principal_error', 'recomendacion', 'payload', 'error', 'updated_at']
             );
         } catch (\Throwable $e) {
             Log::error('Retell inbox persist error: '.$e->getMessage(), [
