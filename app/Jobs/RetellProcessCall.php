@@ -53,6 +53,14 @@ class RetellProcessCall implements ShouldQueue
             return;
         }
 
+        // Llamadas del simulador de entrenamiento: no asociar a clientes
+        $agentId = $call['agent_id'] ?? null;
+        $simulatorAgents = array_filter(explode(',', config('services.retell.simulator_agent_ids', '')));
+        if ($agentId && in_array($agentId, $simulatorAgents, true)) {
+            Log::info('Retell job: simulador de entrenamiento, skip asociación a cliente', ['call_id' => $callId, 'agent_id' => $agentId]);
+            return;
+        }
+
         Log::info('Retell job start', [
             'event' => $event, 'call_id' => $callId, 'status' => $status,
             'direction' => $direction, 'from' => $fromNumber, 'to' => $toNumber,

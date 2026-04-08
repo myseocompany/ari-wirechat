@@ -54,6 +54,11 @@ return [
         'timeout' => (int) env('CHANNELS_API_TIMEOUT', 30),
     ],
 
+    'retell' => [
+        'internal_token' => env('RETELL_INTERNAL_TOKEN'),
+        'simulator_agent_ids' => env('RETELL_SIMULATOR_AGENT_IDS', ''),
+    ],
+
     'twilio' => [
         'enabled' => env('TWILIO_ENABLED', true),
         'account_sid' => env('TWILIO_ACCOUNT_SID'),

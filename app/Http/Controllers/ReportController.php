@@ -911,6 +911,17 @@ class ReportController extends Controller
                 'ri.products_mentioned',
                 'ri.daily_volume_empanadas',
                 'ri.live_attendance_status',
+                'ri.escenario_detectado',
+                'ri.hizo_apertura_correcta',
+                'ri.preguntas_situacion',
+                'ri.identifico_problema',
+                'ri.hizo_implicacion',
+                'ri.cliente_dijo_beneficio',
+                'ri.cerro_con_paso_concreto',
+                'ri.puntaje_spin',
+                'ri.resumen_llamada',
+                'ri.principal_error',
+                'ri.recomendacion',
                 'ri.payload',
                 'ri.processed_at',
                 'ri.error',
@@ -1039,6 +1050,49 @@ class ReportController extends Controller
         $action->save();
 
         return back()->with('retell_association_success', "La llamada {$callId} quedo asociada al cliente #{$customerId}.");
+    }
+
+    public function simuladorSpin(Request $request): View
+    {
+        $fromDate = $request->filled('from_date')
+            ? Carbon::createFromFormat('Y-m-d', $request->string('from_date'))->startOfDay()
+            : now()->subDays(30)->startOfDay();
+        $toDate = $request->filled('to_date')
+            ? Carbon::createFromFormat('Y-m-d', $request->string('to_date'))->endOfDay()
+            : now()->endOfDay();
+
+        $simulatorAgentIds = array_filter(explode(',', config('services.retell.simulator_agent_ids', '')));
+
+        $model = DB::table('retell_inbox as ri')
+            ->select([
+                'ri.id', 'ri.call_id', 'ri.agent_name', 'ri.agent_id',
+                'ri.status', 'ri.event', 'ri.call_successful', 'ri.user_sentiment',
+                'ri.escenario_detectado', 'ri.hizo_apertura_correcta', 'ri.preguntas_situacion',
+                'ri.identifico_problema', 'ri.hizo_implicacion', 'ri.cliente_dijo_beneficio',
+                'ri.cerro_con_paso_concreto', 'ri.puntaje_spin',
+                'ri.resumen_llamada', 'ri.principal_error', 'ri.recomendacion',
+                'ri.payload', 'ri.created_at',
+            ])
+            ->when(!empty($simulatorAgentIds), function ($query) use ($simulatorAgentIds) {
+                $query->whereIn('ri.agent_id', $simulatorAgentIds);
+            }, function ($query) {
+                $query->whereNotNull('ri.escenario_detectado');
+            })
+            ->whereBetween('ri.created_at', [$fromDate, $toDate])
+            ->when($request->filled('asesor'), function ($query) use ($request) {
+                $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(ri.payload, '$.call.from_number')) LIKE ?", ['%'.$request->string('asesor').'%']);
+            })
+            ->when($request->filled('escenario'), function ($query) use ($request) {
+                $query->where('ri.escenario_detectado', $request->string('escenario'));
+            })
+            ->when($request->filled('puntaje_min'), function ($query) use ($request) {
+                $query->where('ri.puntaje_spin', '>=', (int) $request->input('puntaje_min'));
+            })
+            ->orderByDesc('ri.created_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('reports.views.simulador_spin', compact('model', 'fromDate', 'toDate', 'request'));
     }
 
     private function resolveRetellCallUrl(string $callId): ?string

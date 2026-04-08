@@ -4173,6 +4173,8 @@ class APIController extends Controller
             };
 
             $extracted = [
+                'agent_id' => $normalizeString($call['agent_id'] ?? null),
+                'agent_name' => $normalizeString($call['agent_name'] ?? null),
                 'event' => $normalizeString($event),
                 'call_successful' => $normalizeBoolean($analysis['call_successful'] ?? null),
                 'in_voicemail' => $normalizeBoolean($analysis['in_voicemail'] ?? null),
@@ -4210,6 +4212,8 @@ class APIController extends Controller
             DB::table('retell_inbox')->upsert(
                 [[
                     'call_id' => $callId,
+                    'agent_id' => $extracted['agent_id'],
+                    'agent_name' => $extracted['agent_name'],
                     'status' => is_scalar($status) ? (string) $status : null,
                     'event' => $extracted['event'],
                     'call_successful' => $extracted['call_successful'],
@@ -4237,7 +4241,7 @@ class APIController extends Controller
                     'updated_at' => now(),
                 ]],
                 ['call_id'],
-                ['status', 'event', 'call_successful', 'in_voicemail', 'user_sentiment', 'masses_used', 'busca_automatizar', 'products_mentioned', 'daily_volume_empanadas', 'live_attendance_status', 'escenario_detectado', 'hizo_apertura_correcta', 'preguntas_situacion', 'identifico_problema', 'hizo_implicacion', 'cliente_dijo_beneficio', 'cerro_con_paso_concreto', 'puntaje_spin', 'resumen_llamada', 'principal_error', 'recomendacion', 'payload', 'error', 'updated_at']
+                ['agent_id', 'agent_name', 'status', 'event', 'call_successful', 'in_voicemail', 'user_sentiment', 'masses_used', 'busca_automatizar', 'products_mentioned', 'daily_volume_empanadas', 'live_attendance_status', 'escenario_detectado', 'hizo_apertura_correcta', 'preguntas_situacion', 'identifico_problema', 'hizo_implicacion', 'cliente_dijo_beneficio', 'cerro_con_paso_concreto', 'puntaje_spin', 'resumen_llamada', 'principal_error', 'recomendacion', 'payload', 'error', 'updated_at']
             );
         } catch (\Throwable $e) {
             Log::error('Retell inbox persist error: '.$e->getMessage(), [
