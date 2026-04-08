@@ -115,13 +115,9 @@
             @php
               $isTwilioCallType = (int) $item['type_id'] === 21;
               $isRetellCallType = (int) $item['type_id'] === 104;
-              $isRetellSuccessful = $isRetellCallType && Str::contains(
-                Str::lower((string) $item['note']),
-                ['exitosa: sí', 'exitosa: si']
-              );
               $hasRetellSource = !empty($item['url']) || !empty($item['retell_call_id']);
               $shouldRenderAudio = ($isTwilioCallType && !empty($item['url']))
-                || ($isRetellCallType && $isRetellSuccessful && $hasRetellSource);
+                || ($isRetellCallType && $hasRetellSource);
             @endphp
             @if($shouldRenderAudio)
               @php
