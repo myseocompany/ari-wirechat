@@ -131,6 +131,7 @@
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Proceso</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Datos técnicos</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Variables de negocio</th>
+          <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Evaluación SPIN</th>
           <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Cliente / Acción</th>
         </tr>
       </thead>
@@ -156,6 +157,16 @@
             $voicemailLabel = is_null($item->in_voicemail) ? 'Sin dato' : ((int) $item->in_voicemail === 1 ? 'Sí' : 'No');
             $automatizarLabel = is_null($item->busca_automatizar) ? 'Sin dato' : ((int) $item->busca_automatizar === 1 ? 'Sí' : 'No');
             $manualCustomerInput = old('call_id') === $item->call_id ? old('customer_id') : $customerId;
+            $spinFields = [
+                'hizo_apertura_correcta' => 'Apertura',
+                'preguntas_situacion' => 'Situación',
+                'identifico_problema' => 'Problema',
+                'hizo_implicacion' => 'Implicación',
+                'cliente_dijo_beneficio' => 'Beneficio',
+                'cerro_con_paso_concreto' => 'Cierre',
+            ];
+            $hasSpin = !is_null($item->puntaje_spin) || !is_null($item->escenario_detectado);
+            $transcript = $call['transcript'] ?? null;
           @endphp
           <tr class="hover:bg-slate-50">
             <td class="px-4 py-3 align-top">
@@ -191,6 +202,62 @@
               <div>Masa: {{ $item->masses_used ?: '—' }}</div>
               <div>Volumen/día: {{ $item->daily_volume_empanadas !== null ? $item->daily_volume_empanadas : '—' }}</div>
               <div>Asistencia en vivo: {{ $item->live_attendance_status ?: '—' }}</div>
+            </td>
+            <td class="px-4 py-3 align-top text-xs">
+              @if ($hasSpin)
+                {{-- Puntaje --}}
+                @php
+                  $puntaje = (int) $item->puntaje_spin;
+                  $colorPuntaje = $puntaje >= 7 ? 'bg-emerald-100 text-emerald-700' : ($puntaje >= 5 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700');
+                @endphp
+                <div class="mb-2 flex items-center gap-2">
+                  <span class="inline-flex items-center rounded-full px-2 py-1 text-sm font-bold {{ $colorPuntaje }}">{{ $puntaje }}/10</span>
+                  @if ($item->escenario_detectado)
+                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">{{ $item->escenario_detectado }}</span>
+                  @endif
+                </div>
+                {{-- Checklist SPIN --}}
+                <div class="space-y-0.5">
+                  @foreach ($spinFields as $field => $label)
+                    @php $val = $item->$field; @endphp
+                    <div class="flex items-center gap-1">
+                      @if (is_null($val))
+                        <span class="text-slate-300">○</span>
+                      @elseif ((int) $val === 1)
+                        <span class="text-emerald-500">✓</span>
+                      @else
+                        <span class="text-red-400">✗</span>
+                      @endif
+                      <span class="{{ !is_null($val) && (int)$val === 0 ? 'font-semibold text-red-500' : 'text-slate-600' }}">{{ $label }}</span>
+                    </div>
+                  @endforeach
+                </div>
+                {{-- Textos colapsables --}}
+                @if ($item->resumen_llamada || $item->principal_error || $item->recomendacion || $transcript)
+                  <details class="mt-2">
+                    <summary class="cursor-pointer text-slate-400 hover:text-slate-600">Ver detalle</summary>
+                    <div class="mt-2 space-y-2">
+                      @if ($item->resumen_llamada)
+                        <div><span class="font-semibold text-slate-500">Resumen:</span> {{ $item->resumen_llamada }}</div>
+                      @endif
+                      @if ($item->principal_error)
+                        <div><span class="font-semibold text-red-500">Error principal:</span> {{ $item->principal_error }}</div>
+                      @endif
+                      @if ($item->recomendacion)
+                        <div><span class="font-semibold text-amber-600">Recomendación:</span> {{ $item->recomendacion }}</div>
+                      @endif
+                      @if ($transcript)
+                        <details class="mt-1">
+                          <summary class="cursor-pointer font-semibold text-slate-500 hover:text-slate-700">Transcripción</summary>
+                          <pre class="mt-1 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-lg bg-slate-50 p-2 text-xs leading-relaxed text-slate-700">{{ $transcript }}</pre>
+                        </details>
+                      @endif
+                    </div>
+                  </details>
+                @endif
+              @else
+                <span class="text-slate-300">—</span>
+              @endif
             </td>
             <td class="px-4 py-3 align-top">
               @if ($customerId)

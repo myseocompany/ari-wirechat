@@ -4182,6 +4182,18 @@ class APIController extends Controller
                 'products_mentioned' => $normalizeString($customAnalysisData['products_mentioned'] ?? null),
                 'daily_volume_empanadas' => $normalizeDailyVolume($customAnalysisData['daily_volume_empanadas'] ?? null),
                 'live_attendance_status' => $normalizeString($customAnalysisData['live_attendance_status'] ?? null),
+                // SPIN simulator fields
+                'escenario_detectado' => $normalizeString($customAnalysisData['escenario_detectado'] ?? null),
+                'hizo_apertura_correcta' => $normalizeBoolean($customAnalysisData['hizo_apertura_correcta'] ?? null),
+                'preguntas_situacion' => $normalizeBoolean($customAnalysisData['preguntas_situacion'] ?? null),
+                'identifico_problema' => $normalizeBoolean($customAnalysisData['identifico_problema'] ?? null),
+                'hizo_implicacion' => $normalizeBoolean($customAnalysisData['hizo_implicacion'] ?? null),
+                'cliente_dijo_beneficio' => $normalizeBoolean($customAnalysisData['cliente_dijo_beneficio'] ?? null),
+                'cerro_con_paso_concreto' => $normalizeBoolean($customAnalysisData['cerro_con_paso_concreto'] ?? null),
+                'puntaje_spin' => $normalizeDailyVolume($customAnalysisData['puntaje_spin'] ?? null),
+                'resumen_llamada' => $normalizeString($customAnalysisData['resumen_llamada'] ?? null),
+                'principal_error' => $normalizeString($customAnalysisData['principal_error'] ?? null),
+                'recomendacion' => $normalizeString($customAnalysisData['recomendacion'] ?? null),
             ];
 
             $existing = DB::table('retell_inbox')
@@ -4208,13 +4220,24 @@ class APIController extends Controller
                     'products_mentioned' => $extracted['products_mentioned'],
                     'daily_volume_empanadas' => $extracted['daily_volume_empanadas'],
                     'live_attendance_status' => $extracted['live_attendance_status'],
+                    'escenario_detectado' => $extracted['escenario_detectado'],
+                    'hizo_apertura_correcta' => $extracted['hizo_apertura_correcta'],
+                    'preguntas_situacion' => $extracted['preguntas_situacion'],
+                    'identifico_problema' => $extracted['identifico_problema'],
+                    'hizo_implicacion' => $extracted['hizo_implicacion'],
+                    'cliente_dijo_beneficio' => $extracted['cliente_dijo_beneficio'],
+                    'cerro_con_paso_concreto' => $extracted['cerro_con_paso_concreto'],
+                    'puntaje_spin' => $extracted['puntaje_spin'],
+                    'resumen_llamada' => $extracted['resumen_llamada'],
+                    'principal_error' => $extracted['principal_error'],
+                    'recomendacion' => $extracted['recomendacion'],
                     'payload' => json_encode($payloadToStore, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     'error' => null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]],
                 ['call_id'],
-                ['status', 'event', 'call_successful', 'in_voicemail', 'user_sentiment', 'masses_used', 'busca_automatizar', 'products_mentioned', 'daily_volume_empanadas', 'live_attendance_status', 'payload', 'error', 'updated_at']
+                ['status', 'event', 'call_successful', 'in_voicemail', 'user_sentiment', 'masses_used', 'busca_automatizar', 'products_mentioned', 'daily_volume_empanadas', 'live_attendance_status', 'escenario_detectado', 'hizo_apertura_correcta', 'preguntas_situacion', 'identifico_problema', 'hizo_implicacion', 'cliente_dijo_beneficio', 'cerro_con_paso_concreto', 'puntaje_spin', 'resumen_llamada', 'principal_error', 'recomendacion', 'payload', 'error', 'updated_at']
             );
         } catch (\Throwable $e) {
             Log::error('Retell inbox persist error: '.$e->getMessage(), [
