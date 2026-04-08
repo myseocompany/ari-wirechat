@@ -374,7 +374,8 @@ it('has emails', function (string $email) {
 </laravel-boost-guidelines>
 
 ## Language
-- The CRM UI is in English. All routes, view file names, method names, column labels, button text, page titles, and user-facing strings must be in English. Spanish is only acceptable in business-domain content (e.g. product names, customer notes, prompt files).
+- Code is in English: routes, file names, method names, variable names, database columns, CSS classes.
+- The UI is in Spanish: all user-facing strings (labels, button text, page titles, table headers, empty states) must be in Spanish.
 
 ## Tareas Pendientes Operativas
 
