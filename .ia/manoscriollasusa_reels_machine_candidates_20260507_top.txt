@@ -1,0 +1,122 @@
+total_items=80
+profile_video_items=72
+
+1. https://www.instagram.com/reel/DXKtblGAcrK/
+   plays=115186 views=64487 likes=2493 comments=425 score=193296
+   machineSignals=maquina, máquina, equipo matchedTerms=maquina, máquina, equipo, empanada, empanadas
+   caption=La conocí en octubre de 2021. La llevé del apartamento al garaje y a cada mudanza hasta convertirla en el corazón de mi pequeña fábrica. Más que una máquina, fue mi socia: siempre estuvo ahí, empujándome a producir, sin 
+   firstComment=Creo que en España la venden
+
+2. https://www.instagram.com/reel/DXczQEUARzw/
+   plays=45509 views=24535 likes=660 comments=92 score=65309
+   machineSignals=maquina matchedTerms=maquina
+   caption=
+   firstComment=Precio
+
+3. https://www.instagram.com/reel/DWmrDjJAbKD/
+   plays=26435 views=13207 likes=165 comments=33 score=34385
+   machineSignals=máquina matchedTerms=máquina, empanada, empanadas
+   caption=Mira lo que puede pasar cuando tienes una masa perfecta… 👀 y una máquina eficiente como esta 🔥 No se trata solo de hacer empanadas, se trata de lograr consistencia, velocidad y un producto que realmente destaque 👌 Aquí t
+   firstComment=Hola dónde puedo conseguir esa máquina
+
+4. https://www.instagram.com/reel/DWMeFQHju1V/
+   plays=22923 views=9690 likes=139 comments=6 score=29003
+   machineSignals=maquina matchedTerms=maquina, empanada, empanadas
+   caption=Empanadas 100% maíz Masa artesanal sin conservante ni aditivos.. Visita nuestro perfil…
+   firstComment=Y me lo podrían traer a España?
+
+5. https://www.instagram.com/reel/DXl5nv8jhck/
+   plays=16156 views=7021 likes=226 comments=24 score=26876
+   machineSignals=máquina, equipo matchedTerms=máquina, equipo, empanada, empanadas
+   caption=AYUDAME a describir este video con una palabra.. . . Hoy el equipo trabaja fuerte... ¿Notas algo distinto? . . ¿Qué crees que podremos producir ahora? . . . Te explico todo en el próximo video, claro si me ayudas a descr
+   firstComment=Unidad
+
+6. https://www.instagram.com/reel/DXnlxhsDRpF/
+   plays=19922 views=10118 likes=131 comments=2 score=26642
+   machineSignals=maquina matchedTerms=maquina, empanada, empanadas, harina pan, curso
+   caption=Tambien puedes hacer tus Empanadas con Harina pan... . Todo te lo mostramos en nuestro curso online
+   firstComment=Hola guapa buenas tardes, por favor puedes decirme como se llama la maquina? Y donde la puedo conseguir. Mil gracias ❤️
+
+7. https://www.instagram.com/reel/DWKTJ9ugQSr/
+   plays=9338 views=4505 likes=138 comments=163 score=22748
+   machineSignals=equipo matchedTerms=equipo, curso
+   caption=¿Quieres aprender a transformar el maíz desde el grano hasta una masa profesional? 🌽✨ En nuestros cursos te enseñamos paso a paso técnicas, equipos y secretos para lograr una masa manejable y de calidad. . Cupos limitado
+   firstComment=Curso
+
+8. https://www.instagram.com/reel/DWFwz0gjfsK/
+   plays=14540 views=7503 likes=200 comments=13 score=21690
+   machineSignals=máquina matchedTerms=máquina, curso
+   caption=￼ Amasa la masa 100% maíz en forma cilíndrica. ￼ Envuelve bien con papel film (sin dejar bolsas de aire). ￼ Guarda a temperatura ambiente, en un lugar fresco. ￼ A la mañana: masa fresca y súper manejable para máquinas. ￼
+   firstComment=La masa debe estar fría?
+
+9. https://www.instagram.com/reel/DXA_aB6Df27/
+   plays=10882 views=5806 likes=106 comments=8 score=15402
+   machineSignals=maquina matchedTerms=maquina
+   caption=Masa 100% maiz… Sin Gluten Sin conservantes Sin Aditivos La hacemos de manera Artesanal… Todos nuestros productos especial para ti…
+   firstComment=La. Quiero. Para. Aser. Arepa. Pelada
+
+10. https://www.instagram.com/reel/DUg68fdgY7W/
+   plays=6318 views=2779 likes=161 comments=6 score=12338
+   machineSignals=máquina matchedTerms=máquina, curso
+   caption=Tenemos promociones toda la semana… Bowl especial de 20 piezas 2 refrescos salsa en $25 Bandeja de 50 piezas 4 refrescos 1 salsa en $45 Bandeja de 100 piezas 4 refrescos 1 salsa grande en $85 Promoción válida hasta el 15
+   firstComment=Felicitaciones Saludos desde Caracas Venezuela que continúen los éxitos para ti y tu gran negocio
+
+11. https://www.instagram.com/reel/DQMHtGbjqaQ/
+   plays=8160 views=5142 likes=67 comments=4 score=11700
+   machineSignals=máquina matchedTerms=máquina
+   caption=Nuestra primera máquina… Y aún después de 4 años sigue con nosotros recomendada 100% para tu negocio o emprendimiento…
+   firstComment=Qué precio tiene esta máquina gracias
+
+12. https://www.instagram.com/reel/DV46q10jT92/
+   plays=7110 views=3105 likes=91 comments=1 score=10980
+   machineSignals=máquina matchedTerms=máquina
+   caption=Puede parecer cámara rápida, pero esto es pasión en tiempo real: trabajo, cariño y ganas de crear. Cuando amas lo que haces, te vuelves imparable — y ninguna máquina lo suple. 🤍⚙️
+
+13. https://www.instagram.com/reel/DVumYTYDf-c/
+   plays=5927 views=2711 likes=88 comments=8 score=10587
+   machineSignals=máquina matchedTerms=máquina, producción
+   caption=Un Día de producción… Para los que no creen que usamos las dos máquinas 😉 y que son parte importante de nuestro negocio… nos han hecho crecer, así como ustedes mis seguidores que siempre nos han apoyado… Con Dios todo es
+   firstComment=Cual máquina es mejor?
+
+14. https://www.instagram.com/reel/DXsPLrzAUYf/
+   plays=4137 views=1607 likes=94 comments=5 score=10267
+   machineSignals=máquina, equipo matchedTerms=máquina, equipo
+   caption=Hoy recibimos una nueva máquina de las mismas manos que nos han acompañado durante todo este tiempo y eso significa mucho: no solo es un equipo nuevo, es la continuidad de una relación basada en confianza, compromiso y c
+   firstComment=Como la puedo comprar, gracias.
+
+15. https://www.instagram.com/reel/DUcXHsxDdRE/
+   plays=5920 views=2590 likes=81 comments=3 score=9690
+   machineSignals=equipo matchedTerms=equipo
+   caption=Hola a todos! Quiero contarles sobre un nuevo restaurante que acaba de abrir mi amiga Rina, una talentosa chef de la India. Su comida es exquisita, y lo mejor es que ofrece platos sin picante, ideales para quienes, como 
+   firstComment=Thank you for supporting us!
+
+16. https://www.instagram.com/reel/DVpCYvTjRyw/
+   plays=4387 views=1607 likes=91 comments=5 score=8957
+   machineSignals=equipo matchedTerms=equipo, curso
+   caption=Quiero agradecer primeramente a Dios y a mi compañero Jorge por su entrega y compañía en esta clase magistral: juntos cocinamos más de 25 libras de proteína y compartimos cada secreto para preparar guisos en volumen, con
+   firstComment=👏👏👏👏👏
+
+17. https://www.instagram.com/reel/DXItk1AjYal/
+   plays=174603 views=91936 likes=4171 comments=55 score=260773
+   machineSignals=- matchedTerms=-
+   caption=Ahora mismo la IA… puede ser tu mejor amigo o amiga… todo lo que puedas aprender sobre la inteligencia artificial.. se que va ser muy beneficioso para tu negocio… . Comienza con algo sencillo y te invito a usarla o apren
+   firstComment=Uno se ríe pero es verdad!!
+
+18. https://www.instagram.com/reel/DUzh7MPjSqy/
+   plays=130132 views=55167 likes=1247 comments=250 score=168572
+   machineSignals=- matchedTerms=empanada, empanadas
+   caption=Frozen Food . Todos nuestros paquetes traen 10 empanadas de un solo sabor: mechada, pollo, molida, queso, pabellón, jamón con queso, papa con queso, caraotas con queso… . Los consiguen en nuestra página web: manoscriolla
+   firstComment=Divinas🤩🤩 que precio tienen?
+
+19. https://www.instagram.com/reel/DXNVGpLAU90/
+   plays=101858 views=63913 likes=2371 comments=80 score=154278
+   machineSignals=- matchedTerms=empanada, empanadas
+   caption=Así comenzó todo: un sueño que se fue haciendo realidad paso a paso, con manos, esfuerzo y personas extraordinarias a mi lado. Hubo tropiezos, dudas y noches difíciles, pero me levanté enfocada en la meta y agradecida co
+   firstComment=❤️🙌🙌
+
+20. https://www.instagram.com/reel/DVFiIKjjXFq/
+   plays=28480 views=12124 likes=236 comments=11 score=34750
+   machineSignals=- matchedTerms=empanada, empanadas
+   caption=Las envolvemos para que se mantengan bien frescas. 100% puro maíz, sin conservantes ni aditivos. Masa artesanal y libre de gluten. Cocínalas en Air Fryer, horno o fritas. 🌽✨ . Gracias por preferirnos 🤩
+   firstComment=Hola! Cómo se llama ese papel por favor?
+

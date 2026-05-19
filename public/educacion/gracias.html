@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-WGLFR8');</script>
+  <!-- End Google Tag Manager -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gracias | Maquiempanadas</title>
+  <meta name="description" content="Gracias por tu interés. Te conectamos por WhatsApp en segundos." />
+  <style>
+    :root {
+      --blue: #1E40AF;
+      --orange: #F97316;
+      --text: #0f172a;
+      --muted: #475569;
+      --line: #e2e8f0;
+      --card: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      display: grid;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 16px;
+      background: var(--orange);
+      color: #ffffff;
+      text-decoration: none;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WGLFR8"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <main class="card">
+    <h1>Gracias por tu interés</h1>
+    <p>Estamos preparando tu contacto por WhatsApp.</p>
+    <a id="continue-link" class="btn" href="#">Continuar a WhatsApp</a>
+    <p class="small">Si no abre automáticamente, usa el botón.</p>
+  </main>
+
+  <script>
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var redirectUrl = params.get('wa') || 'https://wa.me/573206945548';
+    var sendTo = params.get('send_to');
+    var continueLink = document.getElementById('continue-link');
+    if (continueLink) {
+      continueLink.href = redirectUrl;
+    }
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'educacion_whatsapp_lead',
+      page: 'educacion_gracias',
+      send_to: sendTo || null
+    });
+    window.dataLayer.push({
+      event: 'educacion_gracias_whatsapp',
+      page: 'educacion_gracias',
+      destination: 'whatsapp'
+    });
+    window.dataLayer.push({
+      event: 'gracias_whatsapp_conversion',
+      page: 'educacion_gracias',
+      destination: 'whatsapp'
+    });
+
+    var autoRedirectEnabled = true;
+    var redirected = false;
+    function goToWhatsApp() {
+      if (!autoRedirectEnabled || redirected) {
+        return;
+      }
+      redirected = true;
+      window.location.replace(redirectUrl);
+    }
+
+    var timeoutId = null;
+    if (autoRedirectEnabled) {
+      timeoutId = setTimeout(goToWhatsApp, 2000);
+      setTimeout(goToWhatsApp, 5000);
+    }
+
+    if (sendTo && /^AW-\d+\/[\w-]+$/.test(sendTo)) {
+      var gtagScript = document.createElement('script');
+      gtagScript.async = true;
+      gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(sendTo.split('/')[0]);
+      gtagScript.onload = function () {
+        function gtag() {
+          window.dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', sendTo.split('/')[0]);
+        gtag('event', 'conversion', {
+          send_to: sendTo,
+          event_callback: function () {
+            if (timeoutId) {
+              clearTimeout(timeoutId);
+            }
+            goToWhatsApp();
+          }
+        });
+      };
+      document.head.appendChild(gtagScript);
+    }
+  })();
+  </script>
+</body>
+</html>

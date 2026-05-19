@@ -9,6 +9,15 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "apify-instagram": {
+            "type": "remote",
+            "enabled": true,
+            "url": "https://mcp.apify.com?tools=apify/instagram-scraper",
+            "oauth": false,
+            "headers": {
+                "Authorization": "Bearer {env:APIFY_TOKEN}"
+            }
         }
     }
 }

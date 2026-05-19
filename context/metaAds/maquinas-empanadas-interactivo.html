@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Máquinas de empanadas - Análisis de anuncios</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --bg: #f6f7f9;
+            --panel: #ffffff;
+            --ink: #17202a;
+            --muted: #667085;
+            --line: #d9dee7;
+            --accent: #0f766e;
+            --accent-soft: #d9f3ef;
+            --warn: #9a6700;
+            --warn-soft: #fff3c4;
+            --off: #7c2d12;
+            --off-soft: #ffedd5;
+            --shadow: 0 12px 30px rgba(15, 23, 42, .08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            line-height: 1.45;
+        }
+
+        header {
+            background: #111827;
+            color: #ffffff;
+            padding: 28px 24px;
+        }
+
+        .wrap {
+            width: min(1180px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(26px, 4vw, 42px);
+            letter-spacing: 0;
+        }
+
+        .subtitle {
+            max-width: 760px;
+            margin: 10px 0 0;
+            color: #cbd5e1;
+            font-size: 15px;
+        }
+
+        main {
+            padding: 22px 0 40px;
+        }
+
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            display: grid;
+            grid-template-columns: 1.3fr repeat(4, minmax(150px, .55fr)) auto;
+            gap: 10px;
+            align-items: end;
+            margin-bottom: 18px;
+            padding: 14px;
+            background: rgba(246, 247, 249, .94);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            backdrop-filter: blur(12px);
+        }
+
+        label {
+            display: grid;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        input,
+        select,
+        button {
+            min-height: 40px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: #ffffff;
+            color: var(--ink);
+            font: inherit;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px 10px;
+        }
+
+        button {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        button.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .stat {
+            padding: 14px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 26px;
+        }
+
+        .stat span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        article {
+            display: grid;
+            gap: 12px;
+            padding: 16px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .creative-media {
+            display: block;
+            width: 100%;
+            max-height: 360px;
+            object-fit: contain;
+            background: #eef2f7;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: #eef2f7;
+            color: #344054;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .pill.active {
+            background: var(--accent-soft);
+            color: #115e59;
+        }
+
+        .pill.inactive {
+            background: var(--off-soft);
+            color: var(--off);
+        }
+
+        .pill.low {
+            background: var(--warn-soft);
+            color: var(--warn);
+        }
+
+        .angle {
+            margin: 0;
+            padding: 10px 12px;
+            border-left: 4px solid var(--accent);
+            background: #f0fdfa;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        .piece {
+            margin: 0;
+            color: #344054;
+        }
+
+        details {
+            border-top: 1px solid var(--line);
+            padding-top: 10px;
+        }
+
+        summary {
+            cursor: pointer;
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin: 10px 0 0;
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            color: #1f2937;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 12px;
+        }
+
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        a {
+            color: var(--accent);
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .empty {
+            display: none;
+            padding: 28px;
+            text-align: center;
+            background: var(--panel);
+            border: 1px dashed var(--line);
+            border-radius: 8px;
+            color: var(--muted);
+        }
+
+        @media (max-width: 960px) {
+            .toolbar,
+            .stats,
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="wrap">
+            <h1>Máquinas de empanadas</h1>
+            <p class="subtitle">Archivo interactivo armado desde la exportación local de la Biblioteca de Anuncios de Meta. Incluye solo empresas que venden máquinas, moldes o equipos directamente relacionados con producción de empanadas.</p>
+        </div>
+    </header>
+
+    <main class="wrap">
+        <section class="toolbar" aria-label="Filtros">
+            <label>
+                Buscar
+                <input id="search" type="search" placeholder="Empresa, ángulo, ID, texto...">
+            </label>
+            <label>
+                Empresa
+                <select id="companyFilter"></select>
+            </label>
+            <label>
+                Ángulo
+                <select id="angleFilter"></select>
+            </label>
+            <label>
+                Estado
+                <select id="statusFilter">
+                    <option value="">Todos</option>
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                    <option value="Bajo">Bajo volumen</option>
+                </select>
+            </label>
+            <label>
+                Orden
+                <select id="sortMode">
+                    <option value="longest-active">Más tiempo activos</option>
+                    <option value="newest">Más recientes</option>
+                    <option value="company">Empresa</option>
+                    <option value="angle">Ángulo</option>
+                </select>
+            </label>
+            <button class="primary" id="exportCsv" type="button">Exportar CSV</button>
+        </section>
+
+        <section class="stats" aria-label="Resumen">
+            <div class="stat"><strong id="totalAds">0</strong><span>Piezas filtradas</span></div>
+            <div class="stat"><strong id="totalCompanies">0</strong><span>Empresas</span></div>
+            <div class="stat"><strong id="activeAds">0</strong><span>Activas</span></div>
+            <div class="stat"><strong id="lowAds">0</strong><span>Bajo volumen</span></div>
+        </section>
+
+        <section id="cards" class="grid" aria-live="polite"></section>
+        <div id="empty" class="empty">No hay piezas que coincidan con esos filtros.</div>
+    </main>
+
+    <script>
+        const ads = [
+            {
+                company: "TecnoalimGlobal",
+                angle: "Escalar producción",
+                segment: "B2B / pequeñas y medianas empresas",
+                status: "Activo",
+                adId: "968189627713732",
+                startDate: "2023-06-30",
+                image: "Biblioteca de anuncios_files/616060688_1243711744286277_2281583747129798041_n.jpg",
+                date: "En circulación desde el 30 jun 2023",
+                piece: "Video 1:08 + WhatsApp. Promete 500+ máquinas instaladas, 15+ años, envíos internacionales y equipos para empanadas/discos.",
+                copy: "¿Listo para escalar tu producción? 500+ máquinas instaladas, 15+ años. Envíos internacionales + despacho desde USA o Argentina. Equipos para empanadas y discos diseñados para pequeñas y medianas empresas. Hacé crecer tu producción con tecnología de última generación."
+            },
+            {
+                company: "Maquiempanadas",
+                angle: "Producción por hora",
+                segment: "B2B / fabricantes de empanadas",
+                status: "Activo",
+                adId: "578331897715250",
+                startDate: "2023-06-30",
+                image: "Biblioteca de anuncios_files/600224650_1174918417627731_3291445500028598441_n.jpg",
+                date: "En circulación desde el 30 jun 2023",
+                piece: "Video 0:17 + landing + cotización. Oferta directa de máquina para producir más de 1.500 empanadas/hora.",
+                copy: "Máquina para hacer empanadas. Conoce nuestro catálogo de máquinas para hacer empanadas. Aumenta tu producción realizando más de 1.500 empanadas/hora. Venta directa. Cotiza con nosotros."
+            },
+            {
+                company: "Maquiempanadas",
+                angle: "Demostración en vivo",
+                segment: "B2B / compradores en España",
+                status: "Activo",
+                adId: "930033696870589",
+                startDate: "2026-03-06",
+                image: "Biblioteca de anuncios_files/533108739_4255373964785858_6923556481362436238_n.jpg",
+                date: "En circulación desde el 6 mar 2026",
+                piece: "Video + formulario/mensaje. Invita al Tour de la Empanada en España para ver la máquina funcionando.",
+                copy: "¿Está pensando en invertir en una máquina para empanadas? Venga a verla funcionando en vivo durante el Tour de la Empanada - España. Aprenda a congelar empanadas crudas en el taller práctico."
+            },
+            {
+                company: "Maquiempanadas",
+                angle: "Demostración en vivo",
+                segment: "B2B / compradores en España",
+                status: "Activo",
+                adId: "1212114947597496",
+                startDate: "2025-08-08",
+                image: "Biblioteca de anuncios_files/536373050_24213198255027707_311095806813287364_n.jpg",
+                date: "En circulación desde el 8 ago 2025",
+                piece: "Variación del anuncio del Tour de la Empanada. CTA a enviar mensaje.",
+                copy: "¿Está pensando en invertir en una máquina para empanadas? Venga a verla funcionando en vivo durante el Tour de la Empanada - España."
+            },
+            {
+                company: "Maquiempanadas",
+                angle: "Promoción Black Friday",
+                segment: "B2B / clientes internacionales",
+                status: "Inactivo",
+                adId: "806208992337273",
+                startDate: "2025-11-02",
+                image: "Biblioteca de anuncios_files/577451211_819203627709605_6652556052663640878_n.jpg",
+                date: "2 nov 2025 - 16 nov 2025",
+                piece: "Video 0:19. Promoción por compra de CM05 con bonos acumulados por cantidad de máquinas.",
+                copy: "En este Black Friday le bajamos al gasto y le subimos a la entrega. Conoce la CM05, la máquina que hace 1600 empanadas por hora de trigo o maíz. Promoción especial: USD 500, USD 1000 o USD 1500 según cantidad."
+            },
+            {
+                company: "Maquiempanadas",
+                angle: "Control remoto y datos",
+                segment: "B2B / dueños de planta",
+                status: "Inactivo",
+                adId: "781608263427497",
+                startDate: "2026-04-01",
+                image: "Biblioteca de anuncios_files/630232316_1440190127760117_571460986168373325_n.jpg",
+                date: "2026",
+                piece: "Video 0:43 + reserva. Lanza CM05i como máquina inteligente con reportes en tiempo real.",
+                copy: "¿Sabe cuánta plata pierde cuando no está en la fábrica? La primera máquina de empanadas que le avisa todo lo que pasa, aunque no esté. Reporta cuántas empanadas ha hecho, producción por hora y por operador, detenciones y problemas."
+            },
+            {
+                company: "Maquiempanadas",
+                angle: "Miedo a invertir",
+                segment: "B2B / emprendedores",
+                status: "Inactivo",
+                adId: "330243984886129",
+                startDate: "2025-11-20",
+                image: "Biblioteca de anuncios_files/589788112_2063281777762386_1465343159127843224_n.jpg",
+                date: "2025",
+                piece: "Video 0:21. Usa objeción emocional: invertir vs seguir con los mismos problemas.",
+                copy: "El miedo a perder frena a la mayoría. Con método + herramienta correcta se abren posibilidades. La CM05 hace 1600 empanadas por hora de trigo o maíz y devuelve tiempo."
+            },
+            {
+                company: "Maquiempanadas",
+                angle: "Automatización y desgaste físico",
+                segment: "B2B / operación manual",
+                status: "Inactivo",
+                adId: "1831529663881878",
+                startDate: "2025-09-01",
+                image: "Biblioteca de anuncios_files/535175918_4055937927994988_2887724960207656241_n.jpg",
+                date: "2025",
+                piece: "Video 1:22. Promueve evento en Madrid y Escuela de la Empanada.",
+                copy: "Ve cómo automatizar tus empanadas, reduce desgaste físico y materia prima. Asiste en Madrid y accede a la Escuela de la Empanada."
+            },
+            {
+                company: "Maquiempanadas",
+                angle: "Dolor operativo diario",
+                segment: "B2B / emprendedores gastronómicos",
+                status: "Inactivo",
+                adId: "726689090530460",
+                startDate: "2025-11-01",
+                image: "Biblioteca de anuncios_files/589563158_1608656867160837_6808186060586575046_n.jpg",
+                date: "2025",
+                piece: "Texto + video. Entra por cansancio de madrugar, preparar masa y cortar empanadas.",
+                copy: "¿Cansado de madrugar a preparar la masa y cortar empanadas? Sabemos que emprender no es fácil, pero cuando inviertes correctamente puedes alcanzar tu sueño."
+            },
+            {
+                company: "Máquinas Dosarmec",
+                angle: "Capacidad técnica",
+                segment: "B2B / producción semiautomática",
+                status: "Activo",
+                adId: "919023200836963",
+                startDate: "2026-03-05",
+                image: "Biblioteca de anuncios_files/505431027_1363164861635645_1237630166524215638_n.jpg",
+                date: "En circulación desde el 5 mar 2026",
+                piece: "Imagen/video + web. Presenta cerradora semiautomática de tres moldes con variador de velocidad.",
+                copy: "Máquina cerradora de empanadas de tres moldes, semiautomática, para producciones entre 600 a 1200 empanadas por hora. Muy fácil de usar, con variador de velocidad. Alimentación eléctrica."
+            },
+            {
+                company: "Máquinas Dosarmec",
+                angle: "Crecimiento con prueba social",
+                segment: "B2B / negocios de empanadas",
+                status: "Inactivo",
+                adId: "359505752553637",
+                startDate: "2026-04-23",
+                image: "Biblioteca de anuncios_files/680443504_979640241293494_1971072783554584395_n.jpg",
+                date: "2026",
+                piece: "Video 0:53. Testimonio de negocio real y lista de beneficios.",
+                copy: "Máquinas de empanadas que multiplican tu producción. Acero inoxidable, moldes intercambiables, más producción en menos tiempo, calidad profesional y modelos manuales/semiautomáticos adaptados a cada proyecto."
+            },
+            {
+                company: "Máquinas Dosarmec",
+                angle: "Cerradora continua",
+                segment: "B2B / producción continua",
+                status: "Inactivo",
+                adId: "2261699444353601",
+                startDate: "2025-01-01",
+                image: "Biblioteca de anuncios_files/572478785_1350595086064422_4240803321407566756_n.jpg",
+                date: "2026",
+                piece: "Texto directo. Anuncia cerradora continua con dos velocidades y seis moldes.",
+                copy: "Aumentá tu producción con nuestra cerradora continua de empanadas. Dos velocidades, 6 moldes. Enviamos a todo el país y exportamos a todo el mundo. La mejor calidad al mejor precio."
+            },
+            {
+                company: "Empamaker",
+                angle: "Influencer / validación profesional",
+                segment: "Moldes y equipos / emprendedores de cocina",
+                status: "Inactivo",
+                adId: "775913868457013",
+                startDate: "2025-08-18",
+                image: "Biblioteca de anuncios_files/514537442_1654149098691393_6155140404048252052_n.jpg",
+                date: "18 ago 2025 - 27 ago 2025",
+                piece: "Video 1:28. Chef/pastelera prueba moldes EmpaMaker y valida facilidad, precisión y practicidad.",
+                copy: "Andrea Cevallos aprueba EmpaMaker. La chef y pastelera peruana radicada en USA probó los moldes para empanadas EmpaMaker. Envíos a todo USA y WhatsApp de atención."
+            },
+            {
+                company: "Empamaker",
+                angle: "Personalización de moldes",
+                segment: "Moldes personalizados / food business",
+                status: "Activo",
+                adId: "1246400170944584",
+                startDate: "2026-03-17",
+                image: "Biblioteca de anuncios_files/535440002_1696574230986799_3971071551374860815_n.jpg",
+                date: "En circulación desde el 17 mar 2026",
+                piece: "Video + múltiples links. Caso de molde personalizado para Morfi Australia Hot Dog y mención de máquina neumática.",
+                copy: "Con nuestro molde personalizado lo hacemos posible. Diseñamos un molde para Morfi Australia Hot Dog. Si estás en Perú, ven al showroom en Pueblo Libre y conoce nuestra máquina neumática de empanadas."
+            },
+            {
+                company: "Cuatro Jotas Ingenieria",
+                angle: "Versatilidad empanadas/arepas",
+                segment: "B2B / automatización compacta",
+                status: "Inactivo",
+                adId: "26024090660551220",
+                startDate: "2026-03-17",
+                image: "Biblioteca de anuncios_files/502895513_1050343679885141_6356146045814589955_n.jpg",
+                date: "17 mar 2026 - 24 mar 2026",
+                piece: "Video 0:49 + contacto. Presenta MEL como máquina eléctrica, silenciosa y sin compresor.",
+                copy: "¿Empanadas o arepas? Hazlas todas con la misma máquina. La MEL es eléctrica, silenciosa y sin compresor. Ajusta masa, forma y velocidad fácilmente. Compacta, higiénica y lista para trabajar."
+            },
+            {
+                company: "Ferrero Machines",
+                angle: "Caso de transformación",
+                segment: "B2B / negocios que producen a mano",
+                status: "Activo",
+                adId: "1360886619114170",
+                startDate: "2026-04-13",
+                image: "Biblioteca de anuncios_files/673631938_945942698355669_3254603015745905566_n.jpg",
+                date: "En circulación desde el 13 abr 2026",
+                piece: "Video. Historia de Don Dairo: de producción manual a producir hasta 300% más.",
+                copy: "15 años haciendo empanadas a mano. Dolor, cansancio, empleados agotados y producción limitada. Hoy Don Dairo produce hasta 300% más, sin ruido, sin esfuerzo físico y con control."
+            },
+            {
+                company: "Ferrero Machines",
+                angle: "Cambio de rumbo productivo",
+                segment: "B2B / diversificación de productos",
+                status: "Activo bajo volumen",
+                adId: "4265136097134234",
+                startDate: "2026-03-26",
+                image: "Biblioteca de anuncios_files/672281347_1281994243999463_2076517188373097384_n.jpg",
+                date: "En circulación desde el 26 mar 2026",
+                piece: "Anuncio con bajo volumen. Muestra una máquina como herramienta para variar diseños y ampliar catálogo.",
+                copy: "No es solo cambiar moldes. Es cambiar el rumbo de tu producción. Con una sola máquina puedes crear empanadas, pasteles y arepas, variar diseños en segundos y escalar sin complicarte."
+            },
+            {
+                company: "Ferrero Machines",
+                angle: "Patty Maker / eficiencia total",
+                segment: "B2B / producción industrial",
+                status: "Inactivo bajo volumen",
+                adId: "1679434793020496",
+                startDate: "2025-11-22",
+                image: "Biblioteca de anuncios_files/673557576_1635765524239170_6415614128419151012_n.jpg",
+                date: "22 nov 2025",
+                piece: "Video 0:44. Lista cinco razones; destaca laminación, corte, relleno y sellado en una mesa.",
+                copy: "La Patty Maker realiza múltiples procesos en un solo espacio: laminación de masa, realimentación, corte, relleno y sellado. Produce entre 720 y 2160 empanadas por hora y requiere menos operarios."
+            },
+            {
+                company: "Ferrero Machines",
+                angle: "Dolor físico y tiempo",
+                segment: "B2B / emprendedoras y producción manual",
+                status: "Inactivo bajo volumen",
+                adId: "1605585283996281",
+                startDate: "2026-04-01",
+                image: "Biblioteca de anuncios_files/672684327_1276709037899114_5033103300583070533_n.jpg",
+                date: "1 abr 2026 - 2 abr 2026",
+                piece: "Video 2:44. Historia personal: dolor de muñeca y jornadas largas vs terminar más temprano con doble producción.",
+                copy: "8 años haciendo empanadas a mano. Dolor en la muñeca, jornadas hasta las 4 p.m. y el cuerpo diciendo pare. Hoy termina a las 11:30 AM, sin dolor y con el doble de producción."
+            },
+            {
+                company: "Ferrero Machines",
+                angle: "Respaldo y garantía",
+                segment: "B2B / aversión al riesgo",
+                status: "Activo bajo volumen",
+                adId: "798816232994339",
+                startDate: "2026-04-21",
+                image: "Biblioteca de anuncios_files/672079804_26316996051260263_3902293422470501236_n.jpg",
+                date: "En circulación desde el 21 abr 2026",
+                piece: "Anuncio con varias versiones. Entra por tranquilidad, soporte y garantía de 12 meses.",
+                copy: "Cuando inviertes en una máquina, compras tranquilidad, respaldo y un equipo que te acompaña. Garantía real durante 12 meses, soporte especializado y centro de servicio técnico."
+            },
+            {
+                company: "Aurela Decor",
+                angle: "Uso doméstico fácil",
+                segment: "D2C / cocina familiar",
+                status: "Activo",
+                adId: "1246814254278210",
+                startDate: "2026-04-09",
+                image: "Biblioteca de anuncios_files/484168813_1339106177122036_4488580035363523524_n.jpg",
+                date: "En circulación desde el 9 abr 2026",
+                piece: "Video 0:26 + ecommerce. Producto DumplingMaker como máquina automática para empanadas.",
+                copy: "Haz deliciosas empanadas de manera rápida y sencilla con DumplingMaker. Uso sencillo, alta calidad, fácil de limpiar, multifunción para empanadas, pasteles, raviolis, wonton y más."
+            },
+            {
+                company: "Comprando en Guate",
+                angle: "Practicidad familiar",
+                segment: "D2C / gadget de cocina",
+                status: "Activo bajo volumen",
+                adId: "945084905089850",
+                startDate: "2026-04-18",
+                image: "Biblioteca de anuncios_files/677765760_1067353076466717_8021100555412279891_n.jpg",
+                date: "En circulación desde el 18 abr 2026",
+                piece: "Video 0:05. Tráfico a producto GoComprar: máquina 2 en 1 para hacer empanadas.",
+                copy: "Prepara tus empanadas favoritas desde casa de forma práctica y cómoda. Ideal para compartir en familia. Uso sencillo, diseño cómodo y facilita la preparación."
+            },
+            {
+                company: "Comprando en Guate",
+                angle: "Practicidad familiar",
+                segment: "D2C / gadget de cocina",
+                status: "Inactivo bajo volumen",
+                adId: "1259383936138639",
+                startDate: "2026-03-16",
+                image: "Biblioteca de anuncios_files/680410263_1660845345160779_1677440644934668616_n.jpg",
+                date: "16 mar 2026 - 17 mar 2026",
+                piece: "Video 0:19. Variante con el mismo enfoque y enlace a producto GoComprar.",
+                copy: "Prepara tus empanadas favoritas desde casa de forma práctica y cómoda. Producto máquina para hacer empanadas 2 en 1."
+            },
+            {
+                company: "Revine Portugal",
+                angle: "Accesorio doméstico 2 en 1",
+                segment: "D2C / gadget de cocina",
+                status: "Activo",
+                adId: "2430829347351226",
+                startDate: "2026-03-31",
+                image: "Biblioteca de anuncios_files/464198453_542897391715446_3106782127349308946_n.jpg",
+                date: "En circulación desde el 31 mar 2026",
+                piece: "Video 0:08 + ecommerce. Producto Dumplinger para bolinhos, tartas, empanadas y wontons.",
+                copy: "O seu novo acessório de cozinha favorito. Perfeito para fazer bolinhos de massa, tartes, empanadas, wontons. Poupa tempo e esforço, fácil de usar e limpar."
+            },
+            {
+                company: "Mundobaratord",
+                angle: "Laminadora multiuso",
+                segment: "Equipo de masa / doméstico-comercial",
+                status: "Inactivo",
+                adId: "657229382610520",
+                startDate: "2022-12-01",
+                image: "Biblioteca de anuncios_files/565090040_1367115851598821_1524520198494207504_n.jpg",
+                date: "1 dic 2022 - 31 dic 2022",
+                piece: "Video 0:54 + Facebook. Máquina de pasta eléctrica/laminadora para masa de pasta, ravioli, panes y empanadas.",
+                copy: "La máquina de pasta eléctrica o laminadora permite preparar pasta fresca de manera rápida, uniforme y sin esfuerzo. Lamina y corta masa para espagueti, fettuccine, lasaña, ravioli, panes, empanadas y más."
+            }
+        ];
+
+        const cards = document.querySelector("#cards");
+        const empty = document.querySelector("#empty");
+        const search = document.querySelector("#search");
+        const companyFilter = document.querySelector("#companyFilter");
+        const angleFilter = document.querySelector("#angleFilter");
+        const statusFilter = document.querySelector("#statusFilter");
+        const sortMode = document.querySelector("#sortMode");
+        const totalAds = document.querySelector("#totalAds");
+        const totalCompanies = document.querySelector("#totalCompanies");
+        const activeAds = document.querySelector("#activeAds");
+        const lowAds = document.querySelector("#lowAds");
+
+        function uniqueValues(key) {
+            return [...new Set(ads.map((ad) => ad[key]))].sort((a, b) => a.localeCompare(b, "es"));
+        }
+
+        function fillSelect(select, label, values) {
+            select.innerHTML = `<option value="">${label}</option>` + values.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("");
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, (char) => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                "\"": "&quot;",
+                "'": "&#039;"
+            })[char]);
+        }
+
+        function statusClass(status) {
+            if (status.includes("bajo")) {
+                return "low";
+            }
+
+            return status.startsWith("Activo") ? "active" : "inactive";
+        }
+
+        function metaUrl(adId) {
+            return `https://www.facebook.com/ads/library/?id=${encodeURIComponent(adId)}`;
+        }
+
+        function filteredAds() {
+            const term = search.value.trim().toLowerCase();
+            const company = companyFilter.value;
+            const angle = angleFilter.value;
+            const status = statusFilter.value;
+
+            const rows = ads.filter((ad) => {
+                const haystack = `${ad.company} ${ad.angle} ${ad.segment} ${ad.status} ${ad.adId} ${ad.piece} ${ad.copy}`.toLowerCase();
+                return (!term || haystack.includes(term))
+                    && (!company || ad.company === company)
+                    && (!angle || ad.angle === angle)
+                    && (!status || ad.status.includes(status));
+            });
+
+            return rows.sort((a, b) => {
+                if (sortMode.value === "newest") {
+                    return (b.startDate || "").localeCompare(a.startDate || "");
+                }
+
+                if (sortMode.value === "company") {
+                    return a.company.localeCompare(b.company, "es") || (a.startDate || "").localeCompare(b.startDate || "");
+                }
+
+                if (sortMode.value === "angle") {
+                    return a.angle.localeCompare(b.angle, "es") || (a.startDate || "").localeCompare(b.startDate || "");
+                }
+
+                return (a.startDate || "9999-99-99").localeCompare(b.startDate || "9999-99-99");
+            });
+        }
+
+        function render() {
+            const rows = filteredAds();
+            cards.innerHTML = rows.map((ad) => `
+                <article>
+                    <div class="card-head">
+                        <div>
+                            <h2>${escapeHtml(ad.company)}</h2>
+                            <div class="meta">
+                                <span class="pill ${statusClass(ad.status)}">${escapeHtml(ad.status)}</span>
+                                <span class="pill">${escapeHtml(ad.segment)}</span>
+                            </div>
+                        </div>
+                        <a href="${metaUrl(ad.adId)}" target="_blank" rel="noreferrer">ID ${escapeHtml(ad.adId)}</a>
+                    </div>
+                    ${ad.image ? `<img class="creative-media" src="${escapeHtml(ad.image)}" alt="Pieza publicitaria de ${escapeHtml(ad.company)}" loading="lazy">` : ""}
+                    <p class="angle">${escapeHtml(ad.angle)}</p>
+                    <p class="piece">${escapeHtml(ad.piece)}</p>
+                    <div class="links">
+                        <span class="pill">${escapeHtml(ad.date)}</span>
+                        <a href="${metaUrl(ad.adId)}" target="_blank" rel="noreferrer">Abrir en Meta</a>
+                    </div>
+                    <details>
+                        <summary>Ver texto de la pieza</summary>
+                        <pre>${escapeHtml(ad.copy)}</pre>
+                    </details>
+                </article>
+            `).join("");
+
+            empty.style.display = rows.length ? "none" : "block";
+            totalAds.textContent = rows.length;
+            totalCompanies.textContent = new Set(rows.map((ad) => ad.company)).size;
+            activeAds.textContent = rows.filter((ad) => ad.status.startsWith("Activo")).length;
+            lowAds.textContent = rows.filter((ad) => ad.status.includes("bajo")).length;
+        }
+
+        function exportCsv() {
+            const headers = ["empresa", "angulo_creativo", "segmento", "estado", "id_biblioteca", "fecha_inicio_iso", "fecha", "imagen", "pieza_publicitaria", "texto", "url_meta"];
+            const rows = filteredAds().map((ad) => [
+                ad.company,
+                ad.angle,
+                ad.segment,
+                ad.status,
+                ad.adId,
+                ad.startDate || "",
+                ad.date,
+                ad.image || "",
+                ad.piece,
+                ad.copy,
+                metaUrl(ad.adId)
+            ]);
+            const csv = [headers, ...rows]
+                .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+                .join("\n");
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "maquinas-empanadas-meta-ads.csv";
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        fillSelect(companyFilter, "Todas", uniqueValues("company"));
+        fillSelect(angleFilter, "Todos", uniqueValues("angle"));
+        [search, companyFilter, angleFilter, statusFilter, sortMode].forEach((control) => control.addEventListener("input", render));
+        document.querySelector("#exportCsv").addEventListener("click", exportCsv);
+        render();
+    </script>
+</body>
+</html>

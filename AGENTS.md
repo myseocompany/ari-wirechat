@@ -380,3 +380,9 @@ it('has emails', function (string $email) {
 ## Tareas Pendientes Operativas
 
 - [ ] Implementar colas para los mensajes de `sellerChat` (webhook + procesamiento), para desacoplarlos del CRM y evitar caídas/desconexiones cuando el CRM esté fuera de línea.
+
+## Apify MCP
+
+- Usar el MCP de Apify desde `https://mcp.apify.com/`.
+- Para scraping de Instagram, usar el actor `apify/instagram-scraper` con `APIFY_TOKEN` tomado del `.env`.
+- En análisis de reels, las reproducciones visibles deben recalificarse desde la grilla pública `/reels/` de Instagram en Chrome cuando Apify no coincida con lo que muestra Instagram.

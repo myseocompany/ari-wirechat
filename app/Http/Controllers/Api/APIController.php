@@ -3654,19 +3654,19 @@ class APIController extends Controller
 
     public function getSourceRD($request)
     {
-        // POST RD STATION
+        // Looks up CustomerSource by RD's last_conversion.source.
+        // Returns null when no rd_source mapping exists, so unmapped leads
+        // are visible instead of silently bucketed into a default id.
         $json = $request->json()->all();
-        $str = '';
-        if (isset($json['leads'][0]['last_conversion']['source'])) {
-            $str = $json['leads'][0]['last_conversion']['source'];
-        } // evento
-        $model = CustomerSource::where('rd_source', $str)->first();
-        $sid = 1;
-        if ($model) {
-            $sid = $model->id;
+        $str = $json['leads'][0]['last_conversion']['source'] ?? '';
+
+        if ($str === '') {
+            return null;
         }
 
-        return $sid;
+        $model = CustomerSource::where('rd_source', $str)->first();
+
+        return $model?->id;
     }
 
     public function sendCampaign(Request $request, $campaign_id, $customer_id)
