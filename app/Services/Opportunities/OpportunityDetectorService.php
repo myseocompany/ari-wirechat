@@ -2,6 +2,7 @@
 
 namespace App\Services\Opportunities;
 
+use App\Enums\CustomerMaker;
 use App\Models\Customer;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -10,6 +11,12 @@ use Illuminate\Support\Facades\DB;
 
 class OpportunityDetectorService
 {
+    private const MAKER_FILTERS = [
+        'project' => CustomerMaker::Project->value,
+        'makes' => CustomerMaker::MakesEmpanadas->value,
+        'other' => CustomerMaker::Other->value,
+    ];
+
     private const KEYWORDS = [
         'alimentec',
         'precio',
@@ -64,7 +71,7 @@ class OpportunityDetectorService
     public function analyze(array $filters = [], int $perPage = 25): array
     {
         [$fromDate, $toDate] = $this->dateRange($filters);
-        $limit = min(1000, max(10, (int) ($filters['limit'] ?? 500)));
+        $limit = min(3000, max(10, (int) ($filters['limit'] ?? 500)));
         $page = LengthAwarePaginator::resolveCurrentPage();
         $perPage = min(100, max(10, $perPage));
 
@@ -84,6 +91,9 @@ class OpportunityDetectorService
             'medium' => $rows->where('priority', 'medium')->count(),
             'low' => $rows->where('priority', 'low')->count(),
             'unattended' => $rows->where('is_unattended', true)->count(),
+            'makers' => $rows->where('production_status', 'makes')->count(),
+            'projects' => $rows->where('production_status', 'project')->count(),
+            'production_known' => $rows->filter(fn ($row) => (int) ($row->estimated_daily_empanadas ?? 0) > 0)->count(),
         ];
 
         $pageRows = $rows->slice(($page - 1) * $perPage, $perPage)->values();
@@ -171,6 +181,8 @@ class OpportunityDetectorService
                 'customers.email',
                 'customers.status_id',
                 'customers.user_id',
+                'customers.maker',
+                'customers.count_empanadas',
                 'users.name as user_name',
                 'customer_sources.name as source_name',
                 'customer_statuses.name as status_name',
@@ -193,6 +205,8 @@ class OpportunityDetectorService
             ->when(! empty($filters['status_ids']), fn ($query) => $query->whereIn('customers.status_id', (array) $filters['status_ids']))
             ->when(! empty($filters['source_id']), fn ($query) => $query->where('customers.source_id', $filters['source_id']))
             ->when(! empty($filters['user_id']), fn ($query) => $query->where('customers.user_id', $filters['user_id']))
+            ->when(! empty($filters['maker']) && $filters['maker'] === 'unknown', fn ($query) => $query->whereNull('customers.maker'))
+            ->when(! empty($filters['maker']) && isset(self::MAKER_FILTERS[$filters['maker']]), fn ($query) => $query->where('customers.maker', self::MAKER_FILTERS[$filters['maker']]))
             ->when(! empty($filters['messages_min']), fn ($query) => $query->where('ms.messages_count', '>=', (int) $filters['messages_min']))
             ->when(! empty($filters['messages_max']), fn ($query) => $query->where('ms.messages_count', '<=', (int) $filters['messages_max']))
             ->when(! empty($filters['action_note_search']), function ($query) use ($filters) {
@@ -247,6 +261,7 @@ class OpportunityDetectorService
             ->select(
                 'customers.id',
                 DB::raw("(select group_concat(concat(case when nullif(trim(wm.body), '') is null then concat('[', coalesce(wm.type, 'mensaje'), ']') else wm.body end, '||@ts||', date_format(wm.created_at, '%Y-%m-%d %H:%i')) order by wm.created_at desc separator '\n') from (select wire_messages.body, wire_messages.type, wire_messages.created_at from wire_messages where wire_messages.sendable_id = customers.id order by wire_messages.created_at desc limit 5) as wm) as last_messages_body"),
+                DB::raw("(select group_concat(concat(case when nullif(trim(wm.body), '') is null then concat('[', coalesce(wm.type, 'mensaje'), ']') else wm.body end, '||@ts||', date_format(wm.created_at, '%Y-%m-%d %H:%i')) order by wm.created_at desc separator '\n') from (select wire_messages.body, wire_messages.type, wire_messages.created_at from wire_messages where wire_messages.sendable_id = customers.id order by wire_messages.created_at desc limit 30) as wm) as analysis_messages_body"),
                 DB::raw("(select group_concat(concat(coalesce(nullif(trim(a.note), ''), '[sin nota]'), '||@type||', coalesce(at.name, 'Sin tipo'), '||@user||', a.creator_user_name, '||@ts||', date_format(a.created_at, '%Y-%m-%d %H:%i')) order by a.created_at desc separator '\n') from (select actions.note, actions.type_id, actions.created_at, users.name as creator_user_name from actions inner join users on users.id = actions.creator_user_id where actions.customer_id = customers.id and actions.creator_user_id is not null and actions.creator_user_id > 0 order by actions.created_at desc limit 3) as a left join action_types as at on at.id = a.type_id) as last_actions_body"),
                 DB::raw("(select group_concat(tags.name order by tags.name separator '||') from customer_tag as ct join tags on tags.id = ct.tag_id where ct.customer_id = customers.id) as tag_names")
             )
@@ -257,6 +272,7 @@ class OpportunityDetectorService
         return $rows->map(function ($row) use ($heavyData) {
             $extra = $heavyData->get($row->id);
             $row->last_messages_body = $extra->last_messages_body ?? null;
+            $row->analysis_messages_body = $extra->analysis_messages_body ?? null;
             $row->last_actions_body = $extra->last_actions_body ?? null;
             $row->tag_names = $extra->tag_names ?? null;
 
@@ -279,9 +295,24 @@ class OpportunityDetectorService
             $isEarlyStatus = $this->containsAny($statusName, self::EARLY_STATUSES);
             $lastCustomerMessageAt = $row->last_customer_message_at ? Carbon::parse($row->last_customer_message_at) : null;
             $lastActionAt = $row->last_action_at ? Carbon::parse($row->last_action_at) : null;
-            $messagesText = $this->normalize((string) ($row->last_messages_body ?? ''));
+            $messagesText = $this->normalize((string) ($row->analysis_messages_body ?? $row->last_messages_body ?? ''));
             $matchedKeywords = $this->matchedKeywords($messagesText);
+            $production = $this->detectProduction($row, $messagesText);
             $isUnattended = $lastCustomerMessageAt && (! $lastActionAt || $lastCustomerMessageAt->gt($lastActionAt));
+
+            if ($production['status'] === 'makes') {
+                $score += 3;
+                $reasons[] = 'Produce empanadas: '.$production['label'];
+            } elseif ($production['status'] === 'project') {
+                $reasons[] = 'Proyecto: no produce actualmente';
+            } elseif ($production['status'] === 'other') {
+                $reasons[] = 'Tipo de cliente: '.$production['label'];
+            }
+
+            if ($production['daily_amount'] > 0) {
+                $score += min(3, max(1, intdiv($production['daily_amount'], 300)));
+                $reasons[] = 'Produccion estimada: '.number_format($production['daily_amount']).' emp/dia';
+            }
 
             if ($isUnattended) {
                 $score += 4;
@@ -322,16 +353,25 @@ class OpportunityDetectorService
             $row->priority = $score >= 8 ? 'high' : ($score >= 5 ? 'medium' : 'low');
             $row->priority_label = $score >= 8 ? 'Alta' : ($score >= 5 ? 'Media' : 'Baja');
             $row->is_unattended = (bool) $isUnattended;
+            $row->production_status = $production['status'];
+            $row->production_label = $production['label'];
+            $row->estimated_daily_empanadas = $production['daily_amount'];
+            $row->production_evidence = $production['evidence'];
+            $row->production_rank = $production['rank'];
             $row->matched_keywords = $matchedKeywords;
             $row->opportunity_reasons = $reasons;
 
             return $row;
         })->sort(function ($left, $right) {
             return [
+                (int) $right->production_rank,
+                (int) $right->estimated_daily_empanadas,
                 (int) $right->opportunity_score,
                 (string) $right->last_customer_message_at,
                 (int) $right->messages_count,
             ] <=> [
+                (int) $left->production_rank,
+                (int) $left->estimated_daily_empanadas,
                 (int) $left->opportunity_score,
                 (string) $left->last_customer_message_at,
                 (int) $left->messages_count,
@@ -354,7 +394,141 @@ class OpportunityDetectorService
             $rows = $rows->where('is_unattended', true);
         }
 
+        if (isset($filters['production_min']) && $filters['production_min'] !== '') {
+            $rows = $rows->filter(fn ($row) => (int) ($row->estimated_daily_empanadas ?? 0) >= (int) $filters['production_min']);
+        }
+
         return $rows->values();
+    }
+
+    /**
+     * @return array{status: string, label: string, daily_amount: int, evidence: ?string, rank: int}
+     */
+    private function detectProduction(object $row, string $messagesText): array
+    {
+        $maker = CustomerMaker::fromDatabase($row->maker ?? null);
+        $fieldEvidence = trim((string) ($row->count_empanadas ?? ''));
+        $fieldAmount = $this->extractEmpanadasAmount($fieldEvidence);
+        $messageAmount = $this->extractEmpanadasAmount($messagesText, true);
+        $dailyAmount = $fieldAmount ?: $messageAmount;
+        $messageStatus = $this->inferProductionStatusFromText($messagesText);
+
+        if ($maker === CustomerMaker::MakesEmpanadas || $dailyAmount > 0) {
+            return [
+                'status' => 'makes',
+                'label' => CustomerMaker::MakesEmpanadas->label(),
+                'daily_amount' => $dailyAmount,
+                'evidence' => $fieldEvidence !== '' ? $fieldEvidence : $this->productionEvidence($messagesText),
+                'rank' => 3,
+            ];
+        }
+
+        if ($maker === CustomerMaker::Project || $this->textMeansProject($fieldEvidence) || $messageStatus === 'project') {
+            return [
+                'status' => 'project',
+                'label' => CustomerMaker::Project->label(),
+                'daily_amount' => 0,
+                'evidence' => $fieldEvidence !== '' ? $fieldEvidence : $this->productionEvidence($messagesText),
+                'rank' => 1,
+            ];
+        }
+
+        if ($maker === CustomerMaker::Other) {
+            return [
+                'status' => 'other',
+                'label' => CustomerMaker::Other->label(),
+                'daily_amount' => 0,
+                'evidence' => $fieldEvidence !== '' ? $fieldEvidence : null,
+                'rank' => 2,
+            ];
+        }
+
+        if ($messageStatus === 'makes') {
+            return [
+                'status' => 'makes',
+                'label' => 'Hace empanadas (inferido)',
+                'daily_amount' => 0,
+                'evidence' => $this->productionEvidence($messagesText),
+                'rank' => 3,
+            ];
+        }
+
+        return [
+            'status' => 'unknown',
+            'label' => 'Sin clasificar',
+            'daily_amount' => 0,
+            'evidence' => $fieldEvidence !== '' ? $fieldEvidence : null,
+            'rank' => 0,
+        ];
+    }
+
+    private function extractEmpanadasAmount(string $value, bool $requireProductionContext = false): int
+    {
+        $normalized = $this->normalize($value);
+        if ($normalized === '' || $this->textMeansProject($normalized)) {
+            return 0;
+        }
+
+        $searchText = $requireProductionContext
+            ? $this->productionContextText($normalized)
+            : $normalized;
+
+        if ($searchText === '' || ! preg_match_all('/\d{1,3}(?:[.,]\d{3})*|\d+/', $searchText, $matches)) {
+            return 0;
+        }
+
+        $numbers = array_map(
+            fn ($number) => (int) preg_replace('/\D+/', '', $number),
+            $matches[0]
+        );
+
+        $numbers = array_values(array_filter($numbers, fn ($number) => $number > 0 && $number < 100000));
+
+        return max($numbers ?: [0]);
+    }
+
+    private function productionContextText(string $value): string
+    {
+        $parts = preg_split('/[\n.;!?]+/', $value) ?: [];
+        $relevantParts = array_filter($parts, function (string $part): bool {
+            return preg_match('/(empanada|produ|diaria|diario|dia|día|hora|semana|mensual|hacemos|fabricamos|vendemos)/u', $part) === 1;
+        });
+
+        return implode(' ', $relevantParts);
+    }
+
+    private function textMeansProject(string $value): bool
+    {
+        $normalized = $this->normalize($value);
+
+        return str_contains($normalized, 'no produzco')
+            || str_contains($normalized, 'proyecto')
+            || str_contains($normalized, 'quiero empezar')
+            || str_contains($normalized, 'voy a iniciar')
+            || str_contains($normalized, 'emprendimiento');
+    }
+
+    private function inferProductionStatusFromText(string $value): string
+    {
+        if ($this->textMeansProject($value)) {
+            return 'project';
+        }
+
+        if (preg_match('/\b(produzco|producimos|hacemos|fabricamos|vendemos)\b/u', $this->normalize($value)) === 1) {
+            return 'makes';
+        }
+
+        return 'unknown';
+    }
+
+    private function productionEvidence(string $value): ?string
+    {
+        $plain = trim(preg_replace('/\s+/', ' ', str_replace('||@ts||', ' ', $value)) ?? '');
+        if ($plain === '') {
+            return null;
+        }
+
+        return mb_strimwidth($plain, 0, 160, '...');
     }
 
     private function normalize(string $value): string

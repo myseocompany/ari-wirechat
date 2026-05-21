@@ -9,7 +9,7 @@
   <div class="flex flex-col gap-1">
     <h1 class="mb-1">Agente de oportunidades</h1>
     <div class="text-xs text-slate-500">
-      {{ $summary['analyzed'] }} analizados de {{ $summary['candidate_total'] }} candidatos encontrados · {{ $summary['high'] }} alta prioridad · {{ $summary['unattended'] }} sin atender
+      {{ $summary['analyzed'] }} analizados de {{ $summary['candidate_total'] }} candidatos encontrados · {{ $summary['makers'] }} producen · {{ $summary['production_known'] }} con volumen
     </div>
   </div>
   <a href="{{ url('/reports/views/customers_messages_count') }}?{{ http_build_query(request()->except('priority', 'unattended')) }}" class="inline-flex items-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
@@ -23,8 +23,8 @@
     <div class="mt-2 text-3xl font-bold text-rose-600">{{ $summary['high'] }}</div>
   </div>
   <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Media</div>
-    <div class="mt-2 text-3xl font-bold text-amber-600">{{ $summary['medium'] }}</div>
+    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Producen</div>
+    <div class="mt-2 text-3xl font-bold text-amber-600">{{ $summary['makers'] }}</div>
   </div>
   <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
     <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Analizados</div>
@@ -32,8 +32,8 @@
     <div class="mt-1 text-xs text-slate-400">de {{ $summary['candidate_total'] }} candidatos</div>
   </div>
   <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Sin atender</div>
-    <div class="mt-2 text-3xl font-bold text-blue-600">{{ $summary['unattended'] }}</div>
+    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Con volumen</div>
+    <div class="mt-2 text-3xl font-bold text-blue-600">{{ $summary['production_known'] }}</div>
   </div>
 </div>
 
@@ -59,6 +59,16 @@
           <option value="high" @selected($request->priority === 'high')>Alta</option>
           <option value="medium" @selected($request->priority === 'medium')>Media</option>
           <option value="low" @selected($request->priority === 'low')>Baja</option>
+        </select>
+      </div>
+      <div class="col-span-6 flex flex-col gap-1 lg:col-span-2">
+        <label for="maker" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Produccion</label>
+        <select id="maker" name="maker" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
+          <option value="">Todas</option>
+          <option value="makes" @selected($request->maker === 'makes')>Hace empanadas</option>
+          <option value="project" @selected($request->maker === 'project')>Proyecto</option>
+          <option value="other" @selected($request->maker === 'other')>Otros</option>
+          <option value="unknown" @selected($request->maker === 'unknown')>Sin clasificar</option>
         </select>
       </div>
       <div class="col-span-12 flex flex-col gap-1 lg:col-span-4">
@@ -106,8 +116,12 @@
         </select>
       </div>
       <div class="col-span-6 flex flex-col gap-1 lg:col-span-2">
+        <label for="production_min" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Min emp/dia</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="0" id="production_min" name="production_min" value="{{ $request->production_min }}">
+      </div>
+      <div class="col-span-6 flex flex-col gap-1 lg:col-span-2">
         <label for="limit" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Analizar</label>
-        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="10" max="1000" id="limit" name="limit" value="{{ $request->limit ?? 500 }}">
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="10" max="3000" id="limit" name="limit" value="{{ $request->limit ?? 500 }}">
       </div>
     </div>
     <div class="flex flex-wrap items-center justify-between gap-3">
@@ -130,15 +144,17 @@
   <div class="overflow-x-auto">
     <table class="min-w-full table-fixed divide-y divide-slate-200">
       <colgroup>
-        <col class="w-[16%]">
-        <col class="w-[26%]">
-        <col class="w-[28%]">
-        <col class="w-[30%]">
+        <col class="w-[14%]">
+        <col class="w-[24%]">
+        <col class="w-[20%]">
+        <col class="w-[20%]">
+        <col class="w-[22%]">
       </colgroup>
       <thead class="bg-slate-50">
         <tr>
           <th class="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Prioridad</th>
           <th class="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Prospecto</th>
+          <th class="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Produccion</th>
           <th class="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Motivos</th>
           <th class="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.28em] text-slate-500">Contexto</th>
         </tr>
@@ -190,6 +206,16 @@
             </td>
             <td class="px-4 py-5 align-top">
               <div class="space-y-2">
+                <div class="text-sm font-semibold text-slate-900">{{ $item->production_label }}</div>
+                <div class="text-2xl font-bold text-slate-900">{{ $item->estimated_daily_empanadas ? number_format($item->estimated_daily_empanadas) : '-' }}</div>
+                <div class="text-xs uppercase tracking-[0.16em] text-slate-400">emp/dia estimadas</div>
+                @if ($item->production_evidence)
+                  <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[13px] leading-5 text-slate-600">{{ $item->production_evidence }}</div>
+                @endif
+              </div>
+            </td>
+            <td class="px-4 py-5 align-top">
+              <div class="space-y-2">
                 @foreach ($item->opportunity_reasons as $reason)
                   <div class="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-[15px] leading-6 text-slate-700">{{ $reason }}</div>
                 @endforeach
@@ -232,7 +258,7 @@
           </tr>
         @empty
           <tr>
-            <td colspan="4" class="px-4 py-8 text-center text-sm text-slate-500">No se encontraron oportunidades con estos filtros.</td>
+            <td colspan="5" class="px-4 py-8 text-center text-sm text-slate-500">No se encontraron oportunidades con estos filtros.</td>
           </tr>
         @endforelse
       </tbody>

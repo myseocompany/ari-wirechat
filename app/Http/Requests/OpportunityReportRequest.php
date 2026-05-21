@@ -26,8 +26,10 @@ class OpportunityReportRequest extends FormRequest
             'source_id' => ['nullable', 'integer', 'exists:customer_sources,id'],
             'user_id' => ['nullable', 'integer', 'exists:users,id'],
             'priority' => ['nullable', 'in:high,medium,low'],
+            'maker' => ['nullable', 'in:unknown,project,makes,other'],
+            'production_min' => ['nullable', 'integer', 'min:0'],
             'unattended' => ['nullable', 'boolean'],
-            'limit' => ['nullable', 'integer', 'min:10', 'max:1000'],
+            'limit' => ['nullable', 'integer', 'min:10', 'max:3000'],
         ];
     }
 
