@@ -15,6 +15,8 @@ class DetectOpportunities extends Command
         {--priority= : high, medium o low}
         {--maker= : unknown, project, makes u other}
         {--production_min= : Produccion minima diaria estimada}
+        {--llm : Usa OpenAI para analizar prospectos ambiguos}
+        {--llm_limit=50 : Maximo de prospectos a analizar con OpenAI}
         {--unattended : Solo clientes con mensaje posterior a la ultima accion humana}
         {--limit=100 : Maximo de prospectos a analizar}';
 
@@ -30,6 +32,8 @@ class DetectOpportunities extends Command
             'priority' => $this->option('priority'),
             'maker' => $this->option('maker'),
             'production_min' => $this->option('production_min'),
+            'llm' => $this->option('llm'),
+            'llm_limit' => $this->option('llm_limit'),
             'unattended' => $this->option('unattended'),
             'limit' => $this->option('limit'),
         ];
@@ -38,18 +42,19 @@ class DetectOpportunities extends Command
         $rows = collect($result['model']->items())->take(25);
 
         $this->info(sprintf(
-            'Oportunidades %s a %s: %d analizados de %d candidatos, %d alta, %d media, %d sin atender.',
+            'Oportunidades %s a %s: %d analizados de %d candidatos, %d alta, %d media, %d sin atender, %d con IA.',
             $result['fromDate']->toDateString(),
             $result['toDate']->toDateString(),
             $result['summary']['analyzed'],
             $result['summary']['candidate_total'],
             $result['summary']['high'],
             $result['summary']['medium'],
-            $result['summary']['unattended']
+            $result['summary']['unattended'],
+            $result['summary']['llm_analyzed']
         ));
 
         $this->table(
-            ['Score', 'Prioridad', 'Cliente', 'Telefono', 'Produce', 'Emp/dia', 'Estado', 'Asesor', 'Motivos'],
+            ['Score', 'Prioridad', 'Cliente', 'Telefono', 'Produce', 'Emp/dia', 'Intencion', 'IA', 'Estado', 'Asesor', 'Motivos'],
             $rows->map(fn ($row) => [
                 $row->opportunity_score,
                 $row->priority_label,
@@ -57,6 +62,8 @@ class DetectOpportunities extends Command
                 preg_replace('/\D+/', '', (string) $row->phone),
                 $row->production_label,
                 $row->estimated_daily_empanadas ? number_format($row->estimated_daily_empanadas) : '-',
+                $row->intent_label ?? '-',
+                $row->llm_used ? 'Si' : '-',
                 $row->status_name ?? 'Sin estado',
                 $row->user_name ?? 'Sin asignar',
                 mb_strimwidth(implode('; ', $row->opportunity_reasons), 0, 90, '...'),

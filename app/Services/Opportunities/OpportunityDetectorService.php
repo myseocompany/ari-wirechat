@@ -65,7 +65,7 @@ class OpportunityDetectorService
     ];
 
     /**
-     * @param array<string, mixed> $filters
+     * @param  array<string, mixed>  $filters
      * @return array{model: LengthAwarePaginator, summary: array<string, int>, fromDate: Carbon, toDate: Carbon}
      */
     public function analyze(array $filters = [], int $perPage = 25): array
@@ -80,6 +80,7 @@ class OpportunityDetectorService
         $rows = $this->baseRows($baseQuery, $limit);
         $rows = $this->attachHeavyData($rows);
         $rows = $this->scoreRows($rows);
+        $rows = $this->analyzeAmbiguousRowsWithLlm($rows, $filters);
         $rows = $this->applyComputedFilters($rows, $filters);
 
         $summary = [
@@ -94,6 +95,7 @@ class OpportunityDetectorService
             'makers' => $rows->where('production_status', 'makes')->count(),
             'projects' => $rows->where('production_status', 'project')->count(),
             'production_known' => $rows->filter(fn ($row) => (int) ($row->estimated_daily_empanadas ?? 0) > 0)->count(),
+            'llm_analyzed' => $rows->where('llm_used', true)->count(),
         ];
 
         $pageRows = $rows->slice(($page - 1) * $perPage, $perPage)->values();
@@ -118,7 +120,7 @@ class OpportunityDetectorService
     }
 
     /**
-     * @param array<string, mixed> $filters
+     * @param  array<string, mixed>  $filters
      */
     private function dateRange(array $filters): array
     {
@@ -136,7 +138,7 @@ class OpportunityDetectorService
     }
 
     /**
-     * @param array<string, mixed> $filters
+     * @param  array<string, mixed>  $filters
      */
     private function baseQuery(array $filters, Carbon $fromDate, Carbon $toDate): \Illuminate\Database\Eloquent\Builder
     {
@@ -247,7 +249,7 @@ class OpportunityDetectorService
     }
 
     /**
-     * @param Collection<int, object> $rows
+     * @param  Collection<int, object>  $rows
      * @return Collection<int, object>
      */
     private function attachHeavyData(Collection $rows): Collection
@@ -281,7 +283,7 @@ class OpportunityDetectorService
     }
 
     /**
-     * @param Collection<int, object> $rows
+     * @param  Collection<int, object>  $rows
      * @return Collection<int, object>
      */
     private function scoreRows(Collection $rows): Collection
@@ -358,11 +360,134 @@ class OpportunityDetectorService
             $row->estimated_daily_empanadas = $production['daily_amount'];
             $row->production_evidence = $production['evidence'];
             $row->production_rank = $production['rank'];
+            $row->intent = $this->detectIntent($matchedKeywords);
+            $row->intent_label = $this->intentLabel($row->intent);
+            $row->llm_used = false;
+            $row->llm_error = null;
+            $row->llm_duration_ms = null;
+            $row->llm_model = null;
+            $row->llm_confidence = null;
+            $row->llm_evidence = null;
             $row->matched_keywords = $matchedKeywords;
             $row->opportunity_reasons = $reasons;
 
             return $row;
-        })->sort(function ($left, $right) {
+        })->pipe(fn ($rows) => $this->sortRows($rows));
+    }
+
+    /**
+     * @param  Collection<int, object>  $rows
+     * @param  array<string, mixed>  $filters
+     * @return Collection<int, object>
+     */
+    private function analyzeAmbiguousRowsWithLlm(Collection $rows, array $filters): Collection
+    {
+        if (empty($filters['llm'])) {
+            return $rows;
+        }
+
+        $limit = min(200, max(1, (int) ($filters['llm_limit'] ?? 50)));
+        $analyzer = app(OpportunityLlmAnalyzer::class);
+
+        $rowsToAnalyze = $rows
+            ->filter(fn ($row) => $this->shouldAnalyzeWithLlm($row))
+            ->take($limit);
+
+        foreach ($rowsToAnalyze as $row) {
+            $analysis = $analyzer->analyze($row);
+            $this->applyLlmAnalysis($row, $analysis);
+        }
+
+        return $this->sortRows($rows);
+    }
+
+    private function shouldAnalyzeWithLlm(object $row): bool
+    {
+        if (! in_array($row->priority, ['high', 'medium'], true)) {
+            return false;
+        }
+
+        return $row->production_status === 'unknown'
+            || (int) ($row->estimated_daily_empanadas ?? 0) === 0
+            || $row->intent === 'unknown';
+    }
+
+    /**
+     * @param array{
+     *     llm_used: bool,
+     *     llm_error: string|null,
+     *     llm_duration_ms: int|null,
+     *     model: string|null,
+     *     produce_empanadas: string,
+     *     estimated_daily_empanadas: int|null,
+     *     intent: string,
+     *     confidence: float|null,
+     *     evidence: string|null
+     * } $analysis
+     */
+    private function applyLlmAnalysis(object $row, array $analysis): void
+    {
+        $row->llm_used = $analysis['llm_used'];
+        $row->llm_error = $analysis['llm_error'];
+        $row->llm_duration_ms = $analysis['llm_duration_ms'];
+        $row->llm_model = $analysis['model'];
+        $row->llm_confidence = $analysis['confidence'];
+        $row->llm_evidence = $analysis['evidence'];
+
+        if (! $analysis['llm_used']) {
+            return;
+        }
+
+        if ($row->production_status === 'unknown' && $analysis['produce_empanadas'] === 'yes') {
+            $row->production_status = 'makes';
+            $row->production_label = 'Hace empanadas (IA)';
+            $row->production_rank = 3;
+            $row->opportunity_score += 3;
+            $row->opportunity_reasons[] = 'IA: produce empanadas';
+        }
+
+        if ($row->production_status === 'unknown' && $analysis['produce_empanadas'] === 'no') {
+            $row->production_status = 'project';
+            $row->production_label = 'Proyecto (IA)';
+            $row->production_rank = 1;
+            $row->opportunity_reasons[] = 'IA: parece proyecto';
+        }
+
+        if ($row->production_status === 'unknown' && $analysis['produce_empanadas'] === 'other') {
+            $row->production_status = 'other';
+            $row->production_label = 'Otro producto (IA)';
+            $row->production_rank = 2;
+            $row->opportunity_reasons[] = 'IA: oportunidad de otro tipo';
+        }
+
+        if ((int) ($row->estimated_daily_empanadas ?? 0) === 0 && $analysis['estimated_daily_empanadas']) {
+            $row->estimated_daily_empanadas = $analysis['estimated_daily_empanadas'];
+            $row->opportunity_score += min(3, max(1, intdiv($analysis['estimated_daily_empanadas'], 300)));
+            $row->opportunity_reasons[] = 'IA: produccion estimada '.number_format($analysis['estimated_daily_empanadas']).' emp/dia';
+        }
+
+        if ($row->intent === 'unknown' && $analysis['intent'] !== 'unknown') {
+            $row->intent = $analysis['intent'];
+            $row->intent_label = $this->intentLabel($analysis['intent']);
+            $row->opportunity_score += in_array($analysis['intent'], ['buy', 'quote'], true) ? 3 : 1;
+            $row->opportunity_reasons[] = 'IA: intencion '.$row->intent_label;
+        }
+
+        if ($analysis['evidence'] && ! $row->production_evidence) {
+            $row->production_evidence = $analysis['evidence'];
+        }
+
+        $row->priority = $row->opportunity_score >= 8 ? 'high' : ($row->opportunity_score >= 5 ? 'medium' : 'low');
+        $row->priority_label = $row->opportunity_score >= 8 ? 'Alta' : ($row->opportunity_score >= 5 ? 'Media' : 'Baja');
+    }
+
+    /**
+     * @param  Collection<int, object>  $rows
+     * @return Collection<int, object>
+     */
+    private function sortRows(Collection $rows): Collection
+    {
+        return $rows->sort(function ($left, $right) {
             return [
                 (int) $right->production_rank,
                 (int) $right->estimated_daily_empanadas,
@@ -380,8 +505,8 @@ class OpportunityDetectorService
     }
 
     /**
-     * @param Collection<int, object> $rows
-     * @param array<string, mixed> $filters
+     * @param  Collection<int, object>  $rows
+     * @param  array<string, mixed>  $filters
      * @return Collection<int, object>
      */
     private function applyComputedFilters(Collection $rows, array $filters): Collection
@@ -537,7 +662,7 @@ class OpportunityDetectorService
     }
 
     /**
-     * @param array<int, string> $needles
+     * @param  array<int, string>  $needles
      */
     private function containsAny(string $haystack, array $needles): bool
     {
@@ -563,5 +688,43 @@ class OpportunityDetectorService
         }
 
         return array_values(array_unique($matches));
+    }
+
+    /**
+     * @param  array<int, string>  $matchedKeywords
+     */
+    private function detectIntent(array $matchedKeywords): string
+    {
+        $keywords = array_map(fn ($keyword) => $this->normalize($keyword), $matchedKeywords);
+
+        if (array_intersect($keywords, ['comprar', 'compra'])) {
+            return 'buy';
+        }
+
+        if (array_intersect($keywords, ['precio', 'precios', 'valor', 'costo', 'costos', 'cotizacion', 'cotización', 'cotizar', 'ficha tecnica', 'ficha técnica'])) {
+            return 'quote';
+        }
+
+        if (in_array('alimentec', $keywords, true)) {
+            return 'event';
+        }
+
+        if (array_intersect($keywords, ['maquina', 'máquina', 'maquinas', 'máquinas', 'equipo', 'produccion', 'producción', 'capacidad', 'demo'])) {
+            return 'info';
+        }
+
+        return 'unknown';
+    }
+
+    private function intentLabel(string $intent): string
+    {
+        return match ($intent) {
+            'buy' => 'Comprar',
+            'quote' => 'Cotizar',
+            'info' => 'Información',
+            'event' => 'Evento',
+            'support' => 'Soporte',
+            default => 'No claro',
+        };
     }
 }

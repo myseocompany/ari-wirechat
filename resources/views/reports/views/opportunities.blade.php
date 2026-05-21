@@ -9,7 +9,7 @@
   <div class="flex flex-col gap-1">
     <h1 class="mb-1">Agente de oportunidades</h1>
     <div class="text-xs text-slate-500">
-      {{ $summary['analyzed'] }} analizados de {{ $summary['candidate_total'] }} candidatos encontrados · {{ $summary['makers'] }} producen · {{ $summary['production_known'] }} con volumen
+      {{ $summary['analyzed'] }} analizados de {{ $summary['candidate_total'] }} candidatos encontrados · {{ $summary['makers'] }} producen · {{ $summary['production_known'] }} con volumen · {{ $summary['llm_analyzed'] }} con IA
     </div>
   </div>
   <a href="{{ url('/reports/views/customers_messages_count') }}?{{ http_build_query(request()->except('priority', 'unattended')) }}" class="inline-flex items-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
@@ -17,7 +17,7 @@
   </a>
 </div>
 
-<div class="mb-4 grid gap-3 md:grid-cols-4">
+<div class="mb-4 grid gap-3 md:grid-cols-5">
   <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
     <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Alta</div>
     <div class="mt-2 text-3xl font-bold text-rose-600">{{ $summary['high'] }}</div>
@@ -34,6 +34,10 @@
   <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
     <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Con volumen</div>
     <div class="mt-2 text-3xl font-bold text-blue-600">{{ $summary['production_known'] }}</div>
+  </div>
+  <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Con IA</div>
+    <div class="mt-2 text-3xl font-bold text-teal-600">{{ $summary['llm_analyzed'] }}</div>
   </div>
 </div>
 
@@ -123,6 +127,10 @@
         <label for="limit" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Analizar</label>
         <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="10" max="3000" id="limit" name="limit" value="{{ $request->limit ?? 500 }}">
       </div>
+      <div class="col-span-6 flex flex-col gap-1 lg:col-span-2">
+        <label for="llm_limit" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Max IA</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="number" min="1" max="200" id="llm_limit" name="llm_limit" value="{{ $request->llm_limit ?? 50 }}">
+      </div>
     </div>
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex flex-wrap items-center gap-4">
@@ -133,6 +141,10 @@
         <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
           <input type="checkbox" name="tag_none" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('tag_none')) checked @endif>
           Sin etiqueta
+        </label>
+        <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          <input type="checkbox" name="llm" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('llm')) checked @endif>
+          Analizar ambiguos con IA
         </label>
       </div>
       <button type="submit" class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700">Analizar</button>
@@ -209,8 +221,19 @@
                 <div class="text-sm font-semibold text-slate-900">{{ $item->production_label }}</div>
                 <div class="text-2xl font-bold text-slate-900">{{ $item->estimated_daily_empanadas ? number_format($item->estimated_daily_empanadas) : '-' }}</div>
                 <div class="text-xs uppercase tracking-[0.16em] text-slate-400">emp/dia estimadas</div>
+                <div class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Intención: {{ $item->intent_label ?? 'No claro' }}</div>
+                @if ($item->llm_used)
+                  <div class="inline-flex w-fit rounded-full bg-teal-100 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.16em] text-teal-700">
+                    IA {{ $item->llm_confidence !== null ? number_format($item->llm_confidence * 100, 0).'%' : '' }}
+                  </div>
+                @elseif ($item->llm_error)
+                  <div class="text-xs text-slate-400">IA: {{ $item->llm_error }}</div>
+                @endif
                 @if ($item->production_evidence)
                   <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-[13px] leading-5 text-slate-600">{{ $item->production_evidence }}</div>
+                @endif
+                @if ($item->llm_evidence && $item->llm_evidence !== $item->production_evidence)
+                  <div class="rounded-xl border border-teal-100 bg-teal-50 px-3 py-2 text-[13px] leading-5 text-teal-700">{{ $item->llm_evidence }}</div>
                 @endif
               </div>
             </td>

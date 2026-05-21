@@ -28,6 +28,8 @@ class OpportunityReportRequest extends FormRequest
             'priority' => ['nullable', 'in:high,medium,low'],
             'maker' => ['nullable', 'in:unknown,project,makes,other'],
             'production_min' => ['nullable', 'integer', 'min:0'],
+            'llm' => ['nullable', 'boolean'],
+            'llm_limit' => ['nullable', 'integer', 'min:1', 'max:200'],
             'unattended' => ['nullable', 'boolean'],
             'limit' => ['nullable', 'integer', 'min:10', 'max:3000'],
         ];
