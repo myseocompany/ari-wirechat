@@ -399,7 +399,8 @@ class OpportunityDetectorService
             return $rows;
         }
 
-        $limit = min(200, max(1, (int) ($filters['llm_limit'] ?? 50)));
+        $requestedLimit = min(200, max(1, (int) ($filters['llm_limit'] ?? 50)));
+        $limit = app()->runningInConsole() ? $requestedLimit : min(10, $requestedLimit);
         $analyzer = app(OpportunityLlmAnalyzer::class);
 
         $rowsToAnalyze = $rows
