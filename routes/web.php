@@ -408,6 +408,7 @@ Route::middleware('auth')->prefix('reports')->group(function () {
     Route::get('/views/customers_followup', [ReportController::class, 'RFM_CustomersFollowups']);
     Route::get('/views/daily_customers_followup', [CustomerController::class, 'daily']);
     Route::get('/views/customers_messages_count', [ReportController::class, 'customersByMessageCount']);
+    Route::get('/views/opportunities', [ReportController::class, 'opportunities'])->name('reports.opportunities');
     Route::get('/views/twilio_calls', [ReportController::class, 'twilioCalls'])->name('reports.twilio_calls');
     Route::get('/views/retell_inbox', [ReportController::class, 'retellInbox']);
     Route::post('/views/retell_inbox/associate-customer', [ReportController::class, 'associateRetellInboxCustomer'])->name('reports.retell_inbox.associate_customer');

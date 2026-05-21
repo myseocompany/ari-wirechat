@@ -34,4 +34,5 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withCommands([
         \App\Console\Commands\ProcessRetellInbox::class,
         \App\Console\Commands\NotifyPendingActions::class,
+        \App\Console\Commands\DetectOpportunities::class,
     ])->create();

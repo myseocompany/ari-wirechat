@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AssociateRetellInboxCustomerRequest;
 use App\Http\Requests\CalculatorCustomersReportRequest;
 use App\Http\Requests\CustomerMessagesReportRequest;
+use App\Http\Requests\OpportunityReportRequest;
 use App\Http\Requests\LeadConversationClassificationReportRequest;
 use App\Http\Requests\LeadConversationClassificationRunRequest;
 use App\Http\Requests\RetellInboxReportRequest;
@@ -14,11 +15,13 @@ use App\Models\ActionType;
 use App\Models\Customer;
 use App\Models\CustomerMeta;
 use App\Models\CustomerStatus;
+use App\Models\CustomerSource;
 use App\Models\LeadConversationClassification;
 use App\Models\Project;
 use App\Models\Tag;
 use App\Models\User;
 use App\Services\LeadClassifier\LeadConversationClassifier;
+use App\Services\Opportunities\OpportunityDetectorService;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Contracts\View\View;
@@ -799,6 +802,22 @@ class ReportController extends Controller
         $users = User::where('status_id', 1)->orderBy('name')->get();
 
         return view('reports.views.customers_by_message_count', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
+    }
+
+    public function opportunities(OpportunityReportRequest $request, OpportunityDetectorService $detector): View
+    {
+        $result = $detector->analyze($request->validated(), 25);
+
+        $model = $result['model'];
+        $summary = $result['summary'];
+        $fromDate = $result['fromDate'];
+        $toDate = $result['toDate'];
+        $statuses = CustomerStatus::orderBy('weight')->get();
+        $tags = Tag::orderBy('name')->get();
+        $sources = CustomerSource::orderBy('name')->get();
+        $users = User::where('status_id', 1)->orderBy('name')->get();
+
+        return view('reports.views.opportunities', compact('model', 'summary', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'sources', 'users'));
     }
 
     public function twilioCalls(TwilioCallsReportRequest $request): View
