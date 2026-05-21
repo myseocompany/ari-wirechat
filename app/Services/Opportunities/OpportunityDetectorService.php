@@ -462,34 +462,34 @@ class OpportunityDetectorService
             $row->production_label = 'Hace empanadas (IA)';
             $row->production_rank = 3;
             $row->opportunity_score += 3;
-            $row->opportunity_reasons[] = 'IA: produce empanadas';
+            $this->addOpportunityReason($row, 'IA: produce empanadas');
         }
 
         if ($row->production_status === 'unknown' && $analysis['produce_empanadas'] === 'no') {
             $row->production_status = 'project';
             $row->production_label = 'Proyecto (IA)';
             $row->production_rank = 1;
-            $row->opportunity_reasons[] = 'IA: parece proyecto';
+            $this->addOpportunityReason($row, 'IA: parece proyecto');
         }
 
         if ($row->production_status === 'unknown' && $analysis['produce_empanadas'] === 'other') {
             $row->production_status = 'other';
             $row->production_label = 'Otro producto (IA)';
             $row->production_rank = 2;
-            $row->opportunity_reasons[] = 'IA: oportunidad de otro tipo';
+            $this->addOpportunityReason($row, 'IA: oportunidad de otro tipo');
         }
 
         if ((int) ($row->estimated_daily_empanadas ?? 0) === 0 && $analysis['estimated_daily_empanadas']) {
             $row->estimated_daily_empanadas = $analysis['estimated_daily_empanadas'];
             $row->opportunity_score += min(3, max(1, intdiv($analysis['estimated_daily_empanadas'], 300)));
-            $row->opportunity_reasons[] = 'IA: produccion estimada '.number_format($analysis['estimated_daily_empanadas']).' emp/dia';
+            $this->addOpportunityReason($row, 'IA: produccion estimada '.number_format($analysis['estimated_daily_empanadas']).' emp/dia');
         }
 
         if ($row->intent === 'unknown' && $analysis['intent'] !== 'unknown') {
             $row->intent = $analysis['intent'];
             $row->intent_label = $this->intentLabel($analysis['intent']);
             $row->opportunity_score += in_array($analysis['intent'], ['buy', 'quote'], true) ? 3 : 1;
-            $row->opportunity_reasons[] = 'IA: intencion '.$row->intent_label;
+            $this->addOpportunityReason($row, 'IA: intencion '.$row->intent_label);
         }
 
         if ($analysis['evidence'] && ! $row->production_evidence) {
@@ -500,6 +500,13 @@ class OpportunityDetectorService
 
         $row->priority = $row->opportunity_score >= 8 ? 'high' : ($row->opportunity_score >= 5 ? 'medium' : 'low');
         $row->priority_label = $row->opportunity_score >= 8 ? 'Alta' : ($row->opportunity_score >= 5 ? 'Media' : 'Baja');
+    }
+
+    private function addOpportunityReason(object $row, string $reason): void
+    {
+        $reasons = is_array($row->opportunity_reasons ?? null) ? $row->opportunity_reasons : [];
+        $reasons[] = $reason;
+        $row->opportunity_reasons = $reasons;
     }
 
     /**
