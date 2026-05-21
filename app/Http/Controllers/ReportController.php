@@ -825,8 +825,9 @@ class ReportController extends Controller
     {
         $filters = $request->validated();
         $filters['limit'] = min(3000, max(10, (int) ($filters['limit'] ?? 500)));
+        $filters['export_all'] = true;
 
-        $result = $detector->analyze($filters, 100);
+        $result = $detector->analyze($filters, $filters['limit']);
         $rows = collect($result['model']->items());
 
         $headers = [

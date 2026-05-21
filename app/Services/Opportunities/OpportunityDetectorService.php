@@ -76,7 +76,8 @@ class OpportunityDetectorService
         [$fromDate, $toDate] = $this->dateRange($filters);
         $limit = min(3000, max(10, (int) ($filters['limit'] ?? 500)));
         $page = LengthAwarePaginator::resolveCurrentPage();
-        $perPage = min(100, max(10, $perPage));
+        $perPageMax = ! empty($filters['export_all']) ? $limit : 100;
+        $perPage = min($perPageMax, max(10, $perPage));
 
         $baseQuery = $this->baseQuery($filters, $fromDate, $toDate);
         $candidateTotal = (clone $baseQuery)->count();
