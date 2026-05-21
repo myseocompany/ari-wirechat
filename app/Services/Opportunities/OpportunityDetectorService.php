@@ -59,9 +59,11 @@ class OpportunityDetectorService
     private const LOW_VALUE_STATUSES = [
         'ganado',
         'posventa',
+        'perdido',
         'pidió la baja',
         'pidio la baja',
         'repetido',
+        'spam',
     ];
 
     /**
@@ -293,7 +295,9 @@ class OpportunityDetectorService
             $reasons = [];
 
             $statusName = $this->normalize((string) ($row->status_name ?? ''));
+            $customerName = $this->normalize((string) ($row->name ?? ''));
             $isLowValueStatus = $this->containsAny($statusName, self::LOW_VALUE_STATUSES);
+            $isLowValueCustomer = $this->containsAny($customerName, self::LOW_VALUE_STATUSES);
             $isEarlyStatus = $this->containsAny($statusName, self::EARLY_STATUSES);
             $lastCustomerMessageAt = $row->last_customer_message_at ? Carbon::parse($row->last_customer_message_at) : null;
             $lastActionAt = $row->last_action_at ? Carbon::parse($row->last_action_at) : null;
@@ -346,7 +350,7 @@ class OpportunityDetectorService
                 $reasons[] = 'Sin asesor asignado';
             }
 
-            if ($isLowValueStatus) {
+            if ($isLowValueStatus || $isLowValueCustomer) {
                 $score = max(0, $score - 4);
                 $reasons[] = 'Estado de baja prioridad: '.($row->status_name ?? 'Sin estado');
             }
@@ -362,7 +366,7 @@ class OpportunityDetectorService
             $row->production_rank = $production['rank'];
             $row->intent = $this->detectIntent($matchedKeywords);
             $row->intent_label = $this->intentLabel($row->intent);
-            $nextAction = $this->recommendNextAction($row, $isLowValueStatus);
+            $nextAction = $this->recommendNextAction($row, $isLowValueStatus || $isLowValueCustomer);
             $row->next_best_action = $nextAction['action'];
             $row->next_best_action_label = $nextAction['label'];
             $row->recommended_channel = $nextAction['channel'];
