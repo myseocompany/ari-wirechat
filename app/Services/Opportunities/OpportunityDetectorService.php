@@ -521,7 +521,7 @@ class OpportunityDetectorService
      */
     private function applyLlmAction(object $row, array $analysis): void
     {
-        if ($analysis['next_best_action'] !== 'wait_for_signal') {
+        if ($analysis['next_best_action'] !== 'wait_for_signal' && $this->acceptLlmAction($row, $analysis['next_best_action'])) {
             $row->next_best_action = $analysis['next_best_action'];
             $row->next_best_action_label = $this->actionLabel($analysis['next_best_action']);
         }
@@ -546,6 +546,21 @@ class OpportunityDetectorService
         if ($analysis['stop_condition']) {
             $row->stop_condition = $analysis['stop_condition'];
         }
+    }
+
+    private function acceptLlmAction(object $row, string $action): bool
+    {
+        if (empty($row->user_id) && $action !== 'assign_owner') {
+            return false;
+        }
+
+        if ($action === 'disqualify') {
+            return $row->priority === 'low'
+                && $row->production_status !== 'makes'
+                && (int) ($row->estimated_daily_empanadas ?? 0) === 0;
+        }
+
+        return true;
     }
 
     /**
