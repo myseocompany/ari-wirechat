@@ -54,7 +54,7 @@ class DetectOpportunities extends Command
         ));
 
         $this->table(
-            ['Score', 'Prioridad', 'Cliente', 'Telefono', 'Produce', 'Emp/dia', 'Intencion', 'IA', 'Estado', 'Asesor', 'Motivos'],
+            ['Score', 'Prioridad', 'Cliente', 'Telefono', 'Produce', 'Emp/dia', 'Intencion', 'Accion', 'SLA', 'IA', 'Estado', 'Asesor', 'Motivos'],
             $rows->map(fn ($row) => [
                 $row->opportunity_score,
                 $row->priority_label,
@@ -63,6 +63,8 @@ class DetectOpportunities extends Command
                 $row->production_label,
                 $row->estimated_daily_empanadas ? number_format($row->estimated_daily_empanadas) : '-',
                 $row->intent_label ?? '-',
+                $row->next_best_action_label ?? '-',
+                $row->recommended_sla ?? '-',
                 $row->llm_used ? 'Si' : '-',
                 $row->status_name ?? 'Sin estado',
                 $row->user_name ?? 'Sin asignar',

@@ -20,7 +20,13 @@ class OpportunityLlmAnalyzer
      *     estimated_daily_empanadas: int|null,
      *     intent: string,
      *     confidence: float|null,
-     *     evidence: string|null
+     *     evidence: string|null,
+     *     next_best_action: string,
+     *     recommended_channel: string,
+     *     recommended_sla: string,
+     *     action_reason: string|null,
+     *     suggested_message: string|null,
+     *     stop_condition: string|null
      * }
      */
     public function analyze(object $row): array
@@ -82,6 +88,12 @@ class OpportunityLlmAnalyzer
                 'intent' => $this->normalizeChoice($decoded['intent'] ?? null, ['buy', 'quote', 'info', 'event', 'support', 'unknown'], 'unknown'),
                 'confidence' => $this->normalizeConfidence($decoded['confidence'] ?? null),
                 'evidence' => $this->normalizeText($decoded['evidence'] ?? null),
+                'next_best_action' => $this->normalizeChoice($decoded['next_best_action'] ?? null, ['reply_whatsapp', 'create_call_task', 'send_quote', 'book_demo', 'qualify_project', 'assign_owner', 'wait_for_signal', 'disqualify'], 'wait_for_signal'),
+                'recommended_channel' => $this->normalizeChoice($decoded['recommended_channel'] ?? null, ['whatsapp', 'phone', 'email', 'crm', 'none'], 'crm'),
+                'recommended_sla' => $this->normalizeChoice($decoded['recommended_sla'] ?? null, ['hoy', '24h', '48h', 'esta_semana', 'esperar'], '24h'),
+                'action_reason' => $this->normalizeText($decoded['action_reason'] ?? null),
+                'suggested_message' => $this->normalizeText($decoded['suggested_message'] ?? null, 280),
+                'stop_condition' => $this->normalizeText($decoded['stop_condition'] ?? null),
             ];
         } catch (Throwable $exception) {
             return $this->fallback($exception->getMessage(), $model);
@@ -117,7 +129,13 @@ Devuelve SOLO este JSON:
   "estimated_daily_empanadas": number|null,
   "intent": "buy|quote|info|event|support|unknown",
   "confidence": number,
-  "evidence": "frase textual corta o null"
+  "evidence": "frase textual corta o null",
+  "next_best_action": "reply_whatsapp|create_call_task|send_quote|book_demo|qualify_project|assign_owner|wait_for_signal|disqualify",
+  "recommended_channel": "whatsapp|phone|email|crm|none",
+  "recommended_sla": "hoy|24h|48h|esta_semana|esperar",
+  "action_reason": "razón breve o null",
+  "suggested_message": "mensaje corto para el asesor enviar o null",
+  "stop_condition": "condición breve para dejar de insistir o null"
 }
 
 Reglas:
@@ -128,6 +146,8 @@ Reglas:
 - intent "quote" si pide precio, cotización, ficha o condiciones.
 - intent "buy" si expresa decisión de compra, visita para comprar o cierre.
 - evidence debe ser una frase corta tomada del texto, sin inventar.
+- No recomiendes auto-envío. El mensaje sugerido es un borrador para revisión humana.
+- suggested_message debe estar en español, sonar natural y tener máximo 60 palabras.
 PROMPT;
     }
 
@@ -158,7 +178,7 @@ PROMPT;
         return max(0.0, min(1.0, (float) $value));
     }
 
-    private function normalizeText(mixed $value): ?string
+    private function normalizeText(mixed $value, int $limit = 180): ?string
     {
         if (! is_string($value)) {
             return null;
@@ -166,7 +186,7 @@ PROMPT;
 
         $text = trim(preg_replace('/\s+/', ' ', $value) ?? '');
 
-        return $text === '' ? null : Str::limit($text, 180);
+        return $text === '' ? null : Str::limit($text, $limit);
     }
 
     /**
@@ -179,7 +199,13 @@ PROMPT;
      *     estimated_daily_empanadas: int|null,
      *     intent: string,
      *     confidence: float|null,
-     *     evidence: string|null
+     *     evidence: string|null,
+     *     next_best_action: string,
+     *     recommended_channel: string,
+     *     recommended_sla: string,
+     *     action_reason: string|null,
+     *     suggested_message: string|null,
+     *     stop_condition: string|null
      * }
      */
     private function fallback(string $error, ?string $model = null, ?int $durationMs = null): array
@@ -194,6 +220,12 @@ PROMPT;
             'intent' => 'unknown',
             'confidence' => null,
             'evidence' => null,
+            'next_best_action' => 'wait_for_signal',
+            'recommended_channel' => 'crm',
+            'recommended_sla' => 'esperar',
+            'action_reason' => null,
+            'suggested_message' => null,
+            'stop_condition' => null,
         ];
     }
 }

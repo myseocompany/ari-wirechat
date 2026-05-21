@@ -362,6 +362,15 @@ class OpportunityDetectorService
             $row->production_rank = $production['rank'];
             $row->intent = $this->detectIntent($matchedKeywords);
             $row->intent_label = $this->intentLabel($row->intent);
+            $nextAction = $this->recommendNextAction($row, $isLowValueStatus);
+            $row->next_best_action = $nextAction['action'];
+            $row->next_best_action_label = $nextAction['label'];
+            $row->recommended_channel = $nextAction['channel'];
+            $row->recommended_channel_label = $nextAction['channel_label'];
+            $row->recommended_sla = $nextAction['sla'];
+            $row->action_reason = $nextAction['reason'];
+            $row->suggested_message = $nextAction['message'];
+            $row->stop_condition = $nextAction['stop_condition'];
             $row->llm_used = false;
             $row->llm_error = null;
             $row->llm_duration_ms = null;
@@ -422,7 +431,13 @@ class OpportunityDetectorService
      *     estimated_daily_empanadas: int|null,
      *     intent: string,
      *     confidence: float|null,
-     *     evidence: string|null
+     *     evidence: string|null,
+     *     next_best_action: string,
+     *     recommended_channel: string,
+     *     recommended_sla: string,
+     *     action_reason: string|null,
+     *     suggested_message: string|null,
+     *     stop_condition: string|null
      * } $analysis
      */
     private function applyLlmAnalysis(object $row, array $analysis): void
@@ -477,8 +492,49 @@ class OpportunityDetectorService
             $row->production_evidence = $analysis['evidence'];
         }
 
+        $this->applyLlmAction($row, $analysis);
+
         $row->priority = $row->opportunity_score >= 8 ? 'high' : ($row->opportunity_score >= 5 ? 'medium' : 'low');
         $row->priority_label = $row->opportunity_score >= 8 ? 'Alta' : ($row->opportunity_score >= 5 ? 'Media' : 'Baja');
+    }
+
+    /**
+     * @param array{
+     *     next_best_action: string,
+     *     recommended_channel: string,
+     *     recommended_sla: string,
+     *     action_reason: string|null,
+     *     suggested_message: string|null,
+     *     stop_condition: string|null
+     * } $analysis
+     */
+    private function applyLlmAction(object $row, array $analysis): void
+    {
+        if ($analysis['next_best_action'] !== 'wait_for_signal') {
+            $row->next_best_action = $analysis['next_best_action'];
+            $row->next_best_action_label = $this->actionLabel($analysis['next_best_action']);
+        }
+
+        if ($analysis['recommended_channel'] !== 'crm') {
+            $row->recommended_channel = $analysis['recommended_channel'];
+            $row->recommended_channel_label = $this->channelLabel($analysis['recommended_channel']);
+        }
+
+        if ($analysis['recommended_sla'] !== 'esperar') {
+            $row->recommended_sla = $analysis['recommended_sla'];
+        }
+
+        if ($analysis['action_reason']) {
+            $row->action_reason = $analysis['action_reason'];
+        }
+
+        if ($analysis['suggested_message']) {
+            $row->suggested_message = $analysis['suggested_message'];
+        }
+
+        if ($analysis['stop_condition']) {
+            $row->stop_condition = $analysis['stop_condition'];
+        }
     }
 
     /**
@@ -646,6 +702,147 @@ class OpportunityDetectorService
         return 'unknown';
     }
 
+    /**
+     * @return array{action: string, label: string, channel: string, channel_label: string, sla: string, reason: string, message: ?string, stop_condition: string}
+     */
+    private function recommendNextAction(object $row, bool $isLowValueStatus): array
+    {
+        if ($isLowValueStatus) {
+            return $this->nextAction(
+                'wait_for_signal',
+                'crm',
+                'esperar',
+                'El estado actual indica baja prioridad comercial.',
+                null,
+                'Retomar solo si el cliente envía una nueva señal clara.'
+            );
+        }
+
+        if (empty($row->user_id)) {
+            return $this->nextAction(
+                'assign_owner',
+                'crm',
+                'hoy',
+                'El prospecto no tiene asesor asignado.',
+                null,
+                'Continuar cuando haya un responsable comercial asignado.'
+            );
+        }
+
+        if ($row->is_unattended && in_array($row->intent, ['buy', 'quote'], true)) {
+            return $this->nextAction(
+                $row->intent === 'quote' ? 'send_quote' : 'reply_whatsapp',
+                'whatsapp',
+                'hoy',
+                'El cliente escribió después de la última acción humana y tiene intención comercial.',
+                $this->buildSuggestedMessage($row),
+                'Cerrar cuando responda, se agende llamada o quede definida la cotización.'
+            );
+        }
+
+        if ($row->production_status === 'makes' && (int) ($row->estimated_daily_empanadas ?? 0) >= 500) {
+            return $this->nextAction(
+                'create_call_task',
+                'phone',
+                '24h',
+                'Produce empanadas y tiene volumen suficiente para priorizar llamada consultiva.',
+                null,
+                'Cerrar cuando quede agendada llamada, demo o envío de cotización.'
+            );
+        }
+
+        if ($row->intent === 'quote') {
+            return $this->nextAction(
+                'send_quote',
+                'whatsapp',
+                '24h',
+                'El cliente pide precio, cotización, ficha o condiciones.',
+                $this->buildSuggestedMessage($row),
+                'Cerrar cuando se envíe propuesta o se identifique la objeción principal.'
+            );
+        }
+
+        if ($row->intent === 'buy') {
+            return $this->nextAction(
+                'book_demo',
+                'whatsapp',
+                '24h',
+                'El cliente muestra intención de compra.',
+                $this->buildSuggestedMessage($row),
+                'Cerrar cuando acepte horario, llamada o siguiente paso comercial.'
+            );
+        }
+
+        if ($row->production_status === 'project') {
+            return $this->nextAction(
+                'qualify_project',
+                'whatsapp',
+                '48h',
+                'Parece estar en etapa de proyecto y necesita calificación antes de cotizar.',
+                $this->buildSuggestedMessage($row),
+                'Cerrar cuando confirme producción esperada, fecha de inicio y presupuesto aproximado.'
+            );
+        }
+
+        if ($row->is_unattended) {
+            return $this->nextAction(
+                'reply_whatsapp',
+                'whatsapp',
+                '24h',
+                'Hay mensaje reciente del cliente sin acción posterior.',
+                $this->buildSuggestedMessage($row),
+                'Cerrar cuando responda o quede creada una acción humana.'
+            );
+        }
+
+        return $this->nextAction(
+            'wait_for_signal',
+            'crm',
+            'esperar',
+            'No hay una señal suficientemente fuerte para intervenir ahora.',
+            null,
+            'Retomar si llega nuevo mensaje, cambia el estado o aparece intención comercial.'
+        );
+    }
+
+    /**
+     * @return array{action: string, label: string, channel: string, channel_label: string, sla: string, reason: string, message: ?string, stop_condition: string}
+     */
+    private function nextAction(string $action, string $channel, string $sla, string $reason, ?string $message, string $stopCondition): array
+    {
+        return [
+            'action' => $action,
+            'label' => $this->actionLabel($action),
+            'channel' => $channel,
+            'channel_label' => $this->channelLabel($channel),
+            'sla' => $sla,
+            'reason' => $reason,
+            'message' => $message,
+            'stop_condition' => $stopCondition,
+        ];
+    }
+
+    private function buildSuggestedMessage(object $row): ?string
+    {
+        $name = trim((string) ($row->name ?? ''));
+        $firstName = $name !== '' ? strtok($name, ' ') : 'Hola';
+        $greeting = $firstName === 'Hola' ? 'Hola.' : 'Hola '.$firstName.'.';
+
+        if ($row->intent === 'quote') {
+            return $greeting.' Vi que estás revisando información de la máquina. Para cotizar bien, ¿me confirmas cuántas empanadas hacen al día y en qué ciudad estás?';
+        }
+
+        if ($row->intent === 'buy') {
+            return $greeting.' Para avanzar sin hacerte perder tiempo, ¿prefieres que revisemos por llamada la máquina que mejor encaja con tu producción o te envío primero las opciones?';
+        }
+
+        if ($row->production_status === 'project') {
+            return $greeting.' Para orientarte mejor, ¿ya tienes fecha estimada para iniciar producción y cuántas empanadas esperas hacer al día?';
+        }
+
+        return $greeting.' Retomo tu mensaje para ayudarte mejor. ¿Tu prioridad es conocer precios, capacidad de producción o agendar una llamada?';
+    }
+
     private function productionEvidence(string $value): ?string
     {
         $plain = trim(preg_replace('/\s+/', ' ', str_replace('||@ts||', ' ', $value)) ?? '');
@@ -725,6 +922,31 @@ class OpportunityDetectorService
             'event' => 'Evento',
             'support' => 'Soporte',
             default => 'No claro',
+        };
+    }
+
+    private function actionLabel(string $action): string
+    {
+        return match ($action) {
+            'reply_whatsapp' => 'Responder WhatsApp',
+            'create_call_task' => 'Crear llamada',
+            'send_quote' => 'Enviar cotización',
+            'book_demo' => 'Agendar demo',
+            'qualify_project' => 'Calificar proyecto',
+            'assign_owner' => 'Asignar asesor',
+            'disqualify' => 'Descartar',
+            default => 'Esperar señal',
+        };
+    }
+
+    private function channelLabel(string $channel): string
+    {
+        return match ($channel) {
+            'whatsapp' => 'WhatsApp',
+            'phone' => 'Llamada',
+            'email' => 'Email',
+            'none' => 'Ninguno',
+            default => 'CRM',
         };
     }
 }

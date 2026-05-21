@@ -239,6 +239,18 @@
             </td>
             <td class="px-4 py-5 align-top">
               <div class="space-y-2">
+                <div class="rounded-xl border border-emerald-100 bg-emerald-50 px-3.5 py-3 text-[15px] leading-6 text-emerald-800">
+                  <div class="text-xs font-bold uppercase tracking-[0.16em] text-emerald-600">Siguiente acción</div>
+                  <div class="mt-1 font-semibold">{{ $item->next_best_action_label ?? 'Esperar señal' }}</div>
+                  <div class="mt-1 text-[13px] text-emerald-700">{{ $item->recommended_channel_label ?? 'CRM' }} · {{ $item->recommended_sla ?? 'esperar' }}</div>
+                  <div class="mt-2 text-[13px] leading-5 text-emerald-700">{{ $item->action_reason }}</div>
+                  @if ($item->suggested_message)
+                    <div class="mt-2 rounded-lg border border-emerald-200 bg-white/70 px-3 py-2 text-[13px] leading-5 text-slate-700">{{ $item->suggested_message }}</div>
+                  @endif
+                  @if ($item->stop_condition)
+                    <div class="mt-2 text-[12px] leading-5 text-emerald-700">Salida: {{ $item->stop_condition }}</div>
+                  @endif
+                </div>
                 @foreach ($item->opportunity_reasons as $reason)
                   <div class="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-[15px] leading-6 text-slate-700">{{ $reason }}</div>
                 @endforeach
