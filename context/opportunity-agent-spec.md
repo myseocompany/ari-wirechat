@@ -10,6 +10,7 @@ Convertir conversaciones y campos del CRM en una lista accionable para ventas. E
 - Usar conversación como respaldo para inferir intención, producción, evidencia y contexto.
 - Mantener un scoring híbrido, explicable y auditable.
 - Activar LLM solo como apoyo para casos ambiguos o incompletos.
+- Procesar LLM fuera del request web mediante cron/comando y guardar resultados por cliente.
 - No auto-enviar mensajes desde este agente. Solo sugerir acción y texto.
 
 ## Entradas
@@ -74,6 +75,8 @@ Convertir conversaciones y campos del CRM en una lista accionable para ventas. E
 
 El LLM debe devolver JSON estructurado. No reemplaza `maker` ni `count_empanadas` cuando esos campos son claros; solo completa señales faltantes o ambiguas.
 
+La UI no debe llamar OpenAI directamente. El reporte genera/lee la lista de oportunidades con reglas y aplica resultados IA cacheados desde `opportunity_llm_analyses`. El procesamiento IA se ejecuta con `opportunities:detect --llm` desde CLI o scheduler.
+
 Campos esperados:
 
 ```json
@@ -97,5 +100,4 @@ Campos esperados:
 - Auto-envío de WhatsApp.
 - Bandits, reinforcement learning o scoring predictivo entrenado.
 - Cambios de dependencias.
-- Migraciones para cache persistente de IA.
 - Templates aprobados de WhatsApp.

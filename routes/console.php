@@ -8,7 +8,10 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-
 Schedule::command('retell:process --limit=200')
     ->everyMinute()
+    ->withoutOverlapping();
+
+Schedule::command('opportunities:detect --limit=500 --llm --llm_limit=20')
+    ->everyTenMinutes()
     ->withoutOverlapping();

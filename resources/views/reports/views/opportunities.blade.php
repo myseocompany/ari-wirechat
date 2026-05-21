@@ -144,8 +144,9 @@
         </label>
         <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
           <input type="checkbox" name="llm" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('llm')) checked @endif>
-          Analizar ambiguos con IA
+          Mostrar IA procesada
         </label>
+        <span class="text-xs text-slate-400">La IA se procesa por cron; este filtro no llama OpenAI en vivo.</span>
       </div>
       <button type="submit" class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-700">Analizar</button>
     </div>

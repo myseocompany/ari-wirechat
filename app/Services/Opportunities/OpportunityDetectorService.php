@@ -4,6 +4,7 @@ namespace App\Services\Opportunities;
 
 use App\Enums\CustomerMaker;
 use App\Models\Customer;
+use App\Models\OpportunityLlmAnalysis;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -82,6 +83,7 @@ class OpportunityDetectorService
         $rows = $this->baseRows($baseQuery, $limit);
         $rows = $this->attachHeavyData($rows);
         $rows = $this->scoreRows($rows);
+        $rows = $this->attachCachedLlmAnalyses($rows);
         $rows = $this->analyzeAmbiguousRowsWithLlm($rows, $filters);
         $rows = $this->applyComputedFilters($rows, $filters);
 
@@ -395,24 +397,61 @@ class OpportunityDetectorService
      */
     private function analyzeAmbiguousRowsWithLlm(Collection $rows, array $filters): Collection
     {
-        if (empty($filters['llm'])) {
+        if (empty($filters['llm']) || ! app()->runningInConsole()) {
             return $rows;
         }
 
-        $requestedLimit = min(200, max(1, (int) ($filters['llm_limit'] ?? 50)));
-        $limit = app()->runningInConsole() ? $requestedLimit : min(10, $requestedLimit);
+        $limit = min(200, max(1, (int) ($filters['llm_limit'] ?? 50)));
         $analyzer = app(OpportunityLlmAnalyzer::class);
 
         $rowsToAnalyze = $rows
-            ->filter(fn ($row) => $this->shouldAnalyzeWithLlm($row))
+            ->filter(fn ($row) => $this->shouldAnalyzeWithLlm($row) && $this->needsFreshLlmAnalysis($row))
             ->take($limit);
 
         foreach ($rowsToAnalyze as $row) {
             $analysis = $analyzer->analyze($row);
+            $this->cacheLlmAnalysis($row, $analysis);
             $this->applyLlmAnalysis($row, $analysis);
         }
 
         return $this->sortRows($rows);
+    }
+
+    /**
+     * @param  Collection<int, object>  $rows
+     * @return Collection<int, object>
+     */
+    private function attachCachedLlmAnalyses(Collection $rows): Collection
+    {
+        $customerIds = $rows->pluck('id')->all();
+        if ($customerIds === []) {
+            return $rows;
+        }
+
+        $analyses = OpportunityLlmAnalysis::query()
+            ->whereIn('customer_id', $customerIds)
+            ->get()
+            ->keyBy('customer_id');
+
+        foreach ($rows as $row) {
+            $analysis = $analyses->get($row->id);
+
+            if (! $analysis || $analysis->input_hash !== $this->llmInputHash($row)) {
+                continue;
+            }
+
+            $this->applyLlmAnalysis($row, $this->analysisModelToArray($analysis));
+        }
+
+        return $this->sortRows($rows);
+    }
+
+    private function needsFreshLlmAnalysis(object $row): bool
+    {
+        return ! OpportunityLlmAnalysis::query()
+            ->where('customer_id', $row->id)
+            ->where('input_hash', $this->llmInputHash($row))
+            ->exists();
     }
 
     private function shouldAnalyzeWithLlm(object $row): bool
@@ -424,6 +463,102 @@ class OpportunityDetectorService
         return $row->production_status === 'unknown'
             || (int) ($row->estimated_daily_empanadas ?? 0) === 0
             || $row->intent === 'unknown';
+    }
+
+    /**
+     * @param array{
+     *     llm_used: bool,
+     *     llm_error: string|null,
+     *     llm_duration_ms: int|null,
+     *     model: string|null,
+     *     produce_empanadas: string,
+     *     estimated_daily_empanadas: int|null,
+     *     intent: string,
+     *     confidence: float|null,
+     *     evidence: string|null,
+     *     next_best_action: string,
+     *     recommended_channel: string,
+     *     recommended_sla: string,
+     *     action_reason: string|null,
+     *     suggested_message: string|null,
+     *     stop_condition: string|null
+     * } $analysis
+     */
+    private function cacheLlmAnalysis(object $row, array $analysis): void
+    {
+        OpportunityLlmAnalysis::query()->updateOrCreate(
+            ['customer_id' => $row->id],
+            [
+                'input_hash' => $this->llmInputHash($row),
+                'llm_used' => $analysis['llm_used'],
+                'llm_error' => $analysis['llm_error'],
+                'llm_duration_ms' => $analysis['llm_duration_ms'],
+                'model' => $analysis['model'],
+                'produce_empanadas' => $analysis['produce_empanadas'],
+                'estimated_daily_empanadas' => $analysis['estimated_daily_empanadas'],
+                'intent' => $analysis['intent'],
+                'confidence' => $analysis['confidence'],
+                'evidence' => $analysis['evidence'],
+                'next_best_action' => $analysis['next_best_action'],
+                'recommended_channel' => $analysis['recommended_channel'],
+                'recommended_sla' => $analysis['recommended_sla'],
+                'action_reason' => $analysis['action_reason'],
+                'suggested_message' => $analysis['suggested_message'],
+                'stop_condition' => $analysis['stop_condition'],
+                'analyzed_at' => now(),
+            ]
+        );
+    }
+
+    private function llmInputHash(object $row): string
+    {
+        return hash('sha256', implode('|', [
+            (string) ($row->maker ?? ''),
+            (string) ($row->count_empanadas ?? ''),
+            (string) ($row->status_id ?? ''),
+            (string) ($row->user_id ?? ''),
+            (string) ($row->analysis_messages_body ?? ''),
+        ]));
+    }
+
+    /**
+     * @return array{
+     *     llm_used: bool,
+     *     llm_error: string|null,
+     *     llm_duration_ms: int|null,
+     *     model: string|null,
+     *     produce_empanadas: string,
+     *     estimated_daily_empanadas: int|null,
+     *     intent: string,
+     *     confidence: float|null,
+     *     evidence: string|null,
+     *     next_best_action: string,
+     *     recommended_channel: string,
+     *     recommended_sla: string,
+     *     action_reason: string|null,
+     *     suggested_message: string|null,
+     *     stop_condition: string|null
+     * }
+     */
+    private function analysisModelToArray(OpportunityLlmAnalysis $analysis): array
+    {
+        return [
+            'llm_used' => (bool) $analysis->llm_used,
+            'llm_error' => $analysis->llm_error,
+            'llm_duration_ms' => $analysis->llm_duration_ms,
+            'model' => $analysis->model,
+            'produce_empanadas' => $analysis->produce_empanadas,
+            'estimated_daily_empanadas' => $analysis->estimated_daily_empanadas,
+            'intent' => $analysis->intent,
+            'confidence' => $analysis->confidence !== null ? (float) $analysis->confidence : null,
+            'evidence' => $analysis->evidence,
+            'next_best_action' => $analysis->next_best_action,
+            'recommended_channel' => $analysis->recommended_channel,
+            'recommended_sla' => $analysis->recommended_sla,
+            'action_reason' => $analysis->action_reason,
+            'suggested_message' => $analysis->suggested_message,
+            'stop_condition' => $analysis->stop_condition,
+        ];
     }
 
     /**
