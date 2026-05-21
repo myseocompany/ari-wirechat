@@ -5,17 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AssociateRetellInboxCustomerRequest;
 use App\Http\Requests\CalculatorCustomersReportRequest;
 use App\Http\Requests\CustomerMessagesReportRequest;
-use App\Http\Requests\OpportunityReportRequest;
 use App\Http\Requests\LeadConversationClassificationReportRequest;
 use App\Http\Requests\LeadConversationClassificationRunRequest;
+use App\Http\Requests\OpportunityReportRequest;
 use App\Http\Requests\RetellInboxReportRequest;
 use App\Http\Requests\TwilioCallsReportRequest;
 use App\Models\Action;
 use App\Models\ActionType;
 use App\Models\Customer;
 use App\Models\CustomerMeta;
-use App\Models\CustomerStatus;
 use App\Models\CustomerSource;
+use App\Models\CustomerStatus;
 use App\Models\LeadConversationClassification;
 use App\Models\Project;
 use App\Models\Tag;
@@ -28,6 +28,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -820,6 +821,70 @@ class ReportController extends Controller
         return view('reports.views.opportunities', compact('model', 'summary', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'sources', 'users'));
     }
 
+    public function exportOpportunities(OpportunityReportRequest $request, OpportunityDetectorService $detector): Response
+    {
+        $filters = $request->validated();
+        $filters['limit'] = min(3000, max(10, (int) ($filters['limit'] ?? 500)));
+
+        $result = $detector->analyze($filters, 100);
+        $rows = collect($result['model']->items());
+
+        $headers = [
+            'ID',
+            'Prioridad',
+            'Score',
+            'Cliente',
+            'Telefono',
+            'Produce',
+            'Empanadas dia',
+            'Intencion',
+            'Accion',
+            'Canal',
+            'SLA',
+            'Asesor',
+            'Estado',
+            'IA',
+            'Evidencia',
+            'Mensaje sugerido',
+            'URL',
+        ];
+
+        $callback = function () use ($rows, $headers): void {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, $headers);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->id,
+                    $row->priority_label,
+                    $row->opportunity_score,
+                    $row->name,
+                    preg_replace('/\D+/', '', (string) $row->phone),
+                    $row->production_label,
+                    $row->estimated_daily_empanadas ?: '',
+                    $row->intent_label ?? '',
+                    $row->next_best_action_label ?? '',
+                    $row->recommended_channel_label ?? '',
+                    $row->recommended_sla ?? '',
+                    $row->user_name ?? 'Sin asignar',
+                    $row->status_name ?? 'Sin estado',
+                    $row->llm_used ? 'Si' : 'No',
+                    $row->llm_evidence ?: $row->production_evidence,
+                    $row->suggested_message,
+                    route('customers.show', $row->id),
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        $filename = 'oportunidades-'.now()->format('Ymd-His').'.csv';
+
+        return response()->streamDownload($callback, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
     public function twilioCalls(TwilioCallsReportRequest $request): View
     {
         $fromDate = $request->filled('from_date')
@@ -1092,7 +1157,7 @@ class ReportController extends Controller
                 'ri.resumen_llamada', 'ri.principal_error', 'ri.recomendacion',
                 'ri.payload', 'ri.created_at',
             ])
-            ->when(!empty($simulatorAgentIds), function ($query) use ($simulatorAgentIds) {
+            ->when(! empty($simulatorAgentIds), function ($query) use ($simulatorAgentIds) {
                 $query->whereIn('ri.agent_id', $simulatorAgentIds);
             }, function ($query) {
                 $query->whereNotNull('ri.escenario_detectado');

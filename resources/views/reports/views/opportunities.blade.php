@@ -15,6 +15,9 @@
   <a href="{{ url('/reports/views/customers_messages_count') }}?{{ http_build_query(request()->except('priority', 'unattended')) }}" class="inline-flex items-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
     Ver mensajes
   </a>
+  <a href="{{ route('reports.opportunities.export', request()->query()) }}" class="inline-flex items-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100">
+    Exportar CSV
+  </a>
 </div>
 
 <div class="mb-4 grid gap-3 md:grid-cols-5">
@@ -145,6 +148,10 @@
         <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
           <input type="checkbox" name="llm" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('llm')) checked @endif>
           Mostrar IA procesada
+        </label>
+        <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          <input type="checkbox" name="llm_only" value="1" class="rounded border-slate-300 text-[color:var(--ds-coral)] focus:ring-[color:var(--ds-coral)]" @if ($request->boolean('llm_only')) checked @endif>
+          Solo con IA
         </label>
         <span class="text-xs text-slate-400">La IA se procesa por cron; este filtro no llama OpenAI en vivo.</span>
       </div>

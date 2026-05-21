@@ -737,6 +737,10 @@ class OpportunityDetectorService
             $rows = $rows->where('is_unattended', true);
         }
 
+        if (! empty($filters['llm_only'])) {
+            $rows = $rows->where('llm_used', true);
+        }
+
         if (isset($filters['production_min']) && $filters['production_min'] !== '') {
             $rows = $rows->filter(fn ($row) => (int) ($row->estimated_daily_empanadas ?? 0) >= (int) $filters['production_min']);
         }
