@@ -9,7 +9,7 @@
   <div class="flex flex-col gap-1">
     <h1 class="mb-1">Agente de oportunidades</h1>
     <div class="text-xs text-slate-500">
-      {{ $summary['total'] }} prospectos analizados · {{ $summary['high'] }} alta prioridad · {{ $summary['unattended'] }} sin atender
+      {{ $summary['analyzed'] }} analizados de {{ $summary['candidate_total'] }} candidatos encontrados · {{ $summary['high'] }} alta prioridad · {{ $summary['unattended'] }} sin atender
     </div>
   </div>
   <a href="{{ url('/reports/views/customers_messages_count') }}?{{ http_build_query(request()->except('priority', 'unattended')) }}" class="inline-flex items-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
@@ -27,8 +27,9 @@
     <div class="mt-2 text-3xl font-bold text-amber-600">{{ $summary['medium'] }}</div>
   </div>
   <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Baja</div>
-    <div class="mt-2 text-3xl font-bold text-slate-500">{{ $summary['low'] }}</div>
+    <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Analizados</div>
+    <div class="mt-2 text-3xl font-bold text-slate-500">{{ $summary['analyzed'] }}</div>
+    <div class="mt-1 text-xs text-slate-400">de {{ $summary['candidate_total'] }} candidatos</div>
   </div>
   <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
     <div class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Sin atender</div>

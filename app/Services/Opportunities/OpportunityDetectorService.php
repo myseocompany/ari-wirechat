@@ -68,13 +68,18 @@ class OpportunityDetectorService
         $page = LengthAwarePaginator::resolveCurrentPage();
         $perPage = min(100, max(10, $perPage));
 
-        $rows = $this->baseRows($filters, $fromDate, $toDate, $limit);
+        $baseQuery = $this->baseQuery($filters, $fromDate, $toDate);
+        $candidateTotal = (clone $baseQuery)->count();
+        $rows = $this->baseRows($baseQuery, $limit);
         $rows = $this->attachHeavyData($rows);
         $rows = $this->scoreRows($rows);
         $rows = $this->applyComputedFilters($rows, $filters);
 
         $summary = [
             'total' => $rows->count(),
+            'analyzed' => $rows->count(),
+            'candidate_total' => $candidateTotal,
+            'limit' => $limit,
             'high' => $rows->where('priority', 'high')->count(),
             'medium' => $rows->where('priority', 'medium')->count(),
             'low' => $rows->where('priority', 'low')->count(),
@@ -122,9 +127,8 @@ class OpportunityDetectorService
 
     /**
      * @param array<string, mixed> $filters
-     * @return Collection<int, object>
      */
-    private function baseRows(array $filters, Carbon $fromDate, Carbon $toDate, int $limit): Collection
+    private function baseQuery(array $filters, Carbon $fromDate, Carbon $toDate): \Illuminate\Database\Eloquent\Builder
     {
         $messageStatsQuery = DB::table('wire_messages as wm')
             ->whereNotNull('wm.sendable_id')
@@ -213,7 +217,15 @@ class OpportunityDetectorService
                         ->whereColumn('ct.customer_id', 'customers.id')
                         ->whereIn('ct.tag_id', (array) $filters['tag_ids']);
                 });
-            })
+            });
+    }
+
+    /**
+     * @return Collection<int, object>
+     */
+    private function baseRows(\Illuminate\Database\Eloquent\Builder $baseQuery, int $limit): Collection
+    {
+        return $baseQuery
             ->orderByDesc('ms.last_message_at')
             ->orderByDesc('ms.messages_count')
             ->limit($limit)

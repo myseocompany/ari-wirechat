@@ -34,10 +34,11 @@ class DetectOpportunities extends Command
         $rows = collect($result['model']->items())->take(25);
 
         $this->info(sprintf(
-            'Oportunidades %s a %s: %d total, %d alta, %d media, %d sin atender.',
+            'Oportunidades %s a %s: %d analizados de %d candidatos, %d alta, %d media, %d sin atender.',
             $result['fromDate']->toDateString(),
             $result['toDate']->toDateString(),
-            $result['summary']['total'],
+            $result['summary']['analyzed'],
+            $result['summary']['candidate_total'],
             $result['summary']['high'],
             $result['summary']['medium'],
             $result['summary']['unattended']
