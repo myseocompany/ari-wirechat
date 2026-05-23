@@ -65,5 +65,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'check.api.token' => \App\Http\Middleware\CheckApiToken::class,
         'machine.token' => \App\Http\Middleware\MachineTokenAuth::class,
+        'mcp.token' => \App\Http\Middleware\EnsureMcpTokenIsValid::class,
     ];
 }
