@@ -3,6 +3,7 @@
 namespace App\Mcp\Servers;
 
 use App\Mcp\Tools\CrmAnalyticsSummaryTool;
+use App\Mcp\Tools\CustomerN8nCsvExportTool;
 use Laravel\Mcp\Server;
 
 class CrmAnalyticsServer extends Server
@@ -32,6 +33,7 @@ class CrmAnalyticsServer extends Server
      */
     protected array $tools = [
         CrmAnalyticsSummaryTool::class,
+        CustomerN8nCsvExportTool::class,
     ];
 
     /**
