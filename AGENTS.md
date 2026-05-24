@@ -52,6 +52,18 @@ This application is a Laravel application and its main Laravel ecosystems packag
 ## Laravel Boost
 - Laravel Boost is an MCP server that comes with powerful tools designed specifically for this application. Use them.
 
+## AriChat CRM MCP
+- When a task needs live CRM data, CRM summaries, exports for automations, or validation of the MCP tools exposed by this app, try to use the configured MCP server `arichat-crm` before falling back to direct database or SSH access.
+- The production HTTP endpoint is `https://arichat.co/mcp/crm-analytics` and Codex expects the bearer token in `ARICHAT_MCP_TOKEN`.
+- Available tools may change over time; list the MCP tools first when you need to discover the current capabilities.
+- If `arichat-crm` is unavailable or the token is not loaded in the current Codex session, state that briefly and continue with the best local/SSH fallback.
+
+## n8n Customer CSV Exports
+- For n8n customer CSV exports, use the production database functions `getPhone3(c.phone, c.phone2, c.contact_phone2)` and `format_name(c.name)` instead of reimplementing phone/name normalization in PHP.
+- Export columns as `customer_id,phone,name`, where `customer_id` is `c.id`, `phone` is `getPhone3(...)`, and `name` is `format_name(...)`. `getPhone3(...)` should return a clean WhatsApp-ready phone with country code when it can identify one.
+- Exclude rows where `getPhone3(...)` is null or empty so n8n does not receive customers without an exportable WhatsApp phone.
+- When excluding a previous campaign, filter actions by the exact `actions.note` text requested by the user, and remember that `actions` uses soft deletes.
+
 ## Artisan
 - Use the `list-artisan-commands` tool when you need to call an Artisan command to double check the available parameters.
 
