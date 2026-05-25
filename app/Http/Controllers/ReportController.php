@@ -28,10 +28,10 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
 {
@@ -821,7 +821,7 @@ class ReportController extends Controller
         return view('reports.views.opportunities', compact('model', 'summary', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'sources', 'users'));
     }
 
-    public function exportOpportunities(OpportunityReportRequest $request, OpportunityDetectorService $detector): Response
+    public function exportOpportunities(OpportunityReportRequest $request, OpportunityDetectorService $detector): StreamedResponse
     {
         $filters = $request->validated();
         $filters['limit'] = min(3000, max(10, (int) ($filters['limit'] ?? 500)));

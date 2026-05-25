@@ -1,0 +1,323 @@
+{
+  "name": "💡EBL_Google_Sheets_WhatsApp texto con errores",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sheetId": "1CA-79JIowyOpokFve_LCojhDzigC01BqxSoD9Q782Ug",
+        "range": "datasheet",
+        "options": {}
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        144
+      ],
+      "id": "832dea26-31a6-4cd4-bfad-0254a0245d4f",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "71jBjK32UojqtZBO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 50,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -272,
+        144
+      ],
+      "id": "80e1a7eb-c03f-4035-b809-815182b78f64",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": "=30"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        816,
+        160
+      ],
+      "id": "64b10965-9de4-45f2-9a1d-479a5aedf0e8",
+      "name": "Wait",
+      "webhookId": "6885ec8b-a63a-4d5e-b295-008f8fc33e0a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/771764079364202/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAYXv9KcpsQBRWsxHKDdlI4hF0clMOvVJEgUoKOVUWjpbZAANR4p0lcjZBNAi2ZBAiQPiRvplE2ycLr1vwWuf0aqWkTOa9Jfl8kYFlMseWicGf1HZBY7MLXZA62ZAUB78p87GjKgraw1GeKcW4iWqOpM8WYLRikXohHaESt9QOSgyd2mRsdHgDk4qHfIDq7IPeqAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Loop Over Items').item.json.Telefono }}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"safetybogota_today\",\n    \"language\": {\n      \"code\": \"es\"\n    },\n    \"components\": [\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Loop Over Items').item.json.name }}\"\n          }\n        ]\n      }\n    ]\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        160
+      ],
+      "id": "dbd2d12b-61f2-429a-b63f-a876b2a76cb6",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d61110ee-6ead-4fbc-98ce-5e4e669eec57",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "Telefono",
+        "include": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        0,
+        160
+      ],
+      "id": "e5730323-6558-4dfa-94e5-35770f7d62ec",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "check-wamid",
+              "leftValue": "={{ $json.body.messages[0].id }}",
+              "rightValue": "wamid.",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        416,
+        160
+      ],
+      "id": "690d5a2c-9762-4d54-a360-80bdde62cb41",
+      "name": "¿WA Enviado?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://aricrm.com.co/api/actions/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"customer_id\":\"{{ $('Loop Over Items').item.json.Id }}\",\n\"note\":\"Masivo WA enviado: Safety hoy\",\n\"type_id\":\"8\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        48
+      ],
+      "id": "7229f818-1395-43c4-a512-322a8e094605",
+      "name": "CRM: WA Enviado"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://aricrm.com.co/api/actions/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"customer_id\":\"{{ $('Loop Over Items').item.json.Id }}\",\n\"note\":\"Masivo WA no enviado: Safety hoy\",\n\"type_id\":\"15\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        224
+      ],
+      "id": "2e8f607b-3f70-4726-bad7-a8dcd604a172",
+      "name": "CRM: WA No Enviado",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        144
+      ],
+      "id": "9920ff9e-233e-49c9-adf0-313196576209",
+      "name": "When clicking 'Execute workflow'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "¿WA Enviado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿WA Enviado?": {
+      "main": [
+        [
+          {
+            "node": "CRM: WA Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CRM: WA No Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM: WA Enviado": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM: WA No Enviado": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "fc973614-37e5-468f-9c61-0e97e1022c7c",
+  "meta": {
+    "instanceId": "214d3d107d90a37f93970729696a21c6c4484e8739a264cbd219ef20ed05bd59"
+  },
+  "id": "n5jddSba69JvH7xygsqmC",
+  "tags": []
+}

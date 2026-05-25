@@ -38,10 +38,21 @@
       ]);
   }
 
-  // Detectamos cambios de asignación o estado en historial
+  $timeline->push([
+      'type' => 'estado',
+      'date' => $customer->updated_at,
+      'status' => $customer->status->name ?? $customer->status_id,
+      'assigned_to' => $customer->user->name ?? 'Sin asignar',
+      'editor' => $customer->updated_user->name ?? 'Desconocido',
+      'color' => $customer->status->color ?? 'gray',
+      'is_current' => true,
+  ]);
+
   $prevUserId = null;
+  $prevStatusId = null;
   foreach ($customer->histories->sortBy('updated_at') as $history) {
       $currentUserId = $history->user_id;
+      $currentStatusId = $history->status_id;
       $asignadoA = $history->user->name ?? 'Sin asignar';
       $editor = $history->updated_user->name ?? 'Desconocido';
 
@@ -55,16 +66,20 @@
           ]);
       }
 
-      $timeline->push([
-          'type' => 'estado',
-          'date' => $history->updated_at,
-          'status' => $history->status->name ?? $history->status_id,
-          'assigned_to' => $asignadoA,
-          'editor' => $editor,
-          'color' => $history->status->color ?? 'gray',
-      ]);
+      if ($prevStatusId !== null && $currentStatusId != $prevStatusId) {
+          $timeline->push([
+              'type' => 'estado',
+              'date' => $history->updated_at,
+              'status' => $history->status->name ?? $history->status_id,
+              'assigned_to' => $asignadoA,
+              'editor' => $editor,
+              'color' => $history->status->color ?? 'gray',
+              'is_current' => false,
+          ]);
+      }
 
       $prevUserId = $currentUserId;
+      $prevStatusId = $currentStatusId;
   }
 
   foreach ($chatMessages as $message) {

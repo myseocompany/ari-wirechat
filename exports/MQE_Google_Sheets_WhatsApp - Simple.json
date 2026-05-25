@@ -1,0 +1,322 @@
+{
+  "name": "MQE_Google_Sheets_WhatsApp - Simple",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        112,
+        -240
+      ],
+      "id": "3731d960-ebfd-4e3b-b5b2-c73ba9713b02"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sheetId": "1lrFEVDY0hM726OA1ThtGF8vq2sNQDdb8al5PPnijebE",
+        "range": "dataSheet",
+        "options": {}
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        304,
+        -240
+      ],
+      "id": "5e0e9cff-1b2b-4997-adc5-0cb7f6439b08",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "71jBjK32UojqtZBO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 100,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        480,
+        -240
+      ],
+      "id": "0d5c20a9-0f09-416d-97ed-9c24bb03b8da",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": "=30"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1360,
+        -224
+      ],
+      "id": "d7f26aba-c77c-4f20-af77-d126c9b9b1e6",
+      "name": "Wait",
+      "webhookId": "17692b5c-6322-4854-8ed4-3054b4a80864"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/331909369994463/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAJfCeNH6EwBPZBIIUZC4PLlEFO1GcgnxZBDeSUS4ZCj7yUEPuHbMN19ubnQ83nuXN92sZCFWfRkbAKVpZADkdQJabzSDQZA74yT5vDIoKMItomGw7REfnvD3vuLpHNZAFc91UMoOUDt9KZC909E8xZBfGBAVuX4nhLAqFw9LuQSAe22scyRQtL19MNfMnMCDwoAZDZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Loop Over Items').item.json.Telefono }}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"alimentec2026\",\n    \"language\": {\n      \"code\": \"es\"\n    },\n    \"components\": [\n      {\n        \"type\": \"header\",\n        \"parameters\": [\n          {\n            \"type\": \"image\",\n            \"image\": {\n              \"link\": \"https://arichat.co/img/alimentec_2026_tu.jpg\"\n            }\n          }\n        ]\n      },\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Loop Over Items').item.json.name }}\"\n          }\n        ]\n      }\n    ]\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        -224
+      ],
+      "id": "24b1ab31-d54c-4a5e-8673-1043110f5373",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        752,
+        -384
+      ],
+      "id": "d75b8c0c-ee68-4eda-bfde-793e1410ab35",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "Telefono",
+        "include": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        752,
+        -224
+      ],
+      "id": "ce413d43-47bf-4133-9a35-058c1f508ab9",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "check-wamid",
+              "leftValue": "={{ $json.body.messages[0].id }}",
+              "rightValue": "wamid.",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        -224
+      ],
+      "id": "0ec26ea2-5ad0-4b8b-8dc3-4ab22f7f0e26",
+      "name": "¿WA Enviado?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://arichat.co/api/actions/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"customer_id\":\"{{ $('Loop Over Items').item.json.Id }}\",\n\"note\":\"Masivo WA enviado: alimentec2026\",\n\"type_id\":\"14\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        -304
+      ],
+      "id": "87a7968b-16b6-4cb8-94ea-5d3a6fd3113e",
+      "name": "CRM: WA Enviado"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://arichat.co/api/actions/save",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"customer_id\":\"{{ $('Loop Over Items').item.json.Id }}\",\n\"note\":\"Masivo WA no enviado: alimentec2026\",\n\"type_id\":\"15\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        -144
+      ],
+      "id": "8d6a0561-47bb-460f-b469-7f8a5cc8d052",
+      "name": "CRM: WA No Enviado",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "¿WA Enviado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿WA Enviado?": {
+      "main": [
+        [
+          {
+            "node": "CRM: WA Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CRM: WA No Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM: WA Enviado": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM: WA No Enviado": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "357a6d47-f3bc-4df3-b926-1c9fe68b58d3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "214d3d107d90a37f93970729696a21c6c4484e8739a264cbd219ef20ed05bd59"
+  },
+  "id": "YiOkiGekMGKn9PhV",
+  "tags": []
+}

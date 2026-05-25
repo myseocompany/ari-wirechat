@@ -85,10 +85,14 @@ class OpportunityDetectorService
         $rows = $this->attachHeavyData($rows);
         $rows = $this->scoreRows($rows);
         $rows = $this->attachCachedLlmAnalyses($rows);
+        $llmPending = $rows->filter(fn ($row) => $this->shouldAnalyzeWithLlm($row) && $this->needsFreshLlmAnalysis($row))->count();
         $rows = $this->analyzeAmbiguousRowsWithLlm($rows, $filters);
         $rows = $this->applyComputedFilters($rows, $filters);
 
         $summary = [
+            'total_leads_range' => $candidateTotal,
+            'llm_pending' => $llmPending,
+            'llm_analyzed' => $rows->where('llm_used', true)->count(),
             'total' => $rows->count(),
             'analyzed' => $rows->count(),
             'candidate_total' => $candidateTotal,
@@ -100,7 +104,6 @@ class OpportunityDetectorService
             'makers' => $rows->where('production_status', 'makes')->count(),
             'projects' => $rows->where('production_status', 'project')->count(),
             'production_known' => $rows->filter(fn ($row) => (int) ($row->estimated_daily_empanadas ?? 0) > 0)->count(),
-            'llm_analyzed' => $rows->where('llm_used', true)->count(),
         ];
 
         $pageRows = $rows->slice(($page - 1) * $perPage, $perPage)->values();

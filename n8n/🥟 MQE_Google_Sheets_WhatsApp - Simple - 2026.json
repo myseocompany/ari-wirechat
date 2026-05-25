@@ -1,0 +1,345 @@
+{
+  "name": "🥟 MQE_Google_Sheets_WhatsApp - Simple - 2026",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        144
+      ],
+      "id": "5d746b72-4dfc-4cd4-8150-9c8980631027"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "sheetId": "1lrFEVDY0hM726OA1ThtGF8vq2sNQDdb8al5PPnijebE",
+        "range": "dataSheet",
+        "options": {}
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        144
+      ],
+      "id": "3c94285c-1a0b-4774-b2fe-176c9b639ebb",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "71jBjK32UojqtZBO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -272,
+        144
+      ],
+      "id": "23a85b75-4948-4702-b5dd-28dc90d6de42",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": "=30"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        816,
+        160
+      ],
+      "id": "5ed7498f-b7e0-43d8-b971-d61281a4da55",
+      "name": "Wait",
+      "webhookId": "17692b5c-6322-4854-8ed4-3054b4a80864"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v22.0/331909369994463/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer EAAJfCeNH6EwBPZBIIUZC4PLlEFO1GcgnxZBDeSUS4ZCj7yUEPuHbMN19ubnQ83nuXN92sZCFWfRkbAKVpZADkdQJabzSDQZA74yT5vDIoKMItomGw7REfnvD3vuLpHNZAFc91UMoOUDt9KZC909E8xZBfGBAVuX4nhLAqFw9LuQSAe22scyRQtL19MNfMnMCDwoAZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $('Loop Over Items').item.json.Telefono }}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"alimentec2026_reactivar\",\n    \"language\": {\n      \"code\": \"es\"\n    },\n    \"components\": [\n      {\n        \"type\": \"header\",\n        \"parameters\": [\n          {\n            \"type\": \"image\",\n            \"image\": {\n              \"link\": \"https://arichat.co/img/alimentec_2026_tu.jpg\"\n            }\n          }\n        ]\n      },\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Loop Over Items').item.json.name }}\"\n          }\n        ]\n      }\n    ]\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        160
+      ],
+      "id": "a7082529-deca-4c4a-82ce-7d55dca6e891",
+      "name": "HTTP Request WA",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ab074dbb-d96d-4259-b3a5-c3d6b2b57929",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "Telefono",
+        "include": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        0,
+        160
+      ],
+      "id": "08f4f710-960e-4ad9-a955-7a1cdd471729",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://arichat.co/api/actions/save",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"customer_id\": \"{{ $('Loop Over Items').item.json.Id }}\",\n  \"note\": \"Masivo WA enviado: alimentec2026\",\n  \"type_id\": \"14\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        64
+      ],
+      "id": "ce3e7a84-291e-4bcc-b601-fa8791437dee",
+      "name": "CRM: WA Enviado",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "check-wamid",
+              "leftValue": "={{ $json.body?.messages?.[0]?.id || '' }}",
+              "rightValue": "wamid.",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        416,
+        160
+      ],
+      "id": "50601169-e70e-4aa7-8072-7048df2f6b1c",
+      "name": "¿WA Enviado?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://arichat.co/api/actions/save",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"customer_id\": \"{{ $('Loop Over Items').item.json.Id }}\",\n  \"note\": \"Masivo WA no enviado: alimentec2026\",\n  \"type_id\": \"15\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        256
+      ],
+      "id": "82d2b008-4bdf-451e-b0af-30220bbafef4",
+      "name": "CRM: WA No Enviado",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request WA": {
+      "main": [
+        [
+          {
+            "node": "¿WA Enviado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request WA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿WA Enviado?": {
+      "main": [
+        [
+          {
+            "node": "CRM: WA Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "CRM: WA No Enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM: WA Enviado": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM: WA No Enviado": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "82d14465-da7d-46db-9bb3-29e6b975d41e",
+  "meta": {
+    "instanceId": "214d3d107d90a37f93970729696a21c6c4484e8739a264cbd219ef20ed05bd59"
+  },
+  "id": "0WBmZEZUuQs7l9W_VpAnF",
+  "tags": []
+}

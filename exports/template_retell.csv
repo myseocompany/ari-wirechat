@@ -1,0 +1,7 @@
+phone number,ignore e164 validation,dynamic variable1,dynamic variable2,metadata,custom_sip_headers
++14001231234,false,value1 (optional),value2 (optional),{"key":"value"},{"X-Custom-Header":"value"}
+Only the phone number is required. Feel free to add or remove the other columns.
+Set ignore e164 validation to true to skip E164 format validation for phone numbers.
+Metadata must be a valid JSON string (e.g., {"key": "value"}).
+custom_sip_headers must be a valid JSON string with keys starting with X- (e.g., {"X-Custom-Header": "value"}).
+,,,,
