@@ -643,9 +643,6 @@ Route::get('/reports/missing-customer-files/verify-month', [ReportController::cl
 Route::get('/reports/missing-customer-files', [ReportController::class, 'missingCustomerFiles'])
     ->name('reports.missing_customer_files');
 
-Route::get('/reports/missing-customer-files/verify/{customer}', [ReportController::class, 'verifyCustomerFiles'])
-    ->name('reports.missing_customer_files.verify'); // AJAX
-
 Route::get(
     '/reports/missing-customer-files/{customer}/verify',
     [ReportController::class, 'verifyCustomer']
