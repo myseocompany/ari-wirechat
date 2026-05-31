@@ -102,7 +102,30 @@
       ]);
   }
 
-  $timeline = $timeline->sortByDesc('date');
+  $timeline = $timeline->sort(function (array $left, array $right) {
+      $leftTimestamp = empty($left['date']) ? 0 : \Carbon\Carbon::parse($left['date'])->getTimestamp();
+      $rightTimestamp = empty($right['date']) ? 0 : \Carbon\Carbon::parse($right['date'])->getTimestamp();
+
+      if ($leftTimestamp !== $rightTimestamp) {
+          return $rightTimestamp <=> $leftTimestamp;
+      }
+
+      $typePriority = [
+          'chat' => 40,
+          'action' => 30,
+          'estado' => 20,
+          'asignacion' => 10,
+      ];
+
+      $leftPriority = $typePriority[$left['type']] ?? 0;
+      $rightPriority = $typePriority[$right['type']] ?? 0;
+
+      if ($leftPriority !== $rightPriority) {
+          return $rightPriority <=> $leftPriority;
+      }
+
+      return ((int) ($right['id'] ?? 0)) <=> ((int) ($left['id'] ?? 0));
+  })->values();
 @endphp
 
 <div class="space-y-3">
