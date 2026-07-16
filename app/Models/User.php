@@ -10,11 +10,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\Contracts\OAuthenticatable;
+use Laravel\Passport\HasApiTokens;
 use Namu\WireChat\Traits\Chatable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements OAuthenticatable
 {
     use Chatable;
+    use HasApiTokens;
     use HasFactory, Notifiable;
 
     /**

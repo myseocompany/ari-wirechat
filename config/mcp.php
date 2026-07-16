@@ -27,7 +27,8 @@ return [
 
     'redirect_domains' => [
         env('APP_URL', 'http://localhost'),
-        // 'https://example.com',
+        'https://claude.ai',
+        'https://claude.com',
     ],
 
 ];
