@@ -227,6 +227,19 @@ class OpportunityDetectorService
                         ->where('filter_actions.note', 'like', '%'.$filters['action_note_search'].'%');
                 });
             })
+            ->when(! empty($filters['notes_tags']), function ($query) use ($filters) {
+                $tags = $this->parseNotesTags((string) $filters['notes_tags']);
+
+                if ($tags === []) {
+                    return;
+                }
+
+                $query->where(function ($tagQuery) use ($tags) {
+                    foreach ($tags as $tag) {
+                        $tagQuery->orWhere('customers.notes', 'like', '%'.$tag.'%');
+                    }
+                });
+            })
             ->when(! empty($filters['tag_none']), function ($query) {
                 $query->whereNotExists(function ($subQuery) {
                     $subQuery->selectRaw('1')
@@ -242,6 +255,19 @@ class OpportunityDetectorService
                         ->whereIn('ct.tag_id', (array) $filters['tag_ids']);
                 });
             });
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function parseNotesTags(string $value): array
+    {
+        return collect(preg_split('/[\s,;]+/', $value) ?: [])
+            ->map(fn (string $tag): string => trim($tag))
+            ->filter(fn (string $tag): bool => $tag !== '')
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**

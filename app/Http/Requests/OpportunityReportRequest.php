@@ -18,6 +18,7 @@ class OpportunityReportRequest extends FormRequest
             'messages_max' => ['nullable', 'integer', 'min:0', 'gte:messages_min'],
             'message_search' => ['nullable', 'string', 'max:200'],
             'action_note_search' => ['nullable', 'string', 'max:200'],
+            'notes_tags' => ['nullable', 'string', 'max:500'],
             'status_ids' => ['nullable', 'array'],
             'status_ids.*' => ['integer', 'exists:customer_statuses,id'],
             'tag_ids' => ['nullable', 'array'],

@@ -86,6 +86,10 @@
         <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="action_note_search" name="action_note_search" value="{{ $request->action_note_search }}">
       </div>
       <div class="col-span-12 flex flex-col gap-1 lg:col-span-4">
+        <label for="notes_tags" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Tags en notas</label>
+        <input class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none" type="text" id="notes_tags" name="notes_tags" value="{{ $request->notes_tags }}" placeholder="#alimentec2026_meta_ads, #alimentec2026_WP">
+      </div>
+      <div class="col-span-12 flex flex-col gap-1 lg:col-span-4">
         <label for="status_ids" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Estados</label>
         <select id="status_ids" name="status_ids[]" multiple class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none">
           @foreach ($statuses as $status)
