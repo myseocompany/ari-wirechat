@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <form action="{{ route('reports.opportunities') }}" method="GET" class="rounded-lg border border-slate-200 bg-white">
+  <form action="{{ route('reports.opportunities') }}" method="GET" class="rounded-lg border border-slate-200 bg-white" data-opportunities-loading-form>
     <details>
       <summary class="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-slate-700">
         <span>Filtros</span>
@@ -259,10 +259,55 @@
         </tbody>
       </table>
     </div>
-    <div class="border-t border-slate-200 px-4 py-3">
+    <div class="border-t border-slate-200 px-4 py-3" data-opportunities-loading-links>
       {{ $model->onEachSide(1)->links() }}
     </div>
   </div>
 </div>
 
+<div id="opportunities-loading" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-white/70 backdrop-blur-sm">
+  <div class="flex min-w-[240px] flex-col items-center gap-3 rounded-lg border border-slate-200 bg-white px-6 py-5 text-center shadow-lg">
+    <div class="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-900"></div>
+    <div>
+      <p class="text-sm font-semibold text-slate-900">Cargando analisis</p>
+      <p class="mt-1 text-xs text-slate-500">Esto puede tardar unos segundos.</p>
+    </div>
+  </div>
+</div>
+
 @endsection
+
+@push('scripts')
+  <script>
+    (function () {
+      var loading = document.getElementById('opportunities-loading');
+      if (!loading) {
+        return;
+      }
+
+      function showLoading() {
+        loading.classList.remove('hidden');
+        loading.classList.add('flex');
+      }
+
+      function hideLoading() {
+        loading.classList.add('hidden');
+        loading.classList.remove('flex');
+      }
+
+      document.querySelectorAll('[data-opportunities-loading-form]').forEach(function (form) {
+        form.addEventListener('submit', function () {
+          showLoading();
+        });
+      });
+
+      document.querySelectorAll('[data-opportunities-loading-links] a[href]').forEach(function (link) {
+        link.addEventListener('click', function () {
+          showLoading();
+        });
+      });
+
+      window.addEventListener('pageshow', hideLoading);
+    })();
+  </script>
+@endpush
