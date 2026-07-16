@@ -464,6 +464,7 @@ class OpportunityDetectorService
             ->keyBy('customer_id');
 
         foreach ($rows as $row) {
+            $row->llm_analysis_is_fresh = false;
             $analysis = $analyses->get($row->id);
 
             if (! $analysis || $analysis->input_hash !== $this->llmInputHash($row)) {
@@ -471,6 +472,7 @@ class OpportunityDetectorService
             }
 
             $this->applyLlmAnalysis($row, $this->analysisModelToArray($analysis));
+            $row->llm_analysis_is_fresh = true;
         }
 
         return $this->sortRows($rows);
@@ -478,6 +480,10 @@ class OpportunityDetectorService
 
     private function needsFreshLlmAnalysis(object $row): bool
     {
+        if (property_exists($row, 'llm_analysis_is_fresh')) {
+            return ! (bool) $row->llm_analysis_is_fresh;
+        }
+
         return ! OpportunityLlmAnalysis::query()
             ->where('customer_id', $row->id)
             ->where('input_hash', $this->llmInputHash($row))
