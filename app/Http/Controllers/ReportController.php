@@ -10,6 +10,7 @@ use App\Http\Requests\LeadConversationClassificationRunRequest;
 use App\Http\Requests\OpportunityReportRequest;
 use App\Http\Requests\RetellInboxReportRequest;
 use App\Http\Requests\TwilioCallsReportRequest;
+use App\Http\Requests\WirechatIncomingMessagesReportRequest;
 use App\Models\Action;
 use App\Models\ActionType;
 use App\Models\Customer;
@@ -1333,6 +1334,85 @@ class ReportController extends Controller
         return view('reports.views.customers_lead_classifications', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
     }
 
+    public function wirechatIncomingMessages(WirechatIncomingMessagesReportRequest $request): View
+    {
+        [$fromDate, $toDate, $selectedRange] = $this->resolveWirechatMessagesDateRange($request);
+        $customerMorph = (new Customer)->getMorphClass();
+
+        $baseQuery = DB::table('wire_messages')
+            ->join('customers', 'customers.id', '=', 'wire_messages.sendable_id')
+            ->leftJoin('users', 'users.id', '=', 'customers.user_id')
+            ->where('wire_messages.sendable_type', $customerMorph)
+            ->whereNull('wire_messages.deleted_at');
+
+        if ($fromDate && $toDate) {
+            $baseQuery->whereBetween('wire_messages.created_at', [$fromDate, $toDate]);
+        }
+
+        if ($request->filled('customer_search')) {
+            $searchTerm = '%'.$request->string('customer_search').'%';
+            $baseQuery->where(function ($query) use ($searchTerm): void {
+                $query
+                    ->where('customers.name', 'like', $searchTerm)
+                    ->orWhere('customers.phone', 'like', $searchTerm)
+                    ->orWhere('customers.phone2', 'like', $searchTerm)
+                    ->orWhere('customers.contact_phone2', 'like', $searchTerm)
+                    ->orWhere('customers.business', 'like', $searchTerm);
+            });
+        }
+
+        if ($request->filled('message_search')) {
+            $searchTerm = '%'.$request->string('message_search').'%';
+            $baseQuery->where('wire_messages.body', 'like', $searchTerm);
+        }
+
+        $totalMessages = (clone $baseQuery)->count();
+        $totalCustomers = (clone $baseQuery)->distinct('customers.id')->count('customers.id');
+        $totalConversations = (clone $baseQuery)
+            ->whereNotNull('wire_messages.conversation_id')
+            ->distinct('wire_messages.conversation_id')
+            ->count('wire_messages.conversation_id');
+
+        $dailyMessages = (clone $baseQuery)
+            ->selectRaw('date(wire_messages.created_at) as message_date')
+            ->selectRaw('count(*) as total')
+            ->groupBy('message_date')
+            ->orderBy('message_date')
+            ->get();
+
+        $recentMessages = (clone $baseQuery)
+            ->select([
+                'wire_messages.id',
+                'wire_messages.conversation_id',
+                'wire_messages.body',
+                'wire_messages.type',
+                'wire_messages.created_at',
+                'customers.id as customer_id',
+                'customers.name as customer_name',
+                'customers.phone',
+                'customers.phone2',
+                'customers.contact_phone2',
+                'customers.business',
+                'users.name as user_name',
+            ])
+            ->orderByDesc('wire_messages.created_at')
+            ->paginate(50)
+            ->withQueryString();
+
+        return view('reports.views.wirechat_incoming_messages', [
+            'dailyMessages' => $dailyMessages,
+            'filterOptions' => $this->wirechatMessagesFilterOptions(),
+            'fromDate' => $fromDate?->toDateString(),
+            'recentMessages' => $recentMessages,
+            'request' => $request,
+            'selectedRange' => $selectedRange,
+            'toDate' => $toDate?->toDateString(),
+            'totalConversations' => $totalConversations,
+            'totalCustomers' => $totalCustomers,
+            'totalMessages' => $totalMessages,
+        ]);
+    }
+
     public function runCustomersLeadClassifications(
         LeadConversationClassificationRunRequest $request,
         LeadConversationClassifier $classifier
@@ -1377,6 +1457,51 @@ class ReportController extends Controller
         return redirect()
             ->to('/reports/views/customers_lead_classifications?'.http_build_query($request->safe()->except('limit')))
             ->with('status', "Clasificación ejecutada ({$rangeLabel}). Conversaciones encontradas: {$foundCount}. Límite: {$limitLabel}. Procesadas: {$processed}. Omitidas: {$skipped}.");
+    }
+
+    /**
+     * @return array{0: Carbon|null, 1: Carbon|null, 2: string}
+     */
+    private function resolveWirechatMessagesDateRange(WirechatIncomingMessagesReportRequest $request): array
+    {
+        $range = $request->string('range', 'today')->toString();
+        $now = now();
+
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            return [
+                Carbon::parse($request->string('from_date'))->startOfDay(),
+                Carbon::parse($request->string('to_date'))->endOfDay(),
+                'custom',
+            ];
+        }
+
+        return match ($range) {
+            'today' => [$now->copy()->subDay()->setTime(17, 0), $now->copy()->endOfDay(), 'today'],
+            'yesterday' => [$now->copy()->subDay()->startOfDay(), $now->copy()->subDay()->endOfDay(), 'yesterday'],
+            'weekly' => [$now->copy()->startOfWeek(), $now->copy()->endOfWeek(), 'weekly'],
+            'monthly' => [$now->copy()->startOfMonth(), $now->copy()->endOfMonth(), 'monthly'],
+            'last30' => [$now->copy()->subDays(29)->startOfDay(), $now->copy()->endOfDay(), 'last30'],
+            'last60' => [$now->copy()->subDays(59)->startOfDay(), $now->copy()->endOfDay(), 'last60'],
+            'last90' => [$now->copy()->subDays(89)->startOfDay(), $now->copy()->endOfDay(), 'last90'],
+            default => [null, null, 'all'],
+        };
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function wirechatMessagesFilterOptions(): array
+    {
+        return [
+            'today' => 'Hoy',
+            'yesterday' => 'Ayer',
+            'weekly' => 'Semana',
+            'monthly' => 'Mes',
+            'last30' => 'Ultimos 30',
+            'last60' => 'Ultimos 60',
+            'last90' => 'Ultimos 90',
+            'all' => 'Todo',
+        ];
     }
 
     public function customersStatusEightConversations(Request $request): View

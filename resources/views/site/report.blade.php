@@ -28,6 +28,9 @@
 	<a href="/reports/views/retell_inbox" class="list-group-item">Reporte de Retell Inbox</a>
 </div>
 <div class="list-group">
+	<a href="{{ route('reports.wirechat_incoming_messages') }}" class="list-group-item">Reporte de mensajes entrantes de Wirechat</a>
+</div>
+<div class="list-group">
 	<a href="https://lookerstudio.google.com/u/0/reporting/04988fbd-8e80-4f63-bfc8-a3b6f4c004d9/page/uIHMD" 
 	class="list-group-item" target="_blank">Reporte satisfacción</a>
 </div>
