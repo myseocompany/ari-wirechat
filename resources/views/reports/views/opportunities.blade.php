@@ -12,9 +12,6 @@
       {{ $summary['total_leads_range'] }} leads en rango · {{ $summary['llm_pending'] }} con dudas (IA pendiente) · {{ $summary['llm_analyzed'] }} analizados con IA
     </div>
   </div>
-  <a href="{{ url('/reports/views/customers_messages_count') }}?{{ http_build_query(request()->except('priority', 'unattended')) }}" class="inline-flex items-center rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
-    Ver mensajes
-  </a>
   <a href="{{ route('reports.opportunities.export', request()->query()) }}" class="inline-flex items-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100">
     Exportar CSV
   </a>
