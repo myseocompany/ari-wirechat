@@ -9,11 +9,11 @@ use App\Http\Requests\GoogleAdsLeadRequest;
 use App\Http\Requests\UpdateCustomerFromRdRequest;
 use App\Jobs\ForwardN8nWebhook;
 use App\Jobs\RetellProcessCall;
+use App\Jobs\SendCampaignToCustomer;
 use App\Models\Action;
 use App\Models\ActionType;
 use App\Models\ActivityLog;
 use App\Models\AudienceCustomer;
-use App\Models\Campaign;
 use App\Models\ChannelsWebhookLog;
 use App\Models\Country;
 use App\Models\Customer;
@@ -3670,24 +3670,25 @@ class APIController extends Controller
         return $model?->id;
     }
 
-    public function sendCampaign(Request $request, $campaign_id, $customer_id)
+    public function sendCampaign(Request $request, $campaign_id, $customer_id): JsonResponse
     {
-
-        $campaign = Campaign::find($campaign_id);
-        if (! $campaign) {
-            return;
-        }
-
-        \Log::info('campaign=>', [$campaign]);
-
-        $customer = Customer::find($customer_id);
-        if (! $customer) {
-            return;
-        }
-
         $channel = $request->get('channel');
 
-        app(WhatsAppService::class)->sendCampaignMessages($campaign, $customer, $channel);
+        SendCampaignToCustomer::dispatch(
+            (int) $campaign_id,
+            (int) $customer_id,
+            is_string($channel) && $channel !== '' ? $channel : null
+        );
+
+        Log::info('Campaign send accepted and queued', [
+            'campaign_id' => (int) $campaign_id,
+            'customer_id' => (int) $customer_id,
+            'channel' => $channel,
+        ]);
+
+        return response()->json([
+            'message' => 'Campaña WhatsApp encolada',
+        ], 202);
     }
 
     public function sendToN8n($cid)
