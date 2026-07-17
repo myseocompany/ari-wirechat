@@ -30,6 +30,8 @@ class WhatsAppWebhookForwarder
                     'status' => $response->status(),
                     'body' => Str::limit($response->body(), 1000),
                 ]);
+
+                $response->throw();
             } else {
                 Log::info('SellerChat webhook forward ok', [
                     'status' => $response->status(),
@@ -40,6 +42,8 @@ class WhatsAppWebhookForwarder
             Log::warning('SellerChat webhook forward exception', [
                 'error' => $exception->getMessage(),
             ]);
+
+            throw $exception;
         }
     }
 }

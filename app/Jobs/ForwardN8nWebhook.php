@@ -42,6 +42,8 @@ class ForwardN8nWebhook implements ShouldQueue
                     'status' => $response->status(),
                     'body' => Str::limit($response->body(), 1000),
                 ]);
+
+                $response->throw();
             } else {
                 Log::info('N8n webhook forward ok', [
                     'url' => $this->url,
@@ -54,6 +56,8 @@ class ForwardN8nWebhook implements ShouldQueue
                 'url' => $this->url,
                 'error' => $exception->getMessage(),
             ]);
+
+            throw $exception;
         }
     }
 }
