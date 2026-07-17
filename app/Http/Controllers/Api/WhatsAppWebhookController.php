@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WhatsAppWebhookRequest;
-use App\Services\WhatsAppInboundMessageService;
-use App\Services\WhatsAppWebhookForwarder;
+use App\Jobs\ForwardSellerChatWebhook;
+use App\Jobs\ProcessSellerChatInboundWebhook;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -35,9 +35,7 @@ class WhatsAppWebhookController extends Controller
     }
 
     public function receive(
-        WhatsAppWebhookRequest $request,
-        WhatsAppInboundMessageService $service,
-        WhatsAppWebhookForwarder $forwarder
+        WhatsAppWebhookRequest $request
     ): Response {
         Log::info('WhatsApp webhook received', [
             'has_entry' => $request->has('entry'),
@@ -45,8 +43,8 @@ class WhatsAppWebhookController extends Controller
             'signature_present' => $request->hasHeader('X-Hub-Signature-256'),
         ]);
 
-        $service->handle($request->all());
-        $forwarder->forward(
+        ProcessSellerChatInboundWebhook::dispatch($request->all());
+        ForwardSellerChatWebhook::dispatch(
             $request->getContent(),
             array_filter([
                 'X-Hub-Signature-256' => $request->header('X-Hub-Signature-256'),

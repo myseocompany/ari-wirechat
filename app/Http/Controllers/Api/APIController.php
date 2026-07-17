@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GoogleAdsLeadRequest;
 use App\Http\Requests\UpdateCustomerFromRdRequest;
+use App\Jobs\ForwardN8nWebhook;
 use App\Jobs\RetellProcessCall;
 use App\Models\Action;
 use App\Models\ActionType;
@@ -3691,24 +3692,13 @@ class APIController extends Controller
 
     public function sendToN8n($cid)
     {
-        // Define tu URL de producción del Webhook en n8n
         $webhookUrl = 'https://n8n-1-85-1.onrender.com/webhook/5977d7f0-ace7-4daf-9ead-cd6f1856fbb5'; // <-- reemplaza con tu URL real
 
-        // Estructura el payload que deseas enviar (puedes modificarlo según lo que esperas en n8n)
         $payload = [
             'customer_id' => $cid ?? null,
         ];
 
-        // Enviar el POST al webhook de n8n
-        $response = Http::post($webhookUrl, $payload);
-
-        // Opcional: verificar respuesta
-        if ($response->failed()) {
-            Log::error('Error al enviar lead a n8n', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-        }
+        ForwardN8nWebhook::dispatch($webhookUrl, $payload);
     }
 
     /**
