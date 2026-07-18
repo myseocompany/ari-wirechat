@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Máquinas industriales para empanadas con producción de hasta 1,200 unidades por hora. Equipos con soporte y entrega en Latinoamérica.">
+    <meta name="keywords" content="máquinas para empanadas, maquinaria industrial, empanadas, producción industrial">
+    <meta name="author" content="EmpanadaTech Industrial">
+    <title>Máquinas Industriales para Empanadas | Producción B2B</title>
+    <style>
+        :root {
+            --blue: #1E40AF;
+            --orange: #F97316;
+            --white: #ffffff;
+            --light-gray: #f3f4f6;
+            --text: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            color: var(--text);
+            background: var(--white);
+            line-height: 1.6;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            width: min(1200px, 92%);
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--blue);
+            color: var(--white);
+            text-align: center;
+            padding: 0.65rem 1rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .hero {
+            padding: 4rem 0 3rem;
+            background: linear-gradient(120deg, rgba(30, 64, 175, 0.08), rgba(249, 115, 22, 0.08));
+        }
+
+        .hero-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 3vw + 1.2rem, 3.2rem);
+            color: var(--blue);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            color: #1f2937;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: var(--orange);
+            color: var(--white);
+            padding: 0.9rem 1.6rem;
+            border-radius: 999px;
+            font-weight: 700;
+            margin-top: 1.6rem;
+            transition: transform 0.2s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .hero-indicators {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.8rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .hero-image {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 24px 45px rgba(15, 23, 42, 0.12);
+            padding: 1.5rem;
+        }
+
+        .hero-image img {
+            border-radius: 16px;
+        }
+
+        .trust-bar {
+            background: var(--light-gray);
+            padding: 2rem 0;
+        }
+
+        .trust-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .trust-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+
+        section {
+            padding: 3.5rem 0;
+        }
+
+        .section-title {
+            font-size: clamp(1.6rem, 2vw + 1rem, 2.4rem);
+            color: var(--blue);
+            margin-bottom: 1.2rem;
+        }
+
+        .section-subtitle {
+            color: #475569;
+            max-width: 720px;
+            margin-bottom: 2rem;
+        }
+
+        .how-grid,
+        .product-grid,
+        .support-grid,
+        .pricing-grid,
+        .testimonial-grid,
+        .country-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 18px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        .steps {
+            display: grid;
+            gap: 1rem;
+            margin: 1.8rem 0;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 0.8rem;
+            align-items: flex-start;
+        }
+
+        .step-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(249, 115, 22, 0.15);
+            color: var(--orange);
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+        }
+
+        .info-banner {
+            background: rgba(30, 64, 175, 0.08);
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .gallery-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+
+        .gallery-grid img {
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            color: var(--blue);
+        }
+
+        .testimonial-highlight {
+            display: flex;
+            gap: 1.2rem;
+            align-items: center;
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-top: 1.5rem;
+        }
+
+        .testimonial-highlight img {
+            width: 90px;
+            height: 90px;
+            border-radius: 16px;
+            object-fit: cover;
+        }
+
+        .coverage {
+            background: var(--light-gray);
+        }
+
+        .map-card img {
+            border-radius: 16px;
+        }
+
+        .before-after table {
+            margin-top: 0;
+        }
+
+        .counter {
+            margin-top: 1rem;
+            font-weight: 700;
+            color: var(--blue);
+        }
+
+        .pricing-card {
+            border: 2px solid transparent;
+        }
+
+        .pricing-card.highlight {
+            border-color: var(--orange);
+            box-shadow: 0 18px 40px rgba(249, 115, 22, 0.2);
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 0;
+        }
+
+        .faq-item summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--blue);
+        }
+
+        .cta-final {
+            background: var(--blue);
+            color: var(--white);
+            padding: 3.5rem 0;
+        }
+
+        .cta-final form {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .cta-final input,
+        .cta-final select {
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .cta-final button {
+            background: var(--orange);
+            color: var(--white);
+            padding: 0.9rem 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        footer {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 2.5rem 0;
+        }
+
+        .footer-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .whatsapp-floating {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #25d366;
+            color: var(--white);
+            padding: 0.9rem 1.1rem;
+            border-radius: 999px;
+            font-weight: 700;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+
+        .tag {
+            background: rgba(30, 64, 175, 0.12);
+            color: var(--blue);
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        @media (min-width: 768px) {
+            .hero-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                align-items: center;
+            }
+
+            .trust-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .how-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .support-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .testimonial-grid,
+            .pricing-grid,
+            .country-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .footer-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+
+            .cta-final form {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .cta-final button {
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">🚚 Envío disponible a toda Latinoamérica</div>
+
+    <header class="hero">
+        <div class="container hero-grid">
+            <div>
+                <h1>Máquinas Industriales para Empanadas: Produce 1,200 Unidades por Hora</h1>
+                <p>Equipos profesionales en operación en 15 países de Latinoamérica. Diseñadas para negocios que necesitan crecer con control de calidad y producción estandarizada.</p>
+                <a class="cta-button" href="#video">Ver máquinas en funcionamiento</a>
+                <div class="hero-indicators">
+                    <span>15 años en el mercado</span>
+                    <span>|</span>
+                    <span>+500 clientes</span>
+                    <span>|</span>
+                    <span>Certificación ISO</span>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://placehold.co/560x420?text=M%C3%A1quina+industrial+en+acci%C3%B3n" alt="Máquina industrial para empanadas en acción">
+            </div>
+        </div>
+    </header>
+
+    <section class="trust-bar">
+        <div class="container trust-grid">
+            <div class="trust-card">Logo Cliente 1</div>
+            <div class="trust-card">Logo Cliente 2</div>
+            <div class="trust-card">Logo Cliente 3</div>
+            <div class="trust-card">Logo Cliente 4</div>
+            <div class="trust-card">Logo Cliente 5</div>
+            <div class="trust-card">Banderas: México · Chile · Perú · Colombia · Argentina</div>
+            <div class="trust-card">Certificaciones: ISO · CE · BPA</div>
+        </div>
+    </section>
+
+    <section id="video">
+        <div class="container">
+            <h2 class="section-title">Cómo Funciona</h2>
+            <p class="section-subtitle">Entiende en minutos cómo tu equipo de producción puede pasar de un proceso manual a una línea industrial estable y rentable.</p>
+            <div class="how-grid">
+                <div class="card">
+                    <iframe width="100%" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Video demostrativo de la máquina" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <div class="card">
+                    <div class="steps">
+                        <div class="step-item">
+                            <div class="step-icon">1</div>
+                            <div>
+                                <h3>Colocas la masa</h3>
+                                <p>Las tolvas reciben masa fresca o precocida con calibración automática.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-icon">2</div>
+                            <div>
+                                <h3>Agregas el relleno</h3>
+                                <p>Dosificación controlada para consistencia en cada empanada.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-icon">3</div>
+                            <div>
+                                <h3>La máquina cierra/sella</h3>
+                                <p>Sellado uniforme sin merma y con bordes definidos.</p>
+                            </div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-icon">4</div>
+                            <div>
+                                <h3>Empanada lista</h3>
+                                <p>Salida inmediata para empaque, congelado o freído.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="info-banner">Produce 800-1,200 empanadas/hora | Compatible con masa fresca y precocida | Tamaños: 8cm a 15cm</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 class="section-title">Tu Producto, Tu Máquina</h2>
+            <p class="section-subtitle">Configuramos tu línea para respetar tu receta tradicional y el formato que tu mercado espera.</p>
+            <div class="product-grid">
+                <div>
+                    <div class="gallery-grid">
+                        <img src="https://placehold.co/320x220?text=Empanada+carne" alt="Empanada de carne">
+                        <img src="https://placehold.co/320x220?text=Empanada+pollo" alt="Empanada de pollo">
+                        <img src="https://placehold.co/320x220?text=Empanada+queso" alt="Empanada de queso">
+                        <img src="https://placehold.co/320x220?text=Empanada+mariscos" alt="Empanada de mariscos">
+                        <img src="https://placehold.co/320x220?text=Empanada+vegetal" alt="Empanada vegetal">
+                        <img src="https://placehold.co/320x220?text=Empanada+premium" alt="Empanada premium">
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo de empanada</th>
+                                <th>Tamaño</th>
+                                <th>Compatible</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Horno tradicional</td>
+                                <td>12 cm</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>Frita</td>
+                                <td>10 cm</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>Mini empanada</td>
+                                <td>8 cm</td>
+                                <td>✓</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <div class="testimonial-highlight">
+                        <img src="https://placehold.co/120x120?text=Cliente" alt="Foto cliente">
+                        <div>
+                            <h3>“Mantuvimos nuestra receta y duplicamos turnos sin contratar más personal.”</h3>
+                            <p>Fábrica Empanadas La Estrella - Lima, Perú</p>
+                        </div>
+                    </div>
+                    <div class="tag-list">
+                        <span class="tag">Recetas tradicionales</span>
+                        <span class="tag">Ajuste de gramaje</span>
+                        <span class="tag">Cierres personalizados</span>
+                        <span class="tag">Calibración en sitio</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="coverage">
+        <div class="container">
+            <h2 class="section-title">Cobertura y Envíos</h2>
+            <p class="section-subtitle">Entregamos en toda Latinoamérica con asesoría logística y tiempos claros por país.</p>
+            <div class="how-grid">
+                <div class="card map-card">
+                    <img src="https://placehold.co/560x360?text=Mapa+Latinoam%C3%A9rica" alt="Mapa de cobertura en Latinoamérica">
+                    <p class="info-banner" style="margin-top: 1rem;">Instalación y capacitación incluida</p>
+                </div>
+                <div class="card">
+                    <div class="country-grid">
+                        <div>
+                            <h3>México</h3>
+                            <p>Entrega en 12-15 días</p>
+                        </div>
+                        <div>
+                            <h3>Colombia</h3>
+                            <p>Entrega en 10-12 días</p>
+                        </div>
+                        <div>
+                            <h3>Chile</h3>
+                            <p>Entrega en 14-18 días</p>
+                        </div>
+                        <div>
+                            <h3>Perú</h3>
+                            <p>Entrega en 9-11 días</p>
+                        </div>
+                        <div>
+                            <h3>Argentina</h3>
+                            <p>Entrega en 15-20 días</p>
+                        </div>
+                        <div>
+                            <h3>Centroamérica</h3>
+                            <p>Entrega en 12-16 días</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 class="section-title">Garantía y Soporte</h2>
+            <div class="support-grid">
+                <div class="card">
+                    <h3>Garantía 2 años</h3>
+                    <p>Protección total de fábrica con componentes certificados.</p>
+                </div>
+                <div class="card">
+                    <h3>Soporte 24/7</h3>
+                    <p>Asistencia técnica para continuidad operacional.</p>
+                </div>
+                <div class="card">
+                    <h3>Repuestos disponibles</h3>
+                    <p>Stock permanente y envío express.</p>
+                </div>
+                <div class="card">
+                    <h3>Capacitación incluida</h3>
+                    <p>Entrenamiento presencial y manuales en español.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="before-after">
+        <div class="container">
+            <h2 class="section-title">Antes vs Después</h2>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producción Manual</th>
+                            <th>Con Máquina Industrial</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>50 empanadas/hora</td>
+                            <td>1,200 empanadas/hora</td>
+                        </tr>
+                        <tr>
+                            <td>Inconsistencia en tamaño</td>
+                            <td>Calidad estándar y uniforme</td>
+                        </tr>
+                        <tr>
+                            <td>Alto costo laboral</td>
+                            <td>ROI en 6 meses</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 class="section-title">Prueba Social</h2>
+            <p class="section-subtitle">Empresas de alimentos en toda la región ya escalan con nuestra tecnología.</p>
+            <div class="testimonial-grid">
+                <div class="card">
+                    <img src="https://placehold.co/200x140?text=Cliente+1" alt="Foto cliente 1">
+                    <h3>Empanadas Santa Rosa</h3>
+                    <p>Chile</p>
+                    <p>“Recuperé la inversión en 4 meses”</p>
+                </div>
+                <div class="card">
+                    <img src="https://placehold.co/200x140?text=Cliente+2" alt="Foto cliente 2">
+                    <h3>Empanadas Norte</h3>
+                    <p>México</p>
+                    <p>“Recuperé la inversión en 4 meses”</p>
+                </div>
+                <div class="card">
+                    <img src="https://placehold.co/200x140?text=Cliente+3" alt="Foto cliente 3">
+                    <h3>Empanadas Costamar</h3>
+                    <p>Perú</p>
+                    <p>“Recuperé la inversión en 4 meses”</p>
+                </div>
+            </div>
+            <p class="counter">+500 máquinas vendidas en América Latina</p>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 class="section-title">Modelos y Precios</h2>
+            <div class="pricing-grid">
+                <div class="card pricing-card">
+                    <h3>Modelo Manual</h3>
+                    <p><strong>Desde $2,500 USD</strong></p>
+                    <ul>
+                        <li>Producción 400/hora</li>
+                        <li>Ideal para talleres pequeños</li>
+                        <li>Calibración básica</li>
+                    </ul>
+                </div>
+                <div class="card pricing-card highlight">
+                    <h3>Modelo Semiautomático</h3>
+                    <p><strong>Desde $4,800 USD</strong></p>
+                    <ul>
+                        <li>Producción 800/hora</li>
+                        <li>Dosificación ajustable</li>
+                        <li>Control de sellado</li>
+                    </ul>
+                </div>
+                <div class="card pricing-card">
+                    <h3>Modelo Automático</h3>
+                    <p><strong>Desde $8,500 USD</strong></p>
+                    <ul>
+                        <li>Producción 1,200/hora</li>
+                        <li>Conveyor integrado</li>
+                        <li>Panel de monitoreo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <h2 class="section-title">Preguntas Frecuentes</h2>
+            <div class="card">
+                <div class="faq-item">
+                    <details>
+                        <summary>¿Funciona con mi receta tradicional?</summary>
+                        <p>Configuramos masa, gramaje y sellado según tu receta para mantener sabor y textura.</p>
+                    </details>
+                </div>
+                <div class="faq-item">
+                    <details>
+                        <summary>¿Entregan a mi país?</summary>
+                        <p>Tenemos rutas activas en toda Latinoamérica con tiempos de entrega definidos.</p>
+                    </details>
+                </div>
+                <div class="faq-item">
+                    <details>
+                        <summary>¿Qué garantía tiene?</summary>
+                        <p>Garantía completa de 2 años con repuestos y asistencia técnica.</p>
+                    </details>
+                </div>
+                <div class="faq-item">
+                    <details>
+                        <summary>¿Necesito electricidad especial?</summary>
+                        <p>Trabajamos con voltajes industriales estándar y adaptamos según tu país.</p>
+                    </details>
+                </div>
+                <div class="faq-item">
+                    <details>
+                        <summary>¿Incluye capacitación?</summary>
+                        <p>Incluye instalación y capacitación presencial para tu equipo.</p>
+                    </details>
+                </div>
+                <div class="faq-item">
+                    <details>
+                        <summary>¿Cómo sé que no es una estafa?</summary>
+                        <p>Compartimos referencias de clientes, certificaciones y visitas virtuales en vivo.</p>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-final">
+        <div class="container">
+            <h2 class="section-title" style="color: var(--white);">Agenda tu demostración virtual gratuita</h2>
+            <p>Recibe asesoría personalizada y una simulación de producción para tu tipo de empanada.</p>
+            <form action="#" method="post">
+                <input type="text" name="nombre" placeholder="Nombre" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="text" name="pais" placeholder="País" required>
+                <input type="tel" name="whatsapp" placeholder="WhatsApp" required>
+                <button type="submit">Quiero ver la máquina en acción</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-grid">
+            <div>
+                <h3>EmpanadaTech Industrial</h3>
+                <p>Av. Industrial 1234, Parque Empresarial, Bogotá, Colombia</p>
+            </div>
+            <div>
+                <h3>Contacto</h3>
+                <p>+57 312 000 0000</p>
+                <p>+52 55 0000 0000</p>
+                <p>ventas@empanadatech.com</p>
+            </div>
+            <div>
+                <h3>Redes sociales</h3>
+                <p>LinkedIn · YouTube · WhatsApp</p>
+            </div>
+            <div>
+                <h3>Certificaciones</h3>
+                <p>ISO 9001 · CE · BPA</p>
+            </div>
+        </div>
+    </footer>
+
+    <a class="whatsapp-floating" href="#" aria-label="WhatsApp">WhatsApp</a>
+</body>
+</html>
