@@ -42,10 +42,18 @@ class ProcessAriCrmMirrorDelivery implements ShouldQueue
             $payload = $delivery->payload;
             $integration = $delivery->integration;
 
-            $contactMapping = AriCrmMirrorContact::query()->where('integration_id', $integration->id)->where('aricrm_contact_id', $payload['contact_id'])->lockForUpdate()->first();
             $phone = preg_replace('/\D+/', '', (string) $payload['phone']) ?: null;
+            $contactMapping = AriCrmMirrorContact::query()->where('integration_id', $integration->id)->where('aricrm_contact_id', $payload['contact_id'])->lockForUpdate()->first();
             $customer = $contactMapping?->customer;
             if (! $customer) {
+                if ($phone) {
+                    AriCrmMirrorContact::query()
+                        ->where('integration_id', $integration->id)
+                        ->where('normalized_phone', $phone)
+                        ->lockForUpdate()
+                        ->first();
+                }
+
                 $customer = $this->findCustomerByNormalizedPhone($phone);
                 $customer ??= Customer::query()->create([
                     'name' => $payload['name'] ?: 'Cliente AriCRM',
