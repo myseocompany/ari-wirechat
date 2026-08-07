@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('conversation_id')->references('id')->on('wire_conversations')->cascadeOnDelete();
-            $table->unique(['integration_id', 'aricrm_conversation_id']);
+            $table->unique(['integration_id', 'aricrm_conversation_id'], 'ari_crm_mirror_conversation_unique');
         });
     }
 
