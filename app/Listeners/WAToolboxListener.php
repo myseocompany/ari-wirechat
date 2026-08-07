@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Models\AriCrmMirrorMessage;
 use App\Models\User;
 use App\Services\MessageSourceConversationService;
 use App\Services\WAToolboxService;
@@ -16,6 +17,10 @@ class WAToolboxListener
 
     public function handle(object $event): void
     {
+        if (AriCrmMirrorMessage::query()->where('wire_message_id', $event->message->id)->exists()) {
+            return;
+        }
+
         if (($event->message->sendable_type ?? null) !== app(User::class)->getMorphClass()) {
             return;
         }

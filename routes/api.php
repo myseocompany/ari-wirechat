@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CustomerApiController;
 use App\Http\Controllers\Api\MachineReportController;
 use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\SellerChatOutgoingController;
+use App\Http\Controllers\Api\V1\Integrations\AriCrmMirrorMessageController;
 use App\Http\Controllers\Api\WAToolBoxController;
 use App\Http\Controllers\Api\WhatsAppCrmOutgoingController;
 use App\Http\Controllers\Api\WhatsAppWebhookController;
@@ -28,6 +29,7 @@ Route::middleware('api')->group(
             return response()->json(['pong' => true]);
         });
         Route::post('/whatsapp/outgoing', [WhatsAppCrmOutgoingController::class, 'store']);
+        Route::post('/v1/integrations/aricrm/messages', [AriCrmMirrorMessageController::class, 'store']);
         Route::post('/sellerchat/outgoing', [SellerChatOutgoingController::class, 'store']);
 
         Route::post('/campaigns/{campaign_id}/send-to/{customer_id}', [APIController::class, 'sendCampaign']);
