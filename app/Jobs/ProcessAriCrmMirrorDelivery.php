@@ -46,8 +46,10 @@ class ProcessAriCrmMirrorDelivery implements ShouldQueue
             $phone = preg_replace('/\D+/', '', (string) $payload['phone']) ?: null;
             $customer = $contactMapping?->customer;
             if (! $customer) {
-                $customer = $phone ? Customer::findByPhoneInternational($phone) : null;
-                $customer ??= Customer::query()->create(['name' => $payload['name'] ?: 'Cliente AriCRM', 'phone' => $phone]);
+                $customer = Customer::query()->create([
+                    'name' => $payload['name'] ?: 'Cliente AriCRM',
+                    'phone' => $phone,
+                ]);
                 AriCrmMirrorContact::query()->create(['integration_id' => $integration->id, 'aricrm_contact_id' => $payload['contact_id'], 'customer_id' => $customer->id, 'normalized_phone' => $phone]);
             }
             if (filled($payload['name']) && $customer->name !== $payload['name']) {
