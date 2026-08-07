@@ -46,7 +46,8 @@ class ProcessAriCrmMirrorDelivery implements ShouldQueue
             $phone = preg_replace('/\D+/', '', (string) $payload['phone']) ?: null;
             $customer = $contactMapping?->customer;
             if (! $customer) {
-                $customer = Customer::query()->create([
+                $customer = $this->findCustomerByNormalizedPhone($phone);
+                $customer ??= Customer::query()->create([
                     'name' => $payload['name'] ?: 'Cliente AriCRM',
                     'phone' => $phone,
                 ]);
@@ -75,5 +76,16 @@ class ProcessAriCrmMirrorDelivery implements ShouldQueue
             $delivery->update(['status' => 'processed', 'wire_message_id' => $wireMessage->id, 'processed_at' => now()]);
             DB::afterCommit(fn () => broadcast(new MessageCreated($wireMessage)));
         });
+    }
+
+    private function findCustomerByNormalizedPhone(?string $phone): ?Customer
+    {
+        if (! $phone || DB::connection()->getDriverName() !== 'mysql') {
+            return null;
+        }
+
+        return Customer::query()
+            ->whereRaw('getPhone3(phone, phone2, contact_phone2) = ?', [$phone])
+            ->first();
     }
 }
