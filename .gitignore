@@ -21,6 +21,7 @@ yarn-error.log
 /.vscode
 /storage/logs/laravel.log
 /storage/logs/*.log
+/storage/logs/
 /logs/laravel.log
 logs/laravel.log
 
@@ -36,3 +37,16 @@ public/.DS_Store
 exports/
 docs/
 graphify-out/
+
+# Temporary production import and validation utilities
+/apply_import_*.sql
+/check_raw_exception.php
+/export_without_masivo_wa.php
+/import_fb_*.sql
+/import_rd_*.sql
+/inspect_actions_schema.php
+/inspect_all_folder_exceptions.php
+/kill_import.php
+/processlist.php
+/run_import_all.php
+/validate_*.php
