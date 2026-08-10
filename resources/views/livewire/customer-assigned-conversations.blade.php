@@ -168,14 +168,14 @@
                 <section class="flex h-full flex-col gap-3 overflow-y-auto bg-gray-50 p-5 dark:bg-gray-950/40">
                     @forelse ($selectedMessages as $message)
                         @php
-                            $senderName = $message->sendable?->display_name ?? 'Sistema';
-                            $isMine = $message->sendable_type === auth()->user()->getMorphClass() && (int) $message->sendable_id === (int) auth()->id();
+                            $senderName = $message->sendable?->display_name ?? $message->sendable?->name ?? 'Sistema';
+                            $isOutgoing = $message->sendable_type !== $customerMorph;
                             $body = trim((string) $message->body) !== '' ? $message->body : ($message->hasAttachment() ? '[Adjunto]' : '['.$message->type->value.']');
                         @endphp
-                        <article class="max-w-[80%] rounded-2xl px-4 py-3 shadow-sm {{ $isMine ? 'ml-auto bg-blue-600 text-white' : 'bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-100' }}">
-                            <div class="mb-1 text-xs font-semibold {{ $isMine ? 'text-blue-100' : 'text-gray-500 dark:text-gray-300' }}">{{ $senderName }}</div>
+                        <article class="max-w-[80%] rounded-2xl px-4 py-3 shadow-sm {{ $isOutgoing ? 'ml-auto bg-blue-600 text-white' : 'bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-100' }}">
+                            <div class="mb-1 text-xs font-semibold {{ $isOutgoing ? 'text-blue-100' : 'text-gray-500 dark:text-gray-300' }}">{{ $senderName }}</div>
                             <p class="text-sm">{{ $body }}</p>
-                            <div class="mt-2 text-right text-[11px] {{ $isMine ? 'text-blue-100' : 'text-gray-400 dark:text-gray-300' }}">
+                            <div class="mt-2 text-right text-[11px] {{ $isOutgoing ? 'text-blue-100' : 'text-gray-400 dark:text-gray-300' }}">
                                 {{ $message->created_at?->format('Y-m-d H:i') }}
                             </div>
                         </article>
