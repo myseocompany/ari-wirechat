@@ -8,6 +8,7 @@ use App\Models\AriCrmMirrorConversation;
 use App\Models\AriCrmMirrorDelivery;
 use App\Models\AriCrmMirrorMessage;
 use App\Models\Customer;
+use App\Models\CustomerStatus;
 use App\Services\MessageSourceConversationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -55,10 +56,22 @@ class ProcessAriCrmMirrorDelivery implements ShouldQueue
                 }
 
                 $customer = $this->findCustomerByNormalizedPhone($phone);
-                $customer ??= Customer::query()->create([
-                    'name' => $payload['name'] ?: 'Cliente AriCRM',
-                    'phone' => $phone,
-                ]);
+                if (! $customer) {
+                    $newCustomerStatusId = CustomerStatus::query()
+                        ->where('name', 'Nuevo')
+                        ->value('id');
+
+                    if (! $newCustomerStatusId) {
+                        throw new \RuntimeException('No se encontró el estado inicial "Nuevo" para clientes de AriCRM.');
+                    }
+
+                    $customer = Customer::query()->create([
+                        'name' => $payload['name'] ?: 'Cliente AriCRM',
+                        'phone' => $phone,
+                        'status_id' => $newCustomerStatusId,
+                    ]);
+                }
+
                 AriCrmMirrorContact::query()->create(['integration_id' => $integration->id, 'aricrm_contact_id' => $payload['contact_id'], 'customer_id' => $customer->id, 'normalized_phone' => $phone]);
             }
             if (filled($payload['name']) && $customer->name !== $payload['name']) {
