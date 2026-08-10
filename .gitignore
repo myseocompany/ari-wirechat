@@ -44,9 +44,11 @@ graphify-out/
 /export_without_masivo_wa.php
 /import_fb_*.sql
 /import_rd_*.sql
+/import_*.php
 /inspect_actions_schema.php
 /inspect_all_folder_exceptions.php
 /kill_import.php
 /processlist.php
 /run_import_all.php
 /validate_*.php
+/validate_*.sql
