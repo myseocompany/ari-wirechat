@@ -1024,6 +1024,18 @@ class CustomerController extends Controller
         }
 
         $model->load('tags');
+        $callBriefing = $model->callBriefing;
+        $callBriefingStale = false;
+        if (app_feature_enabled('customer_call_briefing_enabled', false) && $callBriefing && in_array($callBriefing->status, ['ready', 'insufficient_context'], true)) {
+            try {
+                $prompt = app(\App\Services\CustomerCallBriefingPromptLoader::class)->load();
+                $currentSource = app(\App\Services\CustomerCallBriefingContextBuilder::class)
+                    ->build($model, $prompt['version'], $prompt['hash']);
+                $callBriefingStale = ! hash_equals((string) $callBriefing->source_hash, $currentSource['source_hash']);
+            } catch (\Throwable) {
+                $callBriefingStale = true;
+            }
+        }
         $action_options = ActionType::orderby('weigth')->get();
         $actions = Action::where('customer_id', '=', $id)
             ->with(['type', 'creator', 'transcription'])
@@ -1324,7 +1336,7 @@ class CustomerController extends Controller
             'messageSourceLabelsByConversation',
             'messageSourceLabelsByMessage',
             'productsByCountry',
-            'productCountries'
+            'productCountries', 'callBriefing', 'callBriefingStale'
         ));
     }
 

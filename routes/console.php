@@ -15,3 +15,7 @@ Schedule::command('retell:process --limit=200')
 Schedule::command('opportunities:detect --limit=500 --llm --llm_limit=20')
     ->everyTenMinutes()
     ->withoutOverlapping();
+
+Schedule::command('app:expire-pending-customer-call-briefings')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();

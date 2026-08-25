@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use Namu\WireChat\Traits\Chatable;
@@ -138,6 +139,11 @@ class Customer extends Authenticatable
     public function histories()
     {
         return $this->hasMany('App\Models\CustomerHistory');
+    }
+
+    public function callBriefing(): HasOne
+    {
+        return $this->hasOne(CustomerCallBriefing::class);
     }
 
     public function files()

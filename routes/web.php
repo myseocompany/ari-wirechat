@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\APIController;
 use App\Http\Controllers\AudienceController;
 use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\ChannelsCallRecoveryController;
+use App\Http\Controllers\CustomerCallBriefingController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomerFileController;
 use App\Http\Controllers\CustomerStatusController;
@@ -171,6 +172,9 @@ Route::middleware('auth')->prefix('customers')->group(function () {
     Route::post('/{customer}/audience', [CustomerController::class, 'storeAudience'])->whereNumber('customer');
     Route::get('/history/{customer}/show', [CustomerController::class, 'showHistory'])->whereNumber('customer');
     Route::post('/{customer}/notes', [CustomerController::class, 'updateNotes'])->whereNumber('customer');
+    Route::post('/{customer}/call-briefing', [CustomerCallBriefingController::class, 'store'])
+        ->name('customers.call-briefing.store')
+        ->whereNumber('customer');
 
     // Específicas
     Route::get('/ajax/update_user', [CustomerController::class, 'updateAjax']);
