@@ -478,10 +478,10 @@
                   <div class="space-y-2">
                     <h3 id="call-briefing-title" class="text-sm font-semibold text-slate-900">Análisis de llamada</h3>
                     @if($callBriefing?->status !== 'pending' || $callBriefing->updated_at?->lessThan(now()->subMinutes(3)))
-                      <form method="POST" action="{{ route('customers.call-briefing.store', $model) }}" class="w-full">
+                      <form method="POST" action="{{ route('customers.call-briefing.store', $model) }}">
                         @csrf
-                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
-                          {{ $callBriefing?->status === 'pending' ? 'Reintentar análisis de llamada' : ($callBriefing ? ($callBriefingStale ? 'Actualizar análisis de llamada' : 'Preparar análisis de nuevo') : 'Preparar análisis de llamada') }}
+                        <button type="submit" class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700">
+                          {{ $callBriefing?->status === 'pending' ? 'Reintentar' : ($callBriefing ? ($callBriefingStale ? 'Actualizar' : 'Analizar de nuevo') : 'Analizar llamada') }}
                         </button>
                       </form>
                     @endif
