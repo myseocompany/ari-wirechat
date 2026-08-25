@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('customer_call_briefings', function (Blueprint $table) {
-            $table->unsignedBigInteger('customer_id')->primary();
+            $table->unsignedInteger('customer_id')->primary();
             $table->string('status', 24)->default('pending');
             $table->text('summary')->nullable();
             $table->json('known_facts')->nullable();
