@@ -474,21 +474,21 @@
               </div>
 
               @if(app_feature_enabled('customer_call_briefing_enabled', false))
-                <section class="rounded-lg border border-violet-200 bg-violet-50 p-3" aria-labelledby="call-briefing-title">
-                  <div class="flex items-center justify-between gap-2">
-                    <h3 id="call-briefing-title" class="text-sm font-semibold text-violet-950">Preparación de llamada</h3>
+                <section class="rounded-lg border border-slate-200 bg-slate-50 p-3" aria-labelledby="call-briefing-title">
+                  <div class="space-y-2">
+                    <h3 id="call-briefing-title" class="text-sm font-semibold text-slate-900">Análisis de llamada</h3>
                     @if($callBriefing?->status !== 'pending' || $callBriefing->updated_at?->lessThan(now()->subMinutes(3)))
-                      <form method="POST" action="{{ route('customers.call-briefing.store', $model) }}">
+                      <form method="POST" action="{{ route('customers.call-briefing.store', $model) }}" class="w-full">
                         @csrf
-                        <button type="submit" class="inline-flex items-center rounded-md bg-violet-700 px-3 py-2 text-xs font-semibold text-white transition hover:bg-violet-800">
-                          {{ $callBriefing?->status === 'pending' ? 'Reintentar análisis' : ($callBriefing ? ($callBriefingStale ? 'Actualizar análisis' : 'Preparar de nuevo') : 'Preparar análisis') }}
+                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
+                          {{ $callBriefing?->status === 'pending' ? 'Reintentar análisis de llamada' : ($callBriefing ? ($callBriefingStale ? 'Actualizar análisis de llamada' : 'Preparar análisis de nuevo') : 'Preparar análisis de llamada') }}
                         </button>
                       </form>
                     @endif
                   </div>
 
                   @if($callBriefing?->status === 'pending')
-                    <p class="mt-2 text-xs text-violet-800">Estamos revisando el historial del cliente.</p>
+                    <p class="mt-2 text-xs text-blue-800">Estamos revisando el historial del cliente.</p>
                     @if($callBriefing->updated_at?->lessThan(now()->subMinutes(3)))
                       <p class="mt-1 text-xs text-amber-800">La preparación tardó más de lo esperado.</p>
                     @endif
