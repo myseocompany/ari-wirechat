@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Plan de contenidos · 50 horas | Maquiempanadas</title>
+    <style>
+        :root { --navy:#09234d; --blue:#075cc9; --cyan:#20a4f3; --ink:#102039; --muted:#68768a; --paper:#f3f6fa; --line:#dce4ef; --white:#fff; --green:#12805c; --orange:#ed7d31; --red:#c83b48; }
+        * { box-sizing:border-box; } html { scroll-behavior:smooth; } body { margin:0; color:var(--ink); background:var(--paper); font:15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        .shell { width:min(1240px, calc(100% - 32px)); margin:auto; } .hero { position:relative; overflow:hidden; padding:54px 0 46px; color:#fff; background:linear-gradient(125deg,#071d42 0%,#074a9f 62%,#0b78e8 100%); }
+        .hero::after { content:""; position:absolute; right:-90px; top:-170px; width:510px; height:510px; border:90px solid #ffffff12; border-radius:50%; } .hero-grid { position:relative; z-index:1; display:grid; grid-template-columns:1.5fr .8fr; gap:40px; align-items:end; }
+        .eyebrow { margin-bottom:10px; font-size:12px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#84caff; } h1 { max-width:820px; margin:0; font-size:clamp(34px,5vw,62px); line-height:1.02; letter-spacing:-.05em; } .lead { max-width:720px; margin:18px 0 0; font-size:18px; color:#d8eaff; }
+        .hero-total { padding:24px; border:1px solid #ffffff30; border-radius:22px; background:#ffffff12; backdrop-filter:blur(10px); } .hero-total strong { display:block; font-size:56px; line-height:1; } .hero-total span { color:#d8eaff; }
+        .nav { position:sticky; z-index:10; top:0; border-bottom:1px solid var(--line); background:#fffffff2; backdrop-filter:blur(12px); } .nav .shell { display:flex; gap:7px; overflow:auto; padding:11px 0; } .nav a { padding:8px 12px; border-radius:8px; color:var(--muted); font-size:13px; font-weight:700; text-decoration:none; white-space:nowrap; } .nav a:hover { color:var(--blue); background:#eaf3ff; }
+        main { padding:28px 0 70px; } section { scroll-margin-top:74px; margin-top:22px; } .panel { padding:24px; border:1px solid var(--line); border-radius:18px; background:var(--white); box-shadow:0 8px 26px #10203908; } .section-head { display:flex; justify-content:space-between; gap:20px; align-items:flex-end; margin-bottom:20px; } h2 { margin:0; font-size:25px; letter-spacing:-.025em; } h3 { margin:0; font-size:17px; } p { margin:7px 0 0; } .muted { color:var(--muted); }
+        .evidence { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; } .evidence-card { padding:18px; border-radius:14px; background:#f7f9fc; border:1px solid var(--line); } .evidence-card strong { display:block; color:var(--blue); font-size:26px; letter-spacing:-.03em; } .evidence-card span { color:var(--muted); font-size:13px; } .insights { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:15px; } .insight { padding:18px; border-left:4px solid var(--cyan); border-radius:10px; background:#eff7ff; } .insight:nth-child(2) { border-color:var(--green); background:#f0faf6; } .insight:nth-child(3) { border-color:var(--orange); background:#fff7ed; } .insight h3 { margin-bottom:7px; } .insight p { color:var(--muted); font-size:13px; }
+        .allocation { display:grid; grid-template-columns:280px 1fr; gap:28px; align-items:center; } .donut { display:grid; place-items:center; width:250px; aspect-ratio:1; margin:auto; border-radius:50%; background:conic-gradient(#075cc9 0 10%,#20a4f3 10% 26%,#22a884 26% 50%,#8b5cf6 50% 74%,#ed7d31 74% 88%,#db3a6a 88% 94%,#748092 94% 100%); } .donut::after { content:"50\A horas"; display:grid; place-items:center; width:152px; aspect-ratio:1; border-radius:50%; white-space:pre; text-align:center; color:var(--navy); background:#fff; font-size:24px; font-weight:800; line-height:1.15; box-shadow:inset 0 0 0 1px var(--line); }
+        .legend { display:grid; grid-template-columns:repeat(2,1fr); gap:10px 18px; } .legend-item { display:grid; grid-template-columns:12px 1fr auto; gap:9px; align-items:center; padding:9px 0; border-bottom:1px solid var(--line); } .swatch { width:10px; height:10px; border-radius:3px; } .legend-item strong { font-size:13px; } .legend-item b { color:var(--navy); }
+        .toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; } select,button { border:1px solid var(--line); border-radius:9px; padding:9px 12px; color:var(--ink); background:#fff; font:inherit; } button { cursor:pointer; font-weight:700; } button:hover { border-color:var(--blue); color:var(--blue); } .progress { min-width:210px; } .progress-label { display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; font-weight:700; } .progress-track { height:9px; overflow:hidden; border-radius:99px; background:#e6ebf2; } .progress-fill { width:0; height:100%; border-radius:99px; background:linear-gradient(90deg,var(--cyan),var(--blue)); transition:width .25s; }
+        .tasks { display:grid; gap:10px; } .task { display:grid; grid-template-columns:30px 78px 1.4fr .8fr 90px; gap:12px; align-items:center; padding:14px; border:1px solid var(--line); border-radius:12px; transition:.2s; } .task:hover { border-color:#a9c8ed; } .task.done { opacity:.55; background:#f2f7f5; } .task.done .task-name { text-decoration:line-through; } .task input { width:18px; height:18px; accent-color:var(--green); } .week,.hours,.owner { color:var(--muted); font-size:12px; font-weight:750; } .hours { text-align:right; color:var(--blue); } .task-name { font-weight:720; } .task-output { color:var(--muted); font-size:13px; }
+        .weeks { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; } .week-card { padding:18px; border-top:5px solid var(--blue); border-radius:13px; background:#f8fafc; } .week-card:nth-child(2) { border-color:var(--cyan); } .week-card:nth-child(3) { border-color:var(--green); } .week-card:nth-child(4) { border-color:var(--orange); } .week-card ul { margin:12px 0 0; padding-left:18px; color:var(--muted); } .week-card li + li { margin-top:6px; }
+        .cadence { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; } .day { min-height:155px; padding:16px; border-radius:13px; color:#fff; background:var(--navy); } .day:nth-child(2) { background:#075cc9; } .day:nth-child(3) { background:#10745c; } .day:nth-child(4) { background:#6741a5; } .day:nth-child(5) { background:#b45120; } .day small { opacity:.75; font-weight:800; text-transform:uppercase; letter-spacing:.08em; } .day h3 { margin-top:8px; } .day p { font-size:13px; color:#ffffffcf; }
+        .deliverables { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; } .delivery { padding:18px; border:1px solid var(--line); border-radius:13px; } .delivery b { display:block; margin-bottom:5px; color:var(--blue); font-size:30px; } .delivery span { font-weight:750; } .delivery p { color:var(--muted); font-size:13px; } .funnel { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; } .funnel-step { position:relative; padding:20px; border-radius:14px; color:#fff; background:var(--navy); } .funnel-step:nth-child(2) { background:var(--blue); } .funnel-step:nth-child(3) { background:var(--green); } .funnel-step small { opacity:.7; font-weight:800; letter-spacing:.1em; } .funnel-step ul { padding-left:18px; margin:12px 0 0; color:#ffffffd8; font-size:13px; } .sla { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; } .sla div { padding:14px; border:1px solid var(--line); border-radius:10px; } .sla b { display:block; color:var(--red); font-size:19px; } .faq-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; } .faq-item { display:grid; grid-template-columns:42px 1fr auto; gap:10px; align-items:center; padding:12px; border:1px solid var(--line); border-radius:10px; } .faq-rank { display:grid; place-items:center; width:34px; height:34px; border-radius:50%; color:#fff; background:var(--blue); font-weight:800; } .faq-item b { color:var(--blue); }
+        .kpis { width:100%; border-collapse:collapse; } .kpis th,.kpis td { padding:13px 10px; border-bottom:1px solid var(--line); text-align:left; } .kpis th { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.06em; } .target { font-weight:800; color:var(--green); } .rule { padding:14px 16px; border-left:4px solid var(--orange); border-radius:6px; color:#65411e; background:#fff7ed; }
+        .empty { padding:25px; text-align:center; color:var(--muted); border:1px dashed var(--line); border-radius:12px; }
+        @media (max-width:920px) { .hero-grid,.allocation { grid-template-columns:1fr; }.hero-total { max-width:360px; }.evidence,.weeks,.deliverables,.insights { grid-template-columns:repeat(2,1fr); }.cadence,.funnel { grid-template-columns:repeat(2,1fr); }.task { grid-template-columns:30px 70px 1fr 74px; }.task-output { grid-column:3 / -1; }.owner { display:none; } }
+        @media (max-width:560px) { .shell { width:min(100% - 22px,1240px); }.hero { padding-top:38px; }.evidence,.weeks,.deliverables,.cadence,.legend,.insights,.funnel,.sla,.faq-grid { grid-template-columns:1fr; }.panel { padding:18px; }.task { grid-template-columns:25px 1fr 64px; }.week { display:none; }.task-output { grid-column:2 / -1; }.section-head { display:block; }.toolbar { margin-top:14px; }.donut { width:220px; } }
+        @media print { .nav,.toolbar button { display:none; } body { background:#fff; }.hero { padding:28px 0; }.panel { break-inside:avoid; box-shadow:none; }.task { break-inside:avoid; } }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <div class="shell hero-grid">
+            <div><div class="eyebrow">Maquiempanadas · Plan mensual de agencia</div><h1>50 horas para recuperar rendimiento y convertir atención en oportunidades</h1><p class="lead">Ejecución mensual basada en el plan de contenidos, el desempeño real de Instagram, las preguntas FAQ y las señales de venta del CRM.</p></div>
+            <div class="hero-total"><strong>50 h</strong><span>Alcance cerrado de estrategia, producción, publicación, pauta y optimización.</span></div>
+        </div>
+    </header>
+    <nav class="nav"><div class="shell"><a href="#diagnostico">Diagnóstico</a><a href="#funnel">Funnel</a><a href="#faq">FAQ</a><a href="#horas">Horas</a><a href="#ejecucion">Ejecución</a><a href="#calendario">Calendario</a><a href="#entregables">Entregables</a><a href="#metricas">Métricas</a></div></nav>
+    <main class="shell">
+        <section class="panel" id="diagnostico">
+            <div class="section-head"><div><div class="eyebrow">Punto de partida</div><h2>Qué debe corregir y aprovechar la agencia</h2></div></div>
+            <div class="evidence">
+                <div class="evidence-card"><strong>−43%</strong><span>Visualizaciones totales recientes pese a publicar más.</span></div>
+                <div class="evidence-card"><strong>3 formatos</strong><span>Historias reales, prueba sensorial y FAQ lideraron lo reciente.</span></div>
+                <div class="evidence-card"><strong>430</strong><span>Consultas sobre cómo cotizar: principal intención BOFU.</span></div>
+                <div class="evidence-card"><strong>40%</strong><span>Ventas sin una fuente útil: se requiere disciplina de atribución.</span></div>
+            </div>
+            <div class="insights">
+                <article class="insight"><h3>Valor y beneficio ganan</h3><p>El histórico de Maquiempanadas promedia 19.171 vistas en contenido de valor y 17.305 en beneficio, frente a 3.450 en piezas centradas en características. La máquina debe probar una transformación, no protagonizar un catálogo.</p></article>
+                <article class="insight"><h3>Los casos reales tienen techo alto</h3><p>Los mejores históricos llegaron a 134.000 vistas con sueño + producción, 76.800 con crecimiento de cliente y 68.000 con control financiero. El caso debe incluir tensión, cambio y evidencia.</p></article>
+                <article class="insight"><h3>La competencia valida el ángulo</h3><p>En perfiles comparados, los mensajes de beneficio superan ampliamente a la descripción técnica. La pauta activa del sector insiste en capacidad/hora, demostración y personalización: señales para probar, no para copiar literalmente.</p></article>
+            </div>
+            <p class="rule">Criterio rector: cada pieza debe cumplir una función —atraer, demostrar, resolver una objeción o generar conversación— y tener una sola CTA medible.</p>
+        </section>
+
+        <section class="panel" id="funnel">
+            <div class="section-head"><div><div class="eyebrow">Contenido conectado a ventas</div><h2>Un funnel, no una parrilla aislada</h2><p class="muted">Cada contenido debe producir una señal que la agencia pueda entregar y medir en el CRM.</p></div></div>
+            <div class="funnel">
+                <article class="funnel-step"><small>TOFU · ATRAER</small><h3>Historias, cultura y aspiración</h3><ul><li>Cliente como protagonista.</li><li>Tradición, sueño y crecimiento.</li><li>Prueba sensorial y momentos reales.</li><li>Objetivo: alcance y reproducción.</li></ul></article>
+                <article class="funnel-step"><small>MOFU · EVALUAR</small><h3>Beneficio, demo y FAQ</h3><ul><li>Capacidad y ahorro de trabajo.</li><li>Video de funcionamiento.</li><li>Ficha técnica, moldes y compatibilidad.</li><li>Objetivo: guardados y conversaciones.</li></ul></article>
+                <article class="funnel-step"><small>BOFU · DECIDIR</small><h3>Cotización, pagos y prueba</h3><ul><li>Cómo cotizar y elegir modelo.</li><li>Formas de pago y garantía.</li><li>Demo/en vivo con promesa concreta.</li><li>Objetivo: lead, proforma y cita.</li></ul></article>
+            </div>
+            <div class="sla"><div><b>&lt; 5 min</b><span>Respuesta a conversación inbound caliente.</span></div><div><b>Mismo día</b><span>Diagnóstico, llamada o propuesta de siguiente paso.</span></div><div><b>&lt; 24 h</b><span>Seguimiento posterior a cotización, demo o ficha enviada.</span></div></div>
+        </section>
+
+        <section class="panel" id="faq">
+            <div class="section-head"><div><div class="eyebrow">Backlog basado en conversaciones</div><h2>Preguntas que deben convertirse en contenido</h2><p class="muted">Ordenadas por frecuencia e intención; la agencia debe producir una respuesta reutilizable en reel, story, DM y ventas.</p></div></div>
+            <div class="faq-grid">
+                <div class="faq-item"><span class="faq-rank">1</span><span>¿Cómo puedo cotizar una máquina?<small class="muted">BOFU · precio</small></span><b>430</b></div>
+                <div class="faq-item"><span class="faq-rank">2</span><span>¿Dónde están ubicados?<small class="muted">Confianza · logística</small></span><b>122</b></div>
+                <div class="faq-item"><span class="faq-rank">3</span><span>¿Pueden enviar la ficha técnica?<small class="muted">MOFU · evaluación</small></span><b>108</b></div>
+                <div class="faq-item"><span class="faq-rank">4</span><span>¿Tienen video del funcionamiento?<small class="muted">MOFU · demostración</small></span><b>86</b></div>
+                <div class="faq-item"><span class="faq-rank">5</span><span>¿Venden máquinas en Colombia?<small class="muted">Cobertura</small></span><b>46</b></div>
+                <div class="faq-item"><span class="faq-rank">6</span><span>¿Cuál es la capacidad de producción?<small class="muted">MOFU · diagnóstico</small></span><b>43</b></div>
+                <div class="faq-item"><span class="faq-rank">7</span><span>¿Tienen moldes o kits?<small class="muted">Producto</small></span><b>42</b></div>
+                <div class="faq-item"><span class="faq-rank">8</span><span>¿Venden máquinas de segunda?<small class="muted">Objeción de precio</small></span><b>26</b></div>
+                <div class="faq-item"><span class="faq-rank">9</span><span>¿Cuáles son las formas de pago?<small class="muted">BOFU · cierre</small></span><b>18</b></div>
+                <div class="faq-item"><span class="faq-rank">10</span><span>¿Funcionan para masa de plátano?<small class="muted">Compatibilidad</small></span><b>15</b></div>
+            </div>
+            <p class="rule">Alerta de conversión: la respuesta actual sobre formas de pago no resuelve la duda. Antes de publicar, la agencia debe obtener de ventas las alternativas reales, financiación si aplica, requisitos y siguiente paso.</p>
+        </section>
+
+        <section class="panel" id="horas">
+            <div class="section-head"><div><div class="eyebrow">Presupuesto operativo</div><h2>Distribución exacta de las 50 horas</h2></div></div>
+            <div class="allocation">
+                <div class="donut" aria-label="Distribución de 50 horas"></div>
+                <div class="legend">
+                    <div class="legend-item"><i class="swatch" style="background:#075cc9"></i><strong>Estrategia y medición</strong><b>5 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#20a4f3"></i><strong>Preproducción</strong><b>8 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#22a884"></i><strong>Producción</strong><b>12 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#8b5cf6"></i><strong>Postproducción</strong><b>12 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#ed7d31"></i><strong>Publicación y comunidad</strong><b>7 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#db3a6a"></i><strong>Pauta y pruebas</strong><b>3 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#748092"></i><strong>Análisis y cierre</strong><b>3 h</b></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel" id="ejecucion">
+            <div class="section-head">
+                <div><div class="eyebrow">Checklist operativo</div><h2>Qué ejecuta la agencia</h2><p class="muted">Marca tareas para registrar el avance; se guarda en este navegador.</p></div>
+                <div class="toolbar"><select id="filter"><option value="all">Todas las semanas</option><option value="1">Semana 1</option><option value="2">Semana 2</option><option value="3">Semana 3</option><option value="4">Semana 4</option></select><div class="progress"><div class="progress-label"><span>Avance</span><span id="progressText">0 / 50 h</span></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div><button id="reset">Reiniciar</button></div>
+            </div>
+            <div class="tasks" id="tasks"></div>
+        </section>
+
+        <section class="panel" id="calendario">
+            <div class="section-head"><div><div class="eyebrow">Cadencia editorial</div><h2>Ritmo semanal recomendado</h2><p class="muted">El plan del PDF se conserva, ajustado a los resultados observados.</p></div></div>
+            <div class="cadence">
+                <article class="day"><small>Lunes</small><h3>Recurso útil</h3><p>Plantilla de costos, guía de capacidad o comparador. CTA con palabra clave “COSTO”.</p></article>
+                <article class="day"><small>Martes</small><h3>FAQ de compra</h3><p>Cotización, ficha técnica, capacidad, pagos, garantía o compatibilidad. CTA “PREGUNTAS”.</p></article>
+                <article class="day"><small>Miércoles</small><h3>Prueba real</h3><p>Cliente, textura, sonido, velocidad o antes/después. Mostrar resultado antes que explicación.</p></article>
+                <article class="day"><small>Viernes</small><h3>Conexión</h3><p>Historia humana ligada a una enseñanza sobre producir, emprender o dirigir el negocio.</p></article>
+                <article class="day"><small>Domingo</small><h3>CTA / En vivo</h3><p>En vivo quincenal con promesa concreta. Reutilizar cada sesión en clips; evitar el aviso aislado.</p></article>
+            </div>
+            <div class="weeks" style="margin-top:18px">
+                <article class="week-card"><h3>Semana 1 · Fundamentos</h3><ul><li>Auditoría y línea base.</li><li>Guiones de cotización/capacidad.</li><li>Grabación principal.</li></ul></article>
+                <article class="week-card"><h3>Semana 2 · Evidencia</h3><ul><li>Caso de cliente.</li><li>Prueba sensorial.</li><li>Primer carrusel y prueba de pauta.</li></ul></article>
+                <article class="week-card"><h3>Semana 3 · Objeciones</h3><ul><li>Pagos y garantía.</li><li>Ficha técnica/modelos.</li><li>En vivo + clips reutilizables.</li></ul></article>
+                <article class="week-card"><h3>Semana 4 · Escala</h3><ul><li>Replicar ganadores.</li><li>Corregir cuartil inferior.</li><li>Informe y backlog siguiente.</li></ul></article>
+            </div>
+        </section>
+
+        <section class="panel" id="entregables">
+            <div class="section-head"><div><div class="eyebrow">Salida mensual</div><h2>Entregables incluidos</h2></div></div>
+            <div class="deliverables">
+                <article class="delivery"><b>8</b><span>Reels editados</span><p>3 prueba/cliente, 3 FAQ/objeción y 2 demostración/beneficio.</p></article>
+                <article class="delivery"><b>4</b><span>Carruseles</span><p>Uno semanal, tratado como experimento porque el histórico aún es pequeño.</p></article>
+                <article class="delivery"><b>12</b><span>Secuencias de stories</span><p>Recurso, FAQ, conexión y activación de conversación.</p></article>
+                <article class="delivery"><b>2</b><span>Funnel de en vivo</span><p>Invitación con promesa, recordatorio, evento y clips posteriores.</p></article>
+                <article class="delivery"><b>3</b><span>Automatizaciones CTA</span><p>Palabras clave COSTO, PREGUNTAS y EN VIVO con respuesta y trazabilidad.</p></article>
+                <article class="delivery"><b>3</b><span>Creativos de pauta</span><p>Dos stories nativas y un carrusel para audiencias frías/retargeting.</p></article>
+                <article class="delivery"><b>1</b><span>Calendario aprobado</span><p>Temas, responsables, fechas, CTA, enlaces y fuente de campaña.</p></article>
+                <article class="delivery"><b>1</b><span>Informe ejecutivo</span><p>Ganadores, piezas a corregir, leads y decisiones del mes siguiente.</p></article>
+            </div>
+        </section>
+
+        <section class="panel" id="metricas">
+            <div class="section-head"><div><div class="eyebrow">Criterio de éxito</div><h2>Indicadores y metas del siguiente mes</h2></div></div>
+            <div style="overflow:auto"><table class="kpis"><thead><tr><th>Indicador</th><th>Línea base reciente</th><th>Meta</th><th>Decisión</th></tr></thead><tbody>
+                <tr><td>Visualizaciones promedio/publicación</td><td>≈ 2.039</td><td class="target">≥ 2.650 (+30%)</td><td>Replicar hook y formato del cuartil superior.</td></tr>
+                <tr><td>Alcance promedio/publicación</td><td>≈ 1.515</td><td class="target">≥ 1.900 (+25%)</td><td>Reeditar portada/apertura si queda bajo la mediana.</td></tr>
+                <tr><td>Tasa de interacción sobre alcance</td><td>≈ 2,87%</td><td class="target">≥ 3,1%</td><td>Priorizar guardados, compartidos y respuestas.</td></tr>
+                <tr><td>Seguimientos por publicación</td><td>≈ 2</td><td class="target">≥ 5</td><td>CTA de seguimiento en carruseles de valor.</td></tr>
+                <tr><td>Conversaciones con palabra clave</td><td>Sin línea base consistente</td><td class="target">Medir 100%</td><td>Registrar COSTO, PREGUNTAS y EN VIVO por origen.</td></tr>
+                <tr><td>Leads/ventas con fuente identificada</td><td>60% en muestra de ventas</td><td class="target">≥ 90%</td><td>UTM, palabra clave y fuente obligatoria en CRM.</td></tr>
+            </tbody></table></div>
+        </section>
+    </main>
+    <script>
+        const tasks = [
+            {id:'a1',week:1,hours:2,owner:'Estratega',name:'Auditar rendimiento anual y últimos 28 días',output:'Línea base, ganadores, cuartil inferior y aprendizajes por formato.'},
+            {id:'a2',week:1,hours:2,owner:'Estratega',name:'Construir calendario, CTA y mapa de medición',output:'Calendario mensual con objetivo, palabra clave, UTM y responsable.'},
+            {id:'a3',week:1,hours:1,owner:'Cuenta',name:'Reunión de alineación y aprobaciones',output:'Alcance cerrado, voceros, locaciones y agenda de grabación.'},
+            {id:'b1',week:1,hours:4,owner:'Copy/Estratega',name:'Escribir guiones y hooks de 8 reels',output:'Prueba real, sensorial, FAQ, objeciones y demostración.'},
+            {id:'b2',week:1,hours:2,owner:'Productor',name:'Preparar shot list, utilería y agenda',output:'Plan de rodaje por escena, máquina, cliente y recurso visual.'},
+            {id:'b3',week:1,hours:2,owner:'Copy',name:'Crear copies de carruseles y stories',output:'4 carruseles y 12 secuencias con una CTA cada una.'},
+            {id:'c1',week:1,hours:6,owner:'Producción',name:'Jornada principal de grabación',output:'Demostraciones, FAQ, B-roll, textura, sonido y vocero.'},
+            {id:'c2',week:2,hours:4,owner:'Producción',name:'Grabar caso de cliente y prueba real',output:'Testimonio, problema, proceso, resultado y producto final.'},
+            {id:'c3',week:2,hours:2,owner:'Producción',name:'Organizar y respaldar material',output:'Biblioteca etiquetada por formato, máquina, tema y fecha.'},
+            {id:'d1',week:2,hours:8,owner:'Editor',name:'Editar 8 reels verticales',output:'Hook en 2 segundos, ritmo, subtítulos, CTA y versiones finales.'},
+            {id:'d2',week:2,hours:3,owner:'Diseño',name:'Diseñar 4 carruseles y assets de stories',output:'Sistema visual consistente y adaptación 9:16 / 4:5.'},
+            {id:'d3',week:2,hours:1,owner:'Editor',name:'Portadas, control de calidad y exportación',output:'Archivos finales revisados y listos para programar.'},
+            {id:'e1',week:3,hours:2,owner:'Community',name:'Programar contenidos, copies y enlaces',output:'Parrilla publicada con CTA, UTM, etiquetas y horarios.'},
+            {id:'e2',week:3,hours:3,owner:'Community',name:'Gestionar comunidad y derivar leads',output:'Respuestas, clasificación y envío de conversaciones al CRM.'},
+            {id:'e3',week:3,hours:2,owner:'Automatización',name:'Configurar palabras clave y probar respuestas',output:'COSTO, PREGUNTAS y EN VIVO funcionando de extremo a extremo.'},
+            {id:'f1',week:3,hours:1.5,owner:'Paid media',name:'Adaptar 3 creativos para pauta',output:'Stories nativas, prueba social y carrusel con mensajes diferenciados.'},
+            {id:'f2',week:3,hours:1,owner:'Paid media',name:'Configurar campañas y audiencias',output:'Prospección, retargeting, UTMs y eventos de medición.'},
+            {id:'f3',week:4,hours:.5,owner:'Paid media',name:'Optimizar prueba inicial',output:'Pausa de perdedores y redistribución hacia el creativo ganador.'},
+            {id:'g1',week:4,hours:2,owner:'Analista',name:'Revisión semanal y decisiones de contenido',output:'Replicar, observar o corregir con evidencia por publicación.'},
+            {id:'g2',week:4,hours:1,owner:'Analista',name:'Informe final y backlog del mes siguiente',output:'Resultados, leads, aprendizajes y próximos experimentos.'}
+        ];
+        const saved = JSON.parse(localStorage.getItem('mqe-plan-50h') || '{}');
+        const container = document.querySelector('#tasks'); const filter = document.querySelector('#filter');
+        function renderTasks() { const week = filter.value; const visible = tasks.filter(task => week === 'all' || String(task.week) === week); container.innerHTML = visible.length ? visible.map(task => `<label class="task ${saved[task.id] ? 'done' : ''}"><input type="checkbox" data-id="${task.id}" ${saved[task.id] ? 'checked' : ''}><span class="week">SEM ${task.week}</span><span><span class="task-name">${task.name}</span><span class="task-output">${task.output}</span></span><span class="owner">${task.owner}</span><span class="hours">${task.hours} h</span></label>`).join('') : '<div class="empty">No hay tareas para este filtro.</div>'; container.querySelectorAll('input').forEach(input => input.addEventListener('change', event => { saved[event.target.dataset.id] = event.target.checked; localStorage.setItem('mqe-plan-50h',JSON.stringify(saved)); renderTasks(); updateProgress(); })); }
+        function updateProgress() { const completed = tasks.filter(task => saved[task.id]).reduce((total,task) => total + task.hours,0); document.querySelector('#progressText').textContent = `${completed} / 50 h`; document.querySelector('#progressFill').style.width = `${completed / 50 * 100}%`; }
+        filter.addEventListener('change',renderTasks); document.querySelector('#reset').addEventListener('click',() => { tasks.forEach(task => delete saved[task.id]); localStorage.setItem('mqe-plan-50h','{}'); renderTasks(); updateProgress(); }); renderTasks(); updateProgress();
+    </script>
+</body>
+</html>
