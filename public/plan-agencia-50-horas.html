@@ -14,7 +14,7 @@
         .nav { position:sticky; z-index:10; top:0; border-bottom:1px solid var(--line); background:#fffffff2; backdrop-filter:blur(12px); } .nav .shell { display:flex; gap:7px; overflow:auto; padding:11px 0; } .nav a { padding:8px 12px; border-radius:8px; color:var(--muted); font-size:13px; font-weight:700; text-decoration:none; white-space:nowrap; } .nav a:hover { color:var(--blue); background:#eaf3ff; }
         main { padding:28px 0 70px; } section { scroll-margin-top:74px; margin-top:22px; } .panel { padding:24px; border:1px solid var(--line); border-radius:18px; background:var(--white); box-shadow:0 8px 26px #10203908; } .section-head { display:flex; justify-content:space-between; gap:20px; align-items:flex-end; margin-bottom:20px; } h2 { margin:0; font-size:25px; letter-spacing:-.025em; } h3 { margin:0; font-size:17px; } p { margin:7px 0 0; } .muted { color:var(--muted); }
         .evidence { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; } .evidence-card { padding:18px; border-radius:14px; background:#f7f9fc; border:1px solid var(--line); } .evidence-card strong { display:block; color:var(--blue); font-size:26px; letter-spacing:-.03em; } .evidence-card span { color:var(--muted); font-size:13px; } .insights { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:15px; } .insight { padding:18px; border-left:4px solid var(--cyan); border-radius:10px; background:#eff7ff; } .insight:nth-child(2) { border-color:var(--green); background:#f0faf6; } .insight:nth-child(3) { border-color:var(--orange); background:#fff7ed; } .insight h3 { margin-bottom:7px; } .insight p { color:var(--muted); font-size:13px; }
-        .allocation { display:grid; grid-template-columns:280px 1fr; gap:28px; align-items:center; } .donut { display:grid; place-items:center; width:250px; aspect-ratio:1; margin:auto; border-radius:50%; background:conic-gradient(#075cc9 0 10%,#20a4f3 10% 26%,#22a884 26% 50%,#8b5cf6 50% 74%,#ed7d31 74% 88%,#db3a6a 88% 94%,#748092 94% 100%); } .donut::after { content:"50\A horas"; display:grid; place-items:center; width:152px; aspect-ratio:1; border-radius:50%; white-space:pre; text-align:center; color:var(--navy); background:#fff; font-size:24px; font-weight:800; line-height:1.15; box-shadow:inset 0 0 0 1px var(--line); }
+        .allocation { display:grid; grid-template-columns:280px 1fr; gap:28px; align-items:center; } .donut { display:grid; place-items:center; width:250px; aspect-ratio:1; margin:auto; border-radius:50%; background:conic-gradient(#075cc9 0 10%,#20a4f3 10% 30%,#22a884 30% 50%,#8b5cf6 50% 66%,#ed7d31 66% 80%,#db3a6a 80% 90%,#748092 90% 100%); } .donut::after { content:"50\A horas"; display:grid; place-items:center; width:152px; aspect-ratio:1; border-radius:50%; white-space:pre; text-align:center; color:var(--navy); background:#fff; font-size:24px; font-weight:800; line-height:1.15; box-shadow:inset 0 0 0 1px var(--line); }
         .legend { display:grid; grid-template-columns:repeat(2,1fr); gap:10px 18px; } .legend-item { display:grid; grid-template-columns:12px 1fr auto; gap:9px; align-items:center; padding:9px 0; border-bottom:1px solid var(--line); } .swatch { width:10px; height:10px; border-radius:3px; } .legend-item strong { font-size:13px; } .legend-item b { color:var(--navy); }
         .toolbar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; } select,button { border:1px solid var(--line); border-radius:9px; padding:9px 12px; color:var(--ink); background:#fff; font:inherit; } button { cursor:pointer; font-weight:700; } button:hover { border-color:var(--blue); color:var(--blue); } .progress { min-width:210px; } .progress-label { display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; font-weight:700; } .progress-track { height:9px; overflow:hidden; border-radius:99px; background:#e6ebf2; } .progress-fill { width:0; height:100%; border-radius:99px; background:linear-gradient(90deg,var(--cyan),var(--blue)); transition:width .25s; }
         .tasks { display:grid; gap:10px; } .task { display:grid; grid-template-columns:30px 78px 1.4fr .8fr 90px; gap:12px; align-items:center; padding:14px; border:1px solid var(--line); border-radius:12px; transition:.2s; } .task:hover { border-color:#a9c8ed; } .task.done { opacity:.55; background:#f2f7f5; } .task.done .task-name { text-decoration:line-through; } .task input { width:18px; height:18px; accent-color:var(--green); } .week,.hours,.owner { color:var(--muted); font-size:12px; font-weight:750; } .hours { text-align:right; color:var(--blue); } .task-name { font-weight:720; } .task-output { color:var(--muted); font-size:13px; }
@@ -32,7 +32,7 @@
     <header class="hero">
         <div class="shell hero-grid">
             <div><div class="eyebrow">Maquiempanadas · Plan mensual de agencia</div><h1>50 horas para recuperar rendimiento y convertir atención en oportunidades</h1><p class="lead">Ejecución mensual basada en el plan de contenidos, el desempeño real de Instagram, las preguntas FAQ y las señales de venta del CRM.</p></div>
-            <div class="hero-total"><strong>50 h</strong><span>Alcance cerrado de estrategia, producción, publicación, pauta y optimización.</span></div>
+            <div class="hero-total"><strong>50 h</strong><span>Alcance cerrado de estrategia, planeación, automatización, revisión y optimización.</span></div>
         </div>
     </header>
     <nav class="nav"><div class="shell"><a href="#diagnostico">Diagnóstico</a><a href="#funnel">Funnel</a><a href="#faq">FAQ</a><a href="#horas">Horas</a><a href="#ejecucion">Ejecución</a><a href="#calendario">Calendario</a><a href="#entregables">Entregables</a><a href="#metricas">Métricas</a></div></nav>
@@ -85,27 +85,27 @@
             <div class="allocation">
                 <div class="donut" aria-label="Distribución de 50 horas"></div>
                 <div class="legend">
-                    <div class="legend-item"><i class="swatch" style="background:#075cc9"></i><strong>Estrategia y medición</strong><b>5 h</b></div>
-                    <div class="legend-item"><i class="swatch" style="background:#20a4f3"></i><strong>Preproducción</strong><b>8 h</b></div>
-                    <div class="legend-item"><i class="swatch" style="background:#22a884"></i><strong>Producción</strong><b>12 h</b></div>
-                    <div class="legend-item"><i class="swatch" style="background:#8b5cf6"></i><strong>Postproducción</strong><b>12 h</b></div>
-                    <div class="legend-item"><i class="swatch" style="background:#ed7d31"></i><strong>Publicación y comunidad</strong><b>7 h</b></div>
-                    <div class="legend-item"><i class="swatch" style="background:#db3a6a"></i><strong>Pauta y pruebas</strong><b>3 h</b></div>
-                    <div class="legend-item"><i class="swatch" style="background:#748092"></i><strong>Análisis y cierre</strong><b>3 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#075cc9"></i><strong>Estrategia y arquitectura</strong><b>5 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#20a4f3"></i><strong>Planeación de contenidos</strong><b>10 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#22a884"></i><strong>Campañas de mensajes</strong><b>10 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#8b5cf6"></i><strong>Campañas de llamadas IA</strong><b>8 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#ed7d31"></i><strong>CRM, atribución y enrutamiento</strong><b>7 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#db3a6a"></i><strong>Revisión con producción MQE</strong><b>5 h</b></div>
+                    <div class="legend-item"><i class="swatch" style="background:#748092"></i><strong>Análisis y optimización</strong><b>5 h</b></div>
                 </div>
             </div>
         </section>
 
         <section class="panel" id="ejecucion">
             <div class="section-head">
-                <div><div class="eyebrow">Checklist operativo</div><h2>Qué ejecuta la agencia</h2><p class="muted">Marca tareas para registrar el avance; se guarda en este navegador.</p></div>
+                <div><div class="eyebrow">Checklist operativo</div><h2>Qué planea, configura y controla la agencia</h2><p class="muted">La producción audiovisual la ejecuta el equipo de Maquiempanadas. Marca tareas para registrar el avance; se guarda en este navegador.</p></div>
                 <div class="toolbar"><select id="filter"><option value="all">Todas las semanas</option><option value="1">Semana 1</option><option value="2">Semana 2</option><option value="3">Semana 3</option><option value="4">Semana 4</option></select><div class="progress"><div class="progress-label"><span>Avance</span><span id="progressText">0 / 50 h</span></div><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div><button id="reset">Reiniciar</button></div>
             </div>
             <div class="tasks" id="tasks"></div>
         </section>
 
         <section class="panel" id="calendario">
-            <div class="section-head"><div><div class="eyebrow">Cadencia editorial</div><h2>Ritmo semanal recomendado</h2><p class="muted">El plan del PDF se conserva, ajustado a los resultados observados.</p></div></div>
+            <div class="section-head"><div><div class="eyebrow">Cadencia editorial</div><h2>Ritmo semanal recomendado</h2><p class="muted">La agencia entrega guiones y briefs; el equipo de producción de Maquiempanadas graba, edita y carga las piezas para revisión.</p></div></div>
             <div class="cadence">
                 <article class="day"><small>Lunes</small><h3>Recurso útil</h3><p>Plantilla de costos, guía de capacidad o comparador. CTA con palabra clave “COSTO”.</p></article>
                 <article class="day"><small>Martes</small><h3>FAQ de compra</h3><p>Cotización, ficha técnica, capacidad, pagos, garantía o compatibilidad. CTA “PREGUNTAS”.</p></article>
@@ -114,25 +114,31 @@
                 <article class="day"><small>Domingo</small><h3>CTA / En vivo</h3><p>En vivo quincenal con promesa concreta. Reutilizar cada sesión en clips; evitar el aviso aislado.</p></article>
             </div>
             <div class="weeks" style="margin-top:18px">
-                <article class="week-card"><h3>Semana 1 · Fundamentos</h3><ul><li>Auditoría y línea base.</li><li>Guiones de cotización/capacidad.</li><li>Grabación principal.</li></ul></article>
-                <article class="week-card"><h3>Semana 2 · Evidencia</h3><ul><li>Caso de cliente.</li><li>Prueba sensorial.</li><li>Primer carrusel y prueba de pauta.</li></ul></article>
-                <article class="week-card"><h3>Semana 3 · Objeciones</h3><ul><li>Pagos y garantía.</li><li>Ficha técnica/modelos.</li><li>En vivo + clips reutilizables.</li></ul></article>
-                <article class="week-card"><h3>Semana 4 · Escala</h3><ul><li>Replicar ganadores.</li><li>Corregir cuartil inferior.</li><li>Informe y backlog siguiente.</li></ul></article>
+                <article class="week-card"><h3>Semana 1 · Arquitectura</h3><ul><li>Auditoría, segmentos y línea base.</li><li>Guiones y briefs de producción.</li><li>Mapa de recorridos y responsables.</li></ul></article>
+                <article class="week-card"><h3>Semana 2 · Mensajes</h3><ul><li>Configurar tres secuencias.</li><li>Entregar contenidos a producción MQE.</li><li>Probar trazabilidad y escalamiento.</li></ul></article>
+                <article class="week-card"><h3>Semana 3 · Llamadas IA</h3><ul><li>Lanzar dos pilotos controlados.</li><li>Revisar piezas producidas.</li><li>Auditar conversaciones y derivación.</li></ul></article>
+                <article class="week-card"><h3>Semana 4 · Optimización</h3><ul><li>Ajustar mensajes y guiones.</li><li>Replicar contenido ganador.</li><li>Informe y backlog siguiente.</li></ul></article>
             </div>
         </section>
 
         <section class="panel" id="entregables">
             <div class="section-head"><div><div class="eyebrow">Salida mensual</div><h2>Entregables incluidos</h2></div></div>
             <div class="deliverables">
-                <article class="delivery"><b>8</b><span>Reels editados</span><p>3 prueba/cliente, 3 FAQ/objeción y 2 demostración/beneficio.</p></article>
-                <article class="delivery"><b>4</b><span>Carruseles</span><p>Uno semanal, tratado como experimento porque el histórico aún es pequeño.</p></article>
-                <article class="delivery"><b>12</b><span>Secuencias de stories</span><p>Recurso, FAQ, conexión y activación de conversación.</p></article>
-                <article class="delivery"><b>2</b><span>Funnel de en vivo</span><p>Invitación con promesa, recordatorio, evento y clips posteriores.</p></article>
-                <article class="delivery"><b>3</b><span>Automatizaciones CTA</span><p>Palabras clave COSTO, PREGUNTAS y EN VIVO con respuesta y trazabilidad.</p></article>
-                <article class="delivery"><b>3</b><span>Creativos de pauta</span><p>Dos stories nativas y un carrusel para audiencias frías/retargeting.</p></article>
-                <article class="delivery"><b>1</b><span>Calendario aprobado</span><p>Temas, responsables, fechas, CTA, enlaces y fuente de campaña.</p></article>
-                <article class="delivery"><b>1</b><span>Informe ejecutivo</span><p>Ganadores, piezas a corregir, leads y decisiones del mes siguiente.</p></article>
+                <article class="delivery"><b>8</b><span>Guiones y briefs de reels</span><p>3 prueba/cliente, 3 FAQ/objeción y 2 demostración/beneficio para producción MQE.</p></article>
+                <article class="delivery"><b>4</b><span>Briefs de carruseles</span><p>Copy, estructura visual, CTA y referencia para que el equipo interno los produzca.</p></article>
+                <article class="delivery"><b>12</b><span>Guiones de stories</span><p>Recurso, FAQ, conexión y activación de conversación.</p></article>
+                <article class="delivery"><b>2</b><span>Funnel de en vivo</span><p>Guion, invitación, recordatorio, evento y plan de clips posteriores.</p></article>
+                <article class="delivery"><b>3</b><span>Campañas de mensajes</span><p>Lead nuevo, seguimiento de cotización/demo y reactivación de 30–90 días.</p></article>
+                <article class="delivery"><b>2</b><span>Campañas de llamadas IA</span><p>Calificación/cita de leads calientes y reactivación de leads elegibles.</p></article>
+                <article class="delivery"><b>1</b><span>Matriz CRM y responsables</span><p>Segmentos, fuentes, SLA, reglas de exclusión y entrega a ventas.</p></article>
+                <article class="delivery"><b>1</b><span>Informe ejecutivo</span><p>Contenido, mensajes, llamadas, oportunidades y decisiones del mes siguiente.</p></article>
             </div>
+            <div class="insights">
+                <article class="insight"><h3>Agencia</h3><p>Investiga, planea, escribe, configura automatizaciones, define medición, revisa entregables y optimiza.</p></article>
+                <article class="insight"><h3>Producción Maquiempanadas</h3><p>Valida datos técnicos, graba, edita, diseña, carga activos y aplica las correcciones acordadas.</p></article>
+                <article class="insight"><h3>Ventas</h3><p>Recibe el lead calificado, responde dentro del SLA, cotiza, agenda demostraciones, cierra y actualiza el CRM.</p></article>
+            </div>
+            <p class="rule">Regla de operación: contactar únicamente leads elegibles y con autorización; respetar horarios, plantillas requeridas y exclusiones; detener mensajes o llamadas ante opt-out; identificar la llamada automatizada cuando corresponda y pasar inmediatamente a una persona cuando exista intención de compra, una objeción sensible o una solicitud expresa.</p>
         </section>
 
         <section class="panel" id="metricas">
@@ -144,31 +150,38 @@
                 <tr><td>Seguimientos por publicación</td><td>≈ 2</td><td class="target">≥ 5</td><td>CTA de seguimiento en carruseles de valor.</td></tr>
                 <tr><td>Conversaciones con palabra clave</td><td>Sin línea base consistente</td><td class="target">Medir 100%</td><td>Registrar COSTO, PREGUNTAS y EN VIVO por origen.</td></tr>
                 <tr><td>Leads/ventas con fuente identificada</td><td>60% en muestra de ventas</td><td class="target">≥ 90%</td><td>UTM, palabra clave y fuente obligatoria en CRM.</td></tr>
+                <tr><td>Mensajes automáticos</td><td>Sin línea base consolidada</td><td class="target">Línea base completa</td><td>Medir entrega, lectura, respuesta, calificación y opt-out por secuencia.</td></tr>
+                <tr><td>Llamadas IA</td><td>Piloto nuevo</td><td class="target">Medir 100%</td><td>Registrar contestación, finalización, cita, transferencia y exclusión.</td></tr>
+                <tr><td>Leads calientes correctamente derivados</td><td>Sin medición uniforme</td><td class="target">100%</td><td>Asignar vendedor y próximo paso, sin conversaciones huérfanas.</td></tr>
             </tbody></table></div>
         </section>
     </main>
     <script>
         const tasks = [
-            {id:'a1',week:1,hours:2,owner:'Estratega',name:'Auditar rendimiento anual y últimos 28 días',output:'Línea base, ganadores, cuartil inferior y aprendizajes por formato.'},
-            {id:'a2',week:1,hours:2,owner:'Estratega',name:'Construir calendario, CTA y mapa de medición',output:'Calendario mensual con objetivo, palabra clave, UTM y responsable.'},
-            {id:'a3',week:1,hours:1,owner:'Cuenta',name:'Reunión de alineación y aprobaciones',output:'Alcance cerrado, voceros, locaciones y agenda de grabación.'},
+            {id:'a1',week:1,hours:2,owner:'Estratega',name:'Auditar rendimiento de contenido y funnel comercial',output:'Línea base, ganadores, fugas y oportunidades por etapa.'},
+            {id:'a2',week:1,hours:2,owner:'Estratega',name:'Construir calendario y arquitectura de campañas',output:'Objetivos, canales, segmentos, CTA, UTMs y responsables.'},
+            {id:'a3',week:1,hours:1,owner:'Cuenta',name:'Alinear alcance, aprobaciones y SLA',output:'Reglas de operación acordadas entre agencia, producción y ventas.'},
             {id:'b1',week:1,hours:4,owner:'Copy/Estratega',name:'Escribir guiones y hooks de 8 reels',output:'Prueba real, sensorial, FAQ, objeciones y demostración.'},
-            {id:'b2',week:1,hours:2,owner:'Productor',name:'Preparar shot list, utilería y agenda',output:'Plan de rodaje por escena, máquina, cliente y recurso visual.'},
-            {id:'b3',week:1,hours:2,owner:'Copy',name:'Crear copies de carruseles y stories',output:'4 carruseles y 12 secuencias con una CTA cada una.'},
-            {id:'c1',week:1,hours:6,owner:'Producción',name:'Jornada principal de grabación',output:'Demostraciones, FAQ, B-roll, textura, sonido y vocero.'},
-            {id:'c2',week:2,hours:4,owner:'Producción',name:'Grabar caso de cliente y prueba real',output:'Testimonio, problema, proceso, resultado y producto final.'},
-            {id:'c3',week:2,hours:2,owner:'Producción',name:'Organizar y respaldar material',output:'Biblioteca etiquetada por formato, máquina, tema y fecha.'},
-            {id:'d1',week:2,hours:8,owner:'Editor',name:'Editar 8 reels verticales',output:'Hook en 2 segundos, ritmo, subtítulos, CTA y versiones finales.'},
-            {id:'d2',week:2,hours:3,owner:'Diseño',name:'Diseñar 4 carruseles y assets de stories',output:'Sistema visual consistente y adaptación 9:16 / 4:5.'},
-            {id:'d3',week:2,hours:1,owner:'Editor',name:'Portadas, control de calidad y exportación',output:'Archivos finales revisados y listos para programar.'},
-            {id:'e1',week:3,hours:2,owner:'Community',name:'Programar contenidos, copies y enlaces',output:'Parrilla publicada con CTA, UTM, etiquetas y horarios.'},
-            {id:'e2',week:3,hours:3,owner:'Community',name:'Gestionar comunidad y derivar leads',output:'Respuestas, clasificación y envío de conversaciones al CRM.'},
-            {id:'e3',week:3,hours:2,owner:'Automatización',name:'Configurar palabras clave y probar respuestas',output:'COSTO, PREGUNTAS y EN VIVO funcionando de extremo a extremo.'},
-            {id:'f1',week:3,hours:1.5,owner:'Paid media',name:'Adaptar 3 creativos para pauta',output:'Stories nativas, prueba social y carrusel con mensajes diferenciados.'},
-            {id:'f2',week:3,hours:1,owner:'Paid media',name:'Configurar campañas y audiencias',output:'Prospección, retargeting, UTMs y eventos de medición.'},
-            {id:'f3',week:4,hours:.5,owner:'Paid media',name:'Optimizar prueba inicial',output:'Pausa de perdedores y redistribución hacia el creativo ganador.'},
-            {id:'g1',week:4,hours:2,owner:'Analista',name:'Revisión semanal y decisiones de contenido',output:'Replicar, observar o corregir con evidencia por publicación.'},
-            {id:'g2',week:4,hours:1,owner:'Analista',name:'Informe final y backlog del mes siguiente',output:'Resultados, leads, aprendizajes y próximos experimentos.'}
+            {id:'b2',week:1,hours:3,owner:'Copy/Diseño',name:'Preparar briefs de carruseles y stories',output:'4 carruseles y 12 secuencias con estructura, referencias y CTA.'},
+            {id:'b3',week:1,hours:2,owner:'Estratega',name:'Diseñar dos funnels de en vivo y pauta',output:'Promesa, convocatoria, guion, reutilización y criterio de audiencia.'},
+            {id:'b4',week:1,hours:1,owner:'Cuenta',name:'Entregar shot lists al equipo de producción MQE',output:'Escenas, recursos, voceros, fechas y criterios de aprobación.'},
+            {id:'c1',week:1,hours:2,owner:'Automatización',name:'Diseñar segmentos y recorridos de mensajería',output:'Lead nuevo, post-cotización/demo y reactivación 30–90 días.'},
+            {id:'c2',week:2,hours:3,owner:'Copy/CRM',name:'Escribir tres secuencias automáticas',output:'Mensajes, tiempos, respuestas esperadas, cierres y exclusiones.'},
+            {id:'c3',week:2,hours:3,owner:'Automatización',name:'Configurar campañas de mensajes',output:'Flujos activos con atribución, responsable y entrega a ventas.'},
+            {id:'c4',week:2,hours:2,owner:'QA',name:'Probar plantillas, horarios y opt-out',output:'Recorridos validados de extremo a extremo sin contactos indebidos.'},
+            {id:'d1',week:2,hours:2,owner:'IA/CRM',name:'Diseñar árboles de dos campañas de llamadas IA',output:'Calificación/cita y reactivación con criterios de transferencia.'},
+            {id:'d2',week:2,hours:2,owner:'Copy/IA',name:'Crear prompts, guiones y manejo de objeciones',output:'Conversación acotada, transparente y alineada con información aprobada.'},
+            {id:'d3',week:3,hours:2,owner:'IA/CRM',name:'Configurar y probar llamadas IA',output:'Pilotos controlados, registro de resultado y escalamiento humano.'},
+            {id:'d4',week:3,hours:2,owner:'QA',name:'Auditar transcripciones y ajustar enrutamiento',output:'Hallazgos, correcciones y casos que deben atenderse manualmente.'},
+            {id:'e1',week:1,hours:2,owner:'CRM',name:'Limpiar, deduplicar y segmentar leads',output:'Base elegible con fuente, antigüedad, estado y prioridad.'},
+            {id:'e2',week:2,hours:2,owner:'CRM/Ventas',name:'Definir asignación, SLA y entrega a vendedores',output:'Responsable y próximo paso para cada respuesta con intención.'},
+            {id:'e3',week:2,hours:2,owner:'Analista',name:'Configurar atribución y tablero de campañas',output:'UTM, palabra clave, mensaje, llamada, cita, proforma y venta.'},
+            {id:'e4',week:3,hours:1,owner:'CRM',name:'Preparar reactivación y condiciones de parada',output:'Lista 30–90 días, máximo de contactos y exclusiones verificadas.'},
+            {id:'f1',week:2,hours:3,owner:'Agencia/MQE',name:'Revisar semanalmente las piezas producidas por MQE',output:'Correcciones sobre hook, claridad, CTA, ritmo y adaptación por formato.'},
+            {id:'f2',week:3,hours:2,owner:'Agencia/MQE',name:'Validar marca, producto y cumplimiento',output:'Aprobación conjunta de datos técnicos, ofertas y mensajes sensibles.'},
+            {id:'g1',week:3,hours:2,owner:'Analista',name:'Revisar rendimiento semanal de automatizaciones',output:'Entrega, respuesta, calificación, citas, opt-out y ajustes.'},
+            {id:'g2',week:4,hours:1.5,owner:'Analista',name:'Actualizar tablero de contenido',output:'Replicar, observar o corregir con evidencia por publicación.'},
+            {id:'g3',week:4,hours:1.5,owner:'Analista',name:'Entregar informe y backlog del mes siguiente',output:'Resultados integrados, aprendizajes y próximos experimentos.'}
         ];
         const saved = JSON.parse(localStorage.getItem('mqe-plan-50h') || '{}');
         const container = document.querySelector('#tasks'); const filter = document.querySelector('#filter');
