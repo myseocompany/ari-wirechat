@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Análisis de publicaciones | Maquiempanadas</title>
+    <style>
+        :root { --ink:#14213d; --muted:#637083; --line:#dfe5ec; --paper:#f5f7fa; --blue:#2563eb; --violet:#7c3aed; --green:#15803d; --red:#dc2626; --amber:#d97706; }
+        * { box-sizing:border-box; } body { margin:0; color:var(--ink); background:var(--paper); font:15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        .wrap { max-width:1240px; margin:auto; padding:42px 24px 64px; } .hero { display:flex; justify-content:space-between; gap:24px; align-items:flex-start; margin-bottom:26px; }
+        h1 { margin:0 0 7px; font-size:clamp(28px,4vw,44px); letter-spacing:-.04em; } h2 { margin:0; font-size:18px; } .eyebrow { color:var(--violet); font-weight:750; letter-spacing:.09em; text-transform:uppercase; font-size:12px; } .muted { color:var(--muted); }
+        .status { max-width:405px; padding:18px 20px; border-radius:14px; color:#fff; background:linear-gradient(135deg,#b91c1c,#ef4444); box-shadow:0 12px 30px #ef444433; } .status.good { background:linear-gradient(135deg,#166534,#22c55e); box-shadow:0 12px 30px #22c55e33; } .status h2 { font-size:19px; } .status p { margin:5px 0 0; opacity:.92; }
+        .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:14px 0 26px; } .card, .panel { background:#fff; border:1px solid var(--line); border-radius:14px; box-shadow:0 3px 10px #14213d08; } .card { padding:17px; } .card .label { color:var(--muted); font-size:13px; } .card .number { margin-top:7px; font-size:27px; font-weight:760; letter-spacing:-.04em; } .delta { font-size:12px; font-weight:700; } .delta.up { color:var(--green); } .delta.down { color:var(--red); } .delta.flat { color:var(--amber); }
+        .panel { padding:22px; margin-top:16px; } .panel-header, .controls { display:flex; justify-content:space-between; gap:14px; align-items:center; flex-wrap:wrap; } .legend { display:flex; align-items:center; gap:14px; color:var(--muted); font-size:12px; } .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; } .blue { background:var(--blue); } .violet { background:var(--violet); }
+        .bar-list { display:grid; gap:16px; margin-top:22px; } .bar-row { display:grid; grid-template-columns:165px 1fr 104px; gap:12px; align-items:center; } .bar-label { font-weight:650; } .track { display:grid; gap:5px; } .bar { min-height:14px; border-radius:5px; color:transparent; } .bar.current { background:var(--blue); } .bar.previous { background:var(--violet); } .bar-values { color:var(--muted); font-size:12px; text-align:right; }
+        select { appearance:none; border:1px solid var(--line); border-radius:8px; background:#fff; padding:9px 32px 9px 11px; color:var(--ink); font:inherit; } .table-wrap { overflow:auto; margin-top:17px; } table { width:100%; border-collapse:collapse; min-width:820px; } th { color:var(--muted); font-size:12px; font-weight:700; text-align:left; text-transform:uppercase; letter-spacing:.04em; } th,td { padding:12px 10px; border-bottom:1px solid var(--line); vertical-align:middle; } tbody tr:hover { background:#f8fafc; } .pill { display:inline-block; padding:3px 8px; border-radius:999px; background:#eef2ff; color:#4338ca; font-size:12px; white-space:nowrap; } .post-link { color:var(--blue); font-weight:700; text-decoration:none; } .caption { max-width:420px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .date-note { font-size:13px; }
+        .method { padding:13px 15px; margin-top:18px; border-left:4px solid var(--blue); color:var(--muted); background:#eff6ff; border-radius:6px; font-size:13px; } #loading { text-align:center; padding:80px 20px; color:var(--muted); } .error { max-width:680px; margin:60px auto; background:#fff; border:1px solid #fecaca; padding:24px; border-radius:14px; }
+        @media (max-width:850px) { .hero { display:block; }.status { margin-top:18px; }.grid { grid-template-columns:repeat(2,1fr); }.bar-row { grid-template-columns:115px 1fr; }.bar-values { grid-column:2; text-align:left; } } @media (max-width:460px) { .wrap { padding:28px 14px; }.grid { grid-template-columns:1fr; }.panel { padding:17px; } }
+    </style>
+</head>
+<body>
+    <main class="wrap" id="app"><div id="loading">Cargando las publicaciones y calculando tendencias…</div></main>
+    <script>
+        const csvUrl = './Dec-31-2025_Aug-26-2026_1436853104922776.csv';
+        const metrics = [
+            ['Visualizaciones', 'Visualizaciones'], ['Alcance', 'Alcance'], ['Interacciones', 'Interacciones'],
+            ['Me gusta', 'Me gusta'], ['Veces que se compartió', 'Compartidos'], ['Veces que se guardó', 'Guardados'], ['Seguimientos', 'Seguimientos']
+        ];
+
+        function parseCsv(text) {
+            const rows = [[]]; let value = ''; let quoted = false;
+            for (let index = 0; index < text.length; index++) {
+                const character = text[index]; const next = text[index + 1];
+                if (character === '"' && quoted && next === '"') { value += '"'; index++; }
+                else if (character === '"') { quoted = !quoted; }
+                else if (character === ',' && !quoted) { rows.at(-1).push(value); value = ''; }
+                else if ((character === '\n' || character === '\r') && !quoted) {
+                    if (character === '\r' && next === '\n') { index++; }
+                    rows.at(-1).push(value); value = ''; if (rows.at(-1).some(Boolean)) { rows.push([]); }
+                } else { value += character; }
+            }
+            if (value || rows.at(-1).length) { rows.at(-1).push(value); }
+            const header = rows.shift().map((item, index) => index === 0 ? item.replace(/^\uFEFF/, '') : item);
+            return rows.filter(row => row.length === header.length).map(row => Object.fromEntries(header.map((key, index) => [key, row[index]])));
+        }
+
+        function number(value) { return Number(String(value || '0').replace(/[^\d-]/g, '')) || 0; }
+        function date(value) { const found = String(value).match(/(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)/); return found ? new Date(+found[3], +found[1] - 1, +found[2], +found[4], +found[5]) : null; }
+        function format(value) { return new Intl.NumberFormat('es-CO').format(Math.round(value)); }
+        function pct(value) { return `${value > 0 ? '+' : ''}${value.toFixed(0)}%`; }
+        function delta(current, previous) { return previous ? ((current - previous) / previous) * 100 : 0; }
+        function summary(rows) {
+            const totals = Object.fromEntries(metrics.map(([key]) => [key, 0]));
+            rows.forEach(row => { metrics.forEach(([key]) => { totals[key] += key === 'Interacciones' ? number(row['Me gusta']) + number(row['Veces que se compartió']) + number(row['Comentarios']) + number(row['Veces que se guardó']) : number(row[key]); }); });
+            totals.Publicaciones = rows.length; totals.TasaInteraccion = totals.Alcance ? (totals.Interacciones / totals.Alcance) * 100 : 0;
+            return totals;
+        }
+        function startOfDay(value) { return new Date(value.getFullYear(), value.getMonth(), value.getDate()); }
+        function dateLabel(value) { return value.toLocaleDateString('es-CO', { day:'numeric', month:'short', year:'numeric' }); }
+        function render(data) {
+            const latest = new Date(Math.max(...data.map(row => row.date))); const recentStart = startOfDay(new Date(latest)); recentStart.setDate(recentStart.getDate() - 27);
+            const previousStart = new Date(recentStart); previousStart.setDate(previousStart.getDate() - 28);
+            const recent = data.filter(row => row.date >= recentStart && row.date <= latest); const previous = data.filter(row => row.date >= previousStart && row.date < recentStart);
+            const now = summary(recent); const before = summary(previous); const avgViewDelta = delta(now.Visualizaciones / now.Publicaciones, before.Visualizaciones / before.Publicaciones); const reachDelta = delta(now.Alcance / now.Publicaciones, before.Alcance / before.Publicaciones); const engagementDelta = delta(now.TasaInteraccion, before.TasaInteraccion);
+            const improved = (avgViewDelta + reachDelta + engagementDelta) / 3 >= 0;
+            const app = document.querySelector('#app');
+            app.innerHTML = `
+                <section class="hero"><div><div class="eyebrow">Instagram · Maquiempanadas</div><h1>¿Las publicaciones recientes mejoraron?</h1><p class="muted">Compara los últimos 28 días disponibles (<strong>${dateLabel(recentStart)} – ${dateLabel(latest)}</strong>) contra los 28 días anteriores.</p></div>
+                <aside class="status ${improved ? 'good' : ''}"><h2>${improved ? 'Sí, hay una mejora' : 'No: el rendimiento desmejoró'}</h2><p>${improved ? 'El promedio combinado de visualizaciones, alcance e interacción creció.' : 'Se publicó más, pero el rendimiento promedio por publicación cayó frente al periodo anterior.'}</p></aside></section>
+                <section class="grid">
+                    ${metricCard('Publicaciones', now.Publicaciones, before.Publicaciones, 'publicaciones')}
+                    ${metricCard('Visualizaciones por publicación', now.Visualizaciones / now.Publicaciones, before.Visualizaciones / before.Publicaciones, 'vistas promedio')}
+                    ${metricCard('Alcance por publicación', now.Alcance / now.Publicaciones, before.Alcance / before.Publicaciones, 'alcance promedio')}
+                    ${metricCard('Tasa de interacción', now.TasaInteraccion, before.TasaInteraccion, 'sobre alcance', true)}
+                </section>
+                <section class="panel"><div class="panel-header"><div><div class="eyebrow">Comparación por publicación</div><h2>Lo reciente vs. el periodo anterior</h2></div><div class="legend"><span><i class="dot blue"></i>Últimos 28 días</span><span><i class="dot violet"></i>28 días anteriores</span></div></div><div class="bar-list" id="bars"></div><div class="method">La comparación usa promedios por publicación para no confundir mayor frecuencia con mejor rendimiento. “Interacciones” = me gusta + compartidos + comentarios + guardados.</div></section>
+                <section class="panel"><div class="panel-header"><div><div class="eyebrow">Detalle de contenido</div><h2>Publicaciones para replicar o corregir</h2></div><div class="controls"><select id="period"><option value="recent">Últimos 28 días</option><option value="previous">28 días anteriores</option><option value="all">Todo el export</option></select><select id="sort"><option value="Visualizaciones">Ordenar: visualizaciones</option><option value="Alcance">Ordenar: alcance</option><option value="Interacciones">Ordenar: interacciones</option><option value="Seguimientos">Ordenar: seguimientos</option></select></div></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Publicación</th><th>Visualizaciones</th><th>Alcance</th><th>Interacciones</th><th>Seguimientos</th></tr></thead><tbody id="posts"></tbody></table></div></section>`;
+            const bars = document.querySelector('#bars');
+            [['Visualizaciones', now.Visualizaciones / now.Publicaciones, before.Visualizaciones / before.Publicaciones], ['Alcance', now.Alcance / now.Publicaciones, before.Alcance / before.Publicaciones], ['Interacciones', now.Interacciones / now.Publicaciones, before.Interacciones / before.Publicaciones], ['Seguimientos', now.Seguimientos / now.Publicaciones, before.Seguimientos / before.Publicaciones]].forEach(([label, current, prior]) => {
+                const maximum = Math.max(current, prior, 1); bars.insertAdjacentHTML('beforeend', `<div class="bar-row"><div class="bar-label">${label}<br><span class="delta ${delta(current,prior) >= 0 ? 'up' : 'down'}">${pct(delta(current, prior))}</span></div><div class="track"><div class="bar current" style="width:${current / maximum * 100}%"></div><div class="bar previous" style="width:${prior / maximum * 100}%"></div></div><div class="bar-values">${format(current)} / ${format(prior)}<br><span>reciente / anterior</span></div></div>`);
+            });
+            function updatePosts() { const selected = document.querySelector('#period').value; const field = document.querySelector('#sort').value; const list = selected === 'recent' ? recent : selected === 'previous' ? previous : data; document.querySelector('#posts').innerHTML = [...list].sort((a,b) => b[field] - a[field]).map(row => `<tr><td class="date-note">${dateLabel(row.date)}</td><td><span class="pill">${row['Tipo de publicación'].replace(' de Instagram','')}</span></td><td class="caption"><a class="post-link" href="${row['Enlace permanente']}" target="_blank" rel="noreferrer">Abrir publicación</a><br><span class="muted">${escapeHtml(row.Descripción || 'Sin descripción')}</span></td><td>${format(row.Visualizaciones)}</td><td>${format(row.Alcance)}</td><td>${format(row.Interacciones)}</td><td>${format(row.Seguimientos)}</td></tr>`).join(''); }
+            document.querySelector('#period').addEventListener('change', updatePosts); document.querySelector('#sort').addEventListener('change', updatePosts); updatePosts();
+        }
+        function metricCard(label, current, previous, suffix, isRate = false) { const change = delta(current, previous); const state = change > 2 ? 'up' : change < -2 ? 'down' : 'flat'; return `<article class="card"><div class="label">${label}</div><div class="number">${isRate ? current.toFixed(2) + '%' : format(current)}</div><div class="delta ${state}">${pct(change)} vs. periodo anterior · ${suffix}</div></article>`; }
+        function escapeHtml(value) { const element = document.createElement('span'); element.textContent = value; return element.innerHTML; }
+        fetch(csvUrl).then(response => { if (!response.ok) throw new Error(); return response.text(); }).then(text => parseCsv(text).map(row => ({ ...row, date:date(row['Hora de publicación']), Visualizaciones:number(row.Visualizaciones), Alcance:number(row.Alcance), Seguimientos:number(row.Seguimientos), Interacciones:number(row['Me gusta']) + number(row['Veces que se compartió']) + number(row.Comentarios) + number(row['Veces que se guardó']) })).filter(row => row.date)).then(render).catch(() => { document.querySelector('#app').innerHTML = '<div class="error"><h2>No se pudo cargar el CSV</h2><p>Abre esta página desde el sitio Laravel para que pueda leer el archivo de datos publicado.</p></div>'; });
+    </script>
+</body>
+</html>
