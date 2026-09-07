@@ -167,7 +167,11 @@ class WhatsAppInboundMessageService
     private function resolveTimestamp(int $timestamp): Carbon
     {
         if ($timestamp > 0) {
-            return Carbon::createFromTimestamp($timestamp);
+            // WhatsApp delivers Unix timestamps in UTC. Persisting the Carbon instance
+            // in UTC into a timezone-naive DATETIME column makes the inbox render it as
+            // a future Colombia time. Store the application-local representation instead.
+            return Carbon::createFromTimestamp($timestamp, 'UTC')
+                ->setTimezone(config('app.timezone', 'America/Bogota'));
         }
 
         return now();

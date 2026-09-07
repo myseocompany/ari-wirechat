@@ -3721,29 +3721,11 @@ class APIController extends Controller
 
     public function saveChannelsAction(Request $request)
     {
-        // --- 1) ACK inmediato (TTFB bajito) -------------------------------
-        // Enviar la respuesta al cliente YA y cerrar la conexión HTTP.
-        response()->json(['status' => 'accepted'], 200)->send();
-        if (function_exists('fastcgi_finish_request')) {
-            fastcgi_finish_request(); // PHP-FPM libera al cliente
-        }
-
         $payloadRaw = $request->getContent();
         $payloadDecoded = json_decode($payloadRaw, true);
-        $payloadData = is_array($payloadDecoded) && array_key_exists(0, $payloadDecoded)
-            ? $payloadDecoded[0]
-            : $payloadDecoded;
-        if (is_array($payloadData) && isset($payloadData['body']) && is_array($payloadData['body'])) {
-            $payloadData = $payloadData['body'];
-        }
-        $phone = is_array($payloadData)
-            ? ($payloadData['msisdn']
-                ?? ($payloadData['contact']['msisdns'][0] ?? null)
-                ?? $payloadData['phoneNumber']
-                ?? $payloadData['contactMsisdn']
-                ?? null)
-            : null;
-        $agentId = is_array($payloadData) ? ($payloadData['agentId'] ?? null) : null;
+        $data = $this->normalizeChannelsWebhookPayload($payloadDecoded);
+        $phone = $this->extractChannelsPhone($data);
+        $agentId = $data['agentId'] ?? $data['agent_id'] ?? null;
 
         try {
             ChannelsWebhookLog::create([
@@ -3763,50 +3745,36 @@ class APIController extends Controller
             ]);
         }
 
-        // --- 2) (Opcional) Autenticación simple por header ----------------
-        // Usa un secreto propio para evitar ruido; no devuelvas 403 a Channels.
+        // No cerramos la respuesta antes de persistir. Con fastcgi_finish_request()
+        // el proceso posterior puede abortarse y Channels recibe un ACK aunque la
+        // llamada no haya quedado registrada.
         try {
             $expected = config('services.channels.secret'); // ponlo en .env
             $got = $request->header('X-Webhook-Secret');
             if ($expected && (! is_string($got) || ! hash_equals($expected, $got))) {
                 \Log::warning('Channels webhook con secreto inválido');
 
-                // Nota: no abortamos; solo ignoramos el evento.
-                return;
+                return response()->json(['status' => 'ignored'], 202);
             }
         } catch (\Throwable $e) {
             \Log::error('Error validando secreto Channels: '.$e->getMessage());
+
+            return response()->json(['status' => 'accepted'], 202);
         }
 
-        // --- 3) Procesamiento asíncrono / en background -------------------
         try {
-            $raw = is_array($payloadDecoded) ? $payloadDecoded : [];
-
-            // Normalizar forma del payload (a veces viene envuelto)
-            $data = is_array($raw) && array_key_exists(0, $raw) ? $raw[0] : $raw;
-            if (isset($data['body']) && is_array($data['body'])) {
-                $data = $data['body'];
-            }
-
-            // Campos tolerantes a distintas variantes de Channels
             $evtType = $data['webhookType'] ?? $data['lastEventType'] ?? $data['type'] ?? null;
-            $msisdn = $data['msisdn'] ?? ($data['contact']['msisdns'][0] ?? null) ?? $data['phoneNumber'] ?? null;
-            $agentId = $data['agentId'] ?? null;
+            $msisdn = $phone;
             $recUrl = $data['recordingLink'] ?? $data['recordingUrl'] ?? null;
 
-            \Log::info('✅ Channels ACK enviado; procesando en background', [
+            \Log::info('Channels webhook recibido', [
                 'evtType' => $evtType,
                 'msisdn' => $msisdn,
                 'agentId' => $agentId,
                 'hasRec' => (bool) $recUrl,
             ]);
 
-            // Si tienes colas, es mejor delegar a un Job
-            // ProcessChannelsWebhook::dispatch($data)->onQueue('webhooks');
-
-            // Fallback sin colas:
             if ($msisdn) {
-                // Normaliza tu formato interno (ajusta a tus helpers reales)
                 $phone = preg_replace('/\D+/', '', $msisdn);
 
                 $customer = \App\Models\Customer::findByPhoneInternational($phone);
@@ -3827,6 +3795,11 @@ class APIController extends Controller
                 } else {
                     \Log::info('Cliente no encontrado por msisdn', ['msisdn' => $msisdn]);
                 }
+            } else {
+                \Log::warning('Webhook de Channels sin número de contacto', [
+                    'evtType' => $evtType,
+                    'payload_keys' => array_keys($data),
+                ]);
             }
         } catch (\Throwable $e) {
             \Log::error('Webhook Channels Error: '.$e->getMessage(), [
@@ -3834,6 +3807,51 @@ class APIController extends Controller
             ]);
         }
 
+        return response()->json(['status' => 'accepted'], 202);
+    }
+
+    /**
+     * Channels can send its event directly, inside the first list item, or
+     * inside a `body` wrapper depending on the event type.
+     */
+    private function normalizeChannelsWebhookPayload(mixed $payload): array
+    {
+        if (! is_array($payload)) {
+            return [];
+        }
+
+        $data = array_key_exists(0, $payload) && is_array($payload[0])
+            ? $payload[0]
+            : $payload;
+
+        return isset($data['body']) && is_array($data['body'])
+            ? $data['body']
+            : $data;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function extractChannelsPhone(array $payload): ?string
+    {
+        $candidates = [
+            $payload['msisdn'] ?? null,
+            data_get($payload, 'contact.msisdns.0'),
+            data_get($payload, 'contact.msisdn'),
+            data_get($payload, 'contacts.0.msisdns.0'),
+            data_get($payload, 'contacts.0.msisdn'),
+            data_get($payload, 'contacts.0.phoneNumber'),
+            $payload['phoneNumber'] ?? null,
+            $payload['contactMsisdn'] ?? null,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_scalar($candidate) && trim((string) $candidate) !== '') {
+                return (string) $candidate;
+            }
+        }
+
+        return null;
     }
 
     public function saveChannelsAction2(Request $request)
