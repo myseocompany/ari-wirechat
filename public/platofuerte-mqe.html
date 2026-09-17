@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Plato Fuerte 2ª ed. — Segmentos para Maquiempanadas</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: #161b22;
+    --panel-2: #1c232d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #f2a900;
+    --accent-2: #ffd166;
+    --border: #30363d;
+    --link: #58a6ff;
+    --active: #2a3441;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; line-height: 1.5; }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  button { font: inherit; cursor: pointer; }
+
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  header { margin-bottom: 20px; }
+  h1 { margin: 0 0 4px; font-size: 24px; letter-spacing: -0.01em; }
+  h1 small { color: var(--muted); font-weight: 500; font-size: 14px; display: block; margin-top: 2px; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  .meta strong { color: var(--text); }
+  .meta code { background: var(--panel); padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start; }
+  @media (min-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); } }
+
+  /* LEFT: segments list */
+  .segments { display: flex; flex-direction: column; gap: 8px; max-height: none; }
+  .segments-header { display: flex; justify-content: space-between; align-items: center; padding: 0 4px 6px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease; }
+  .card:hover { border-color: var(--accent); }
+  .card.active { border-color: var(--accent); background: var(--active); }
+  .card.active .num { color: var(--accent-2); }
+  .card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .num { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; font-size: 13px; min-width: 22px; }
+  .title { font-size: 15px; font-weight: 600; margin: 0; flex: 1; }
+  .times { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; color: var(--accent-2); background: var(--panel-2); padding: 2px 7px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap; }
+  .desc { color: var(--text); font-size: 13.5px; margin: 4px 0 6px; }
+  .mqe { background: var(--panel-2); border-left: 3px solid var(--accent); padding: 7px 10px; font-size: 12.5px; border-radius: 3px; color: var(--text); }
+  .mqe strong { color: var(--accent-2); }
+  .actions { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 12px; }
+  .btn-play { background: var(--accent); color: #1a1a1a; border: 0; padding: 5px 10px; border-radius: 4px; font-weight: 600; font-size: 12px; }
+  .btn-play:hover { background: var(--accent-2); }
+  .yt-out { color: var(--link); font-size: 12px; }
+
+  /* RIGHT: player */
+  .player-col { position: sticky; top: 16px; align-self: start; display: flex; flex-direction: column; gap: 12px; }
+  .video-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .now-playing { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+  .now-playing .np-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .now-playing .np-title { font-size: 16px; font-weight: 600; margin: 0 0 6px; }
+  .now-playing .np-times { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; color: var(--accent-2); }
+  .fallback { color: var(--muted); font-size: 12.5px; }
+  .fallback a { color: var(--link); }
+
+  footer { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12.5px; }
+  footer code { background: var(--panel); padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>
+      Plato Fuerte — 2.ª edición (Q2 2026)
+      <small>Segmentos clave del conversatorio para uso comercial de Maquiempanadas</small>
+    </h1>
+    <div class="meta">
+      <strong>Fuente:</strong> <a href="https://www.youtube.com/watch?v=hZ4VsisvAu8" target="_blank" rel="noopener">YouTube — Plato Fuerte 2.ª ed.</a> ·
+      <strong>Base:</strong> SalesTrack (HeeLatam / GIG) sobre +70 cadenas ·
+      <strong>Panelistas:</strong> Mariano Arango, Pilar Amorocho, Sergio Victoria ·
+      <strong>Docs:</strong> <code>mqe_hechos_food_service_plato_fuerte_2026_09.md</code>, <code>mqe_activacion_marketing_plato_fuerte_2026_09.md</code>
+    </div>
+    <div class="meta"><em>Cifras del panel, no dato oficial. Citar como «análisis de más de 70 cadenas (SalesTrack, Q2 2026)».</em></div>
+  </header>
+
+  <div class="layout">
+    <!-- LEFT: segments list -->
+    <section>
+      <div class="segments-header">
+        <span>Segmentos (11)</span>
+        <span>Duración total ~1h 26m</span>
+      </div>
+      <div class="segments" id="segments"></div>
+    </section>
+
+    <!-- RIGHT: player -->
+    <aside class="player-col">
+      <div class="video-frame">
+        <iframe id="player"
+          src="https://www.youtube-nocookie.com/embed/hZ4VsisvAu8?rel=0"
+          title="Plato Fuerte 2ª edición"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
+      </div>
+      <div class="now-playing">
+        <div class="np-label">Reproduciendo</div>
+        <h3 class="np-title" id="np-title">—</h3>
+        <div class="np-times" id="np-times">—</div>
+      </div>
+      <p class="fallback">Referencia original: <a href="https://www.youtube.com/watch?v=hZ4VsisvAu8" target="_blank" rel="noopener">YouTube — Plato Fuerte 2.ª ed.</a></p>
+    </aside>
+  </div>
+
+  <footer>
+    Generado el 2026-09-16 · Basado en <code>docs/2026_09/mqe_hechos_food_service_plato_fuerte_2026_09.md</code> y el video <a href="https://www.youtube.com/watch?v=hZ4VsisvAu8" target="_blank" rel="noopener">hZ4VsisvAu8</a>. Toda pieza pública debe pasar el control de calidad de voz de marca (<code>docs/2026_08/mqe_brand_voice.md</code>).
+  </footer>
+</div>
+
+<script>
+  const VIDEO_ID = 'hZ4VsisvAu8';
+
+  const segments = [
+    { n: 1,  start: 371,  end: 491,  title: 'Apertura del conversatorio',
+      desc: 'Mariano abre la 2.ª edición y presenta a Pilar Amorocho (25+ años en la industria) y a Sergio Victoria (HeeLatam).',
+      mqe: 'Contexto y credibilidad del evento; útil para citar la fuente en piezas comerciales.' },
+    { n: 2,  start: 491,  end: 789,  title: 'Metodología SalesTrack',
+      desc: 'Sergio explica que SalesTrack mide +70 cadenas del mercado formal en Colombia (ventas, transacciones, servicio, pricing).',
+      mqe: 'Respaldo metodológico. Fórmula de citación: «análisis de más de 70 cadenas de restaurantes de Colombia (SalesTrack, Q2 2026)».' },
+    { n: 3,  start: 789,  end: 828,  title: 'Desempeño por categoría',
+      desc: 'Pollo domina: <b>+18 %</b> ventas y <b>+10 %</b> transacciones. Helados +10 %/+4,1 %. QSR +12,1 %/+6,1 %. Casual +7,6 %/+0,4 %. Cafeterías −1,1 %.',
+      mqe: 'Prioridad comercial: <b>pollo, QSR y acompañamientos/helados</b>. Cafeterías solo con equipos compactos (CM06).' },
+    { n: 4,  start: 828,  end: 1231, title: 'Rentabilidad bajo presión',
+      desc: 'Todas las categorías crecen en ventas, pero los empresarios reportan que «no es suficiente». Compresión de margen por salario mínimo, reforma laboral e inflación.',
+      mqe: 'Ángulo maestro: vender <em>ahorro y control de costo por unidad producida</em>, no «tecnología». Máquina = proyecto de productividad del punto existente.' },
+    { n: 5,  start: 1231, end: 2185, title: 'Domicilio: un tercio del negocio',
+      desc: 'Domicilio = <b>30 %</b> de las ventas de QSR y casual dining. Rappi 52 %, canal propio 34 %, DiDi 13 %. En total, 67 % depende de terceros.',
+      mqe: 'Cocinas que produzcan el volumen adicional del domicilio sin ampliar planta ni depender de personal calificado en pico.' },
+    { n: 6,  start: 2185, end: 2530, title: 'Shrinkflation: porción y calidad no se tocan',
+      desc: 'Aumento acumulado ~40 % en 3 años, demanda elástica. Achicar porción o calidad daña la recurrencia; el consumidor lo nota.',
+      mqe: '«La empanada no se toca. El costo se ataca por otro lado.» Uniformidad como control de costo sin sacrificar producto.' },
+    { n: 7,  start: 2530, end: 2744, title: 'Mano de obra: costo y rotación',
+      desc: 'Mano de obra <b>20–25 %</b> de costos. Rotación <b>200–300 %</b> anual. 70 % de las ventas se concentra viernes–domingo.',
+      mqe: '«La máquina no rota, no cobra prestaciones y produce igual el sábado.» Contrastar capacidad CM06 (500/h), CM08 (500/h), CM05S (1600/h) vs. costo del pico.' },
+    { n: 8,  start: 2744, end: 2858, title: 'Formatos en transición: pickup coffee y all day',
+      desc: 'En México crecen los <em>pickup coffee</em> (~3×3 m, menú corto). En Colombia el formato rápido está desatendido. Paralelo: formato <em>all day</em> en casual dining.',
+      mqe: 'Equipos compactos (CM06/CM06B) para micro-formatos; equipos de turno largo (CM05S/CM08) para all day.' },
+    { n: 9,  start: 2858, end: 3336, title: 'Aperturas casi detenidas: compran productividad',
+      desc: 'Aperturas H1 2026: QSR +0,5 %, casual 0 %, cafeterías +0,3 %, helados +3,3 %. Auge de remodelaciones y adquisiciones (<b>Kokoriko, Presto, OMA, Archie\'s</b>).',
+      mqe: 'El dinero está en <em>remodelar</em>. Equipos que quepan en cocinas existentes; vender como remodelación/productividad, no expansión.' },
+    { n: 10, start: 3336, end: 4800, title: 'Terremoto en el Eje Cafetero',
+      desc: 'Zona afectada = <b>16,3 %</b> de la industria. Armenia +10,4 %, Pereira +10,2 %, Manizales +9,8 %, Cali +6,3 %. QSR regional facturaba ~<b>$230 M/mes</b>. Fenalco Caldas coordinando.',
+      mqe: 'Escenario de re-equipamiento. <em>Tono cauto, respetuoso, no oportunista.</em> Entrar con lectura microzonal y aliados gremiales.' },
+    { n: 11, start: 4800, end: 5160, title: 'Estacionalidad: la ventana de instalación',
+      desc: 'Segundo semestre siempre es el mejor: desde octubre el consumo ya es «dicembrino». Septiembre es tradicionalmente el mes más bajo.',
+      mqe: '«La temporada empieza en octubre. La máquina se instala en septiembre.» Campaña sept–oct 2026 → producción oct–dic.' },
+  ];
+
+  const fmtTime = (s) => {
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  };
+
+  const listEl = document.getElementById('segments');
+  const player = document.getElementById('player');
+  const npTitle = document.getElementById('np-title');
+  const npTimes = document.getElementById('np-times');
+
+  segments.forEach((s, i) => {
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.dataset.idx = i;
+    const watchUrl = `https://www.youtube.com/watch?v=${VIDEO_ID}&t=${s.start}s`;
+    card.innerHTML = `
+      <div class="card-head">
+        <span class="num">${String(s.n).padStart(2,'0')}</span>
+        <h3 class="title">${s.title}</h3>
+        <span class="times">${fmtTime(s.start)} – ${fmtTime(s.end)}</span>
+      </div>
+      <p class="desc">${s.desc}</p>
+      <div class="mqe"><strong>Para Maquiempanadas:</strong> ${s.mqe}</div>
+      <div class="actions">
+        <button class="btn-play" type="button">▶ Reproducir aquí</button>
+        <a class="yt-out" href="${watchUrl}" target="_blank" rel="noopener">YouTube ↗</a>
+      </div>
+    `;
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.yt-out')) return;
+      selectSegment(i);
+    });
+    listEl.appendChild(card);
+  });
+
+  function selectSegment(i) {
+    const s = segments[i];
+    document.querySelectorAll('.card').forEach((c, idx) => c.classList.toggle('active', idx === i));
+    player.src = `https://www.youtube-nocookie.com/embed/${VIDEO_ID}?start=${s.start}&end=${s.end}&autoplay=1&rel=0`;
+    npTitle.textContent = `${String(s.n).padStart(2,'0')} · ${s.title}`;
+    npTimes.textContent = `${fmtTime(s.start)} – ${fmtTime(s.end)}`;
+  }
+
+  // Preselect first segment on load (without autoplay).
+  const s0 = segments[0];
+  document.querySelector('.card').classList.add('active');
+  npTitle.textContent = `01 · ${s0.title}`;
+  npTimes.textContent = `${fmtTime(s0.start)} – ${fmtTime(s0.end)}`;
+</script>
+</body>
+</html>
