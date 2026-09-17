@@ -23,50 +23,58 @@
   a:hover { text-decoration: underline; }
   button { font: inherit; cursor: pointer; }
 
-  .wrap { max-width: 1400px; margin: 0 auto; padding: 24px 20px 80px; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 16px 14px 60px; }
 
-  header { margin-bottom: 20px; }
-  h1 { margin: 0 0 4px; font-size: 24px; letter-spacing: -0.01em; }
-  h1 small { color: var(--muted); font-weight: 500; font-size: 14px; display: block; margin-top: 2px; }
-  .meta { color: var(--muted); font-size: 13px; margin-top: 10px; }
+  header { margin-bottom: 16px; }
+  h1 { margin: 0 0 4px; font-size: 20px; letter-spacing: -0.01em; }
+  h1 small { color: var(--muted); font-weight: 500; font-size: 13px; display: block; margin-top: 2px; }
+  .meta { color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.7; }
   .meta strong { color: var(--text); }
-  .meta code { background: var(--panel); padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+  .meta code { display: none; }
 
-  .layout { display: grid; grid-template-columns: 1fr; gap: 20px; align-items: start; }
-  @media (min-width: 1000px) { .layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); } }
+  .layout { display: grid; grid-template-columns: 1fr; gap: 14px; align-items: start; }
+  @media (min-width: 1000px) {
+    .wrap { padding: 24px 20px 80px; }
+    h1 { font-size: 24px; }
+    .meta code { display: inline; background: var(--panel); padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+    .layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; }
+  }
 
-  /* LEFT: segments list */
-  .segments { display: flex; flex-direction: column; gap: 8px; max-height: none; }
+  /* LEFT: segments list — on mobile comes BELOW player via order */
+  .segments-col { order: 2; }
+  @media (min-width: 1000px) { .segments-col { order: 1; } }
+  .segments { display: flex; flex-direction: column; gap: 8px; }
   .segments-header { display: flex; justify-content: space-between; align-items: center; padding: 0 4px 6px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
   .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease; }
   .card:hover { border-color: var(--accent); }
   .card.active { border-color: var(--accent); background: var(--active); }
   .card.active .num { color: var(--accent-2); }
-  .card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .card-head { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 6px 10px; margin-bottom: 4px; }
   .num { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; font-size: 13px; min-width: 22px; }
-  .title { font-size: 15px; font-weight: 600; margin: 0; flex: 1; }
-  .times { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; color: var(--accent-2); background: var(--panel-2); padding: 2px 7px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap; }
-  .desc { color: var(--text); font-size: 13.5px; margin: 4px 0 6px; }
-  .mqe { background: var(--panel-2); border-left: 3px solid var(--accent); padding: 7px 10px; font-size: 12.5px; border-radius: 3px; color: var(--text); }
+  .title { font-size: 15px; font-weight: 600; margin: 0; flex: 1; min-width: 0; }
+  .times { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11px; color: var(--accent-2); background: var(--panel-2); padding: 2px 7px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap; align-self: center; }
+  .desc { color: var(--text); font-size: 13px; margin: 4px 0 6px; }
+  .mqe { background: var(--panel-2); border-left: 3px solid var(--accent); padding: 7px 10px; font-size: 12px; border-radius: 3px; color: var(--text); }
   .mqe strong { color: var(--accent-2); }
   .actions { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 12px; }
-  .btn-play { background: var(--accent); color: #1a1a1a; border: 0; padding: 5px 10px; border-radius: 4px; font-weight: 600; font-size: 12px; }
+  .btn-play { background: var(--accent); color: #1a1a1a; border: 0; padding: 6px 12px; border-radius: 4px; font-weight: 600; font-size: 13px; }
   .btn-play:hover { background: var(--accent-2); }
   .yt-out { color: var(--link); font-size: 12px; }
 
-  /* RIGHT: player */
-  .player-col { position: sticky; top: 16px; align-self: start; display: flex; flex-direction: column; gap: 12px; }
+  /* RIGHT/TOP: player — on mobile comes FIRST via order */
+  .player-col { order: 1; position: sticky; top: 0; align-self: start; display: flex; flex-direction: column; gap: 10px; z-index: 10; background: var(--bg); padding-bottom: 8px; }
+  @media (min-width: 1000px) { .player-col { order: 2; top: 16px; padding-bottom: 0; } }
   .video-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
   .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-  .now-playing { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
-  .now-playing .np-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
-  .now-playing .np-title { font-size: 16px; font-weight: 600; margin: 0 0 6px; }
-  .now-playing .np-times { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12px; color: var(--accent-2); }
-  .fallback { color: var(--muted); font-size: 12.5px; }
-  .fallback a { color: var(--link); }
+  .now-playing { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .now-playing .np-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+  .now-playing .np-title { font-size: 14px; font-weight: 600; margin: 0; flex: 1; }
+  .now-playing .np-times { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 11px; color: var(--accent-2); white-space: nowrap; }
+  .fallback { display: none; }
+  @media (min-width: 1000px) { .fallback { display: block; color: var(--muted); font-size: 12.5px; } .fallback a { color: var(--link); } }
 
-  footer { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12.5px; }
-  footer code { background: var(--panel); padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+  footer { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12px; }
+  footer code { background: var(--panel); padding: 2px 6px; border-radius: 3px; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -87,7 +95,7 @@
 
   <div class="layout">
     <!-- LEFT: segments list -->
-    <section>
+    <section class="segments-col">
       <div class="segments-header">
         <span>Segmentos (11)</span>
         <span>Duración total ~1h 26m</span>
