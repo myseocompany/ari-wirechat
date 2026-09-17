@@ -216,6 +216,15 @@
   document.querySelector('.card').classList.add('active');
   npTitle.textContent = `01 · ${s0.title}`;
   npTimes.textContent = `${fmtTime(s0.start)} – ${fmtTime(s0.end)}`;
+
+  // Hide local-play buttons if clips are not available on this server.
+  fetch('clips/01_apertura.mp4', { method: 'HEAD' })
+    .then(r => { if (!r.ok) hideLocalButtons(); })
+    .catch(() => hideLocalButtons());
+
+  function hideLocalButtons() {
+    document.querySelectorAll('.btn-play').forEach(b => b.style.display = 'none');
+  }
 </script>
 </body>
 </html>
