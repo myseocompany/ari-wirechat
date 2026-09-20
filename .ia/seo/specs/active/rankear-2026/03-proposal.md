@@ -7,9 +7,13 @@ proposed_at: 2026-09-20
 
 ## Resumen
 
-Combinar investigación de mercado (DataForSEO, presupuesto $45 de los $50 comprados), benchmark cross-category (recorrer 100+ SERPs de nichos B2B con productos físicos caros para aprender patrones ganadores), y un motor de generación de contenidos asistido por LLM con revisión humana, para publicar 15+ piezas ancladas en gaps reales y pasar de rankear solo en texto a rankear en las 4 categorías universales de Google (texto / imágenes / video / shopping) en Colombia y USA como fase 1.
+Rankear top 3 en 4 categorías universales de Google (texto / imágenes / video / shopping) atacando **6 nichos culturalmente específicos** definidos por la cliente + 2 mercados profesionales cruzados. Los nichos son intersecciones audiencia × geografía × producto identitario × vocabulario local: cubanos en USA (empanada cubana), puertorriqueños (empanadilla/pastelillo), costarricenses (chiverre/queso), chilenos (empanada de pino), venezolanos (harina de maíz + arepas) y colombianos en España.
 
-**El feature se ejecuta bajo el nuevo SEO Harness** (`.ia/seo/harness/`) que define SOUL, MÉTODO (RESEARCH → GAP_ANALYSIS → CONTENT_PLAN → GENERATE → PUBLISH → MONITOR → EVOLVE), POLÍTICAS, skills (content QC, model routing, data hygiene), workflows y prompts. El harness es la contraparte MYSEO de SPECBOOT (que queda para el código Laravel del repo).
+Estrategia de **dos pilares de producto**: CM06 (empanadas + arepas, puerta de entrada) para buyer inicial + CM5S (multifuncional con telemetría, competencia directa vs Anko) para buyer profesional. Cada nicho recibe una landing específica que enlaza al pilar correspondiente según intención comercial.
+
+Combinar investigación DataForSEO (presupuesto $45 USD ya comprados, distribuidos en 8 batches por `location_code`), benchmark cross-category (100+ SERPs de nichos B2B análogos), y motor de generación de contenidos asistido por LLM con revisión humana obligatoria + activos originales de Maquiempanadas + autor identificado, para publicar **15 piezas nicho-específicas** en 12 semanas.
+
+**El feature se ejecuta bajo el SEO Harness** (`.ia/seo/harness/`) que define SOUL, MÉTODO (RESEARCH → GAP_ANALYSIS → CONTENT_PLAN → GENERATE → PUBLISH → MONITOR → EVOLVE), POLÍTICAS, skills (content QC con 13 checkpoints, model routing Opus/Sonnet/Haiku, data hygiene), workflows y prompts. El harness es la contraparte MYSEO de SPECBOOT (que queda para el código Laravel del repo).
 
 ## Cambios propuestos
 
@@ -26,26 +30,49 @@ Trabajo de infraestructura. No cambia el sitio todavía.
 - `.ia/seo/data/dataforseo/benchmark_categories.csv` — resultados del recorrido cross-category (fase 3).
 - `.ia/seo/data/dataforseo/llm_presence_baseline.md` — baseline t0.
 
-### Fase 1 — Investigación keywords y gaps (semanas 2-3)
+### Fase 1 — Investigación keywords y gaps por nicho (semanas 2-3)
 
-Consultas DataForSEO priorizadas. **Presupuesto de esta fase: $12 USD.**
+Consultas DataForSEO priorizadas. **Presupuesto de esta fase: $16 USD** (subió $4 vs versión anterior por los 6 nichos).
 
-**Batch 1.1 — Expansión de universo semántico ($4 USD):**
-- `dataforseo_labs/google/keyword_ideas/live` — 5 semillas ES + 5 semillas EN → 200+ ideas
-- `dataforseo_labs/google/keyword_suggestions/live` — variantes long-tail sobre las top 30
-- `dataforseo_labs/google/related_keywords/live` — semánticamente relacionadas
-- `dataforseo_labs/google/search_intent/live` — clasifica intent de las top 200
+**Location codes por nicho:**
 
-**Batch 1.2 — Volumen y dificultad ($3 USD):**
-- `keywords_data/google_ads/search_volume/live` — volumen mensual país-por-país para 300+ keywords
-- `dataforseo_labs/google/bulk_keyword_difficulty/live` — dificultad por batch
+| Nicho | `location_code` | `language_code` | Notas |
+|---|---:|---|---|
+| N1 Cubanos en USA | 2840 | es | USA español general — la diáspora cubana busca en `.com/es` |
+| N2 Puertorriqueños | 2630 (Puerto Rico) + 2840 | es | PR tiene código propio; complementar con USA |
+| N3 Costarricenses | 2188 | es | Google Costa Rica |
+| N4 Chilenos | 2152 | es | Google Chile |
+| N5 Venezolanos | 2862 | es | Google Venezuela |
+| N6 Colombianos en España | 2724 | es | Google España |
+| P1 Anglófono industrial | 2840 | en | USA inglés |
+| P2 Profesional hispano | 2170 (COL) + 2840 + 2152 + 2724 | es | benchmark de comparación entre países |
 
-**Batch 1.3 — Rivales y gaps ($5 USD):**
-- `dataforseo_labs/google/ranked_keywords/live` para 4 dominios × 2 países = 8 requests: ankofood, anko.com.tw, ferrero-machines, adlovermaquinas, empanadasmachine.
-- `dataforseo_labs/google/domain_intersection/live` — Maqui vs cada rival, USA y COL.
-- `dataforseo_labs/google/serp_competitors/live` — competidores agregados por keyword set.
+**Batch 1.1 — Expansión de universo semántico por nicho ($6 USD):**
+- `dataforseo_labs/google/keyword_ideas/live` — semillas culturales específicas por nicho:
+  - N1: `empanada cubana`, `pastelito guayaba y queso`, `empanada de guayaba`
+  - N2: `empanadilla`, `pastelillo`, `pastelillo de carne`
+  - N3: `empanada tica`, `empanada de chiverre`, `empanada de queso costa rica`
+  - N4: `empanada chilena`, `empanada de pino`, `empanada frita chilena`
+  - N5: `empanada venezolana`, `harina PAN empanadas`, `empanada de queso venezolana`, `arepa`
+  - N6: `empanadas colombianas España`, `empanadas colombianas Madrid`
+  - P1: `empanada machine`, `commercial empanada machine`, `automatic empanada maker`
+  - P2: `máquina industrial empanadas`, `línea producción empanadas semiautomática`
+- `dataforseo_labs/google/keyword_suggestions/live` — variantes long-tail sobre las top 30 por nicho.
+- `dataforseo_labs/google/related_keywords/live` — semánticamente relacionadas.
+- `dataforseo_labs/google/search_intent/live` — clasifica intent de las top 200.
 
-**Salida:** `keywords_universe.csv` con 500+ keywords + `content_gaps.csv` con ≥100 gaps priorizados. Sin escribir nada aún.
+**Batch 1.2 — Volumen y dificultad por país específico ($5 USD):**
+- `keywords_data/google_ads/search_volume/live` con el `location_code` correcto de cada nicho para las 30-50 keywords semilla de cada uno. 8 batches × 30-50 kw.
+- `dataforseo_labs/google/bulk_keyword_difficulty/live` por batch por nicho.
+- **Salida clave:** volumen por nicho para priorizar. Probablemente Chile >> Costa Rica en volumen bruto; hay que confirmar con datos.
+
+**Batch 1.3 — Rivales por nicho y gaps ($5 USD):**
+- `dataforseo_labs/google/ranked_keywords/live` para 5 dominios (ankofood, anko.com.tw, ferrero-machines, adlovermaquinas, empanadasmachine) × países prioritarios (USA + COL + los 4 nuevos donde tengan presencia) — hasta 10 requests.
+- Rivales locales por nicho (a identificar en Fase 2 SERPs): para Chile, buscar `metalurgicavazquez.com.ar` o similares; para España, buscar competidores locales de maquinaria alimentaria.
+- `dataforseo_labs/google/domain_intersection/live` — Maqui vs cada rival principal.
+- `dataforseo_labs/google/serp_competitors/live` — competidores agregados por keyword set nicho-específico.
+
+**Salida:** `keywords_universe.csv` con 500+ keywords **clasificadas por nicho** + `content_gaps.csv` con ≥100 gaps priorizados. Sin escribir nada aún.
 
 ### Fase 2 — Benchmark cross-category (semanas 3-4)
 
@@ -123,27 +150,56 @@ Cada tipo de contenido tiene su prompt template en `.ia/seo/scripts/llm_prompts/
 2. **Filtro E-E-A-T** — checklist: ¿hay autor identificado?, ¿fotos originales?, ¿video propio?, ¿testimonio verificable?.
 3. **Filtro Rich Results Test** — el schema pasa validación de Google.
 
-**Piezas a producir (15+ en 12 semanas):**
+**Piezas a producir (15 en 12 semanas, distribuidas por 6 nichos + 2 mercados profesionales):**
 
-| # | Tipo | Título tentativo | Idioma | Target keyword | Volumen |
+### Pilares master (2)
+
+| # | Tipo | Título tentativo | Idioma | Producto | Target keyword | Rol |
+|---|---|---|---|---|---|---|
+| 1 | Pillar master | Máquinas para hacer empanadas y arepas: guía completa | ES | **CM06** | `maquina para hacer empanadas y arepas` | Puerta de entrada — buyer inicial |
+| 2 | Pillar master | Máquina profesional multifuncional para empanadas — CM5S con telemetría | ES | **CM5S** | `maquina industrial empanadas`, `linea produccion empanadas` | Comercial premium — buyer profesional |
+
+### Landing pages nicho-específicas (6)
+
+Una por audiencia. Cada una con vocabulario local, foto/video del producto identitario, testimonio de cliente real del nicho, LocalBusiness schema apuntando a la bodega que despacha (USA para N1/N2, COL para N3/N4/N5/N6, decidir por logística para N6). Todas enlazan al pilar CM06 o CM5S según intención comercial.
+
+| # | Tipo | Nicho | Target keyword | Producto | Bodega despacha |
 |---|---|---|---|---|---|
-| 1 | Pillar | Máquinas industriales para hacer empanadas: guía 2026 | ES | maquina para hacer empanadas | 480/mes |
-| 2 | Pillar EN | Industrial empanada machines: complete buying guide | EN | empanada machine | 480/mes |
-| 3 | Pillar | Máquinas para hacer arepas industriales | ES | maquina para hacer arepas | 210 USA / 590 COL |
-| 4 | Cluster | Cuánto cuesta una máquina para hacer empanadas | ES | precio maquina empanadas | 480+ |
-| 5 | Cluster | Máquina para hacer empanadas colombianas vs argentinas | ES | (gap) | TBD |
-| 6 | Cluster | Cómo elegir entre CM05S, CM06 y CM06B | ES | (marca + comparación) | TBD |
-| 7 | Local | Máquina para hacer empanadas en Miami | ES | maquiempanadas miami | 54 |
-| 8 | Local | Máquina para hacer empanadas en Bogotá | ES | maquina empanadas bogota | 40 |
-| 9 | Local | Empanada machines for restaurants in the US | EN | (gap) | TBD |
-| 10 | Video | Reescribir descripciones + títulos SEO de 10 videos YouTube | ES/EN | varios | — |
-| 11 | Product FAQ | FAQ ampliada para CM06B (top clics del sitio) | ES | (soporte a AC) | — |
-| 12 | Cluster | Presupuesto para producción industrial de arepas | ES | (adyacente a "presupuesto 100 empanadas" que ya rankea) | TBD |
-| 13 | Cluster | Ciclos de producción de una máquina de empanadas industrial | ES | (gap detectado en benchmark) | TBD |
-| 14 | Cluster | Comparativa Maquiempanadas vs Anko vs Ferrero | ES/EN | (defensa de marca) | — |
-| 15 | Local | Empanada machine dealer Texas / Florida | EN | (gap) | TBD |
+| 3 | Landing nicho | N1 Cubanos en USA | `maquina para hacer empanadas cubanas`, `maquina pastelitos guayaba y queso` | CM06 (arranque) + link a CM5S | USA |
+| 4 | Landing nicho | N2 Puertorriqueños | `maquina para hacer empanadillas`, `maquina pastelillos puertorriqueños` | CM06 | USA |
+| 5 | Landing nicho | N3 Costarricenses | `maquina para hacer empanadas costa rica`, `maquina empanadas de chiverre` | CM06 | Colombia |
+| 6 | Landing nicho | N4 Chilenos | `maquina para hacer empanadas chilenas`, `maquina empanadas de pino` | CM06 + CM5S | Colombia |
+| 7 | Landing nicho | N5 Venezolanos | `maquina para hacer empanadas venezolanas`, `maquina para arepas venezolanas` | CM06 (cluster fuerte de arepas) | Colombia |
+| 8 | Landing nicho | N6 Colombianos en España | `maquina empanadas colombianas Madrid`, `venta maquina empanadas España` | CM5S (buyer profesional) | USA o COL según costo |
 
-Las columnas de volumen y gap concretas se completan tras Fase 1.
+### Posts cluster por nicho (6)
+
+Uno por nicho, tipo "cómo empezar negocio de [empanada del nicho] en [ciudad]". Enlazan a la landing nicho + al pilar correspondiente. Formato blog SEO informacional que refuerza el pilar.
+
+| # | Tipo | Nicho | Título tentativo | Target keyword |
+|---|---|---|---|---|
+| 9 | Cluster | N1 | Cómo montar un negocio de pastelitos cubanos en Miami | `negocio empanadas cubanas Miami`, `franquicia pastelitos` |
+| 10 | Cluster | N2 | Cómo hacer empanadillas puertorriqueñas para vender | `negocio empanadillas Puerto Rico`, `receta empanadilla masa` |
+| 11 | Cluster | N3 | Cómo iniciar producción de empanadas ticas | `empanadas ticas para vender`, `negocio empanadas Costa Rica` |
+| 12 | Cluster | N4 | Producción industrial de empanadas de pino en Chile | `empanadas chilenas al por mayor`, `fabrica empanadas Chile` |
+| 13 | Cluster | N5 | Cómo producir empanadas de maíz venezolanas | `empanadas venezolanas negocio`, `harina PAN industrial` |
+| 14 | Cluster | N6 | Empanadas colombianas para hostelería en España | `empanadas colombianas mayorista España`, `distribuidor empanadas Madrid` |
+
+### Pilar en inglés (1)
+
+| # | Tipo | Mercado | Título tentativo | Target keyword |
+|---|---|---|---|---|
+| 15 | Pillar EN | P1 Anglófono industrial USA | Commercial empanada machines: complete buying guide (CM5S) | `commercial empanada machine`, `automatic empanada maker machine` |
+
+### Optimizaciones colaterales incluidas en el ciclo (no cuentan como "piezas" pero son entregables)
+
+- **Product FAQ ampliada** para CM06 y CM5S existentes con las 4 PAA del SERP objetivo de cada uno.
+- **Rewrite de descripciones + títulos SEO** de 10 videos YouTube del canal.
+- **Auditoría y fix de alt-text** en imágenes existentes de páginas de producto (Haiku batch).
+- **hreflang correcto** para las 6 landings nicho + `/en/` + `/es/` base.
+- **Structured data adicional** (LocalBusiness apuntando a bodega, Product/Offer, VideoObject) en las páginas nuevas.
+
+Las columnas de volumen y gap concretas se completan tras Fase 1. **Regla de asignación** post-Fase 1: si un nicho tiene volumen muy menor (ej. Costa Rica < 50 imp/mes en todas sus keywords), su landing se conserva pero el post cluster puede consolidarse con un nicho adyacente. Aprobación de la cliente requerida antes de reasignar.
 
 ### Fase 4 — Publicación técnica y monitoreo (semanas 6-24)
 
@@ -162,15 +218,17 @@ Las columnas de volumen y gap concretas se completan tras Fase 1.
 **Batch 4.3 — Rebench de presencia en LLMs a t+3m y t+6m ($2 USD c/u):**
 - Mismas 10 queries × 4 LLMs para comparar contra baseline.
 
-### Distribución del presupuesto $45 USD
+### Distribución del presupuesto $45 USD (actualizado revisión 2)
 
 | Fase | Costo | Acumulado |
 |---|---:|---:|
-| Fase 1 — Investigación | $12 | $12 |
-| Fase 2 — Benchmark cross-category | $8 | $20 |
-| Fase 3 — Auditoría + LLM baseline | $10 | $30 |
-| Fase 4 — Monitoreo 3 meses + 2 rebenches LLM | $9 | $39 |
-| Reserva iteraciones | $6 | $45 |
+| Fase 1 — Investigación por nicho (8 keyword sets) | **$16** | $16 |
+| Fase 2 — Benchmark cross-category | $8 | $24 |
+| Fase 3 — Auditoría + LLM baseline | $10 | $34 |
+| Fase 4 — Monitoreo 3 meses + 2 rebenches LLM | $9 | $43 |
+| Reserva iteraciones | $2 | $45 |
+
+Fase 1 subió $4 vs versión anterior porque los 6 nichos requieren 8 batches de `search_volume` (uno por `location_code`) en lugar de 3 (USA es, USA en, COL). La reserva bajó de $6 a $2 — más ajustado. Si en Fase 1 se detecta que algún nicho tiene volumen despreciable, se puede recortar su investigación y liberar $1-2 para reserva.
 
 ## Contratos afectados
 

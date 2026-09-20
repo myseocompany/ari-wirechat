@@ -1,6 +1,7 @@
 ---
 slug: rankear-2026
 refined_at: 2026-09-20
+last_updated: 2026-09-20 (revisión 2 — audiencias culturales + estrategia dos pilares)
 ---
 
 # Refined User Story — Rankear 2026
@@ -26,6 +27,38 @@ Son actores distintos: MySEO ejecuta, Maquiempanadas cobra.
 
 **Meta de negocio de referencia** (`GOAL.md`): 40 máquinas de Maquiempanadas vendidas al mes. SEO no es único motor, pero puede aportar entre 8-15 de esas 40 en régimen consolidado (estimación conservadora basada en el funnel actual — pendiente de validar con datos del CRM).
 
+## Audiencias objetivo (revisión 2 — 2026-09-20)
+
+La cliente definió 6 nichos culturalmente específicos + 2 mercados profesionales cruzados. No son "países", son intersecciones **audiencia × geografía × producto identitario × vocabulario**:
+
+| Nicho | Audiencia | Reside en | Producto identitario | Vocabulario clave | Google | Bodega envía |
+|---|---|---|---|---|---|---|
+| N1 | Cubanos | USA (Miami, NJ, NY) | Empanada cubana (guayaba y queso, pastelito) | "empanada cubana", "pastelito guayaba" | google.com · ES | USA |
+| N2 | Puertorriqueños | Puerto Rico + USA mainland | **Empanadilla / pastelillo** (no "empanada") | "empanadilla", "pastelillo puertorriqueño" | google.com · ES | USA |
+| N3 | Costarricenses | Costa Rica | Empanada tica (chiverre, queso) | "empanada tica", "empanada de chiverre" | google.co.cr | Colombia |
+| N4 | Chilenos | Chile | Empanada de pino (carne + cebolla + aceituna + huevo) | "empanada de pino", "empanada chilena" | google.cl | Colombia |
+| N5 | Venezolanos | Venezuela | Empanada de harina de maíz amarilla + arepas | "empanada venezolana", "harina PAN", "arepa" | google.co.ve | Colombia |
+| N6 | Colombianos | España (Madrid, Barcelona) | Empanada colombiana frita (maíz) | "empanadas colombianas Madrid" | google.es · ES | USA o COL |
+| P1 | Comprador industrial en inglés | USA anglófono | Cualquier máquina (foco CM5S) | "empanada machine", "commercial empanada machine" | google.com · EN | USA |
+| P2 | Empresa / franquicia hispanohablante | LATAM extendido + España | CM5S multifuncional con telemetría | "máquina industrial empanadas", "línea producción empanadas" | multi | según país |
+
+## Estrategia de dos pilares de producto
+
+Los datos del sitio (GSC últimos 3 meses) validan lo que ya pasa orgánicamente:
+
+- **CM5S:** pos 4.56 en web, activo #1 en Imágenes (287 clics / 20,398 impresiones). Es la keyword-magnet natural.
+- **CM06 (empanadas + arepas):** pos 5.27 en web, 225 clics. Es el "primer producto" que compra un buyer nuevo.
+- **CM06B (multifuncional):** pos 7.37 en web con 11,813 impresiones — demanda de "multifuncional" mal capturada.
+
+Los dos pilares se complementan como escalera de intención:
+
+| Pilar | Rol | Buyer objetivo | Query cabeza |
+|---|---|---|---|
+| **CM06 (empanadas + arepas)** | Puerta de entrada | Negocio pequeño / familiar / arranque | `maquina para hacer empanadas y arepas` (genérica, alto volumen) |
+| **CM5S (multifuncional + telemetría)** | Comercial premium | Fábrica / franquicia / expansión | `maquina industrial empanadas`, `empanada machine`, `commercial empanada machine` |
+
+Cada pilar tiene páginas nicho-específicas debajo (una por nicho cultural), enlazando hacia arriba al pilar correspondiente según intención comercial detectada.
+
 ## Criterios de aceptación
 
 Formato Gherkin. Cada AC verificable programáticamente contra datos de DataForSEO / GSC.
@@ -38,21 +71,32 @@ Formato Gherkin. Cada AC verificable programáticamente contra datos de DataForS
 
 ### Categoría: rankings objetivo por país + categoría universal
 
-- **AC3 — Meta de posición web (texto).** Al terminar el ciclo (horizonte 6 meses tras publicar contenidos), Maquiempanadas debe estar en **top 3 orgánico** para al menos 10 keywords comerciales adicionales a las actuales, distribuidas así:
-  - USA español: 5 keywords en top 3 (además de las 18 en pos 1 ya existentes).
-  - Colombia: 3 keywords en top 3.
-  - Otro país LATAM (MEX o ARG): 2 keywords en top 3.
-  Medición: `dataforseo_labs/google/historical_serps/live` comparando t0 vs t+6m.
+- **AC3 — Meta de posición web (texto) por nicho.** Al terminar el ciclo (horizonte 6 meses tras publicar contenidos), Maquiempanadas debe estar en **top 3 orgánico** en al menos **12 keywords comerciales nicho-específicas** (2 por cada uno de los 6 nichos culturales) + al menos **3 keywords adicionales del cluster profesional** (P1/P2). Distribución:
+  - **N1 Cubanos en USA:** 2 keywords en top 3 (ej. `maquina para hacer empanadas cubanas`, `maquina pastelitos cubanos`).
+  - **N2 Puertorriqueños:** 2 keywords en top 3 (ej. `maquina para hacer empanadillas`, `maquina pastelillos puerto rico`).
+  - **N3 Costarricenses:** 2 keywords en top 3 (ej. `maquina empanadas costa rica`, `maquina empanadas de chiverre`).
+  - **N4 Chilenos:** 2 keywords en top 3 (ej. `maquina empanadas chilenas`, `maquina empanadas de pino`).
+  - **N5 Venezolanos:** 2 keywords en top 3 (ej. `maquina empanadas venezolanas`, `maquina harina PAN empanadas`).
+  - **N6 Colombianos en España:** 2 keywords en top 3 (ej. `maquina empanadas colombianas madrid`, `venta maquina empanadas españa`).
+  - **P1 Anglófono industrial:** al menos 1 keyword en top 3 (ej. `commercial empanada machine`, `automatic empanada machine`).
+  - **P2 Profesional hispano cross-país:** al menos 2 keywords en top 3 (ej. `linea produccion empanadas industrial`, `maquina empanadas semiautomatica`).
+  
+  Las 18 keywords en posición #1 ya existentes se mantienen — meta de defensa: **no perder ninguna**. Medición: `dataforseo_labs/google/historical_serps/live` comparando t0 vs t+6m. Keywords finales se cierran en Fase 1 del proposal con volumen y competencia verificados.
 
-- **AC4 — Meta de imágenes.** El cluster comercial en Google Images (queries con `máquina`, `molde`, `arepa`, `desmechadora` + producto) debe mover su posición promedio ponderada por impresiones **de 20-36 a ≤10** en USA y a **≤6** en Colombia. Medición: GSC filtrado por `search type = image` + Países.
+- **AC4 — Meta de imágenes por nicho.** El cluster comercial en Google Images (queries con producto identitario de cada nicho + `máquina` / `molde` / `arepa`) debe mover su posición promedio ponderada por impresiones a **≤10 en al menos 4 de los 6 nichos** al final del ciclo. Prioridad de auditoría de imágenes: CM5S (activo #1 hoy) + CM06 + CM06B con alt-text nicho-específico ("máquina para hacer empanadillas puertorriqueñas" ≠ "máquina para hacer empanada de pino"). Medición: GSC `search type = image` + Países + DataForSEO `serp/google/images/live/advanced`.
 
 - **AC5 — Meta de video.** Los videos indexados del sitio deben pasar de **33 impresiones/16m a ≥1,000 impresiones/3m** en Google Search (categoría video) — reflejando que el canal YouTube (1.18M views/año) empieza a impactar el SEO web. Medición: GSC `search type = video`.
 
-- **AC6 — Meta de Shopping / popular products.** En al menos 3 keywords cabeza (`maquina para hacer empanadas`, `empanada machine`, `maquina para hacer arepas`), un producto de Maquiempanadas debe aparecer en el bloque "Popular products" de Google. Hoy: 0. Medición: `serp/google/organic/live/advanced` (feature `popular_products`).
+- **AC6 — Meta de Shopping / popular products.** En al menos 3 keywords cabeza (`maquina para hacer empanadas`, `empanada machine`, `maquina para hacer arepas`), un producto de Maquiempanadas debe aparecer en el bloque "Popular products" de Google. Hoy: 0. Requiere activar Google Merchant Center con feed de productos correctamente estructurado (CM06 y CM5S como prioridad). Medición: `serp/google/organic/live/advanced` (feature `popular_products`).
 
 ### Categoría: contenido publicado
 
-- **AC7 — Content plan ejecutado.** Deben publicarse en `maquiempanadas.com` **≥15 nuevas piezas de contenido** de acuerdo al plan (pillar pages, posts de cluster, páginas de producto ampliadas, casos de uso locales). Cada una con: alt-text descriptivo bilingüe, structured data válido, imagen original o video embed, tabla de datos o especificación.
+- **AC7 — Content plan ejecutado.** Deben publicarse en `maquiempanadas.com` **≥15 nuevas piezas de contenido**, distribuidas así:
+  - **2 pillar pages master:** CM06 (empanadas + arepas, puerta de entrada) y CM5S (multifuncional profesional). En español base.
+  - **6 landing nicho:** una por audiencia cultural (N1-N6). Cada una con vocabulario, foto/video del producto identitario, testimonio local, LocalBusiness schema apuntando a la bodega que envía.
+  - **6 posts cluster:** uno por nicho, tipo "cómo empezar negocio de empanadas [tipo] en [ciudad]", enlazando al pilar y a la landing nicho correspondiente.
+  - **1 pillar en inglés** (CM5S) para P1 anglófono industrial.
+  Cada pieza con: alt-text descriptivo en idioma/dialecto del nicho, structured data válido (Product / Video / FAQ / LocalBusiness según aplique), imagen original o video embed, tabla de datos, autor identificado, hreflang correcto por nicho.
 
 - **AC8 — Video schema corregido.** Los 37 videos con incidencia "no está en página de visualización" deben pasar auditoría de Rich Results Test de Google. Medición: reporte GSC de Video Indexing.
 
@@ -94,15 +138,29 @@ Formato Gherkin. Cada AC verificable programáticamente contra datos de DataForS
 
 ## Supuestos
 
-Todo marcado con `[CONFIRMAR]` antes de `/propose`.
+### Confirmados por la cliente (2026-09-20)
 
-- [CONFIRMAR] **Maquiempanadas puede producir contenido audiovisual original** (fotos, videos de sus máquinas operando) al ritmo requerido por el plan — no todo puede generarse con LLM.
-- [CONFIRMAR] **Existe un autor humano identificable** en el equipo de Maquiempanadas que pueda firmar los posts para cumplir E-E-A-T (nombre real, cargo, credenciales).
-- [CONFIRMAR] **El equipo técnico de Maquiempanadas** puede implementar los fixes de schema y las nuevas páginas — o MySEO lo hace y factura aparte.
-- [CONFIRMAR] **Presupuesto para creación de contenido está definido** — LLM ayuda pero no reemplaza redactor humano final. ¿Hay presupuesto para editor bilingüe?
-- [CONFIRMAR] **El horizonte de 6 meses es aceptable** para el cliente. SEO orgánico no cambia posiciones en 30 días.
-- [CONFIRMAR] **Colombia es prioridad de defensa, USA de crecimiento**. Otros países (MEX, ARG, ESP) van en fase 2.
-- [CONFIRMAR] **El SPEC previo** (`SPEC_dataforseo_50usd.md`) queda superado por este; su contenido técnico se absorbe en el proposal.
+- [✓ CONFIRMADO] **Envío internacional disponible** — Maquiempanadas envía a los 6 nichos culturales (USA, Puerto Rico, Costa Rica, Chile, Venezuela, España).
+- [✓ CONFIRMADO] **Bodegas operativas en Colombia y USA** — permite promesa de entrega diferenciada por nicho (bodega USA para N1/N2/P1; bodega COL para N3/N4/N5/N6).
+- [✓ CONFIRMADO] **Los tres modelos (CM06, CM06B, CM5S) hacen todas las variantes culturales** de empanada (cubana, puertorriqueña, tica, chilena, venezolana, colombiana). No hay que crear producto nuevo.
+- [✓ CONFIRMADO] **Producto foco definido:** estrategia de dos pilares — CM5S para buyer profesional/industrial (postura de la cliente) + CM06 para buyer de arranque (postura MySEO). Ambos con landings nicho-específicas debajo. Los datos de GSC ya validan que ambos rankean bien.
+- [✓ CONFIRMADO] **Adaptación de idioma por nicho aprobada** — se harán landings con vocabulario local (empanadilla/pastelillo, pino, chiverre, harina PAN, etc.), no traducción literal del sitio.
+
+### Pendientes de confirmar
+
+- [CONFIRMAR] **Maquiempanadas puede producir contenido audiovisual original nicho-específico** — 6 nichos requieren 6 sets de fotos/video mostrando el producto identitario (empanada de pino chilena, empanadilla puertorriqueña, etc.). ¿Se puede producir? Alternativa: grabar en la bodega colombiana operando el molde adecuado para cada variante.
+- [CONFIRMAR] **Existe autor humano identificable** que firme los posts para E-E-A-T. Preferible: alguien del equipo de Maquiempanadas con cargo (ejemplo: "Ingeniero de aplicaciones" o "Jefe comercial"). Sin autor firmante, E-E-A-T queda débil.
+- [CONFIRMAR] **Testimonios reales por nicho** — ¿tienen clientes recurrentes en cada uno de los 6 nichos que puedan aparecer citados (nombre + ciudad + tipo de negocio)? Sin testimonio real por nicho, el AC7 queda cojo.
+- [CONFIRMAR] **Precios finales de CM06 y CM5S** para páginas de producto por nicho. Pueden variar por moneda / logística (bodega USA vs COL). Impacta structured data Product/Offer.
+- [CONFIRMAR] **Presupuesto para redactor/editor bilingüe humano** — LLM produce drafts, humano firma. ¿Hay presupuesto asignado o MySEO lo absorbe?
+- [CONFIRMAR] **El equipo técnico de Maquiempanadas puede implementar** los fixes de schema, nuevas páginas y hreflang correcto — o MySEO lo hace y factura aparte.
+- [CONFIRMAR] **Activar Google Merchant Center con feed de productos** para llegar al bloque "Popular products" (AC6). ¿Existe hoy? Si no, sumar como requisito técnico previo.
+- [CONFIRMAR] **El horizonte de 6 meses es aceptable** para la cliente. SEO orgánico no cambia posiciones en 30 días; los 6 nichos duplican el tiempo de asentamiento vs. un mercado único.
+- [CONFIRMAR] **Prioridad entre los 6 nichos** — si hay disparidad de tamaño (probablemente Chile >> Costa Rica), ¿la cliente aprueba una asignación de piezas asimétrica en Fase 1 según volumen real que salga de DataForSEO?
+
+### Confirmado implícitamente
+
+- **El SPEC previo** (`SPEC_dataforseo_50usd.md`) queda superado por este; su contenido técnico se absorbe en el proposal.
 
 ## Riesgos
 
@@ -110,6 +168,8 @@ Todo marcado con `[CONFIRMAR]` antes de `/propose`.
 - **Cambios técnicos en el sitio.** Modificar schema, meta tags, structure de URLs puede afectar posicionamiento existente (18 kw pos 1) si se hace mal. Cualquier cambio con impacto en rankings actuales requiere staging + prueba.
 - **Contenido con LLM que suene genérico o falso.** Google penaliza contenido sin E-E-A-T real. Si el LLM inventa specs de productos o precios, se destruye credibilidad de marca.
 - **Contenido en inglés mal traducido.** Google detecta traducción automática. Contenido en `/en/` debe ser original o profesionalmente traducido.
+- **Vocabulario cultural mal usado.** Si una landing "puertorriqueña" usa vocabulario cubano por descuido (o viceversa), el buyer detecta que no es "para él" y el CTR cae. Cada landing nicho requiere revisión por hispanohablante del origen (o al menos alguien familiarizado con el dialecto).
+- **hreflang mal configurado.** Con 6 nichos + `/en/`, la matriz hreflang crece. Un solo `hreflang` mal apuntado puede canibalizar rankings entre nichos (Google no sabe cuál mostrar).
 
 ### Reversibilidad
 - **Fácil:** meta tags, alt-text, schema — se pueden revertir en minutos.
@@ -137,4 +197,7 @@ Explícitos para prevenir scope creep:
 - **Traducción a PT del sitio.** `/pt/` existe pero no se invierte en él en este ciclo.
 - **Backlinks pagados o schemes de link building agresivos.** Solo outreach orgánico basado en investigación de rivales.
 - **Otros idiomas más allá de ES y EN.**
-- **España, México, Argentina y Ecuador** como mercados de foco activo — quedan como benchmark de datos, no de contenido dedicado en este ciclo.
+- **México, Argentina, Ecuador y Perú como mercados de foco activo** — quedan como benchmark y como reserva para Fase 2 posterior al ciclo. Se sigue midiendo tráfico pero sin landings dedicadas.
+- **Nichos culturales no listados por la cliente** (dominicanos, salvadoreños, hondureños en USA; mexicanos en USA con quesadillas/tamales) — quedan fuera aunque el sitio pueda recibir tráfico de ellos.
+- **Creación de nuevos modelos de máquina o moldes específicos por nicho** — los modelos actuales cubren todas las variantes según la cliente. No se pide a Maquiempanadas hacer producto nuevo.
+- **Estrategia YouTube contenido nuevo** — se reconecta el canal existente con schema correcto (arreglar los 37 videos con incidencia), pero grabar videos nuevos por nicho queda como iniciativa aparte fuera de este SPEC.
