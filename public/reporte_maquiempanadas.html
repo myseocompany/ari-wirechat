@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maquiempanadas — Diagnóstico SEO y Estrategia</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --primary: #b8241d;
+  --primary-dark: #8f1a15;
+  --secondary: #f7b731;
+  --dark: #1a1a1a;
+  --gray: #6b7280;
+  --light: #f9fafb;
+  --border: #e5e7eb;
+  --success: #16a34a;
+  --warning: #f59e0b;
+  --danger: #dc2626;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: var(--dark); background: #fafafa; line-height: 1.6; }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 48px 24px; margin-bottom: 32px; }
+header .container { padding: 0; }
+header h1 { font-size: 2.2rem; margin-bottom: 8px; font-weight: 700; }
+header p { opacity: 0.9; font-size: 1.1rem; }
+header .meta { font-size: 0.85rem; opacity: 0.75; margin-top: 12px; }
+
+nav { position: fixed; top: 0; left: 0; right: 0; background: white; border-bottom: 1px solid var(--border); z-index: 100; padding: 10px 0; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+nav .container { display: flex; align-items: center; gap: 4px; padding: 0 24px; }
+nav .brand { font-weight: 700; color: var(--primary); font-size: 0.95rem; margin-right: 16px; white-space: nowrap; padding-right: 12px; border-right: 1px solid var(--border); }
+nav a { padding: 8px 14px; color: var(--gray); text-decoration: none; border-radius: 6px; font-size: 0.88rem; white-space: nowrap; transition: all 0.15s; }
+nav a:hover, nav a.active { background: var(--primary); color: white; }
+body { padding-top: 56px; }
+header { margin-top: 0; }
+
+section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+h2 { font-size: 1.6rem; margin-bottom: 8px; color: var(--dark); border-bottom: 3px solid var(--primary); padding-bottom: 8px; display: inline-block; }
+h3 { font-size: 1.2rem; margin: 24px 0 12px; color: var(--primary-dark); }
+h4 { font-size: 1rem; margin: 16px 0 8px; color: var(--dark); }
+p { margin-bottom: 12px; }
+p.lead { font-size: 1.05rem; color: var(--gray); margin-bottom: 24px; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 24px 0; }
+.kpi { background: linear-gradient(135deg, #fff, #fafafa); border: 1px solid var(--border); padding: 20px; border-radius: 10px; }
+.kpi .value { font-size: 2rem; font-weight: 700; color: var(--primary); line-height: 1; }
+.kpi .label { font-size: 0.85rem; color: var(--gray); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kpi .sublabel { font-size: 0.75rem; color: var(--gray); margin-top: 4px; }
+
+.chart-container { position: relative; height: 340px; margin: 24px 0; }
+
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: #f9fafb; font-weight: 600; color: var(--gray); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+tr:hover { background: #fafafa; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+.badge-success { background: #dcfce7; color: var(--success); }
+.badge-warning { background: #fef3c7; color: var(--warning); }
+.badge-danger { background: #fee2e2; color: var(--danger); }
+.badge-primary { background: #fef2f1; color: var(--primary); }
+.badge-gray { background: #f3f4f6; color: var(--gray); }
+
+.insight { border-left: 4px solid var(--primary); background: #fef2f1; padding: 16px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+.insight strong { color: var(--primary-dark); }
+.insight-warning { border-left-color: var(--warning); background: #fffbeb; }
+.insight-warning strong { color: #92400e; }
+.insight-success { border-left-color: var(--success); background: #f0fdf4; }
+.insight-success strong { color: #14532d; }
+
+.recommendations { display: grid; gap: 16px; margin: 24px 0; }
+.rec { border: 1px solid var(--border); border-radius: 10px; padding: 20px; background: white; }
+.rec-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.rec-title { font-weight: 700; font-size: 1.05rem; color: var(--dark); }
+.rec-priority { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+.priority-alta { background: #fee2e2; color: var(--danger); }
+.priority-media { background: #fef3c7; color: var(--warning); }
+.priority-baja { background: #dbeafe; color: #1e40af; }
+.rec-body { color: var(--gray); font-size: 0.95rem; }
+.rec-body ul { margin-left: 20px; margin-top: 8px; }
+.rec-body li { margin-bottom: 4px; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } .container { padding: 16px; } section { padding: 20px; } header h1 { font-size: 1.6rem; } }
+
+.tag { display: inline-block; padding: 3px 8px; background: #f3f4f6; border-radius: 4px; font-size: 0.8rem; color: var(--gray); margin: 2px; }
+.tag-primary { background: #fef2f1; color: var(--primary); }
+
+.tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+.tab { padding: 12px 20px; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; color: var(--gray); font-weight: 500; transition: all 0.15s; }
+.tab:hover { color: var(--primary); }
+.tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.serp-pill { padding: 10px 18px; background: white; border: 2px solid var(--border); border-radius: 24px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--gray); transition: all 0.15s; white-space: nowrap; }
+.serp-pill:hover { border-color: var(--primary); color: var(--primary); }
+.serp-pill.active { background: var(--primary); border-color: var(--primary); color: white; }
+.serp-pill .vol { font-weight: 400; opacity: 0.75; margin-left: 6px; }
+
+.serp-block { margin-bottom: 32px; }
+.serp-block h3 { display: flex; align-items: center; gap: 10px; }
+.serp-block h3 .count { font-size: 0.75rem; background: var(--light); color: var(--gray); padding: 3px 8px; border-radius: 12px; font-weight: 500; }
+
+.organic-list { display: flex; flex-direction: column; gap: 14px; }
+.organic-item { padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; background: white; transition: all 0.15s; }
+.organic-item:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.organic-item.maqui { border-left: 4px solid var(--success); background: #f0fdf4; }
+.organic-item.competitor { border-left: 4px solid var(--warning); }
+.organic-item.retail { border-left: 4px solid #9ca3af; opacity: 0.75; }
+.organic-item .pos { display: inline-block; background: var(--primary); color: white; font-weight: 700; padding: 2px 10px; border-radius: 4px; font-size: 0.75rem; margin-right: 10px; }
+.organic-item.maqui .pos { background: var(--success); }
+.organic-item .domain { color: var(--gray); font-size: 0.8rem; }
+.organic-item .title { font-weight: 600; font-size: 0.95rem; color: #1a0dab; margin: 4px 0; }
+.organic-item .title a { color: inherit; text-decoration: none; }
+.organic-item .title a:hover { text-decoration: underline; }
+.organic-item .snippet { color: var(--dark); font-size: 0.85rem; line-height: 1.5; }
+.organic-item .tag-mine { background: var(--success); color: white; }
+
+.images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.image-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: white; }
+.image-item .img-wrapper { width: 100%; height: 120px; background: #f3f4f6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='%23d1d5db'%3E%3Cpath d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z'/%3E%3C/svg%3E") center/40px no-repeat; display: flex; align-items: center; justify-content: center; }
+.image-item img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.image-item .alt { padding: 8px 10px; font-size: 0.75rem; color: var(--gray); line-height: 1.4; }
+.image-item .domain-badge { padding: 2px 8px; font-size: 0.7rem; color: var(--gray); border-top: 1px solid var(--border); background: #fafafa; }
+
+.videos-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.video-item { padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: white; }
+.video-item .source { display: inline-block; padding: 3px 8px; background: #fee2e2; color: var(--danger); border-radius: 4px; font-size: 0.7rem; font-weight: 600; margin-bottom: 8px; }
+.video-item .title { font-weight: 500; font-size: 0.9rem; color: var(--dark); margin-bottom: 6px; }
+.video-item .url { font-size: 0.75rem; color: var(--gray); word-break: break-all; }
+.video-item .url a { color: var(--primary); text-decoration: none; }
+
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.product-item { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: white; transition: all 0.15s; }
+.product-item:hover { border-color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.product-item .price { font-size: 1.1rem; font-weight: 700; color: var(--primary); padding: 8px 12px 4px; }
+.product-item .title { padding: 0 12px 8px; font-size: 0.8rem; color: var(--dark); line-height: 1.4; }
+.product-item .seller { padding: 6px 12px; font-size: 0.7rem; color: var(--gray); background: #fafafa; border-top: 1px solid var(--border); }
+
+.paa-list { display: flex; flex-direction: column; gap: 8px; }
+.paa-item { padding: 12px 16px; background: white; border: 1px solid var(--border); border-radius: 8px; font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
+.paa-item::before { content: "?"; display: inline-block; background: var(--primary); color: white; width: 24px; height: 24px; border-radius: 50%; text-align: center; line-height: 24px; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+
+.serp-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; font-size: 0.85rem; color: var(--gray); }
+.serp-legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+
+footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 0.85rem; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1>Maquiempanadas</h1>
+    <p>Diagnóstico SEO y hoja de ruta estratégica</p>
+    <div class="meta">Análisis con datos de Google Search Console (16 meses), Google Ads (8 meses), YouTube Analytics (2011-2026) y DataForSEO — septiembre 2026</div>
+  </div>
+</header>
+
+<nav>
+  <div class="container">
+    <span class="brand">Maquiempanadas · SEO</span>
+    <a href="#resumen" class="nav-link active">Resumen</a>
+    <a href="#mercado" class="nav-link">Mercado</a>
+    <a href="#activos" class="nav-link">Activos</a>
+    <a href="#universal" class="nav-link">Universal search</a>
+    <a href="#competencia" class="nav-link">Competencia</a>
+    <a href="#serps" class="nav-link">SERPs</a>
+    <a href="#estrategia" class="nav-link">Estrategia</a>
+    <a href="#plan" class="nav-link">Plan</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<section id="resumen">
+  <h2>Resumen ejecutivo</h2>
+  <p class="lead">Maquiempanadas tiene una posición orgánica sólida en el mercado hispano de máquinas para empanadas y arepas: 18 keywords en posición #1 en USA, dominio de marca en Colombia y aparición en respuestas de IA generativa. La mayor oportunidad de crecimiento identificada no está en explorar mercados nuevos, sino en cerrar brechas del activo actual: producto, imagen y video.</p>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">18</div>
+      <div class="label">Keywords en posición #1</div>
+      <div class="sublabel">en Google USA (español)</div>
+    </div>
+    <div class="kpi">
+      <div class="value">81</div>
+      <div class="label">Keywords rankeando USA</div>
+      <div class="sublabel">vs 145 del rival Anko (Taiwán)</div>
+    </div>
+    <div class="kpi">
+      <div class="value">15,052</div>
+      <div class="label">Clics orgánicos 16 meses</div>
+      <div class="sublabel">75.6% desde Web / 24% Imágenes</div>
+    </div>
+    <div class="kpi">
+      <div class="value">3.77M</div>
+      <div class="label">Views YouTube totales</div>
+      <div class="sublabel">1.18M en los últimos 12 meses</div>
+    </div>
+    <div class="kpi">
+      <div class="value">17%</div>
+      <div class="label">Del tráfico viene de USA</div>
+      <div class="sublabel">segundo mercado tras Colombia</div>
+    </div>
+    <div class="kpi">
+      <div class="value">927</div>
+      <div class="label">Conversiones Ads (8 meses)</div>
+      <div class="sublabel">54.6% son de tráfico de marca</div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>Los 3 hallazgos que orientan la estrategia:</strong>
+    <ol style="margin-left: 24px; margin-top: 8px;">
+      <li><strong>El tráfico orgánico que ya llega a Maquiempanadas desde USA es mayoritariamente en español</strong> — la mayor parte de las consultas identificables de USA visibles en Search Console están en español, y para <em>maquina para hacer empanadas</em> el sitio rankea #1 orgánico (posición absoluta 2 en el SERP en vivo). Reforzar geo-targeting hispano en USA es una vía natural. La demanda anglófona existe, pero los términos con volumen bruto alto (empanada maker/press) están dominados por consumidor doméstico y el nicho industrial anglófono es más pequeño de lo que sugieren las cifras.</li>
+      <li><strong>El competidor con más presencia orgánica en USA es Anko (Taiwán), no Ferrero</strong> — Ferrero es fuerte en pujas de Google Ads (34% de superposición en subastas, gana en posición absoluta arriba) pero débil en SEO (18 keywords orgánicas rankeando, ETV $42/mes). Anko tiene 145 keywords y su fortaleza está en cubrir varias categorías de máquinas étnicas (pierogi, egg roll, burrito).</li>
+      <li><strong>El canal YouTube tiene 3.77M views históricos y 1.18M en los últimos 12 meses</strong> — Google Search Console reporta solo 33 impresiones de video del sitio en 16 meses y 37 videos con incidencia de indexación. Investigar y corregir esta desconexión es una hipótesis con potencial alto.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="mercado">
+  <h2>Distribución de mercado</h2>
+  <p class="lead">Colombia es el mercado dominante y USA es el segundo. El resto de LATAM y España completan una cobertura hispanoamericana amplia.</p>
+
+  <div class="two-col">
+    <div>
+      <h3>Tráfico orgánico por país (16 meses)</h3>
+      <div class="chart-container">
+        <canvas id="chartPaises"></canvas>
+      </div>
+    </div>
+    <div>
+      <h3>YouTube views por país (histórico)</h3>
+      <div class="chart-container">
+        <canvas id="chartYT"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <p><strong>La distribución en Google Search y YouTube es coherente</strong> — el mismo cliente hispanohablante busca en ambos canales. Colombia lidera (40.5% de views YouTube sobre total de canal / 36.8% de impresiones Search), USA es segundo (8.4% / 17%). El resto se reparte entre España, Venezuela, México y otros países latinos.</p>
+  <p style="font-size: 0.85rem; color: var(--gray);"><em>Nota: los porcentajes de YouTube arriba se calculan sobre 3.77M views totales del canal. Existe un ~17% de views no atribuidas a país específico (privacidad de YouTube).</em></p>
+
+  <h3>Volumen real del mercado — USA vs Colombia</h3>
+  <p>Comparación de búsquedas mensuales para las keywords principales (fuente: Google Ads / DataForSEO).</p>
+  <div class="chart-container" style="height: 380px;">
+    <canvas id="chartVolumen"></canvas>
+  </div>
+
+  <div class="insight-warning insight">
+    <strong>Cuidado con los volúmenes "grandes" en inglés.</strong> Términos como <em>empanada maker</em> (2,400 búsquedas/mes en USA) o <em>empanada press</em> (1,600/mes) parecen atractivos, pero al revisar quién rankea top 10 la mayoría son <strong>consumidor doméstico</strong> (restaurante en Mission Viejo con Knowledge Graph, prensas de Amazon $20-50, IMUSA electrodomésticos). Sí existen jugadores industriales en esas SERPs (PastaBiz con máquinas de hasta 1,800 unidades/hora aparece en posición 6 de <em>empanada maker</em>), pero son minoría. El segmento comercial claramente industrial se concentra en <em>empanada machine</em> (480 vol/mes) donde Anko domina.
+    <br><br>
+    <em>Nota metodológica:</em> el endpoint de volumen agrega por ubicación sin distinguir idioma real de la búsqueda; los volúmenes reportados son mercado total en USA para esa keyword.
+  </div>
+</section>
+
+<section id="activos">
+  <h2>Activos actuales del sitio</h2>
+  <p class="lead">Maquiempanadas ya tiene una arquitectura SEO madura: catálogo multilenguaje, rich snippets de productos activos, contenido informacional que aparece en respuestas de IA, y un canal YouTube con 15 años de historia.</p>
+
+  <h3>Rendimiento por tipo de página (últimos 3 meses)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Página</th>
+        <th class="num">Clics</th>
+        <th class="num">Impresiones</th>
+        <th class="num">CTR</th>
+        <th class="num">Posición</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Home <code>/</code></td><td class="num">1,572</td><td class="num">33,961</td><td class="num">4.63%</td><td class="num"><span class="badge badge-warning">6.01</span></td></tr>
+      <tr><td>Blog "Crear negocio de empanadas"</td><td class="num">418</td><td class="num">22,849</td><td class="num">1.83%</td><td class="num"><span class="badge badge-warning">5.48</span></td></tr>
+      <tr><td>Producto CM06 (empanadas + arepas)</td><td class="num">225</td><td class="num">7,450</td><td class="num">3.02%</td><td class="num"><span class="badge badge-warning">5.27</span></td></tr>
+      <tr><td>Categoría Moldes</td><td class="num">221</td><td class="num">8,412</td><td class="num">2.63%</td><td class="num"><span class="badge badge-warning">6.66</span></td></tr>
+      <tr><td>Home <code>/en/</code> (inglés)</td><td class="num">216</td><td class="num">1,774</td><td class="num"><span class="badge badge-success">12.18%</span></td><td class="num"><span class="badge badge-success">4.22</span></td></tr>
+      <tr><td>Producto CM06B multifuncional</td><td class="num">203</td><td class="num">11,813</td><td class="num">1.72%</td><td class="num"><span class="badge badge-warning">7.37</span></td></tr>
+      <tr><td>Producto CM05S</td><td class="num">136</td><td class="num">11,434</td><td class="num">1.19%</td><td class="num"><span class="badge badge-warning">4.56</span></td></tr>
+      <tr><td>Categoría Máquinas de arepas</td><td class="num">97</td><td class="num">3,222</td><td class="num">3.01%</td><td class="num"><span class="badge badge-warning">5.76</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Portafolio digital identificado</h3>
+  <div class="two-col">
+    <div>
+      <h4>Máquinas</h4>
+      <span class="tag tag-primary">CM05S</span>
+      <span class="tag tag-primary">CM06</span>
+      <span class="tag tag-primary">CM06B multifuncional</span>
+      <span class="tag tag-primary">CM07</span>
+      <span class="tag tag-primary">CM08</span>
+      <h4>Otras máquinas</h4>
+      <span class="tag">Máquinas de arepas</span>
+      <span class="tag">Desmechadora</span>
+      <span class="tag">Laminadora</span>
+      <span class="tag">Mezcladora</span>
+    </div>
+    <div>
+      <h4>Idiomas activos del sitio</h4>
+      <span class="tag tag-primary">Español (por defecto)</span>
+      <span class="tag tag-primary">Inglés /en/ · 307 URLs</span>
+      <span class="tag tag-primary">Portugués /pt/ · 140 URLs</span>
+      <h4>Contenido complementario</h4>
+      <span class="tag">Blog informacional</span>
+      <span class="tag">Biblioteca de videos</span>
+      <span class="tag">Moldes personalizados</span>
+    </div>
+  </div>
+
+  <h3>Presencia en respuestas de IA generativa</h3>
+  <p>Google Search Console reporta que Maquiempanadas aparece en respuestas de IA generativa (AI Overviews + AI Mode). Estas apariciones están creciendo mes a mes:</p>
+  <div class="chart-container" style="height: 260px;">
+    <canvas id="chartAI"></canvas>
+  </div>
+  <p><strong>Las páginas del blog son las que más aparecen en respuestas de IA</strong> — el contenido informacional está funcionando como motor de autoridad, aunque no traduzca directamente en ventas.</p>
+</section>
+
+<section id="universal">
+  <h2>Búsqueda universal — Web, imagen, vídeo</h2>
+  <p class="lead">Google entrega resultados de tres tipos. Cada uno tiene su propia oportunidad.</p>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab(event, 'tab-web')">🔍 Web</div>
+    <div class="tab" onclick="switchTab(event, 'tab-imagen')">🖼️ Imágenes</div>
+    <div class="tab" onclick="switchTab(event, 'tab-video')">🎬 Vídeo</div>
+  </div>
+
+  <div id="tab-web" class="tab-panel active">
+    <h3>Web · 75.6% del share · Sano</h3>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="value">512K</div><div class="label">Impresiones 16m</div></div>
+      <div class="kpi"><div class="value">15,052</div><div class="label">Clics 16m</div></div>
+      <div class="kpi"><div class="value">2.94%</div><div class="label">CTR promedio</div></div>
+      <div class="kpi"><div class="value">6-8</div><div class="label">Posición promedio</div></div>
+    </div>
+    <p>Este es el canal principal y con mejor salud. La oportunidad aquí es <strong>subir 3-4 páginas específicas de posición 5-8 a posición 2-3</strong> (identificadas en el plan de acción).</p>
+  </div>
+
+  <div id="tab-imagen" class="tab-panel">
+    <h3>Imágenes · 24.4% del share · Necesita auditoría técnica</h3>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="value">165K</div><div class="label">Impresiones 16m</div></div>
+      <div class="kpi"><div class="value">1,375</div><div class="label">Clics 16m</div></div>
+      <div class="kpi"><div class="value">0.83%</div><div class="label">CTR promedio</div></div>
+      <div class="kpi"><div class="value">21-36</div><div class="label">Posición promedio</div></div>
+    </div>
+    <p>La posición promedio es baja, pero <strong>desglosando por consulta cambia la lectura</strong>: cuando alguien busca "vendo máquina para hacer empanadas" o "precio de máquina para empanadas", Maquiempanadas aparece en posición 3-5. Las posiciones malas (20-80+) son tráfico culinario ("empanadas argentinas", "empanadas caseras") que no compra.</p>
+    <p><strong>Producto CM05S es el activo #1 en imágenes:</strong> 287 clics / 20,398 impresiones / posición 11. Ligera optimización puede subirlo a top 5.</p>
+    <p><strong>La brecha real está en desktop</strong>: posición 41 en desktop vs 17 en móvil. El sitio parece optimizado para móvil pero los thumbnails de Google Images en desktop no funcionan bien — sugiere tamaños de imagen mal servidos.</p>
+  </div>
+
+  <div id="tab-video" class="tab-panel">
+    <h3>Vídeo · 0.005% del share · Oportunidad enorme desperdiciada</h3>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="value">33</div><div class="label">Impresiones en 16 meses</div></div>
+      <div class="kpi"><div class="value">37</div><div class="label">Videos indexados con error</div></div>
+      <div class="kpi"><div class="value">1.18M</div><div class="label">Views YouTube últimos 12m</div></div>
+    </div>
+    <div class="insight-success insight">
+      <strong>El canal YouTube tiene 1.18M views en los últimos 12 meses pero Google Search Console reporta solo 33 impresiones de video del sitio en 16 meses.</strong> Además, hay 37 videos con la incidencia "no está en una página de visualización". Google exige que el vídeo sea el contenido principal de la página; añadir schema no garantiza el fix. Es una <strong>hipótesis de trabajo a validar</strong>: si la desconexión es real, cerrarla puede reconectar el canal con la búsqueda web. Antes de invertir esfuerzo grande, diagnosticar caso por caso.
+    </div>
+  </div>
+</section>
+
+<section id="competencia">
+  <h2>Panorama competitivo</h2>
+  <p class="lead">Identificamos tres tipos de competidores. Solo uno vale la pena vigilar en cada canal.</p>
+
+  <h3>Comparativa de fuerza SEO en USA</h3>
+  <div class="chart-container">
+    <canvas id="chartCompetencia"></canvas>
+  </div>
+
+  <div class="two-col" style="margin-top: 24px;">
+    <div>
+      <h3>🏆 En SEO: Anko (Taiwán)</h3>
+      <p>Empresa establecida de maquinaria alimentaria. Domina el mercado industrial anglófono con 145 keywords rankeando en USA (43 en posición 2-3). Sin embargo, <strong>su fortaleza está en amplitud multi-étnica</strong> (pierogi, egg roll, burrito, kibbeh, paratha, siomai, spring roll), no en profundidad de empanadas.</p>
+      <p><em>Recomendación:</em> No competir directamente. Anko es especialista en máquinas para múltiples categorías; Maquiempanadas es especialista en empanadas + arepas. La ventaja natural está en profundizar el nicho, no en imitarlos.</p>
+    </div>
+    <div>
+      <h3>🏆 En Ads: Ferrero Machines</h3>
+      <p>Aparece en 34% de las subastas de Ads de Maquiempanadas y le gana en % de posición absoluta arriba (43.3% vs 41.2%). Pero <strong>su presencia orgánica es débil</strong>: solo 18 keywords rankeando en USA con ETV $42/mes.</p>
+      <p><em>Recomendación:</em> Ferrero se defiende con puja pagada, no con SEO. Fortalecer las mismas keywords orgánicamente reduce la dependencia de Ads que hoy paga Maquiempanadas $6,500-14,900 COP por conversión en ellas.</p>
+    </div>
+    <div>
+      <h3>🏆 En Colombia: adlovermaquinas.com (Lovermaq)</h3>
+      <p>Rival hispano-hablante fuerte en Colombia: 5 keywords en posición #1, ETV $220/mes. <strong>Domina "máquina para hacer arepas"</strong> (posición 1 en las variantes principales, 590 búsquedas/mes) y desmechadora de carne. Compite directo con Maquiempanadas en "maquina para hacer empanadas" (posición 4 vs Maquiempanadas posición 2).</p>
+      <p><em>Recomendación:</em> Defender el liderazgo en máquinas de empanadas y disputar posiciones en el segmento arepas. Ambos operan el mismo mercado.</p>
+    </div>
+    <div>
+      <h3>🚫 Ruido de mercado</h3>
+      <p><strong>Amazon, made-in-china.com, Target, Walmart, Etsy</strong> aparecen en muchas SERPs pero son retail masivo con productos de $20-50. No son competidores directos porque no venden maquinaria industrial de $1,000-10,000 USD.</p>
+      <p><em>Recomendación:</em> Ignorarlos en la estrategia. El comprador de una máquina industrial no compra en Amazon.</p>
+    </div>
+  </div>
+
+  <h3>Elementos que rankean en SERPs de USA (ejemplos reales)</h3>
+  <p>Para "maquina para hacer empanadas" en USA, Google muestra estos elementos:</p>
+  <table>
+    <thead><tr><th>Tipo de elemento</th><th>Contenido</th><th>Fuente</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-primary">Orgánico #2</span></td><td>Maquiempanadas — página principal</td><td>maquiempanadas.com ✓</td></tr>
+      <tr><td><span class="badge badge-gray">Vídeo</span></td><td>Reel de Lovermaq (Instagram)</td><td>adlovermaquinas.com</td></tr>
+      <tr><td><span class="badge badge-gray">Vídeo</span></td><td>Facebook — Maquiempanadas catálogo</td><td>maquiempanadas.com ✓</td></tr>
+      <tr><td><span class="badge badge-gray">Vídeo</span></td><td>YouTube — Ferrero SUPER Patty Maker</td><td>ferrero-machines.com</td></tr>
+      <tr><td><span class="badge badge-gray">Popular product</span></td><td>Máquina automática — $1,170 USD</td><td>marketplace</td></tr>
+      <tr><td><span class="badge badge-gray">Popular product</span></td><td>Wholesale Empanada Machine — $390 USD</td><td>Alibaba</td></tr>
+      <tr><td><span class="badge badge-gray">Imagen</span></td><td>CM06B multifuncional (foto de producto)</td><td>maquiempanadas.com ✓</td></tr>
+      <tr><td><span class="badge badge-gray">Imagen</span></td><td>CM05S (foto de producto)</td><td>maquiempanadas.com ✓</td></tr>
+      <tr><td><span class="badge badge-gray">People Also Ask</span></td><td>¿Cuánto cuesta una máquina para hacer empanadas?</td><td>—</td></tr>
+      <tr><td><span class="badge badge-gray">People Also Ask</span></td><td>¿Qué máquina fabrica empanadas?</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Maquiempanadas ya ocupa 4 slots del SERP</strong> (orgánico + video + 2 imágenes). El siguiente paso es tomar el slot orgánico #1 y responder las 4 People Also Ask con contenido propio.</p>
+</section>
+
+<section id="serps">
+  <h2>Explorador de SERPs</h2>
+  <p class="lead">Vista interactiva de los 5 SERPs más importantes en USA, desglosados en 4 columnas: Web, Imágenes, Videos y Shopping. Verás qué muestra Google realmente para cada consulta, con videos reproducibles y productos con precios.</p>
+
+  <div style="margin: 24px 0;">
+    <a href="serps_maquiempanadas.html" style="display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; background: var(--primary); color: white; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 1rem; box-shadow: 0 2px 8px rgba(184,36,29,0.2);">
+      <span style="font-size: 1.2rem;">🔍</span>
+      Abrir explorador de SERPs
+      <span style="opacity: 0.7;">→</span>
+    </a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 16px;">
+    <div style="padding: 16px; background: #fafbfc; border-radius: 10px; border-left: 4px solid var(--primary);">
+      <div style="font-size: 0.75rem; color: var(--gray); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">🔍 Web</div>
+      <div style="font-size: 0.88rem;">Resultados orgánicos + People Also Ask con etiquetas: tu sitio, competidor, retail.</div>
+    </div>
+    <div style="padding: 16px; background: #fafbfc; border-radius: 10px; border-left: 4px solid #8b5cf6;">
+      <div style="font-size: 0.75rem; color: var(--gray); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">🖼️ Imágenes</div>
+      <div style="font-size: 0.88rem;">Thumbnails reales que Google exhibe.</div>
+    </div>
+    <div style="padding: 16px; background: #fafbfc; border-radius: 10px; border-left: 4px solid var(--danger);">
+      <div style="font-size: 0.75rem; color: var(--gray); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">🎬 Videos</div>
+      <div style="font-size: 0.88rem;">Reproducibles: YouTube e Instagram Reels embebidos.</div>
+    </div>
+    <div style="padding: 16px; background: #fafbfc; border-radius: 10px; border-left: 4px solid #4285f4;">
+      <div style="font-size: 0.75rem; color: var(--gray); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;">🛒 Shopping</div>
+      <div style="font-size: 0.88rem;">Productos con precios reales USD y tier: doméstico / profesional / industrial.</div>
+    </div>
+  </div>
+</section>
+
+<section id="estrategia">
+  <h2>Estrategia recomendada</h2>
+  <p class="lead">Tres frentes complementarios. Ninguno es explorar mercados nuevos — todos consolidan y capitalizan activos existentes.</p>
+
+  <div class="two-col">
+    <div class="rec">
+      <div class="rec-header">
+        <div class="rec-title">1. Defender y profundizar el liderazgo hispano</div>
+        <span class="rec-priority priority-alta">Prioridad ALTA</span>
+      </div>
+      <div class="rec-body">
+        Maquiempanadas tiene 18 keywords en posición #1 en Google USA (todas en español). Es un activo defensible con esfuerzo bajo. La brecha USA vs Colombia no es semántica — es de posición: Colombia rankea pos 2, USA rankea pos 5-6 para la misma keyword.
+        <ul>
+          <li>Reforzar señales de geo-targeting para USA (hreflang, direcciones, PR local)</li>
+          <li>Optimizar landing CM06 y CM06B (pos 5-7) hacia pos 2-3</li>
+          <li>Crear contenido específico para el latino en USA (Miami, Texas, Florida)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rec">
+      <div class="rec-header">
+        <div class="rec-title">2. Reconectar YouTube con el SEO del sitio</div>
+        <span class="rec-priority priority-alta">Prioridad ALTA</span>
+      </div>
+      <div class="rec-body">
+        El canal YouTube tiene 3.77M views totales y 1.18M en los últimos 12 meses, pero Google Search Console muestra solo 33 impresiones de video del sitio en 16 meses. Los 37 videos con incidencia de indexación sugieren que el activo está desconectado del SEO — hay que diagnosticar caso por caso antes de asumir que un solo arreglo lo resuelve.
+        <ul>
+          <li>Diagnosticar y corregir el schema VideoObject de los 37 videos</li>
+          <li>Investigar el salto de 6x en views de 2024 a 2025 (¿fue estratégico o viral?)</li>
+          <li>Integrar embeds YouTube en páginas de producto con markup correcto</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rec">
+      <div class="rec-header">
+        <div class="rec-title">3. Auditoría técnica de imágenes</div>
+        <span class="rec-priority priority-media">Prioridad MEDIA</span>
+      </div>
+      <div class="rec-body">
+        La búsqueda de imágenes es 24% del share pero la posición es mala en desktop (41 vs 17 en móvil). CM05S es el activo #1 con 287 clics — muestra que hay potencial. La brecha técnica en desktop sugiere tamaños de imagen no optimizados para thumbnails de Google Images.
+        <ul>
+          <li>Auditoría de <em>alt-text</em>, filenames y structured data</li>
+          <li>Optimizar tamaños/formatos para desktop</li>
+          <li>Priorizar el CM05S y páginas de moldes personalizados</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rec">
+      <div class="rec-header">
+        <div class="rec-title">4. Mantener contenido informacional del blog</div>
+        <span class="rec-priority priority-baja">Prioridad BAJA</span>
+      </div>
+      <div class="rec-body">
+        El blog genera 20% de los clics del sitio y es el motor de aparición en respuestas de IA generativa (que crece 65% en 4 meses). Aunque no convierte directamente en ventas, refuerza autoridad de dominio y visibilidad de marca.
+        <ul>
+          <li>Mantener frecuencia de publicación actual</li>
+          <li>Optimizar los 3-4 posts que ya aparecen en AI Overviews</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rec">
+      <div class="rec-header">
+        <div class="rec-title">5. No perseguir mercado anglófono industrial</div>
+        <span class="rec-priority priority-baja">Prioridad NEGATIVA</span>
+      </div>
+      <div class="rec-body">
+        Los volúmenes altos en inglés ("empanada maker", "empanada press") son consumidor doméstico, no comprador industrial. El único segmento anglófono industrial real es "empanada machine" (480 vol/mes) donde Anko (Taiwán) domina con recursos que no valen la pena disputar.
+        <ul>
+          <li>Mantener <code>/en/</code> como puerta de entrada mínima, sin invertir en contenido nuevo</li>
+          <li>Redirigir esfuerzo hacia consolidación hispana</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="plan">
+  <h2>Plan de acción — 90 días</h2>
+  <p class="lead">Priorizado por retorno esperado y bajo dependencia externa.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 60px;">#</th>
+        <th>Acción</th>
+        <th style="width: 100px;">Prioridad</th>
+        <th style="width: 120px;">Esfuerzo</th>
+        <th>Impacto esperado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1</strong></td>
+        <td>Diagnosticar caso por caso los 37 videos con incidencia (contenido principal + schema)</td>
+        <td><span class="badge badge-danger">Alta</span></td>
+        <td>Bajo (diagnóstico) / Medio (fix)</td>
+        <td>Hipótesis: puede reconectar canal YouTube con búsqueda web</td>
+      </tr>
+      <tr>
+        <td><strong>2</strong></td>
+        <td>Optimización on-page de CM06 y CM06B (pos 5-7 → pos 2-3)</td>
+        <td><span class="badge badge-danger">Alta</span></td>
+        <td>Medio</td>
+        <td>Potencial de aumento significativo de clics en productos ancla (pendiente medir con CTR real por posición)</td>
+      </tr>
+      <tr>
+        <td><strong>3</strong></td>
+        <td>Auditoría técnica de imágenes (alt-text, filenames, tamaños)</td>
+        <td><span class="badge badge-warning">Media</span></td>
+        <td>Medio</td>
+        <td>Mejorar 24% del share que hoy rankea en pos 20+</td>
+      </tr>
+      <tr>
+        <td><strong>4</strong></td>
+        <td>Contenido en español dirigido a diáspora en USA (Miami, Texas)</td>
+        <td><span class="badge badge-warning">Media</span></td>
+        <td>Medio-alto</td>
+        <td>Cerrar la brecha de posición 5→2 en USA</td>
+      </tr>
+      <tr>
+        <td><strong>5</strong></td>
+        <td>Investigar y replicar la causa del salto YouTube 2024→2025 (6x views)</td>
+        <td><span class="badge badge-primary">Baja</span></td>
+        <td>Bajo (análisis)</td>
+        <td>Si fue estratégico, replicable en otros productos</td>
+      </tr>
+      <tr>
+        <td><strong>6</strong></td>
+        <td>Responder las People Also Ask del SERP con contenido propio</td>
+        <td><span class="badge badge-primary">Baja</span></td>
+        <td>Medio</td>
+        <td>Aumentar apariciones en AI Overviews (crece 65%)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="insight-warning insight" style="margin-top: 24px;">
+    <strong>Antes de ejecutar, decisiones pendientes con la cliente:</strong>
+    <ul style="margin-left: 20px; margin-top: 8px;">
+      <li>¿Cuántas máquinas debe aportar SEO a la meta de 40/mes?</li>
+      <li>¿Envío y soporte a USA está operativamente resuelto?</li>
+      <li>¿El cuello de botella actual es adquisición o cierre/atención?</li>
+    </ul>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  Análisis preparado por MySEO Company · Nicolás Navarro · nicolas@myseocompany.co
+</footer>
+
+<script>
+// Data
+const paisesData = {
+  labels: ['Colombia','Estados Unidos','Argentina','España','Chile','México','Venezuela','Ecuador','Perú','R. Dominicana'],
+  values: [188414, 87220, 36455, 31968, 25253, 18536, 14697, 11280, 9807, 7756]
+};
+const ytData = {
+  labels: ['Colombia','Estados Unidos','España','Venezuela','México','Ecuador','Argentina','Perú','India','Chile'],
+  values: [1528547, 315968, 165892, 157823, 121277, 119054, 101802, 69513, 53109, 52352]
+};
+const volumenData = {
+  labels: ['empanada maker*','empanada press*','maquina para hacer empanadas','empanada machine','molde para empanadas','maquina para hacer arepas','desmechadora de carne','laminadora de masa'],
+  usa: [2400, 1600, 480, 480, 480, 210, 40, 720],
+  col: [10, 10, 480, 10, 590, 590, 480, 1300]
+};
+const aiData = {
+  labels: ['Jun (14d)','Jul','Ago','Sep (16d)'],
+  values: [1757, 5122, 5077, 3297],
+  daily: [125, 165, 164, 206]
+};
+const competenciaData = {
+  labels: ['Maquiempanadas','Anko','Ferrero','adlovermaquinas'],
+  kw: [81, 145, 18, 34],
+  pos1: [18, 1, 1, 0],
+  pos23: [20, 43, 0, 13],
+  pos410: [14, 32, 6, 4],
+  pos1120: [8, 30, 10, 15]
+};
+
+const primaryColor = '#b8241d';
+const secondaryColor = '#f7b731';
+
+new Chart(document.getElementById('chartPaises'), {
+  type: 'bar',
+  data: {
+    labels: paisesData.labels,
+    datasets: [{ label: 'Impresiones (16m)', data: paisesData.values, backgroundColor: primaryColor }]
+  },
+  options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { callback: v => (v/1000)+'K' } } } }
+});
+
+new Chart(document.getElementById('chartYT'), {
+  type: 'bar',
+  data: {
+    labels: ytData.labels,
+    datasets: [{ label: 'Views totales', data: ytData.values, backgroundColor: secondaryColor }]
+  },
+  options: { indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw.toLocaleString()} views (${(100*ctx.raw/3770812).toFixed(1)}% del canal)` } } }, scales: { x: { ticks: { callback: v => (v/1000)+'K' } } } }
+});
+
+new Chart(document.getElementById('chartVolumen'), {
+  type: 'bar',
+  data: {
+    labels: volumenData.labels,
+    datasets: [
+      { label: 'USA (búsquedas/mes)', data: volumenData.usa, backgroundColor: primaryColor },
+      { label: 'Colombia (búsquedas/mes)', data: volumenData.col, backgroundColor: secondaryColor }
+    ]
+  },
+  options: { plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { footer: (items) => items[0].label.includes('*') ? 'Búsquedas dominadas por consumidor doméstico' : '' } } }, scales: { y: { title: { display: true, text: 'Búsquedas / mes' } } } }
+});
+
+new Chart(document.getElementById('chartAI'), {
+  type: 'bar',
+  data: {
+    labels: aiData.labels,
+    datasets: [
+      { label: 'Impresiones totales', data: aiData.values, backgroundColor: primaryColor, yAxisID: 'y' },
+      { label: 'Impresiones/día', data: aiData.daily, type: 'line', borderColor: secondaryColor, backgroundColor: 'transparent', yAxisID: 'y1', tension: 0.3, pointRadius: 5, pointBackgroundColor: secondaryColor }
+    ]
+  },
+  options: {
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      y: { position: 'left', title: { display: true, text: 'Impresiones totales' } },
+      y1: { position: 'right', title: { display: true, text: 'Impresiones/día' }, grid: { drawOnChartArea: false } }
+    }
+  }
+});
+
+new Chart(document.getElementById('chartCompetencia'), {
+  type: 'bar',
+  data: {
+    labels: competenciaData.labels,
+    datasets: [
+      { label: 'Posición #1', data: competenciaData.pos1, backgroundColor: '#16a34a' },
+      { label: 'Posición 2-3', data: competenciaData.pos23, backgroundColor: primaryColor },
+      { label: 'Posición 4-10', data: competenciaData.pos410, backgroundColor: secondaryColor },
+      { label: 'Posición 11-20', data: competenciaData.pos1120, backgroundColor: '#6b7280' }
+    ]
+  },
+  options: {
+    plugins: { legend: { position: 'bottom' } },
+    responsive: true,
+    scales: { x: { stacked: true }, y: { stacked: true, title: { display: true, text: 'Cantidad de keywords rankeando en USA' } } }
+  }
+});
+
+// Tabs
+function switchTab(evt, id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  evt.currentTarget.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+
+
+// Nav scrollspy
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = document.querySelectorAll('section');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if (rect.top <= 120) current = s.id;
+  });
+  navLinks.forEach(l => { l.classList.remove('active'); if (l.getAttribute('href') === '#'+current) l.classList.add('active'); });
+});
+</script>
+</body>
+</html>
