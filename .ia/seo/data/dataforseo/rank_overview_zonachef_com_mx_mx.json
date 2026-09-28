@@ -1,0 +1,101 @@
+{
+  "version": "0.1.20260917",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "0.1078 sec.",
+  "cost": 0.01212,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "09281152-2573-0388-0000-127f59e08087",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "0.0661 sec.",
+      "cost": 0.01212,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "dataforseo_labs",
+        "google",
+        "domain_rank_overview",
+        "live"
+      ],
+      "data": {
+        "api": "dataforseo_labs",
+        "function": "domain_rank_overview",
+        "se_type": "google",
+        "target": "zonachef.com.mx",
+        "location_code": 2484,
+        "language_code": "es"
+      },
+      "result": [
+        {
+          "se_type": "google",
+          "target": "zonachef.com.mx",
+          "location_code": 2484,
+          "language_code": "es",
+          "total_count": 1,
+          "items_count": 1,
+          "items": [
+            {
+              "se_type": "google",
+              "location_code": 2484,
+              "language_code": "es",
+              "metrics": {
+                "organic": {
+                  "pos_1": 10,
+                  "pos_2_3": 70,
+                  "pos_4_10": 387,
+                  "pos_11_20": 1070,
+                  "pos_21_30": 875,
+                  "pos_31_40": 411,
+                  "pos_41_50": 135,
+                  "pos_51_60": 48,
+                  "pos_61_70": 26,
+                  "pos_71_80": 8,
+                  "pos_81_90": 0,
+                  "pos_91_100": 0,
+                  "etv": 9047.498748714133,
+                  "count": 3040,
+                  "estimated_paid_traffic_cost": 1953.506860486421,
+                  "is_new": 1671,
+                  "is_up": 582,
+                  "is_down": 713,
+                  "is_lost": 1907,
+                  "clickstream_etv": null,
+                  "clickstream_gender_distribution": null,
+                  "clickstream_age_distribution": null
+                },
+                "paid": {
+                  "pos_1": 1,
+                  "pos_2_3": 0,
+                  "pos_4_10": 0,
+                  "pos_11_20": 0,
+                  "pos_21_30": 0,
+                  "pos_31_40": 0,
+                  "pos_41_50": 0,
+                  "pos_51_60": 0,
+                  "pos_61_70": 0,
+                  "pos_71_80": 0,
+                  "pos_81_90": 0,
+                  "pos_91_100": 0,
+                  "etv": 45.15062713623047,
+                  "count": 1,
+                  "estimated_paid_traffic_cost": 14.448200225830078,
+                  "is_new": 0,
+                  "is_up": 1,
+                  "is_down": 0,
+                  "is_lost": 0,
+                  "clickstream_etv": null,
+                  "clickstream_gender_distribution": null,
+                  "clickstream_age_distribution": null
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

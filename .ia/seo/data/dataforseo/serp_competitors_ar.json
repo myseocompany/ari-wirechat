@@ -1,0 +1,403 @@
+{
+  "version": "0.1.20260917",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "0.0745 sec.",
+  "cost": 0.0144,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "09281151-2573-0383-0000-eeac4093fc5b",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "0.0372 sec.",
+      "cost": 0.0144,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "dataforseo_labs",
+        "google",
+        "serp_competitors",
+        "live"
+      ],
+      "data": {
+        "api": "dataforseo_labs",
+        "function": "serp_competitors",
+        "se_type": "google",
+        "keywords": [
+          "maquina para hacer empanadas",
+          "maquina para empanadas",
+          "maquina empanadas",
+          "laminadora de masa",
+          "molde para empanadas"
+        ],
+        "location_code": 2032,
+        "language_code": "es",
+        "limit": 20
+      },
+      "result": [
+        {
+          "se_type": "google",
+          "seed_keywords": [
+            "maquina para hacer empanadas",
+            "maquina para empanadas",
+            "maquina empanadas",
+            "laminadora de masa",
+            "molde para empanadas"
+          ],
+          "location_code": 2032,
+          "language_code": "es",
+          "total_count": 49,
+          "items_count": 20,
+          "items": [
+            {
+              "se_type": "google",
+              "domain": "listado.mercadolibre.com.ar",
+              "avg_position": 1,
+              "median_position": 1,
+              "rating": 297,
+              "etv": 220.85669222280416,
+              "keywords_count": 3,
+              "visibility": 3,
+              "relevant_serp_items": 3,
+              "keywords_positions": {
+                "molde para empanadas": [
+                  1
+                ],
+                "maquina para hacer empanadas": [
+                  1
+                ],
+                "laminadora de masa": [
+                  1
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.facebook.com",
+              "avg_position": 3.5,
+              "median_position": 3,
+              "rating": 193,
+              "etv": 64.14325749504202,
+              "keywords_count": 2,
+              "visibility": 1.5,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  3
+                ],
+                "laminadora de masa": [
+                  4
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.instagram.com",
+              "avg_position": 6,
+              "median_position": 6,
+              "rating": 188,
+              "etv": 37.21358005711897,
+              "keywords_count": 2,
+              "visibility": 1,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  6
+                ],
+                "laminadora de masa": [
+                  6
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.youtube.com",
+              "avg_position": 11.5,
+              "median_position": 8,
+              "rating": 177,
+              "etv": 13.422110770998087,
+              "keywords_count": 2,
+              "visibility": 0.35,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  8
+                ],
+                "laminadora de masa": [
+                  15
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.tiktok.com",
+              "avg_position": 16,
+              "median_position": 13,
+              "rating": 168,
+              "etv": 10.13966289702679,
+              "keywords_count": 2,
+              "visibility": 0.1,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  19
+                ],
+                "laminadora de masa": [
+                  13
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.amazon.es",
+              "avg_position": 26,
+              "median_position": 25,
+              "rating": 148,
+              "etv": 3.807481697015951,
+              "keywords_count": 2,
+              "visibility": 0,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  25
+                ],
+                "laminadora de masa": [
+                  27
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.industriaromano.com.ar",
+              "avg_position": 39.5,
+              "median_position": 32,
+              "rating": 121,
+              "etv": 1.252723012046036,
+              "keywords_count": 2,
+              "visibility": 0,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  32
+                ],
+                "laminadora de masa": [
+                  47
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "empatec.com.ar",
+              "avg_position": 2,
+              "median_position": 2,
+              "rating": 98,
+              "etv": 33.70940894800078,
+              "keywords_count": 1,
+              "visibility": 0.9,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  2
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.panconpan.com.ar",
+              "avg_position": 2,
+              "median_position": 2,
+              "rating": 98,
+              "etv": 72.5401979171663,
+              "keywords_count": 1,
+              "visibility": 0.9,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "laminadora de masa": [
+                  2
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "boticadelpastelero.com.ar",
+              "avg_position": 3,
+              "median_position": 3,
+              "rating": 97,
+              "etv": 52.69812173553283,
+              "keywords_count": 1,
+              "visibility": 0.8,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "laminadora de masa": [
+                  3
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "monv.com.ar",
+              "avg_position": 4,
+              "median_position": 4,
+              "rating": 96,
+              "etv": 18.615349199876327,
+              "keywords_count": 1,
+              "visibility": 0.7,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  4
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.reddit.com",
+              "avg_position": 5,
+              "median_position": 5,
+              "rating": 95,
+              "etv": 15.61381269995208,
+              "keywords_count": 1,
+              "visibility": 0.6,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  5
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "panetti.com.ar",
+              "avg_position": 5,
+              "median_position": 5,
+              "rating": 95,
+              "etv": 33.5244345360086,
+              "keywords_count": 1,
+              "visibility": 0.6,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "laminadora de masa": [
+                  5
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "openmaquinas.com.ar",
+              "avg_position": 7,
+              "median_position": 7,
+              "rating": 93,
+              "etv": 8.857447896957154,
+              "keywords_count": 1,
+              "visibility": 0.4,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  7
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.amazon.com",
+              "avg_position": 7,
+              "median_position": 7,
+              "rating": 93,
+              "etv": 19.95306860211602,
+              "keywords_count": 1,
+              "visibility": 0.4,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "laminadora de masa": [
+                  7
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.panier.com.ar",
+              "avg_position": 9,
+              "median_position": 9,
+              "rating": 91,
+              "etv": 11.349459579833976,
+              "keywords_count": 1,
+              "visibility": 0.2,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "laminadora de masa": [
+                  9
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.anko.com.tw",
+              "avg_position": 10,
+              "median_position": 10,
+              "rating": 90,
+              "etv": 4.126215883331214,
+              "keywords_count": 1,
+              "visibility": 0.1,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  10
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.elamasadero.com",
+              "avg_position": 10,
+              "median_position": 10,
+              "rating": 90,
+              "etv": 9.659708197138833,
+              "keywords_count": 1,
+              "visibility": 0.1,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "laminadora de masa": [
+                  10
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "productostaiwaneses.com",
+              "avg_position": 11,
+              "median_position": 11,
+              "rating": 89,
+              "etv": 3.4548464325771677,
+              "keywords_count": 1,
+              "visibility": 0.05,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  11
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "manpan.com",
+              "avg_position": 11,
+              "median_position": 11,
+              "rating": 89,
+              "etv": 8.39439285218114,
+              "keywords_count": 1,
+              "visibility": 0.05,
+              "relevant_serp_items": 1,
+              "keywords_positions": {
+                "laminadora de masa": [
+                  11
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

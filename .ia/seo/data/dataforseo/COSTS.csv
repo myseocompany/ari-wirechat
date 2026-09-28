@@ -25,5 +25,19 @@ fecha,endpoint,target,location_code,language_code,cost_usd,archivo
 2026-09-28,serp/google/organic/live/advanced,maquina para hacer arepas,2724,es,0.00400,serps_espana.json
 2026-09-28,serp/google/organic/live/advanced,molde para empanadillas,2724,es,0.00400,serps_espana.json
 2026-09-28,serp/google/organic/live/advanced,arepa machine,2724,es,0.00400,serps_espana.json
-# TOTAL,,,,,,0.54664,
-# RESTANTE (techo $15.50),,,,,,14.95336,
+2026-09-28,keywords_data/google_ads/search_volume/live,30 keywords,2032,es,0.09000,volume_ar_es.json
+2026-09-28,keywords_data/google_ads/search_volume/live,30 keywords,2484,es,0.09000,volume_mx_es.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,maquiempanadas.com,2032,es,0.01212,rank_overview_maquiempanadas_com_ar.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,maquiempanadas.com,2484,es,0.01212,rank_overview_maquiempanadas_com_mx.json
+2026-09-28,dataforseo_labs/google/serp_competitors/live,5 keywords AR,2032,es,0.01440,serp_competitors_ar.json
+2026-09-28,dataforseo_labs/google/serp_competitors/live,5 keywords MX,2484,es,0.01440,serp_competitors_mx.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,empatec.com.ar,2032,es,0.01212,rank_overview_empatec_com_ar_ar.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,industriaromano.com.ar,2032,es,0.01212,rank_overview_industriaromano_com_ar_ar.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,monv.com.ar,2032,es,0.01212,rank_overview_monv_com_ar_ar.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,foxsteel.com.mx,2484,es,0.01212,rank_overview_foxsteel_com_mx_mx.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,zonachef.com.mx,2484,es,0.01212,rank_overview_zonachef_com_mx_mx.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,gruenn.com.co,2170,es,0.01212,rank_overview_gruenn_com_co_co.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,ingeneumatica.com,2170,es,0.01212,rank_overview_ingeneumatica_com_co.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,italgi.com,2724,es,0.01212,rank_overview_italgi_com_es.json
+# TOTAL,,,,,,0.87664,
+# RESTANTE (techo $15.50),,,,,,14.62336,

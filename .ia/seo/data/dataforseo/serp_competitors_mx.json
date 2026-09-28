@@ -1,0 +1,487 @@
+{
+  "version": "0.1.20260917",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "0.0781 sec.",
+  "cost": 0.0144,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "09281151-2573-0383-0000-547db7d75bd6",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "time": "0.0379 sec.",
+      "cost": 0.0144,
+      "result_count": 1,
+      "path": [
+        "v3",
+        "dataforseo_labs",
+        "google",
+        "serp_competitors",
+        "live"
+      ],
+      "data": {
+        "api": "dataforseo_labs",
+        "function": "serp_competitors",
+        "se_type": "google",
+        "keywords": [
+          "maquina para hacer empanadas",
+          "maquina para empanadas",
+          "maquina empanadas",
+          "laminadora de masa",
+          "molde para empanadas"
+        ],
+        "location_code": 2484,
+        "language_code": "es",
+        "limit": 20
+      },
+      "result": [
+        {
+          "se_type": "google",
+          "seed_keywords": [
+            "maquina para hacer empanadas",
+            "maquina para empanadas",
+            "maquina empanadas",
+            "laminadora de masa",
+            "molde para empanadas"
+          ],
+          "location_code": 2484,
+          "language_code": "es",
+          "total_count": 68,
+          "items_count": 20,
+          "items": [
+            {
+              "se_type": "google",
+              "domain": "listado.mercadolibre.com.mx",
+              "avg_position": 3,
+              "median_position": 3,
+              "rating": 388,
+              "etv": 144.56945249753556,
+              "keywords_count": 4,
+              "visibility": 3.2,
+              "relevant_serp_items": 4,
+              "keywords_positions": {
+                "molde para empanadas": [
+                  4
+                ],
+                "maquina para hacer empanadas": [
+                  3
+                ],
+                "maquina para empanadas": [
+                  1
+                ],
+                "laminadora de masa": [
+                  4
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.youtube.com",
+              "avg_position": 6.25,
+              "median_position": 5,
+              "rating": 375,
+              "etv": 48.75407437039794,
+              "keywords_count": 4,
+              "visibility": 1.9,
+              "relevant_serp_items": 4,
+              "keywords_positions": {
+                "molde para empanadas": [
+                  8
+                ],
+                "maquina para hacer empanadas": [
+                  5
+                ],
+                "maquina para empanadas": [
+                  4
+                ],
+                "laminadora de masa": [
+                  8
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.amazon.com.mx",
+              "avg_position": 7.5,
+              "median_position": 7,
+              "rating": 370,
+              "etv": 65.71712852735675,
+              "keywords_count": 4,
+              "visibility": 1.4,
+              "relevant_serp_items": 4,
+              "keywords_positions": {
+                "molde para empanadas": [
+                  5
+                ],
+                "maquina para hacer empanadas": [
+                  9
+                ],
+                "maquina para empanadas": [
+                  9
+                ],
+                "laminadora de masa": [
+                  7
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.tiktok.com",
+              "avg_position": 8.75,
+              "median_position": 6,
+              "rating": 365,
+              "etv": 24.372935558263762,
+              "keywords_count": 4,
+              "visibility": 1.35,
+              "relevant_serp_items": 4,
+              "keywords_positions": {
+                "molde para empanadas": [
+                  6
+                ],
+                "maquina para hacer empanadas": [
+                  8
+                ],
+                "maquina para empanadas": [
+                  6
+                ],
+                "laminadora de masa": [
+                  15
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.instagram.com",
+              "avg_position": 8.75,
+              "median_position": 5,
+              "rating": 365,
+              "etv": 17.267058659069097,
+              "keywords_count": 4,
+              "visibility": 1.9,
+              "relevant_serp_items": 4,
+              "keywords_positions": {
+                "molde para empanadas": [
+                  7
+                ],
+                "maquina para hacer empanadas": [
+                  2
+                ],
+                "maquina para empanadas": [
+                  5
+                ],
+                "laminadora de masa": [
+                  21
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.facebook.com",
+              "avg_position": 10.25,
+              "median_position": 10,
+              "rating": 359,
+              "etv": 25.39964658911696,
+              "keywords_count": 4,
+              "visibility": 0.7000000000000001,
+              "relevant_serp_items": 4,
+              "keywords_positions": {
+                "molde para empanadas": [
+                  13
+                ],
+                "maquina para hacer empanadas": [
+                  6
+                ],
+                "maquina para empanadas": [
+                  10
+                ],
+                "laminadora de masa": [
+                  12
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "foxsteel.com.mx",
+              "avg_position": 6.333333333333333,
+              "median_position": 2,
+              "rating": 281,
+              "etv": 25.454961300945588,
+              "keywords_count": 3,
+              "visibility": 1.95,
+              "relevant_serp_items": 3,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  1
+                ],
+                "maquina para empanadas": [
+                  2
+                ],
+                "laminadora de masa": [
+                  16
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.walmart.com.mx",
+              "avg_position": 9.333333333333334,
+              "median_position": 11,
+              "rating": 272,
+              "etv": 0.5571370192989896,
+              "keywords_count": 3,
+              "visibility": 1.1,
+              "relevant_serp_items": 3,
+              "keywords_positions": {
+                "molde para empanadas": [
+                  1
+                ],
+                "maquina para hacer empanadas": [
+                  16
+                ],
+                "maquina para empanadas": [
+                  11
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "maquiempanadas.com",
+              "avg_position": 16,
+              "median_position": 16,
+              "rating": 252,
+              "etv": 0.43811814914223457,
+              "keywords_count": 3,
+              "visibility": 0.15000000000000002,
+              "relevant_serp_items": 3,
+              "keywords_positions": {
+                "molde para empanadas": [
+                  18
+                ],
+                "maquina para hacer empanadas": [
+                  14
+                ],
+                "maquina para empanadas": [
+                  16
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "zonachef.com.mx",
+              "avg_position": 23,
+              "median_position": 25,
+              "rating": 231,
+              "etv": 0.15366879272344083,
+              "keywords_count": 3,
+              "visibility": 0.05,
+              "relevant_serp_items": 3,
+              "keywords_positions": {
+                "molde para empanadas": [
+                  16
+                ],
+                "maquina para hacer empanadas": [
+                  25
+                ],
+                "maquina para empanadas": [
+                  28
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "losmenones.com",
+              "avg_position": 3.5,
+              "median_position": 3,
+              "rating": 193,
+              "etv": 3.672244034170029,
+              "keywords_count": 2,
+              "visibility": 1.5,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  4
+                ],
+                "maquina para empanadas": [
+                  3
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "productostaiwaneses.com",
+              "avg_position": 7.5,
+              "median_position": 7,
+              "rating": 185,
+              "etv": 1.0296421345500943,
+              "keywords_count": 2,
+              "visibility": 0.7,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  7
+                ],
+                "maquina para empanadas": [
+                  8
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.anko.com.tw",
+              "avg_position": 13,
+              "median_position": 13,
+              "rating": 174,
+              "etv": 0.5207780088330762,
+              "keywords_count": 2,
+              "visibility": 0.1,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  13
+                ],
+                "maquina para empanadas": [
+                  13
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.ankofood.com",
+              "avg_position": 14,
+              "median_position": 11,
+              "rating": 172,
+              "etv": 0.4263925646801207,
+              "keywords_count": 2,
+              "visibility": 0.1,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  11
+                ],
+                "maquina para empanadas": [
+                  17
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "ferrero-machines.com",
+              "avg_position": 16,
+              "median_position": 14,
+              "rating": 168,
+              "etv": 0.506435187596171,
+              "keywords_count": 2,
+              "visibility": 0.1,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  18
+                ],
+                "maquina para empanadas": [
+                  14
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "monv.com.ar",
+              "avg_position": 16.5,
+              "median_position": 15,
+              "rating": 167,
+              "etv": 0.37699251859801675,
+              "keywords_count": 2,
+              "visibility": 0.1,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  15
+                ],
+                "maquina para empanadas": [
+                  18
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "adlovermaquinas.com",
+              "avg_position": 21,
+              "median_position": 20,
+              "rating": 158,
+              "etv": 0.26434261630525363,
+              "keywords_count": 2,
+              "visibility": 0.05,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  20
+                ],
+                "maquina para empanadas": [
+                  22
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "empatec.com.ar",
+              "avg_position": 23.5,
+              "median_position": 22,
+              "rating": 153,
+              "etv": 0.2064913987837549,
+              "keywords_count": 2,
+              "visibility": 0,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  22
+                ],
+                "maquina para empanadas": [
+                  25
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "baudinequipamientos.com",
+              "avg_position": 24.5,
+              "median_position": 23,
+              "rating": 151,
+              "etv": 0.24066348781387079,
+              "keywords_count": 2,
+              "visibility": 0,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  26
+                ],
+                "maquina para empanadas": [
+                  23
+                ]
+              }
+            },
+            {
+              "se_type": "google",
+              "domain": "www.bodegaaurrera.com.mx",
+              "avg_position": 29,
+              "median_position": 19,
+              "rating": 142,
+              "etv": 0.3612201568897508,
+              "keywords_count": 2,
+              "visibility": 0.05,
+              "relevant_serp_items": 2,
+              "keywords_positions": {
+                "maquina para hacer empanadas": [
+                  39
+                ],
+                "maquina para empanadas": [
+                  19
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
