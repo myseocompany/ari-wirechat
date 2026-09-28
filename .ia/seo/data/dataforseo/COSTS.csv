@@ -43,5 +43,21 @@ fecha,endpoint,target,location_code,language_code,cost_usd,archivo
 2026-09-28,dataforseo_labs/google/domain_rank_overview/live,bralyx.com,2032,es,0.01212,rank_overview_bralyx_com_ar.json
 2026-09-28,dataforseo_labs/google/domain_rank_overview/live,bralyx.com,2170,es,0.01212,rank_overview_bralyx_com_co.json
 2026-09-28,dataforseo_labs/google/domain_rank_overview/live,bralyx.com,2840,es,0.01212,rank_overview_bralyx_com_usa.json
-# TOTAL,,,,,,0.92512,
-# RESTANTE (techo $15.50),,,,,,14.57488,
+2026-09-28,keywords_data/google_ads/search_volume/live,30 keywords,2630,es,0.09000,volume_pr_es.json
+2026-09-28,keywords_data/google_ads/search_volume/live,30 keywords,2188,es,0.09000,volume_cr_es.json
+2026-09-28,keywords_data/google_ads/search_volume/live,30 keywords,2152,es,0.09000,volume_cl_es.json
+2026-09-28,keywords_data/google_ads/search_volume/live,30 keywords,2862,es,0.09000,volume_ve_es.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,maquiempanadas.com,2630,es,0.00000,rank_overview_maquiempanadas_com_pr.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,maquiempanadas.com,2188,es,0.00000,rank_overview_maquiempanadas_com_cr.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,maquiempanadas.com,2152,es,0.01212,rank_overview_maquiempanadas_com_cl.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,maquiempanadas.com,2862,es,0.01212,rank_overview_maquiempanadas_com_ve.json
+2026-09-28,dataforseo_labs/google/ranked_keywords/live,zonachef.com.mx,2484,es,0.02400,ranked_kw_zonachef_com_mx_mx.json
+2026-09-28,dataforseo_labs/google/ranked_keywords/live,foxsteel.com.mx,2484,es,0.02400,ranked_kw_foxsteel_com_mx_mx.json
+2026-09-28,dataforseo_labs/google/ranked_keywords/live,bralyx.com,2076,pt,0.02400,ranked_kw_bralyx_com_br.json
+2026-09-28,dataforseo_labs/google/ranked_keywords/live,industriaromano.com.ar,2032,es,0.02292,ranked_kw_industriaromano_com_ar_ar.json
+2026-09-28,dataforseo_labs/google/ranked_keywords/live,monv.com.ar,2032,es,0.01620,ranked_kw_monv_com_ar_ar.json
+2026-09-28,dataforseo_labs/google/ranked_keywords/live,gruenn.com.co,2170,es,0.01668,ranked_kw_gruenn_com_co_co.json
+2026-09-28,dataforseo_labs/google/ranked_keywords/live,empatec.com.ar,2032,es,0.01344,ranked_kw_empatec_com_ar_ar.json
+2026-09-28,dataforseo_labs/google/ranked_keywords/live,ingeneumatica.com,2170,es,0.01704,ranked_kw_ingeneumatica_com_co.json
+# TOTAL,,,,,,1.46764,
+# RESTANTE (techo $15.50),,,,,,14.03236,

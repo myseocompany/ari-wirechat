@@ -1,0 +1,35 @@
+{
+  "version": "0.1.20260917",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "0.0806 sec.",
+  "cost": 0,
+  "tasks_count": 1,
+  "tasks_error": 1,
+  "tasks": [
+    {
+      "id": "09281222-2573-0388-0000-f8fc149374e2",
+      "status_code": 40501,
+      "status_message": "Invalid Field: 'location_code'.",
+      "time": "0 sec.",
+      "cost": 0,
+      "result_count": 0,
+      "path": [
+        "v3",
+        "dataforseo_labs",
+        "google",
+        "domain_rank_overview",
+        "live"
+      ],
+      "data": {
+        "api": "dataforseo_labs",
+        "function": "domain_rank_overview",
+        "se_type": "google",
+        "target": "maquiempanadas.com",
+        "location_code": 2630,
+        "language_code": "es"
+      },
+      "result": null
+    }
+  ]
+}
