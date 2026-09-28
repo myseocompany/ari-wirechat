@@ -39,5 +39,9 @@ fecha,endpoint,target,location_code,language_code,cost_usd,archivo
 2026-09-28,dataforseo_labs/google/domain_rank_overview/live,gruenn.com.co,2170,es,0.01212,rank_overview_gruenn_com_co_co.json
 2026-09-28,dataforseo_labs/google/domain_rank_overview/live,ingeneumatica.com,2170,es,0.01212,rank_overview_ingeneumatica_com_co.json
 2026-09-28,dataforseo_labs/google/domain_rank_overview/live,italgi.com,2724,es,0.01212,rank_overview_italgi_com_es.json
-# TOTAL,,,,,,0.87664,
-# RESTANTE (techo $15.50),,,,,,14.62336,
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,bralyx.com,2076,pt,0.01212,rank_overview_bralyx_com_br.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,bralyx.com,2032,es,0.01212,rank_overview_bralyx_com_ar.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,bralyx.com,2170,es,0.01212,rank_overview_bralyx_com_co.json
+2026-09-28,dataforseo_labs/google/domain_rank_overview/live,bralyx.com,2840,es,0.01212,rank_overview_bralyx_com_usa.json
+# TOTAL,,,,,,0.92512,
+# RESTANTE (techo $15.50),,,,,,14.57488,
