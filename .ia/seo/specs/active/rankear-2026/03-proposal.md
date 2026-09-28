@@ -1,21 +1,53 @@
 ---
 slug: rankear-2026
 proposed_at: 2026-09-20
+last_updated: 2026-09-28 (revisión 4 — 9 mercados analizados con DataForSEO + tier de nichos por volumen real)
 ---
 
 # Proposal — Rankear 2026
 
 ## Resumen
 
-Rankear top 3 en 4 categorías universales de Google (texto / imágenes / video / shopping) atacando **6 nichos culturalmente específicos** definidos por la cliente + 2 mercados profesionales cruzados. Los nichos son intersecciones audiencia × geografía × producto identitario × vocabulario local: cubanos en USA (empanada cubana), puertorriqueños (empanadilla/pastelillo), costarricenses (chiverre/queso), chilenos (empanada de pino), venezolanos (harina de maíz + arepas) y colombianos en España.
+Rankear top 3 en 4 categorías universales de Google (texto / imágenes / video / shopping) atacando los **6 nichos culturales definidos por la cliente** + 2 mercados profesionales cruzados, reasignando esfuerzo por tier según el volumen real medido con DataForSEO el 2026-09-28. Los nichos siguen siendo intersecciones audiencia × geografía × producto identitario × vocabulario local: cubanos en USA (empanada cubana), puertorriqueños (empanadilla/pastelillo), costarricenses (chiverre/queso), chilenos (empanada de pino), venezolanos (harina de maíz + arepas) y colombianos en España.
 
-Estrategia de **dos pilares de producto**: CM06 (empanadas + arepas, puerta de entrada) para buyer inicial + CM5S (multifuncional con telemetría, competencia directa vs Anko) para buyer profesional. Cada nicho recibe una landing específica que enlaza al pilar correspondiente según intención comercial.
+**Tier de nichos por volumen del cluster core `maquina * empanadas` (17 variantes):**
+- **Tier A (landing + cluster completo):** N1 Cubanos USA, N4 Chilenos (1,120/mes), N6 Colombianos España (790/mes), P2 profesional cross-mercado
+- **Tier B (landing simple, sin cluster satélite):** N5 Venezolanos (200/mes, ancla en laminadora 590), P1 anglófono industrial USA
+- **Tier C (vocabulario dentro de contenido latino USA, sin landing dedicada):** N2 Puertorriqueños (70/mes), N3 Costarricenses (100/mes)
 
-Combinar investigación DataForSEO (presupuesto $45 USD ya comprados, distribuidos en 8 batches por `location_code`), benchmark cross-category (100+ SERPs de nichos B2B análogos), y motor de generación de contenidos asistido por LLM con revisión humana obligatoria + activos originales de Maquiempanadas + autor identificado, para publicar **15 piezas nicho-específicas** en 12 semanas.
+Estrategia de **dos pilares de producto** que sigue vigente: CM06 (empanadas + arepas, puerta de entrada) para buyer inicial + CM5S (multifuncional con telemetría, competencia directa vs Anko) para buyer profesional. Cada nicho de Tier A y B recibe una landing específica que enlaza al pilar correspondiente según intención comercial. Los nichos Tier C se cubren dentro del contenido latino USA.
+
+Combinar GSC, Ads, YouTube y CRM con investigación selectiva de DataForSEO bajo un techo acumulado inicial de **USD 15,50**, benchmark directo y un conjunto pequeño de analogías, y generación asistida por LLM con revisión humana, activos originales y autor identificado. **Las 10-11 piezas** (2 pilares + 3 landings Tier A + 2 landings Tier B + 3 posts cluster Tier A + 1 pilar EN condicional) forman un backlog; se publica primero una cohorte de 3-5 piezas (Tier A) y el resto se libera según evidencia.
 
 **El feature se ejecuta bajo el SEO Harness** (`.ia/seo/harness/`) que define SOUL, MÉTODO (RESEARCH → GAP_ANALYSIS → CONTENT_PLAN → GENERATE → PUBLISH → MONITOR → EVOLVE), POLÍTICAS, skills (content QC con 13 checkpoints, model routing Opus/Sonnet/Haiku, data hygiene), workflows y prompts. El harness es la contraparte MYSEO de SPECBOOT (que queda para el código Laravel del repo).
 
 ## Cambios propuestos
+
+### Revisión 3 — orden de ejecución y control económico
+
+Esta revisión incorpora `seo-audit-maquiempanadas-com-2026-09-20.md` y prevalece sobre cualquier cifra o secuencia anterior que sobreviva en este documento.
+
+1. **Corregir la base antes de crear escala:** validar el HTML/JSON-LD real; reparar mezcla de idiomas y `hreflang`; establecer autoría humana; completar alt text; implementar Product, VideoObject y Recipe/HowTo cuando los datos existan; retirar contenido caduco. FAQ se usa para responder decisiones del comprador, sin prometer rich results generales.
+2. **Explotar fuentes propias gratuitas:** GSC, Ads, YouTube y CRM definen línea base, consultas, cohortes, etapas y resultado comercial. DataForSEO compra solamente evidencia que esas fuentes no entregan.
+3. **Validar demanda e intención:** expandir por nicho con límites de resultados, deduplicar y enriquecer únicamente candidatos comerciales. No se exige producir 500 keywords ni 100 gaps.
+4. **Validar SERP y competencia:** observar primero queries directas de maquinaria. Consultar categorías análogas solo para resolver una hipótesis concreta de formato.
+5. **Pilotar contenido:** optimizar CM06/CM5S y publicar 3-5 piezas. Escalar el backlog hasta 15 únicamente con demanda, capacidad operativa y señal de avance.
+6. **Medir negocio:** oportunidades orgánicas calificadas, conversión a venta e ingreso cobrado atribuible/asistido. Rankings, imágenes, video y LLMs son señales diagnósticas.
+
+Presupuesto operativo inicial:
+
+| Bloque | Rango máximo |
+|---|---:|
+| Gasto ya observado en JSON locales | USD 0,41 |
+| Expansión y validación por nicho | USD 1,50-3,00 |
+| SERPs directas, imágenes y popular products | USD 1,00-2,00 |
+| Competidores y gaps seleccionados | USD 1,00-2,00 |
+| Crawl técnico y páginas ganadoras | USD 0,25-1,00 |
+| Baseline GEO/LLM limitado | USD 0,50-2,00 |
+| Monitoreo inicial y contingencia | USD 2,50-5,00 |
+| **Techo acumulado del primer ciclo** | **USD 15,50** |
+
+Antes de cada batch se registra: endpoint, tareas, `limit`/`depth`, modo Live o Standard, tarifa estimada, costo máximo y decisión que habilita. Para trabajos no interactivos se prefiere la cola Standard; Live se reserva para exploración o verificación puntual.
 
 ### Fase 0 — Setup y baseline (semanas 1-2)
 
@@ -24,15 +56,15 @@ Trabajo de infraestructura. No cambia el sitio todavía.
 - `.ia/seo/scripts/dataforseo_client.py` — cliente Python que envuelve las llamadas a DataForSEO, guarda JSON crudo con timestamp, escribe fila de costo en `COSTS.csv`.
 - `.ia/seo/scripts/serp_snapshot.py` — captura SERP + guarda para comparación t0 vs t+N.
 - `.ia/seo/scripts/llm_prompts/` — biblioteca de prompts de generación por tipo de contenido (pillar page, cluster post, product page, FAQ, alt-text batch).
-- `.ia/seo/data/dataforseo/COSTS.csv` — control de gasto contra el techo $45.
+- `.ia/seo/data/dataforseo/COSTS.csv` — control de gasto contra el techo acumulado inicial de $15,50.
 - `.ia/seo/data/dataforseo/keywords_universe.csv` — inventario final tras fase 1 de investigación.
-- `.ia/seo/data/dataforseo/content_gaps.csv` — gaps priorizados por (volumen × posición_rival) tras fase 2.
+- `.ia/seo/data/dataforseo/content_gaps.csv` — gaps priorizados por demanda, intención, ajuste producto/mercado, valor, rankability y esfuerzo.
 - `.ia/seo/data/dataforseo/benchmark_categories.csv` — resultados del recorrido cross-category (fase 3).
 - `.ia/seo/data/dataforseo/llm_presence_baseline.md` — baseline t0.
 
 ### Fase 1 — Investigación keywords y gaps por nicho (semanas 2-3)
 
-Consultas DataForSEO priorizadas. **Presupuesto de esta fase: $16 USD** (subió $4 vs versión anterior por los 6 nichos).
+Consultas DataForSEO priorizadas y acotadas. **Techo de esta fase: USD 3,00**; el número de mercados no implica gastar el techo si los primeros datos descartan un nicho.
 
 **Location codes por nicho:**
 
@@ -47,7 +79,7 @@ Consultas DataForSEO priorizadas. **Presupuesto de esta fase: $16 USD** (subió 
 | P1 Anglófono industrial | 2840 | en | USA inglés |
 | P2 Profesional hispano | 2170 (COL) + 2840 + 2152 + 2724 | es | benchmark de comparación entre países |
 
-**Batch 1.1 — Expansión de universo semántico por nicho ($6 USD):**
+**Batch 1.1 — Expansión de universo semántico por nicho (techo USD 1,25):**
 - `dataforseo_labs/google/keyword_ideas/live` — semillas culturales específicas por nicho:
   - N1: `empanada cubana`, `pastelito guayaba y queso`, `empanada de guayaba`
   - N2: `empanadilla`, `pastelillo`, `pastelillo de carne`
@@ -57,22 +89,21 @@ Consultas DataForSEO priorizadas. **Presupuesto de esta fase: $16 USD** (subió 
   - N6: `empanadas colombianas España`, `empanadas colombianas Madrid`
   - P1: `empanada machine`, `commercial empanada machine`, `automatic empanada maker`
   - P2: `máquina industrial empanadas`, `línea producción empanadas semiautomática`
-- `dataforseo_labs/google/keyword_suggestions/live` — variantes long-tail sobre las top 30 por nicho.
-- `dataforseo_labs/google/related_keywords/live` — semánticamente relacionadas.
-- `dataforseo_labs/google/search_intent/live` — clasifica intent de las top 200.
+- `keyword_suggestions` o `related_keywords` solo se usan si `keyword_ideas` deja un vacío semántico específico; no se ejecutan por defecto para todas las semillas.
+- `search_intent` se aplica después de deduplicar, únicamente a candidatos sin intención evidente.
 
-**Batch 1.2 — Volumen y dificultad por país específico ($5 USD):**
+**Batch 1.2 — Volumen y dificultad por país específico (techo USD 0,75):**
 - `keywords_data/google_ads/search_volume/live` con el `location_code` correcto de cada nicho para las 30-50 keywords semilla de cada uno. 8 batches × 30-50 kw.
-- `dataforseo_labs/google/bulk_keyword_difficulty/live` por batch por nicho.
+- `bulk_keyword_difficulty` se usa solo cuando la respuesta anterior no contenga una dificultad utilizable y únicamente sobre candidatos aprobados.
 - **Salida clave:** volumen por nicho para priorizar. Probablemente Chile >> Costa Rica en volumen bruto; hay que confirmar con datos.
 
-**Batch 1.3 — Rivales por nicho y gaps ($5 USD):**
+**Batch 1.3 — Rivales por nicho y gaps (techo USD 1,00):**
 - `dataforseo_labs/google/ranked_keywords/live` para 5 dominios (ankofood, anko.com.tw, ferrero-machines, adlovermaquinas, empanadasmachine) × países prioritarios (USA + COL + los 4 nuevos donde tengan presencia) — hasta 10 requests.
 - Rivales locales por nicho (a identificar en Fase 2 SERPs): para Chile, buscar `metalurgicavazquez.com.ar` o similares; para España, buscar competidores locales de maquinaria alimentaria.
 - `dataforseo_labs/google/domain_intersection/live` — Maqui vs cada rival principal.
 - `dataforseo_labs/google/serp_competitors/live` — competidores agregados por keyword set nicho-específico.
 
-**Salida:** `keywords_universe.csv` con 500+ keywords **clasificadas por nicho** + `content_gaps.csv` con ≥100 gaps priorizados. Sin escribir nada aún.
+**Salida:** `keywords_universe.csv` con candidatos útiles clasificados por nicho + `content_gaps.csv` priorizado por `(demanda × intención × ajuste × valor × probabilidad_de_rankear) / esfuerzo`. Sin cuotas de filas y sin escribir contenido aún.
 
 ### Fase 2 — Benchmark cross-category (semanas 3-4)
 
@@ -85,15 +116,16 @@ Recorrer SERPs de nichos B2B con productos físicos caros para aprender **qué f
 - Extractoras de café comerciales
 - Máquinas de helado industrial
 
-**Presupuesto de esta fase: $8 USD.**
+**Techo de esta fase: USD 2,00.**
 
-**Batch 2.1 — SERPs de referencia ($5 USD):**
-- 10 keywords cabeza de cada nicho × 5 nichos × 2 países (USA + COL) = 100 SERPs
-- `serp/google/organic/live/advanced` con `depth=30`
+**Batch 2.1 — SERPs de referencia (techo USD 1,50):**
+- Primero 24-36 SERPs comerciales directas en los mercados candidatos; ampliar solo si cambian la decisión.
+- Hasta 12 SERPs análogas para hipótesis concretas de formato.
+- Preferir `serp/google/organic/task_post` Standard para lotes; usar `live/advanced` cuando la respuesta inmediata sea necesaria. `depth=20` por defecto y 30 solo cuando la segunda o tercera página aporte evidencia.
 
-**Batch 2.2 — Análisis de las top URLs ganadoras ($3 USD):**
-- Top 3 URL por cada SERP recorrido = 300 URLs
-- `on_page/instant_pages` para 30 páginas seleccionadas (las más ricas en features)
+**Batch 2.2 — Análisis de las top URLs ganadoras (techo USD 0,50):**
+- Seleccionar 12-20 URLs que representen patrones distintos; no descargar automáticamente las tres primeras de cada SERP.
+- Usar `on_page/instant_pages` o parsing solo cuando el HTML disponible no resuelva la pregunta.
 
 **Salida:** `benchmark_categories.md` con patrones ganadores:
 - Formatos de pillar page (H1-H6, longitud, imágenes, video embed, FAQ, tabla de specs)
@@ -107,14 +139,14 @@ Recorrer SERPs de nichos B2B con productos físicos caros para aprender **qué f
 
 ### Fase 3 — Content plan asistido por LLM (semanas 4-6)
 
-**Presupuesto DataForSEO de esta fase: $10 USD.**
+**Techo DataForSEO de esta fase: USD 3,00.** La auditoría pública existente sustituye el crawl exploratorio inicial; DataForSEO se usa para verificar hallazgos dudosos o medir lo que el fetch no pudo observar.
 
-**Batch 3.1 — Auditoría del contenido actual ($5 USD):**
+**Batch 3.1 — Verificación técnica dirigida (techo USD 1,00):**
 - `on_page/summary` + `on_page/duplicate_content` sobre `maquiempanadas.com` para detectar qué URLs actuales pueden expandirse (quick wins) vs. crear nuevas.
 - `on_page/broken_resources` para detectar imágenes rotas / videos mal servidos.
 
-**Batch 3.2 — Presencia en LLMs baseline ($5 USD):**
-- `ai_optimization/{chat_gpt|claude|gemini|perplexity}/llm_responses/live` — 10 queries × 4 LLMs = 40 llamadas.
+**Batch 3.2 — Presencia en LLMs baseline (techo USD 2,00):**
+- `ai_optimization/{chat_gpt|claude|gemini|perplexity}/llm_responses/live` — 5-8 queries comerciales congeladas; registrar modelo, configuración, fecha, tokens y costo real.
 - `ai_optimization/llm_mentions/target_metrics/live` para maquiempanadas.com + rivales.
 
 **Motor de generación de contenidos con LLM:**
@@ -131,7 +163,7 @@ Cada tipo de contenido tiene su prompt template en `.ia/seo/scripts/llm_prompts/
 
 3. **`product_faq.md`** — FAQ para páginas de producto:
    - Input: 4 PAA del SERP + specs del producto
-   - Output: 8-12 pares Q/A con schema FAQPage
+   - Output: 8-12 pares Q/A útiles para el comprador; usar `FAQPage` solo si cumple las políticas y sin prometer elegibilidad para rich results.
 
 4. **`alt_text_batch.md`** — alt-text bilingüe para imágenes existentes:
    - Input: URL de imagen + contexto de página
@@ -139,7 +171,7 @@ Cada tipo de contenido tiene su prompt template en `.ia/seo/scripts/llm_prompts/
 
 5. **`local_landing.md`** — landing por ciudad (Miami, Houston, Bogotá, Medellín, Manizales):
    - Input: ciudad + diáspora relevante + queries locales
-   - Output: página con contenido geo-específico + LocalBusiness schema
+   - Output: página con contenido geo-específico; `LocalBusiness` solo cuando la URL represente una sede física real con NAP verificable.
 
 6. **`video_description.md`** — descripciones de YouTube + títulos SEO:
    - Input: URL video + producto + keywords objetivo
@@ -150,7 +182,7 @@ Cada tipo de contenido tiene su prompt template en `.ia/seo/scripts/llm_prompts/
 2. **Filtro E-E-A-T** — checklist: ¿hay autor identificado?, ¿fotos originales?, ¿video propio?, ¿testimonio verificable?.
 3. **Filtro Rich Results Test** — el schema pasa validación de Google.
 
-**Piezas a producir (15 en 12 semanas, distribuidas por 6 nichos + 2 mercados profesionales):**
+**Backlog máximo de piezas (hasta 15, liberadas por cohortes):**
 
 ### Pilares master (2)
 
@@ -159,37 +191,57 @@ Cada tipo de contenido tiene su prompt template en `.ia/seo/scripts/llm_prompts/
 | 1 | Pillar master | Máquinas para hacer empanadas y arepas: guía completa | ES | **CM06** | `maquina para hacer empanadas y arepas` | Puerta de entrada — buyer inicial |
 | 2 | Pillar master | Máquina profesional multifuncional para empanadas — CM5S con telemetría | ES | **CM5S** | `maquina industrial empanadas`, `linea produccion empanadas` | Comercial premium — buyer profesional |
 
-### Landing pages nicho-específicas (6)
+### Landing pages nicho-específicas (Tier A: 3 + Tier B: 2 = 5)
 
-Una por audiencia. Cada una con vocabulario local, foto/video del producto identitario, testimonio de cliente real del nicho, LocalBusiness schema apuntando a la bodega que despacha (USA para N1/N2, COL para N3/N4/N5/N6, decidir por logística para N6). Todas enlazan al pilar CM06 o CM5S según intención comercial.
+Una por audiencia con volumen suficiente. Cada una con vocabulario local, foto/video del producto identitario, testimonio de cliente real del nicho, LocalBusiness schema apuntando a la bodega que despacha (USA para N1/N2, COL para N3/N4/N5, decidir por logística para N6). Todas enlazan al pilar CM06 o CM5S según intención comercial.
 
-| # | Tipo | Nicho | Target keyword | Producto | Bodega despacha |
+**Tier A — landing dedicada + cluster satélite** (nichos donde el volumen cluster core justifica esfuerzo completo):
+
+| # | Tipo | Nicho | Tier | Target keyword | Producto | Bodega |
+|---|---|---|---|---|---|---|
+| 3 | Landing nicho | N1 Cubanos en USA | A | `maquina para hacer empanadas cubanas`, `maquina pastelitos guayaba y queso` | CM06 (arranque) + link a CM5S | USA |
+| 4 | Landing nicho | N4 Chilenos | A | `maquina para hacer empanadas chilenas`, `maquina empanadas de pino`, `fabrica de empanadas chile` (1,120 core + 930 fábrica/mes) | CM06 + CM5S | Colombia |
+| 5 | Landing nicho | N6 Colombianos en España | A | `maquina empanadas colombianas Madrid`, `venta maquina empanadas España` (790 core + 890 laminadora/mes) | CM5S (buyer profesional) | USA o COL según costo |
+
+**Tier B — landing simple sin cluster satélite** (volumen suficiente para landing propia pero no para invertir en cluster):
+
+| # | Tipo | Nicho | Tier | Target keyword | Producto | Bodega |
+|---|---|---|---|---|---|---|
+| 6 | Landing nicho | N5 Venezolanos | B | `maquina empanadas venezolanas`, `laminadora de masa venezuela` (200 core + 590 laminadora/mes — laminadora es ancla real) | CM06 con enlace a laminadora | Colombia |
+| 7 | Landing EN | P1 Anglófono industrial | B | `commercial empanada machine`, `automatic empanada maker machine` | CM5S en inglés | USA |
+
+**Tier C — vocabulario cubierto dentro de contenido latino USA sin landing dedicada** (volumen cluster core insuficiente para landing propia):
+
+- **N2 Puertorriqueños** (70/mes cluster core en la isla) — vocabulario `empanadilla`, `pastelillo` y variantes se incorporan como sección dentro de la landing N1 Cubanos USA (que también aplica a la diáspora puertorriqueña en USA mainland). Sin landing propia.
+- **N3 Costarricenses** (100/mes cluster core) — vocabulario `empanada tica`, `empanada de chiverre` se incorpora como sección dentro del post cluster N1 o del blog latino USA. Sin landing propia.
+
+### Posts cluster por nicho (Tier A: 3)
+
+Uno por cada nicho Tier A, tipo "cómo empezar negocio de [empanada del nicho] en [ciudad]". Enlazan a la landing nicho + al pilar correspondiente. Formato blog SEO informacional que refuerza el pilar. Los nichos Tier B y C **no reciben post cluster** en este ciclo (validar antes de invertir).
+
+| # | Tipo | Nicho | Tier | Título tentativo | Target keyword |
 |---|---|---|---|---|---|
-| 3 | Landing nicho | N1 Cubanos en USA | `maquina para hacer empanadas cubanas`, `maquina pastelitos guayaba y queso` | CM06 (arranque) + link a CM5S | USA |
-| 4 | Landing nicho | N2 Puertorriqueños | `maquina para hacer empanadillas`, `maquina pastelillos puertorriqueños` | CM06 | USA |
-| 5 | Landing nicho | N3 Costarricenses | `maquina para hacer empanadas costa rica`, `maquina empanadas de chiverre` | CM06 | Colombia |
-| 6 | Landing nicho | N4 Chilenos | `maquina para hacer empanadas chilenas`, `maquina empanadas de pino` | CM06 + CM5S | Colombia |
-| 7 | Landing nicho | N5 Venezolanos | `maquina para hacer empanadas venezolanas`, `maquina para arepas venezolanas` | CM06 (cluster fuerte de arepas) | Colombia |
-| 8 | Landing nicho | N6 Colombianos en España | `maquina empanadas colombianas Madrid`, `venta maquina empanadas España` | CM5S (buyer profesional) | USA o COL según costo |
+| 8 | Cluster | N1 | A | Cómo montar un negocio de pastelitos cubanos en Miami (incluye sección puertorriqueña con empanadillas) | `negocio empanadas cubanas Miami`, `franquicia pastelitos`, `empanadilla puertorriqueña miami` |
+| 9 | Cluster | N4 | A | Producción industrial de empanadas de pino en Chile | `empanadas chilenas al por mayor`, `fabrica empanadas Chile` |
+| 10 | Cluster | N6 | A | Empanadas colombianas para hostelería en España | `empanadas colombianas mayorista España`, `distribuidor empanadas Madrid` |
 
-### Posts cluster por nicho (6)
+### Pilar en inglés (opcional, dentro de Tier B)
 
-Uno por nicho, tipo "cómo empezar negocio de [empanada del nicho] en [ciudad]". Enlazan a la landing nicho + al pilar correspondiente. Formato blog SEO informacional que refuerza el pilar.
-
-| # | Tipo | Nicho | Título tentativo | Target keyword |
-|---|---|---|---|---|
-| 9 | Cluster | N1 | Cómo montar un negocio de pastelitos cubanos en Miami | `negocio empanadas cubanas Miami`, `franquicia pastelitos` |
-| 10 | Cluster | N2 | Cómo hacer empanadillas puertorriqueñas para vender | `negocio empanadillas Puerto Rico`, `receta empanadilla masa` |
-| 11 | Cluster | N3 | Cómo iniciar producción de empanadas ticas | `empanadas ticas para vender`, `negocio empanadas Costa Rica` |
-| 12 | Cluster | N4 | Producción industrial de empanadas de pino en Chile | `empanadas chilenas al por mayor`, `fabrica empanadas Chile` |
-| 13 | Cluster | N5 | Cómo producir empanadas de maíz venezolanas | `empanadas venezolanas negocio`, `harina PAN industrial` |
-| 14 | Cluster | N6 | Empanadas colombianas para hostelería en España | `empanadas colombianas mayorista España`, `distribuidor empanadas Madrid` |
-
-### Pilar en inglés (1)
+La landing #7 anterior cumple el rol de landing P1. Si tras Fase 1 el volumen anglófono industrial justifica un pilar completo (no solo landing), se agrega como pieza #11:
 
 | # | Tipo | Mercado | Título tentativo | Target keyword |
 |---|---|---|---|---|
-| 15 | Pillar EN | P1 Anglófono industrial USA | Commercial empanada machines: complete buying guide (CM5S) | `commercial empanada machine`, `automatic empanada maker machine` |
+| 11 (condicional) | Pillar EN | P1 Anglófono industrial USA | Commercial empanada machines: complete buying guide (CM5S) | `commercial empanada machine`, `automatic empanada maker machine` |
+
+### Resumen de piezas
+
+- **2 pilares master ES** (CM06, CM5S) — obligatorios
+- **3 landings Tier A** (N1, N4, N6) — obligatorios
+- **2 landings Tier B** (N5, P1) — obligatorios pero simples
+- **3 posts cluster Tier A** (N1 con inclusión de N2, N4, N6) — obligatorios
+- **1 pilar EN** (condicional post-Fase 1)
+
+**Total backlog: 10-11 piezas** (antes 15). Reducción de 4-5 piezas vs revisión 3 al degradar N2 y N3 a Tier C (sin landing propia) y consolidar el cluster de la diáspora puertorriqueña dentro del post N1.
 
 ### Optimizaciones colaterales incluidas en el ciclo (no cuentan como "piezas" pero son entregables)
 
@@ -199,40 +251,47 @@ Uno por nicho, tipo "cómo empezar negocio de [empanada del nicho] en [ciudad]".
 - **hreflang correcto** para las 6 landings nicho + `/en/` + `/es/` base.
 - **Structured data adicional** (LocalBusiness apuntando a bodega, Product/Offer, VideoObject) en las páginas nuevas.
 
-Las columnas de volumen y gap concretas se completan tras Fase 1. **Regla de asignación** post-Fase 1: si un nicho tiene volumen muy menor (ej. Costa Rica < 50 imp/mes en todas sus keywords), su landing se conserva pero el post cluster puede consolidarse con un nicho adyacente. Aprobación de la cliente requerida antes de reasignar.
+Las columnas de volumen y gap concretas se completaron el 2026-09-28 con el batch DataForSEO de 9 mercados. **Reglas de asignación por tier ya aplicadas** en este documento (revisión 4):
+- Tier A recibe landing + cluster (N1, N4, N6 y el pilar P2 profesional).
+- Tier B recibe landing simple sin cluster (N5, P1).
+- Tier C se cubre dentro del contenido de N1 sin landing dedicada (N2, N3).
+- Argentina queda documentada sin proponer como mercado objetivo (ver Fuera de alcance en 02-refined.md).
+
+Si tras Fase 1 los datos actualizados muestran que algún nicho Tier B tiene señal comercial fuerte (leads calificados o intención de compra clara), se puede promocionar a Tier A con aprobación de la cliente.
 
 ### Fase 4 — Publicación técnica y monitoreo (semanas 6-24)
 
-**Presupuesto DataForSEO de esta fase: $10 USD ($5 para monitoreo × 2 primeros meses; luego se factura mensual).**
+**Techo DataForSEO de esta fase dentro del primer ciclo: USD 5,00.** Después del primer ciclo, cada extensión se decide con datos de oportunidades y ventas.
 
 **Batch 4.1 — Publicación (sin DataForSEO):**
 - Merge cada pieza publicada con: schema válido, alt-text, structured data, canonical, hreflang correcto.
 - Video schema fix para los 37 videos con incidencia (fase de diagnóstico caso por caso, no fix ciego).
 
-**Batch 4.2 — Monitoreo mensual ($3 USD/mes):**
-- `serp/google/organic/live/advanced` de 30 keywords principales × 2 países = 60 requests/mes ≈ $0.24
-- `serp/google/images/live/advanced` de 10 keywords principales × 2 países = 20 requests/mes ≈ $0.10
-- `dataforseo_labs/google/historical_rank_overview/live` mensual del dominio + rivales ≈ $0.05
-- Total: bien por debajo de $3/mes; se reserva margen.
+**Batch 4.2 — Monitoreo mensual (techo inicial USD 3,00):**
+- GSC es la fuente primaria y gratuita para consultas, páginas, países, imágenes y video.
+- DataForSEO verifica mensualmente 15-25 combinaciones keyword × mercado aprobadas, no todos los gaps.
+- Preferir cola Standard; usar Live para comprobaciones puntuales. Registrar `depth` y costo real de cada tarea.
+- `historical_rank_overview` es opcional y su costo se calcula con la tarifa vigente; no se presupone que una tarea cueste USD 0,05.
 
-**Batch 4.3 — Rebench de presencia en LLMs a t+3m y t+6m ($2 USD c/u):**
-- Mismas 10 queries × 4 LLMs para comparar contra baseline.
+**Batch 4.3 — Rebench de presencia en LLMs a t+3m y t+6m (techo USD 2,00 dentro del primer ciclo):**
+- Mismas 5-8 queries y configuración del baseline. No interpretar una respuesta API como representación exacta de todos los usuarios del producto de consumo.
 
-### Distribución del presupuesto $45 USD (actualizado revisión 2)
+### Distribución del presupuesto DataForSEO (revisión 3)
 
-| Fase | Costo | Acumulado |
+| Fase | Techo incremental | Acumulado máximo aproximado* |
 |---|---:|---:|
-| Fase 1 — Investigación por nicho (8 keyword sets) | **$16** | $16 |
-| Fase 2 — Benchmark cross-category | $8 | $24 |
-| Fase 3 — Auditoría + LLM baseline | $10 | $34 |
-| Fase 4 — Monitoreo 3 meses + 2 rebenches LLM | $9 | $43 |
-| Reserva iteraciones | $2 | $45 |
+| Gasto ya observado | — | $0,41 |
+| Fase 1 — Investigación y gaps | $3,00 | $3,41 |
+| Fase 2 — SERPs y benchmark dirigido | $2,00 | $5,41 |
+| Fase 3 — Verificación técnica + LLM baseline | $3,00 | $8,41 |
+| Fase 4 — Monitoreo y rebench inicial | $5,00 | $13,41 |
+| Contingencia del primer ciclo | $2,09 | **$15,50** |
 
-Fase 1 subió $4 vs versión anterior porque los 6 nichos requieren 8 batches de `search_volume` (uno por `location_code`) en lugar de 3 (USA es, USA en, COL). La reserva bajó de $6 a $2 — más ajustado. Si en Fase 1 se detecta que algún nicho tiene volumen despreciable, se puede recortar su investigación y liberar $1-2 para reserva.
+\*El acumulado se concilia contra `cost` de las respuestas reales. Los techos no son objetivos de gasto. El saldo del depósito de USD 50 se conserva para iteraciones que demuestren una decisión o resultado adicional.
 
 ## Contratos afectados
 
-- **`maquiempanadas.com` HTML/JSON-LD:** cada URL nueva agrega structured data (Product, Video, FAQPage, HowTo, LocalBusiness según aplique). Los cambios son aditivos, no rompen contratos existentes.
+- **`maquiempanadas.com` HTML/JSON-LD:** cada URL nueva agrega structured data sustentado (Product, VideoObject, Recipe/HowTo, FAQPage o LocalBusiness cuando corresponda). `offers`, `aggregateRating`, testimonios, NAP y disponibilidad requieren evidencia real. Los cambios se validan en staging.
 
 - **YouTube channel:** descripciones y títulos de 10+ videos se reescriben para SEO. Contrato con la audiencia YouTube no se rompe — el contenido del video no cambia.
 
@@ -241,8 +300,6 @@ Fase 1 subió $4 vs versión anterior porque los 6 nichos requieren 8 batches de
 ## Alternativas descartadas
 
 - **Alternativa A: sólo SEO técnico + esperar que rankeen las páginas actuales.** Descartada porque el sitio ya tiene 18 kw en pos 1 y las páginas actuales no cubren gaps donde rivales rankean top 10. Sin contenido nuevo, el techo está cerca.
-
-- **Alternativa B: enfoque solo en mercado anglófono industrial.** Descartada porque el SERP de `empanada maker` es dominado por consumidor doméstico (Amazon, restaurantes) y `empanada machine` por Anko con recursos difíciles de disputar. El mercado hispano es defendible y menos saturado.
 
 - **Alternativa C: traducir el blog existente al inglés.** Descartada porque el 81% del tráfico USA actual es en español (diáspora latina) — traducir al inglés no capta ese comprador. Contenido en inglés se hace nuevo y original si hay gap real.
 
@@ -256,22 +313,22 @@ Fase 1 subió $4 vs versión anterior porque los 6 nichos requieren 8 batches de
 
 Estos "tests" son de resultado SEO, no unit tests de código.
 
-- **Verificación semanal automatizada:**
-  - Script Python en cron corre `serp/google/organic/live/advanced` sobre keywords del `content_gaps.csv` marcadas como "en curso".
-  - Genera diff vs semana anterior en `.ia/seo/monitoring/YYYY-WW/diff.md`.
+- **Verificación mensual automatizada:**
+  - GSC aporta la serie primaria. Un script captura DataForSEO solo para 15-25 combinaciones keyword × mercado aprobadas.
+  - Genera diff mensual en `.ia/seo/monitoring/YYYY-MM/diff.md`; no se reconsulta cada gap semanalmente.
 
 - **Verificación por AC:**
-  - **AC1** (universo keywords ≥500) → contar filas de `keywords_universe.csv` tras fase 1. Deadline: semana 3.
-  - **AC2** (≥100 gaps) → contar filas de `content_gaps.csv`. Deadline: semana 3.
-  - **AC3** (10 kw en top 3) → medir a t+6m con `dataforseo_labs/google/historical_serps/live` contra baseline t0.
+  - **AC1** (universo útil) → verificar cobertura de los ocho segmentos, deduplicación, fuentes y campos de decisión. Deadline: semana 3.
+  - **AC2** (gaps priorizados) → revisar fórmula, evidencia y decisión recomendada; no contar filas como proxy de calidad. Deadline: semana 3.
+  - **AC3** (keywords objetivo en top 3) → GSC + snapshots propios de SERP en t0/t+3m/t+6m.
   - **AC4** (imágenes pos ≤10 USA, ≤6 COL) → GSC image + `serp/google/images/live/advanced` a t+3m y t+6m.
   - **AC5** (video ≥1,000 impr/3m) → GSC video a t+3m y t+6m.
   - **AC6** (3 kw con producto en Popular products) → `serp/google/organic/live/advanced` a t+3m y t+6m.
-  - **AC7** (15+ piezas publicadas) → checkeo manual + inventario en `.ia/seo/content_ledger.md`.
+  - **AC7** (cohorte piloto 3-5; backlog condicionado) → inventario, aprobación, publicación y decisión de escalar en `.ia/seo/content_ledger.md`.
   - **AC8** (video schema válido) → Rich Results Test manual + reporte GSC Video Indexing.
   - **AC9** (LLM presence baseline + rebench) → `llm_presence_baseline.md`, `llm_presence_t3m.md`, `llm_presence_t6m.md`.
   - **AC10** (rastro JSON) → `.ia/seo/data/dataforseo/` + `COSTS.csv`.
-  - **AC11** (presupuesto ≤$45) → sumatoria de `COSTS.csv` tras fase 4.
+  - **AC11** (primer ciclo acumulado ≤$15,50) → conciliar `COSTS.csv` con el campo `cost` de cada JSON y documentar cualquier nueva aprobación.
   - **AC12** (cada pieza referencia un gap) → checklist manual antes de publicar.
 
 - **Verificación manual de calidad de contenido:**
@@ -373,16 +430,9 @@ Ejemplo actual: `maquina para hacer empanadas` USA — 2,783 impresiones, pos 5.
 
 Costo DataForSEO adicional: **$0** — todo es análisis sobre GSC.
 
-### D. Google Indexing API push tras publicar
+### D. Descubrimiento e indexación compatibles con Google
 
-Nueva acción en workflow `05_publish.md` paso 3. Cada URL nueva se somete al Indexing API de Google para acelerar time-to-index de días/semanas a minutos.
-
-- Endpoint: `https://indexing.googleapis.com/v3/urlNotifications:publish` con payload `{"url": "<url>", "type": "URL_UPDATED"}`.
-- Requisito operativo: Service Account con permiso Owner en Search Console.
-- Alternativa manual: "Request Indexing" desde GSC UI.
-- La respuesta del API se registra en el `trajectory.md` de la pieza (paso 7).
-
-**Requiere aprobación humana explícita** por rate limits de Google — no se hace automáticamente.
+La Indexing API de Google no se usa para estas páginas: está limitada a `JobPosting` y `BroadcastEvent` dentro de `VideoObject`. Después de publicar se actualiza el sitemap con `lastmod`, se comprueba canonical y enlazado interno, y se usa "Request Indexing" en Search Console solo para las pocas URL prioritarias. La fecha y el resultado se registran en el `trajectory.md`.
 
 ### E. Trajectory log obligatorio por pieza
 
@@ -400,11 +450,11 @@ Sin `trajectory.md` completo, la pieza no cuenta contra los AC del feature. Perm
 
 ### Impacto agregado en presupuesto
 
-Las 5 adiciones **no aumentan el techo de $45 USD** del feature:
+Las 5 adiciones **no aumentan el techo acumulado inicial de $15,50 USD** del feature:
 - A y E son cambios organizativos (más disciplina, no más gasto).
 - B redistribuye el gasto LLM entre modelos — probablemente ahorra por usar Haiku donde antes usaría Sonnet por default.
 - C es análisis sobre datos GSC que ya tenemos.
-- D es API gratis de Google.
+- D usa sitemap, enlazado interno y Search Console; no usa indebidamente la Indexing API.
 
 ## Notas sobre mejores prácticas SEO 2026 integradas
 

@@ -49,5 +49,6 @@ Como responsable de crecimiento de Maquiempanadas, quiero **rankear en Google to
 - Diagnóstico previo: `.ia/seo/analisis_keywords_gsc.md`
 - Reporte cliente: `.ia/seo/reporte_maquiempanadas.html`
 - Explorador SERPs: `.ia/seo/serps_maquiempanadas.html`
+- Auditoría SEO/GEO/AEO completa: `seo-audit-maquiempanadas-com-2026-09-20.md`
 - Meta comercial global: `GOAL.md` (40 máquinas Maquiempanadas / mes)
 - Interlocutores: Nicolás Navarro (MySEO), cliente Maquiempanadas

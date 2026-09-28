@@ -1,5 +1,38 @@
 # SPEC — Rankear 2026 (feature completo para revisión externa)
-**Ubicación en el repo:** `.ia/seo/specs/active/rankear-2026/`  **Framework:** SEO Harness — MYSEO-style (SOUL/METHOD/POLICIES/skills/workflows) en `.ia/seo/harness/`  **Estado:** refined + proposed (revisión 2 con audiencias culturales y estrategia dos pilares)  **Fecha:** 2026-09-20
+**Ubicación en el repo:** `.ia/seo/specs/active/rankear-2026/`  **Framework:** SEO Harness — MYSEO-style (SOUL/METHOD/POLICIES/skills/workflows) en `.ia/seo/harness/`  **Estado:** refined + proposed (revisión 3 con auditoría SEO/GEO/AEO y control económico)  **Fecha:** 2026-09-20
+
+> **Nota de vigencia:** este paquete conserva debajo la consolidación histórica de la revisión 2. Para ejecutar o aprobar el feature prevalecen `01-user-story.md`, `02-refined.md` y `03-proposal.md` en su revisión 3. Las reglas de esta sección sustituyen cualquier cifra o instrucción contradictoria que aparezca en la copia histórica.
+
+## Revisión 3 — integración de auditoría y corrección de presupuesto
+
+Fuente nueva integrada: `seo-audit-maquiempanadas-com-2026-09-20.md`.
+
+### Decisiones que cambian el plan
+
+1. La iniciativa se clasifica como **adquisición**. Las métricas ejecutivas son oportunidades orgánicas calificadas, conversión a venta e ingreso cobrado atribuible/asistido; rankings, impresiones y menciones son señales intermedias.
+2. Antes de escalar contenido se valida y corrige la base detectada por la auditoría: idiomas y `hreflang`, autoría humana, alt text, datos estructurados sustentados, contenido caduco y páginas comerciales existentes.
+3. Las 15 piezas pasan a ser un backlog máximo. Se publica una cohorte piloto de 3-5 y el resto se libera según demanda, intención, logística, activos disponibles y señal a 30-90 días.
+4. Se eliminan las cuotas de 500 keywords y 100 gaps. Un registro solo permanece si puede cambiar una decisión. La prioridad usa `(demanda × intención × ajuste × valor × probabilidad_de_rankear) / esfuerzo`.
+5. DataForSEO se opera por compuertas con un techo acumulado inicial de **USD 15,50**, incluido el gasto ya observado de aproximadamente USD 0,41. Cada batch declara endpoint, tareas, límites, tarifa, costo máximo y decisión habilitada. El saldo no es un objetivo de gasto.
+6. GSC, Ads, YouTube y CRM son fuentes primarias. DataForSEO se reserva para demanda externa, SERPs, competidores y verificaciones que las fuentes propias no entregan.
+7. El monitoreo pasa de semanal sobre todos los gaps a mensual sobre 15-25 combinaciones keyword × mercado aprobadas, usando GSC como serie principal.
+8. La línea base LLM se reduce a 5-8 prompts comerciales congelados. Se registra modelo, configuración, fecha, tokens y costo; no se interpreta como réplica exacta del producto de consumo.
+9. `FAQPage`, `aggregateRating`, `offers`, testimonios y `LocalBusiness` solo se publican cuando sean aplicables y tengan evidencia real. No se promete un rich result de FAQ.
+10. Se elimina el uso de Google Indexing API para páginas ordinarias. Se usa sitemap con `lastmod`, canonical, enlazado interno y Request Indexing para pocas URL prioritarias.
+
+### Presupuesto vigente
+
+| Bloque | Techo incremental | Acumulado máximo aproximado |
+|---|---:|---:|
+| Gasto ya observado | — | USD 0,41 |
+| Investigación y gaps | USD 3,00 | USD 3,41 |
+| SERPs y benchmark dirigido | USD 2,00 | USD 5,41 |
+| Verificación técnica + baseline LLM | USD 3,00 | USD 8,41 |
+| Monitoreo y rebench inicial | USD 5,00 | USD 13,41 |
+| Contingencia | USD 2,09 | **USD 15,50** |
+
+Para el detalle ejecutable y los criterios actualizados, revisar `02-refined.md` y `03-proposal.md`.
+
 ---
 ## Cómo leer este documento
 Este archivo consolida los 3 artefactos del ciclo SPECBOOT-adaptado del feature `rankear-2026`:

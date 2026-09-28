@@ -571,32 +571,57 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
     </div>
   </div>
 
-  <h3>Ranking completo por volumen — 9 mercados analizados</h3>
+  <h3>Volumen por cluster de producto — 9 mercados</h3>
+  <p style="color: var(--gray); font-size: 0.9rem;"><strong>Corrección importante</strong> respecto de la lectura inicial: reportar la "keyword individual más grande" por mercado sesga hacia <em>laminadora de masa</em> (que concentra volumen en 1-2 términos) y oculta que <code>maquina * empanadas</code> tiene 17 variantes fragmentadas que suman más en la mayoría de mercados. La priorización real se hace por <strong>cluster de producto</strong>, no por keyword individual.</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Cluster</th>
+        <th class="num">🇺🇸 USA</th>
+        <th class="num">🇨🇴 COL</th>
+        <th class="num">🇦🇷 AR</th>
+        <th class="num">🇲🇽 MX</th>
+        <th class="num">🇨🇱 CL</th>
+        <th class="num">🇪🇸 ESP</th>
+        <th class="num">🇻🇪 VE</th>
+        <th class="num">🇨🇷 CR</th>
+        <th class="num">🇵🇷 PR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background: #dcfce7;"><td><strong>maquina * empanadas</strong> (core, 17 vars)</td><td class="num"><strong>6,550</strong></td><td class="num"><strong>1,930</strong></td><td class="num"><strong>1,580</strong></td><td class="num"><strong>1,360</strong></td><td class="num"><strong>1,120</strong></td><td class="num"><strong>790</strong></td><td class="num">200</td><td class="num">100</td><td class="num">70</td></tr>
+      <tr><td>molde / prensa empanadas</td><td class="num">1,040</td><td class="num">1,290</td><td class="num">840</td><td class="num">1,070</td><td class="num">960</td><td class="num">820</td><td class="num">110</td><td class="num">100</td><td class="num">60</td></tr>
+      <tr><td>arepa / máquina arepas</td><td class="num">540</td><td class="num">780</td><td class="num">50</td><td class="num">70</td><td class="num">180</td><td class="num">510</td><td class="num">70</td><td class="num">20</td><td class="num">50</td></tr>
+      <tr style="color: var(--gray);"><td>laminadora de masa (adyacente)</td><td class="num">790</td><td class="num">1,310</td><td class="num">1,010</td><td class="num"><strong>3,610</strong></td><td class="num">1,310</td><td class="num">890</td><td class="num">590</td><td class="num">50</td><td class="num">20</td></tr>
+      <tr style="color: var(--gray);"><td>fábrica empanadas / desmechadora</td><td class="num">110</td><td class="num">960</td><td class="num">1,620</td><td class="num">150</td><td class="num">930</td><td class="num">140</td><td class="num">80</td><td class="num">30</td><td class="num">20</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size: 0.82rem; color: var(--gray); margin-top: 8px;">Solo <code>maquina(s) para hacer empanadas</code> (2 variantes puras): USA 960 · COL 960 · AR 780 · MX 780 · CL 640 · ESP 340 · VE 60.</p>
+
+  <h3 style="margin-top: 28px;">Priorización real — recalibrada por cluster core</h3>
   <table>
     <thead>
       <tr>
         <th>#</th>
         <th>Mercado</th>
-        <th class="num">Volumen 30 kw</th>
-        <th class="num">Kw top</th>
-        <th class="num">Vol top kw</th>
-        <th class="num">Maqui rankea</th>
-        <th class="num">Maqui pos #1</th>
+        <th class="num">MAQ_EMPANADA</th>
+        <th class="num">Maqui #1</th>
         <th>Priorización</th>
       </tr>
     </thead>
     <tbody>
-      <tr><td>1</td><td>🇺🇸 USA (español + en)</td><td class="num">9,060</td><td>empanada maker*</td><td class="num">2,400</td><td class="num">81</td><td class="num"><strong>18</strong></td><td><span class="badge badge-primary">defensivo</span></td></tr>
-      <tr><td>2</td><td>🇨🇴 Colombia</td><td class="num">6,270</td><td>laminadora de masa</td><td class="num">1,300</td><td class="num">55</td><td class="num"><strong>10</strong></td><td><span class="badge badge-primary">defensivo</span></td></tr>
-      <tr style="background: #fef3c7;"><td>3</td><td>🇲🇽 México</td><td class="num">6,260</td><td>laminadora de masa</td><td class="num">3,600</td><td class="num">17</td><td class="num">0</td><td><span class="badge badge-danger">no-priorizar</span> zonachef+foxsteel dominan</td></tr>
-      <tr style="background: #dcfce7;"><td>4</td><td>🇦🇷 Argentina 🆕</td><td class="num">5,100</td><td>fabrica de empanadas</td><td class="num">1,600</td><td class="num">36</td><td class="num">0</td><td><span class="badge badge-success">alto ROI</span> no era objetivo</td></tr>
-      <tr style="background: #dcfce7;"><td>5</td><td>🇨🇱 Chile 🆕</td><td class="num"><strong>4,500</strong></td><td>laminadora de masa</td><td class="num">1,300</td><td class="num">12</td><td class="num">0</td><td><span class="badge badge-success">alto ROI</span> era nicho del SPEC</td></tr>
-      <tr style="background: #dbeafe;"><td>6</td><td>🇪🇸 España</td><td class="num">3,150</td><td>laminadora de masa</td><td class="num">880</td><td class="num">35</td><td class="num">0</td><td><span class="badge badge-success">alto ROI</span> cero competencia</td></tr>
-      <tr><td>7</td><td>🇻🇪 Venezuela 🆕</td><td class="num">1,050</td><td>laminadora de masa</td><td class="num">590</td><td class="num">6</td><td class="num">0</td><td><span class="badge badge-warning">medio</span> validar antes de landing</td></tr>
-      <tr style="color: var(--gray);"><td>8</td><td>🇨🇷 Costa Rica 🆕</td><td class="num">350</td><td>laminadora de masa</td><td class="num">40</td><td class="num">0</td><td class="num">0</td><td><span class="badge badge-gray">bajo</span> volumen insuficiente</td></tr>
-      <tr style="color: var(--gray);"><td>9</td><td>🇵🇷 Puerto Rico 🆕</td><td class="num">300</td><td>maquina para hacer empanadas</td><td class="num">10</td><td class="num">0</td><td class="num">0</td><td><span class="badge badge-gray">bajo</span> volumen insuficiente</td></tr>
+      <tr><td>1</td><td>🇺🇸 USA (español + en)</td><td class="num"><strong>6,550</strong></td><td class="num"><strong>18</strong></td><td><span class="badge badge-primary">defensivo prioritario</span> mercado core más grande</td></tr>
+      <tr><td>2</td><td>🇨🇴 Colombia</td><td class="num"><strong>1,930</strong></td><td class="num"><strong>10</strong></td><td><span class="badge badge-primary">defensivo</span> segundo más grande</td></tr>
+      <tr style="background: #f3f4f6;"><td>3</td><td>🇦🇷 Argentina</td><td class="num">1,580</td><td class="num">0</td><td><span class="badge badge-gray">documentado, no propuesto</span> nunca fue objetivo de la cliente</td></tr>
+      <tr style="background: #fef3c7;"><td>4</td><td>🇲🇽 México</td><td class="num">1,360</td><td class="num">0</td><td><span class="badge badge-danger">no-priorizar</span> zonachef+foxsteel dominan (laminadora)</td></tr>
+      <tr style="background: #dcfce7;"><td>5</td><td>🇨🇱 Chile</td><td class="num">1,120</td><td class="num">0</td><td><span class="badge badge-success">Tier A</span> mayor de los 6 nichos culturales</td></tr>
+      <tr style="background: #dcfce7;"><td>6</td><td>🇪🇸 España</td><td class="num">790</td><td class="num">0</td><td><span class="badge badge-success">Tier A</span> cero competidor local</td></tr>
+      <tr><td>7</td><td>🇻🇪 Venezuela</td><td class="num">200</td><td class="num">0</td><td><span class="badge badge-warning">Tier B</span> landing simple, ancla laminadora (590)</td></tr>
+      <tr style="color: var(--gray);"><td>8</td><td>🇨🇷 Costa Rica</td><td class="num">100</td><td class="num">0</td><td><span class="badge badge-gray">Tier C</span> vocabulario en contenido latino USA</td></tr>
+      <tr style="color: var(--gray);"><td>9</td><td>🇵🇷 Puerto Rico</td><td class="num">70</td><td class="num">0</td><td><span class="badge badge-gray">Tier C</span> vocabulario en contenido latino USA</td></tr>
     </tbody>
   </table>
+  <p style="font-size: 0.82rem; color: var(--gray); margin-top: 8px;">USA volumen alto no está inflado por consumer keywords en el cluster core (esas son <code>empanada maker</code> 2,400 y <code>empanada press</code> 1,600, cluster <em>maker/press</em>). El cluster <code>maquina * empanadas</code> puro representa comprador industrial.</p>
 
   <h3 style="margin-top: 28px;">Keywords que ganan en cada uno de los 4 nichos consultados hoy</h3>
   <div class="two-col">
@@ -672,20 +697,23 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
   </div>
 
   <div class="insight-warning insight" style="margin-top: 24px;">
-    <strong>Los nichos originales del SPEC no están todos al mismo nivel.</strong> Chile es un mercado real y grande (4,500/mes) — merece landing dedicada al mismo nivel que España o Argentina. Venezuela es marginal pero viable con enfoque en <em>laminadora de masa</em>. Costa Rica y Puerto Rico tienen volumen tan bajo (300-350/mes distribuido en muchas keywords) que las landings dedicadas no se justifican por SEO — la audiencia de esos nichos culturales probablemente vive fuera de sus países (diáspora en USA/España), no en el país.
+    <strong>Los nichos originales del SPEC no están todos al mismo nivel para el producto core.</strong> Chile es un mercado real (1,120/mes en cluster core) — merece landing dedicada al mismo nivel que España (790/mes). Venezuela es marginal (200/mes core, 590 laminadora) — landing simple sin cluster. Costa Rica y Puerto Rico tienen volumen tan bajo en el cluster core (100 y 70/mes respectivamente) que las landings dedicadas no se justifican; la audiencia probablemente vive en la diáspora (USA/España), no en el país. Su vocabulario (empanadilla, pastelillo, empanada tica) se cubre dentro del contenido latino USA sin URL propia.
   </div>
 
   <div class="insight" style="margin-top: 16px;">
-    <strong>Nueva priorización sugerida de los 9 mercados:</strong>
+    <strong>Nueva priorización sugerida de los 9 mercados — SPEC actualizado a revisión 4 con tiers:</strong>
     <ol style="margin-left: 24px; margin-top: 8px;">
-      <li><strong>Chile</strong> — 4,500/mes, sin landing, mismo ángulo B2B que Argentina (<em>fabrica de empanadas</em> 880/mes)</li>
-      <li><strong>Argentina</strong> — 5,100/mes, cero competencia local seria (industriaromano top con solo 91 kws)</li>
-      <li><strong>España</strong> — 3,150/mes, cero competidor local, alta señal del Informe Anual (10.1% share)</li>
-      <li><strong>Colombia + USA</strong> — defensivo (ya lideramos)</li>
-      <li><strong>Venezuela</strong> — validar con landing simple orientada a <em>laminadora de masa</em> antes de invertir más</li>
-      <li><strong>México</strong> — <span class="badge badge-danger">no-priorizar</span> zonachef+foxsteel dominan</li>
-      <li><strong>Costa Rica + Puerto Rico</strong> — <span class="badge badge-gray">volumen insuficiente</span> para landings SEO dedicadas. Si son estratégicas comercialmente, cubrirlas dentro de contenido latino en USA con vocabulario adecuado (<em>empanadilla</em>, <em>pastelillo</em>, <em>empanada tica</em>).</li>
+      <li><strong>USA (español)</strong> — <span class="badge badge-primary">defensivo prioritario</span> 6,550/mes core, 18 kw en pos #1. Reforzar landing latina.</li>
+      <li><strong>Colombia</strong> — <span class="badge badge-primary">defensivo</span> 1,930/mes core, 10 kw en pos #1. Optimizar on-page.</li>
+      <li><strong>Chile</strong> — <span class="badge badge-success">Tier A</span> 1,120/mes core, mayor de los 6 nichos culturales. Landing + cluster.</li>
+      <li><strong>España</strong> — <span class="badge badge-success">Tier A</span> 790/mes core + cero competidor local. Landing + cluster.</li>
+      <li><strong>USA (inglés) — P1 profesional</strong> — <span class="badge badge-warning">Tier B</span> landing en <code>/en/</code> optimizada.</li>
+      <li><strong>Venezuela</strong> — <span class="badge badge-warning">Tier B</span> landing simple con ancla en laminadora (590/mes).</li>
+      <li><strong>Argentina</strong> — <span class="badge badge-gray">documentado, no propuesto</span> nunca fue objetivo de la cliente pese al volumen.</li>
+      <li><strong>México</strong> — <span class="badge badge-danger">no-priorizar</span> zonachef+foxsteel dominan.</li>
+      <li><strong>Costa Rica + Puerto Rico</strong> — <span class="badge badge-gray">Tier C</span> vocabulario dentro del contenido latino USA, sin landing dedicada.</li>
     </ol>
+    <p style="margin-top: 10px;"><strong>Backlog de piezas reducido:</strong> 10-11 piezas (antes 15). 2 pilares + 3 landings Tier A + 2 landings Tier B + 3 posts cluster Tier A + 1 pilar EN condicional.</p>
   </div>
 </section>
 
