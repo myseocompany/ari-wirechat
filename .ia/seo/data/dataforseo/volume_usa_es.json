@@ -1,0 +1,2317 @@
+{
+    "version": "0.1.20260917",
+    "status_code": 20000,
+    "status_message": "Ok.",
+    "time": "3.1744 sec.",
+    "cost": 0.09,
+    "tasks_count": 1,
+    "tasks_error": 0,
+    "tasks": [
+        {
+            "id": "09192250-2573-0367-0000-adab874f5d8d",
+            "status_code": 20000,
+            "status_message": "Ok.",
+            "time": "3.1065 sec.",
+            "cost": 0.09,
+            "result_count": 30,
+            "path": [
+                "v3",
+                "keywords_data",
+                "google_ads",
+                "search_volume",
+                "live"
+            ],
+            "data": {
+                "api": "keywords_data",
+                "function": "search_volume",
+                "se": "google_ads",
+                "location_code": 2840,
+                "language_code": "es",
+                "keywords": [
+                    "maquina para hacer empanadas",
+                    "maquina de hacer empanadas",
+                    "maquina de empanadas",
+                    "maquina para empanadas",
+                    "maquinas para hacer empanadas",
+                    "maquina para hacer arepas",
+                    "maquina de hacer arepas",
+                    "molde para empanadas",
+                    "moldes para empanadas",
+                    "molde para empanadas industrial",
+                    "máquina para hacer empanadas automática",
+                    "máquina para hacer empanadas industrial",
+                    "máquina para hacer empanadas manual",
+                    "vendo máquina para hacer empanadas",
+                    "empanada machine",
+                    "empanada maker",
+                    "empanada press",
+                    "empanada press machine",
+                    "arepa machine",
+                    "arepa maker machine",
+                    "empanada machine for sale",
+                    "automatic empanada maker machine",
+                    "commercial empanada machine",
+                    "masa machine",
+                    "pupusa machine",
+                    "desmechadora de carne",
+                    "laminadora de masa",
+                    "fabrica de empanadas",
+                    "aparato para hacer empanadas",
+                    "prensa para empanadas"
+                ]
+            },
+            "result": [
+                {
+                    "keyword": "maquina para hacer empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 480,
+                    "low_top_of_page_bid": 0.15,
+                    "high_top_of_page_bid": 0.82,
+                    "cpc": 0.27,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 720
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 480
+                        }
+                    ]
+                },
+                {
+                    "keyword": "maquina de hacer empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 210,
+                    "low_top_of_page_bid": 0.16,
+                    "high_top_of_page_bid": 1.18,
+                    "cpc": 0.28,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 210
+                        }
+                    ]
+                },
+                {
+                    "keyword": "maquina de empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 140,
+                    "low_top_of_page_bid": 0.14,
+                    "high_top_of_page_bid": 1.25,
+                    "cpc": 0.35,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 140
+                        }
+                    ]
+                },
+                {
+                    "keyword": "maquina para empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 170,
+                    "low_top_of_page_bid": 0.16,
+                    "high_top_of_page_bid": 0.79,
+                    "cpc": 0.29,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 140
+                        }
+                    ]
+                },
+                {
+                    "keyword": "maquinas para hacer empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 480,
+                    "low_top_of_page_bid": 0.15,
+                    "high_top_of_page_bid": 0.82,
+                    "cpc": 0.27,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 720
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 480
+                        }
+                    ]
+                },
+                {
+                    "keyword": "maquina para hacer arepas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 99,
+                    "search_volume": 210,
+                    "low_top_of_page_bid": 0.21,
+                    "high_top_of_page_bid": 0.86,
+                    "cpc": 0.37,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 260
+                        }
+                    ]
+                },
+                {
+                    "keyword": "maquina de hacer arepas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 97,
+                    "search_volume": 70,
+                    "low_top_of_page_bid": 0.16,
+                    "high_top_of_page_bid": 0.64,
+                    "cpc": 0.29,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 70
+                        }
+                    ]
+                },
+                {
+                    "keyword": "molde para empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 99,
+                    "search_volume": 480,
+                    "low_top_of_page_bid": 0.13,
+                    "high_top_of_page_bid": 0.32,
+                    "cpc": 0.12,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 320
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 320
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 480
+                        }
+                    ]
+                },
+                {
+                    "keyword": "moldes para empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 99,
+                    "search_volume": 480,
+                    "low_top_of_page_bid": 0.13,
+                    "high_top_of_page_bid": 0.32,
+                    "cpc": 0.12,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 320
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 320
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 480
+                        }
+                    ]
+                },
+                {
+                    "keyword": "molde para empanadas industrial",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 99,
+                    "search_volume": 40,
+                    "low_top_of_page_bid": 0.17,
+                    "high_top_of_page_bid": 0.56,
+                    "cpc": 0.16,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 50
+                        }
+                    ]
+                },
+                {
+                    "keyword": "máquina para hacer empanadas automática",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 96,
+                    "search_volume": 50,
+                    "low_top_of_page_bid": 0.16,
+                    "high_top_of_page_bid": 1.17,
+                    "cpc": 0.2,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 70
+                        }
+                    ]
+                },
+                {
+                    "keyword": "máquina para hacer empanadas industrial",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 30,
+                    "low_top_of_page_bid": 0.32,
+                    "high_top_of_page_bid": 2.32,
+                    "cpc": 1.54,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 10
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 30
+                        }
+                    ]
+                },
+                {
+                    "keyword": "máquina para hacer empanadas manual",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "cpc": 0.2,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 10
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 10
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 10
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 20
+                        }
+                    ]
+                },
+                {
+                    "keyword": "vendo máquina para hacer empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 90,
+                    "low_top_of_page_bid": 0.15,
+                    "high_top_of_page_bid": 0.73,
+                    "cpc": 0.27,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 90
+                        }
+                    ]
+                },
+                {
+                    "keyword": "empanada machine",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 480,
+                    "low_top_of_page_bid": 0.22,
+                    "high_top_of_page_bid": 1.28,
+                    "cpc": 0.41,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 390
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 480
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 720
+                        }
+                    ]
+                },
+                {
+                    "keyword": "empanada maker",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 2400,
+                    "low_top_of_page_bid": 0.18,
+                    "high_top_of_page_bid": 0.57,
+                    "cpc": 0.26,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 1900
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 1900
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 1900
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 1900
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 1900
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 2400
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 1900
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 1900
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 2900
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 2400
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 2400
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 2400
+                        }
+                    ]
+                },
+                {
+                    "keyword": "empanada press",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 1600,
+                    "low_top_of_page_bid": 0.19,
+                    "high_top_of_page_bid": 0.51,
+                    "cpc": 0.27,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 1300
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 1300
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 1000
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 1300
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 1600
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 1300
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 1300
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 1600
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 1900
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 1900
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 1600
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 1600
+                        }
+                    ]
+                },
+                {
+                    "keyword": "empanada press machine",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 98,
+                    "search_volume": 260,
+                    "low_top_of_page_bid": 0.16,
+                    "high_top_of_page_bid": 0.58,
+                    "cpc": 0.23,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 320
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 320
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 320
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 320
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 320
+                        }
+                    ]
+                },
+                {
+                    "keyword": "arepa machine",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 97,
+                    "search_volume": 90,
+                    "low_top_of_page_bid": 0.18,
+                    "high_top_of_page_bid": 0.37,
+                    "cpc": 0.22,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 90
+                        }
+                    ]
+                },
+                {
+                    "keyword": "arepa maker machine",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 96,
+                    "search_volume": 170,
+                    "low_top_of_page_bid": 0.16,
+                    "high_top_of_page_bid": 0.38,
+                    "cpc": 0.19,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 260
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 210
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 110
+                        }
+                    ]
+                },
+                {
+                    "keyword": "empanada machine for sale",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 50,
+                    "low_top_of_page_bid": 0.15,
+                    "high_top_of_page_bid": 1.15,
+                    "cpc": 0.24,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 70
+                        }
+                    ]
+                },
+                {
+                    "keyword": "automatic empanada maker machine",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 40,
+                    "low_top_of_page_bid": 0.22,
+                    "high_top_of_page_bid": 2.02,
+                    "cpc": 0.34,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 40
+                        }
+                    ]
+                },
+                {
+                    "keyword": "commercial empanada machine",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 20,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "cpc": 0.25,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 10
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 10
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 10
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 10
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 20
+                        }
+                    ]
+                },
+                {
+                    "keyword": "masa machine",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "LOW",
+                    "competition_index": 8,
+                    "search_volume": 70,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "cpc": 0.29,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 140
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 170
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 40
+                        }
+                    ]
+                },
+                {
+                    "keyword": "pupusa machine",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "LOW",
+                    "competition_index": 15,
+                    "search_volume": 30,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "cpc": 0.28,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 20
+                        }
+                    ]
+                },
+                {
+                    "keyword": "desmechadora de carne",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 40,
+                    "low_top_of_page_bid": 0.23,
+                    "high_top_of_page_bid": 0.55,
+                    "cpc": 0.29,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 40
+                        }
+                    ]
+                },
+                {
+                    "keyword": "laminadora de masa",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 720,
+                    "low_top_of_page_bid": 0.17,
+                    "high_top_of_page_bid": 1,
+                    "cpc": 0.63,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 720
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 720
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 590
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 720
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 720
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 720
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 880
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 880
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 880
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 880
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 880
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 880
+                        }
+                    ]
+                },
+                {
+                    "keyword": "fabrica de empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "LOW",
+                    "competition_index": 16,
+                    "search_volume": 70,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "cpc": 0.43,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 110
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 90
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 30
+                        }
+                    ]
+                },
+                {
+                    "keyword": "aparato para hacer empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 30,
+                    "low_top_of_page_bid": null,
+                    "high_top_of_page_bid": null,
+                    "cpc": 0.2,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 10
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 20
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 30
+                        }
+                    ]
+                },
+                {
+                    "keyword": "prensa para empanadas",
+                    "spell": null,
+                    "location_code": 2840,
+                    "language_code": "es",
+                    "search_partners": false,
+                    "competition": "HIGH",
+                    "competition_index": 100,
+                    "search_volume": 40,
+                    "low_top_of_page_bid": 0.13,
+                    "high_top_of_page_bid": 0.41,
+                    "cpc": 0.28,
+                    "monthly_searches": [
+                        {
+                            "year": 2026,
+                            "month": 8,
+                            "search_volume": 70
+                        },
+                        {
+                            "year": 2026,
+                            "month": 7,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 6,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 5,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 4,
+                            "search_volume": 30
+                        },
+                        {
+                            "year": 2026,
+                            "month": 3,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2026,
+                            "month": 2,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2026,
+                            "month": 1,
+                            "search_volume": 50
+                        },
+                        {
+                            "year": 2025,
+                            "month": 12,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2025,
+                            "month": 11,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2025,
+                            "month": 10,
+                            "search_volume": 40
+                        },
+                        {
+                            "year": 2025,
+                            "month": 9,
+                            "search_volume": 50
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

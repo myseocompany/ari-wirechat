@@ -155,7 +155,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
   <div class="container">
     <h1>Maquiempanadas</h1>
     <p>Diagnóstico SEO y hoja de ruta estratégica</p>
-    <div class="meta">Análisis con datos de Google Search Console (16 meses), Google Ads (8 meses), YouTube Analytics (2011-2026) y DataForSEO — septiembre 2026 · Re-auditado y actualizado: 24-sep-2026</div>
+    <div class="meta">Análisis con datos de Google Search Console (16 meses), Google Ads (8 meses), YouTube Analytics (2011-2026) y DataForSEO — septiembre 2026 · Re-auditado: 24-sep · España añadido: 28-sep-2026</div>
   </div>
 </header>
 
@@ -166,6 +166,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
     <a href="#mercado" class="nav-link">Mercado</a>
     <a href="#activos" class="nav-link">Activos</a>
     <a href="#universal" class="nav-link">Universal search</a>
+    <a href="#espana" class="nav-link">España 🆕</a>
     <a href="#competencia" class="nav-link">Competencia</a>
     <a href="#serps" class="nav-link">SERPs</a>
     <a href="#estrategia" class="nav-link">Estrategia</a>
@@ -245,8 +246,8 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
   <p><strong>La distribución en Google Search y YouTube es coherente</strong> — el mismo cliente hispanohablante busca en ambos canales. Colombia lidera (40.5% de views YouTube sobre total de canal / 36.8% de impresiones Search), USA es segundo (8.4% / 17%). El resto se reparte entre España, Venezuela, México y otros países latinos.</p>
   <p style="font-size: 0.85rem; color: var(--gray);"><em>Nota: los porcentajes de YouTube arriba se calculan sobre 3.77M views totales del canal. Existe un ~17% de views no atribuidas a país específico (privacidad de YouTube).</em></p>
 
-  <h3>Volumen real del mercado — USA vs Colombia</h3>
-  <p>Comparación de búsquedas mensuales para las keywords principales (fuente: Google Ads / DataForSEO).</p>
+  <h3>Volumen real del mercado — USA vs Colombia vs España</h3>
+  <p>Comparación de búsquedas mensuales para las keywords principales (fuente: Google Ads / DataForSEO, 2026-09-28).</p>
   <div class="chart-container" style="height: 380px;">
     <canvas id="chartVolumen"></canvas>
   </div>
@@ -254,8 +255,9 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
   <div class="insight-warning insight">
     <strong>Cuidado con los volúmenes "grandes" en inglés.</strong> Términos como <em>empanada maker</em> (2,400 búsquedas/mes en USA) o <em>empanada press</em> (1,600/mes) parecen atractivos, pero al revisar quién rankea top 10 la mayoría son <strong>consumidor doméstico</strong> (restaurante en Mission Viejo con Knowledge Graph, prensas de Amazon $20-50, IMUSA electrodomésticos). Sí existen jugadores industriales en esas SERPs (PastaBiz con máquinas de hasta 1,800 unidades/hora aparece en posición 6 de <em>empanada maker</em>), pero son minoría. El segmento comercial claramente industrial se concentra en <em>empanada machine</em> (480 vol/mes) donde Anko domina.
     <br><br>
-    <em>Nota metodológica:</em> el endpoint de volumen agrega por ubicación sin distinguir idioma real de la búsqueda; los volúmenes reportados son mercado total en USA para esa keyword.
+    <em>Nota metodológica:</em> el endpoint de volumen agrega por ubicación sin distinguir idioma real de la búsqueda; los volúmenes reportados son mercado total para esa keyword en el país indicado.
   </div>
+
 </section>
 
 <section id="activos">
@@ -370,6 +372,85 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
   </div>
 </section>
 
+<section id="espana">
+  <h2>España — mercado emergente (datos 28-sep-2026)</h2>
+  <p class="lead">Análisis con DataForSEO recién ejecutado: search_volume, rank_overview y ranked_keywords para España (location 2724, es). El sitio aparece en Google España pero con tráfico casi nulo en términos comerciales. No hay competidor local dominante.</p>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">35</div>
+      <div class="label">Keywords rankeando</div>
+      <div class="sublabel">Google España (es)</div>
+    </div>
+    <div class="kpi">
+      <div class="value">0</div>
+      <div class="label">En posición #1</div>
+      <div class="sublabel">vs 18 en USA / 10 en Colombia</div>
+    </div>
+    <div class="kpi">
+      <div class="value">10</div>
+      <div class="label">En posición 4-10</div>
+      <div class="sublabel">todos keywords comerciales</div>
+    </div>
+    <div class="kpi">
+      <div class="value">$9</div>
+      <div class="label">ETV estimado/mes</div>
+      <div class="sublabel">vs $454 Colombia / $298 USA</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top: 24px;">
+    <div>
+      <h3>Keywords rankeando en España</h3>
+      <table>
+        <thead>
+          <tr><th>Keyword</th><th class="num">Pos</th><th class="num">Vol/mes</th><th>URL que rankea</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>maquina para hacer arepas</td><td class="num"><span class="badge badge-warning">7</span></td><td class="num">110</td><td><code>/product/maquina-para-hacer-empanadas-y-arepas-mul…</code></td></tr>
+          <tr><td>maquina para hacer empanadas</td><td class="num"><span class="badge badge-warning">9</span></td><td class="num">170</td><td><code>/</code> (home)</td></tr>
+          <tr><td>máquinas para hacer empanadas</td><td class="num"><span class="badge badge-warning">9</span></td><td class="num">170</td><td><code>/</code> (home)</td></tr>
+          <tr><td>moldes empanadas</td><td class="num"><span class="badge badge-warning">10</span></td><td class="num">210</td><td><code>/en/product-category/moldes/</code></td></tr>
+          <tr><td>empanadas congeladas</td><td class="num"><span class="badge badge-warning">10</span></td><td class="num">140</td><td>artículo blog</td></tr>
+          <tr><td>maquina de hacer empanadas</td><td class="num">14</td><td class="num">140</td><td><code>/</code> (home)</td></tr>
+          <tr><td>molde para empanadillas</td><td class="num">50</td><td class="num">390</td><td><code>/product-category/moldes/</code></td></tr>
+          <tr style="color: var(--gray);"><td colspan="4"><em>+ 15 variaciones de "negocios rentables desde casa" en pos 35-70 — tráfico no comercial</em></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>Volumen de búsqueda España vs otros mercados</h3>
+      <table>
+        <thead>
+          <tr><th>Keyword</th><th class="num">España</th><th class="num">Colombia</th><th class="num">USA</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>laminadora de masa</td><td class="num"><strong>880</strong></td><td class="num">1,300</td><td class="num">720</td></tr>
+          <tr><td>molde para empanadas</td><td class="num">390</td><td class="num">590</td><td class="num">480</td></tr>
+          <tr><td>arepa machine</td><td class="num"><strong>320</strong></td><td class="num">10</td><td class="num">90</td></tr>
+          <tr><td>maquina para hacer empanadas</td><td class="num">170</td><td class="num">480</td><td class="num">480</td></tr>
+          <tr><td>maquina para hacer arepas</td><td class="num">110</td><td class="num">590</td><td class="num">210</td></tr>
+          <tr><td>empanada maker</td><td class="num">10</td><td class="num">10</td><td class="num">2,400</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size: 0.82rem; color: var(--gray); margin-top: 8px;">Fuente: DataForSEO keywords_data/google_ads/search_volume/live · 28-sep-2026</p>
+    </div>
+  </div>
+
+  <div class="insight" style="margin-top: 24px;">
+    <strong>3 gaps concretos en España sin competidor:</strong>
+    <ol style="margin-left: 24px; margin-top: 8px;">
+      <li><strong>laminadora de masa</strong> — 880 búsquedas/mes, el sitio no aparece en este término desde España pese a tener el producto. Es el gap más limpio: alto volumen, keyword directa de producto, sin competidor dominante local.</li>
+      <li><strong>arepa machine</strong> — 320/mes en España, más que en USA (90). La diáspora venezolana y colombiana en España busca en inglés. No hay landing en inglés orientada a España.</li>
+      <li><strong>molde para empanadillas</strong> — 390/mes, rankea pos 50 con la categoría genérica. "Empanadilla" es el vocabulario local de España y del nicho puertorriqueño — una sola landing resuelve dos audiencias.</li>
+    </ol>
+  </div>
+
+  <div class="insight-warning insight" style="margin-top: 16px;">
+    <strong>Por qué España es diferente a USA y Colombia:</strong> en USA y Colombia hay competidores activos (Anko, adlovermaquinas) con decenas de keywords en posición 1-3. En España no hay ningún rival hispanohablante consolidado en maquinaria de empanadas. El primero en llegar con una landing bien construida toma la posición sin pelea — algo que en los otros mercados ya requiere desplazar a alguien.
+  </div>
+</section>
+
 <section id="competencia">
   <h2>Panorama competitivo</h2>
   <p class="lead">Identificamos tres tipos de competidores. Solo uno vale la pena vigilar en cada canal.</p>
@@ -394,6 +475,11 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
       <h3>🏆 En Colombia: adlovermaquinas.com (Lovermaq)</h3>
       <p>Rival hispano-hablante fuerte en Colombia: 5 keywords en posición #1, ETV $220/mes. <strong>Domina "máquina para hacer arepas"</strong> (posición 1 en las variantes principales, 590 búsquedas/mes) y desmechadora de carne. Compite directo con Maquiempanadas en "maquina para hacer empanadas" (posición 4 vs Maquiempanadas posición 2).</p>
       <p><em>Recomendación:</em> Defender el liderazgo en máquinas de empanadas y disputar posiciones en el segmento arepas. Ambos operan el mismo mercado.</p>
+    </div>
+    <div>
+      <h3>🇪🇸 En España: mercado sin competidor dominante</h3>
+      <p>España rankea 35 keywords para Maquiempanadas — pero con ETV de solo $9/mes: el sitio aparece, no convierte. <strong>No hay competidor local hispanohablante consolidado en SEO para maquinaria de empanadas en España</strong>. La diáspora colombiana y venezolana busca en español e inglés (<em>arepa machine</em> 320/mes desde España).</p>
+      <p><em>Oportunidad:</em> Es el único mercado donde ser primero en llegar con contenido específico puede capturar posición #1 sin pelea. El SPEC rankear-2026 incluye landing N6 para colombianos en España con CM5S.</p>
     </div>
     <div>
       <h3>🚫 Ruido de mercado</h3>
@@ -699,7 +785,8 @@ const ytData = {
 const volumenData = {
   labels: ['empanada maker*','empanada press*','maquina para hacer empanadas','empanada machine','molde para empanadas','maquina para hacer arepas','desmechadora de carne','laminadora de masa'],
   usa: [2400, 1600, 480, 480, 480, 210, 40, 720],
-  col: [10, 10, 480, 10, 590, 590, 480, 1300]
+  col: [10, 10, 480, 10, 590, 590, 480, 1300],
+  esp: [10, 10, 170, 10, 390, 110, 70, 880]
 };
 const aiData = {
   labels: ['Jun (14d)','Jul','Ago','Sep (16d)'],
@@ -742,7 +829,8 @@ new Chart(document.getElementById('chartVolumen'), {
     labels: volumenData.labels,
     datasets: [
       { label: 'USA (búsquedas/mes)', data: volumenData.usa, backgroundColor: primaryColor },
-      { label: 'Colombia (búsquedas/mes)', data: volumenData.col, backgroundColor: secondaryColor }
+      { label: 'Colombia (búsquedas/mes)', data: volumenData.col, backgroundColor: secondaryColor },
+      { label: 'España (búsquedas/mes)', data: volumenData.esp, backgroundColor: '#3b82f6' }
     ]
   },
   options: { plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { footer: (items) => items[0].label.includes('*') ? 'Búsquedas dominadas por consumidor doméstico' : '' } } }, scales: { y: { title: { display: true, text: 'Búsquedas / mes' } } } }

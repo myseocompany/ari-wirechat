@@ -35,7 +35,7 @@ nav a:hover, nav a.active { background: var(--primary); color: white; }
 body { padding-top: 56px; }
 header { margin-top: 0; }
 
-section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); scroll-margin-top: 68px; }
 h2 { font-size: 1.6rem; margin-bottom: 8px; color: var(--dark); border-bottom: 3px solid var(--primary); padding-bottom: 8px; display: inline-block; }
 h3 { font-size: 1.2rem; margin: 24px 0 12px; color: var(--primary-dark); }
 h4 { font-size: 1rem; margin: 16px 0 8px; color: var(--dark); }
@@ -155,7 +155,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
   <div class="container">
     <h1>Maquiempanadas</h1>
     <p>Diagnóstico SEO y hoja de ruta estratégica</p>
-    <div class="meta">Análisis con datos de Google Search Console (16 meses), Google Ads (8 meses), YouTube Analytics (2011-2026) y DataForSEO — septiembre 2026</div>
+    <div class="meta">Análisis con datos de Google Search Console (16 meses), Google Ads (8 meses), YouTube Analytics (2011-2026) y DataForSEO — septiembre 2026 · Re-auditado: 24-sep · España añadido: 28-sep-2026</div>
   </div>
 </header>
 
@@ -166,10 +166,12 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
     <a href="#mercado" class="nav-link">Mercado</a>
     <a href="#activos" class="nav-link">Activos</a>
     <a href="#universal" class="nav-link">Universal search</a>
+    <a href="#espana" class="nav-link">España 🆕</a>
     <a href="#competencia" class="nav-link">Competencia</a>
     <a href="#serps" class="nav-link">SERPs</a>
     <a href="#estrategia" class="nav-link">Estrategia</a>
     <a href="#plan" class="nav-link">Plan</a>
+    <a href="#ejecucion" class="nav-link">Ejecución</a>
   </div>
 </nav>
 
@@ -244,8 +246,8 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
   <p><strong>La distribución en Google Search y YouTube es coherente</strong> — el mismo cliente hispanohablante busca en ambos canales. Colombia lidera (40.5% de views YouTube sobre total de canal / 36.8% de impresiones Search), USA es segundo (8.4% / 17%). El resto se reparte entre España, Venezuela, México y otros países latinos.</p>
   <p style="font-size: 0.85rem; color: var(--gray);"><em>Nota: los porcentajes de YouTube arriba se calculan sobre 3.77M views totales del canal. Existe un ~17% de views no atribuidas a país específico (privacidad de YouTube).</em></p>
 
-  <h3>Volumen real del mercado — USA vs Colombia</h3>
-  <p>Comparación de búsquedas mensuales para las keywords principales (fuente: Google Ads / DataForSEO).</p>
+  <h3>Volumen real del mercado — USA vs Colombia vs España</h3>
+  <p>Comparación de búsquedas mensuales para las keywords principales (fuente: Google Ads / DataForSEO, 2026-09-28).</p>
   <div class="chart-container" style="height: 380px;">
     <canvas id="chartVolumen"></canvas>
   </div>
@@ -253,8 +255,9 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
   <div class="insight-warning insight">
     <strong>Cuidado con los volúmenes "grandes" en inglés.</strong> Términos como <em>empanada maker</em> (2,400 búsquedas/mes en USA) o <em>empanada press</em> (1,600/mes) parecen atractivos, pero al revisar quién rankea top 10 la mayoría son <strong>consumidor doméstico</strong> (restaurante en Mission Viejo con Knowledge Graph, prensas de Amazon $20-50, IMUSA electrodomésticos). Sí existen jugadores industriales en esas SERPs (PastaBiz con máquinas de hasta 1,800 unidades/hora aparece en posición 6 de <em>empanada maker</em>), pero son minoría. El segmento comercial claramente industrial se concentra en <em>empanada machine</em> (480 vol/mes) donde Anko domina.
     <br><br>
-    <em>Nota metodológica:</em> el endpoint de volumen agrega por ubicación sin distinguir idioma real de la búsqueda; los volúmenes reportados son mercado total en USA para esa keyword.
+    <em>Nota metodológica:</em> el endpoint de volumen agrega por ubicación sin distinguir idioma real de la búsqueda; los volúmenes reportados son mercado total para esa keyword en el país indicado.
   </div>
+
 </section>
 
 <section id="activos">
@@ -354,7 +357,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
   </div>
 
   <div id="tab-video" class="tab-panel">
-    <h3>Vídeo · 0.005% del share · Oportunidad enorme desperdiciada</h3>
+    <h3>Vídeo · 0.005% del share · Corrección en marcha desde 23-sep</h3>
     <div class="kpi-grid">
       <div class="kpi"><div class="value">33</div><div class="label">Impresiones en 16 meses</div></div>
       <div class="kpi"><div class="value">37</div><div class="label">Videos indexados con error</div></div>
@@ -363,6 +366,88 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
     <div class="insight-success insight">
       <strong>El canal YouTube tiene 1.18M views en los últimos 12 meses pero Google Search Console reporta solo 33 impresiones de video del sitio en 16 meses.</strong> Además, hay 37 videos con la incidencia "no está en una página de visualización". Google exige que el vídeo sea el contenido principal de la página; añadir schema no garantiza el fix. Es una <strong>hipótesis de trabajo a validar</strong>: si la desconexión es real, cerrarla puede reconectar el canal con la búsqueda web. Antes de invertir esfuerzo grande, diagnosticar caso por caso.
     </div>
+    <div class="insight insight">
+      <strong>Actualización 24-sep — diagnóstico confirmado y primera corrección ejecutada:</strong> la incidencia de GSC es exactamente "El vídeo no está en una página de visualización": los videos viven en URLs (fichas de producto, blog) donde el video no es el contenido principal. Ejecutado: (1) video principal nativo en las 6 fichas de máquina, con la demostración horizontal correcta por modelo; (2) primera <a href="https://maquiempanadas.com/videos/demostracion-maquina-cm06b/" style="color: var(--primary);">página de visualización dedicada</a> (CM06B) con VideoObject completo, canonical, hreflang es/en/pt y enlace desde el hub <code>/videos/</code> en los tres idiomas. Pendiente en esa página: título (79 caracteres, se trunca), meta description y <code>og:image</code>. El efecto sobre la indexación de video se mide en GSC en 2-4 semanas; si valida, se replica el patrón por modelo.
+    </div>
+  </div>
+</section>
+
+<section id="espana">
+  <h2>España — mercado emergente (datos 28-sep-2026)</h2>
+  <p class="lead">Análisis con DataForSEO recién ejecutado: search_volume, rank_overview y ranked_keywords para España (location 2724, es). El sitio aparece en Google España pero con tráfico casi nulo en términos comerciales. No hay competidor local dominante.</p>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="value">35</div>
+      <div class="label">Keywords rankeando</div>
+      <div class="sublabel">Google España (es)</div>
+    </div>
+    <div class="kpi">
+      <div class="value">0</div>
+      <div class="label">En posición #1</div>
+      <div class="sublabel">vs 18 en USA / 10 en Colombia</div>
+    </div>
+    <div class="kpi">
+      <div class="value">10</div>
+      <div class="label">En posición 4-10</div>
+      <div class="sublabel">todos keywords comerciales</div>
+    </div>
+    <div class="kpi">
+      <div class="value">$9</div>
+      <div class="label">ETV estimado/mes</div>
+      <div class="sublabel">vs $454 Colombia / $298 USA</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-top: 24px;">
+    <div>
+      <h3>Keywords rankeando en España</h3>
+      <table>
+        <thead>
+          <tr><th>Keyword</th><th class="num">Pos</th><th class="num">Vol/mes</th><th>URL que rankea</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>maquina para hacer arepas</td><td class="num"><span class="badge badge-warning">7</span></td><td class="num">110</td><td><code>/product/maquina-para-hacer-empanadas-y-arepas-mul…</code></td></tr>
+          <tr><td>maquina para hacer empanadas</td><td class="num"><span class="badge badge-warning">9</span></td><td class="num">170</td><td><code>/</code> (home)</td></tr>
+          <tr><td>máquinas para hacer empanadas</td><td class="num"><span class="badge badge-warning">9</span></td><td class="num">170</td><td><code>/</code> (home)</td></tr>
+          <tr><td>moldes empanadas</td><td class="num"><span class="badge badge-warning">10</span></td><td class="num">210</td><td><code>/en/product-category/moldes/</code></td></tr>
+          <tr><td>empanadas congeladas</td><td class="num"><span class="badge badge-warning">10</span></td><td class="num">140</td><td>artículo blog</td></tr>
+          <tr><td>maquina de hacer empanadas</td><td class="num">14</td><td class="num">140</td><td><code>/</code> (home)</td></tr>
+          <tr><td>molde para empanadillas</td><td class="num">50</td><td class="num">390</td><td><code>/product-category/moldes/</code></td></tr>
+          <tr style="color: var(--gray);"><td colspan="4"><em>+ 15 variaciones de "negocios rentables desde casa" en pos 35-70 — tráfico no comercial</em></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3>Volumen de búsqueda España vs otros mercados</h3>
+      <table>
+        <thead>
+          <tr><th>Keyword</th><th class="num">España</th><th class="num">Colombia</th><th class="num">USA</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>laminadora de masa</td><td class="num"><strong>880</strong></td><td class="num">1,300</td><td class="num">720</td></tr>
+          <tr><td>molde para empanadas</td><td class="num">390</td><td class="num">590</td><td class="num">480</td></tr>
+          <tr><td>arepa machine</td><td class="num"><strong>320</strong></td><td class="num">10</td><td class="num">90</td></tr>
+          <tr><td>maquina para hacer empanadas</td><td class="num">170</td><td class="num">480</td><td class="num">480</td></tr>
+          <tr><td>maquina para hacer arepas</td><td class="num">110</td><td class="num">590</td><td class="num">210</td></tr>
+          <tr><td>empanada maker</td><td class="num">10</td><td class="num">10</td><td class="num">2,400</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size: 0.82rem; color: var(--gray); margin-top: 8px;">Fuente: DataForSEO keywords_data/google_ads/search_volume/live · 28-sep-2026</p>
+    </div>
+  </div>
+
+  <div class="insight" style="margin-top: 24px;">
+    <strong>3 gaps concretos en España sin competidor:</strong>
+    <ol style="margin-left: 24px; margin-top: 8px;">
+      <li><strong>laminadora de masa</strong> — 880 búsquedas/mes, el sitio no aparece en este término desde España pese a tener el producto. Es el gap más limpio: alto volumen, keyword directa de producto, sin competidor dominante local.</li>
+      <li><strong>arepa machine</strong> — 320/mes en España, más que en USA (90). La diáspora venezolana y colombiana en España busca en inglés. No hay landing en inglés orientada a España.</li>
+      <li><strong>molde para empanadillas</strong> — 390/mes, rankea pos 50 con la categoría genérica. "Empanadilla" es el vocabulario local de España y del nicho puertorriqueño — una sola landing resuelve dos audiencias.</li>
+    </ol>
+  </div>
+
+  <div class="insight-warning insight" style="margin-top: 16px;">
+    <strong>Por qué España es diferente a USA y Colombia:</strong> en USA y Colombia hay competidores activos (Anko, adlovermaquinas) con decenas de keywords en posición 1-3. En España no hay ningún rival hispanohablante consolidado en maquinaria de empanadas. El primero en llegar con una landing bien construida toma la posición sin pelea — algo que en los otros mercados ya requiere desplazar a alguien.
   </div>
 </section>
 
@@ -390,6 +475,11 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
       <h3>🏆 En Colombia: adlovermaquinas.com (Lovermaq)</h3>
       <p>Rival hispano-hablante fuerte en Colombia: 5 keywords en posición #1, ETV $220/mes. <strong>Domina "máquina para hacer arepas"</strong> (posición 1 en las variantes principales, 590 búsquedas/mes) y desmechadora de carne. Compite directo con Maquiempanadas en "maquina para hacer empanadas" (posición 4 vs Maquiempanadas posición 2).</p>
       <p><em>Recomendación:</em> Defender el liderazgo en máquinas de empanadas y disputar posiciones en el segmento arepas. Ambos operan el mismo mercado.</p>
+    </div>
+    <div>
+      <h3>🇪🇸 En España: mercado sin competidor dominante</h3>
+      <p>España rankea 35 keywords para Maquiempanadas — pero con ETV de solo $9/mes: el sitio aparece, no convierte. <strong>No hay competidor local hispanohablante consolidado en SEO para maquinaria de empanadas en España</strong>. La diáspora colombiana y venezolana busca en español e inglés (<em>arepa machine</em> 320/mes desde España).</p>
+      <p><em>Oportunidad:</em> Es el único mercado donde ser primero en llegar con contenido específico puede capturar posición #1 sin pelea. El SPEC rankear-2026 incluye landing N6 para colombianos en España con CM5S.</p>
     </div>
     <div>
       <h3>🚫 Ruido de mercado</h3>
@@ -476,11 +566,12 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
         <span class="rec-priority priority-alta">Prioridad ALTA</span>
       </div>
       <div class="rec-body">
-        El canal YouTube tiene 3.77M views totales y 1.18M en los últimos 12 meses, pero Google Search Console muestra solo 33 impresiones de video del sitio en 16 meses. Los 37 videos con incidencia de indexación sugieren que el activo está desconectado del SEO — hay que diagnosticar caso por caso antes de asumir que un solo arreglo lo resuelve.
+        El canal YouTube tiene 3.77M views totales y 1.18M en los últimos 12 meses, pero Google Search Console muestra solo 33 impresiones de video del sitio en 16 meses. <strong>El diagnóstico ya se ejecutó (23-sep): la incidencia es "el vídeo no está en una página de visualización".</strong> La primera corrección está en marcha — ver la sección Ejecución.
         <ul>
-          <li>Diagnosticar y corregir el schema VideoObject de los 37 videos</li>
+          <li><span class="badge badge-success">Hecho</span> Diagnosticar los 37 videos: la causa raíz es que viven en páginas donde el video no es el contenido principal</li>
+          <li><span class="badge badge-warning">En marcha</span> Páginas de visualización dedicadas: la de CM06B está publicada; validar en GSC (2-4 semanas) antes de replicar por modelo</li>
           <li>Investigar el salto de 6x en views de 2024 a 2025 (¿fue estratégico o viral?)</li>
-          <li>Integrar embeds YouTube en páginas de producto con markup correcto</li>
+          <li>Videos principales correctos ya integrados en las 6 fichas de producto (galería nativa Woodmart)</li>
         </ul>
       </div>
     </div>
@@ -542,6 +633,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
         <th style="width: 100px;">Prioridad</th>
         <th style="width: 120px;">Esfuerzo</th>
         <th>Impacto esperado</th>
+        <th style="width: 110px;">Estado 24-sep</th>
       </tr>
     </thead>
     <tbody>
@@ -551,6 +643,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
         <td><span class="badge badge-danger">Alta</span></td>
         <td>Bajo (diagnóstico) / Medio (fix)</td>
         <td>Hipótesis: puede reconectar canal YouTube con búsqueda web</td>
+        <td><span class="badge badge-warning">En ejecución</span></td>
       </tr>
       <tr>
         <td><strong>2</strong></td>
@@ -558,6 +651,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
         <td><span class="badge badge-danger">Alta</span></td>
         <td>Medio</td>
         <td>Potencial de aumento significativo de clics en productos ancla (pendiente medir con CTR real por posición)</td>
+        <td><span class="badge badge-gray">Pendiente</span></td>
       </tr>
       <tr>
         <td><strong>3</strong></td>
@@ -565,6 +659,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
         <td><span class="badge badge-warning">Media</span></td>
         <td>Medio</td>
         <td>Mejorar 24% del share que hoy rankea en pos 20+</td>
+        <td><span class="badge badge-gray">Pendiente</span></td>
       </tr>
       <tr>
         <td><strong>4</strong></td>
@@ -572,6 +667,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
         <td><span class="badge badge-warning">Media</span></td>
         <td>Medio-alto</td>
         <td>Cerrar la brecha de posición 5→2 en USA</td>
+        <td><span class="badge badge-gray">Pendiente</span></td>
       </tr>
       <tr>
         <td><strong>5</strong></td>
@@ -579,6 +675,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
         <td><span class="badge badge-primary">Baja</span></td>
         <td>Bajo (análisis)</td>
         <td>Si fue estratégico, replicable en otros productos</td>
+        <td><span class="badge badge-gray">Pendiente</span></td>
       </tr>
       <tr>
         <td><strong>6</strong></td>
@@ -586,6 +683,7 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
         <td><span class="badge badge-primary">Baja</span></td>
         <td>Medio</td>
         <td>Aumentar apariciones en AI Overviews (crece 65%)</td>
+        <td><span class="badge badge-gray">Pendiente</span></td>
       </tr>
     </tbody>
   </table>
@@ -600,10 +698,78 @@ footer { text-align: center; padding: 40px 20px; color: var(--gray); font-size: 
   </div>
 </section>
 
+<section id="ejecucion">
+  <h2>Ejecución — estado al 24-sep-2026</h2>
+  <p class="lead">Qué se ejecutó entre la publicación de este diagnóstico (19-sep) y la re-auditoría de hoy. Las métricas de GSC, Ads y YouTube del reporte corresponden al export del 19-sep; no hay datos de métricas nuevos en esta actualización.</p>
+
+  <h3>Ejecutado</h3>
+  <table>
+    <thead>
+      <tr><th style="width: 120px;">Fecha</th><th>Acción</th><th style="width: 110px;">Estado</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>23-sep</td>
+        <td><strong>Diagnóstico de la incidencia de video de GSC.</strong> Confirmada: "El vídeo no está en una página de visualización" — los 37 videos afectados viven en URLs donde el video no es el contenido principal (fichas, blog), no en páginas dedicadas.</td>
+        <td><span class="badge badge-success">Hecho</span></td>
+      </tr>
+      <tr>
+        <td>23-sep</td>
+        <td><strong>Video principal en las 6 fichas de máquina</strong> (CM05S, CM06, CM06B, CM07, CM08, CM05i) integrado a la galería nativa del tema, con selección auditada por criterios: el video principal nombra el modelo, es horizontal y demuestra la máquina; Shorts y testimonios quedan como complementarios sin duplicados. Re-verificado hoy: las 6 fichas públicas muestran el control de reproducción y el video correcto.</td>
+        <td><span class="badge badge-success">Hecho</span></td>
+      </tr>
+      <tr>
+        <td>23-sep</td>
+        <td><strong>Primera página de visualización dedicada:</strong> <a href="https://maquiempanadas.com/videos/demostracion-maquina-cm06b/" style="color: var(--primary);">/videos/demostracion-maquina-cm06b/</a> — un solo video como propósito de la página, con VideoObject completo (thumbnail propio, duración, fecha), canonical, hreflang es/en/pt (las tres responden 200), incluida en el sitemap y enlazada desde el hub <code>/videos/</code> en los tres idiomas.</td>
+        <td><span class="badge badge-success">Hecho</span></td>
+      </tr>
+      <tr>
+        <td>24-sep</td>
+        <td><strong>Re-auditoría de lo publicado:</strong> 6/6 fichas con video operativo, página de video 200 en tres idiomas, VideoObject presente, sitemap y enlaces del hub verificados en HTML público.</td>
+        <td><span class="badge badge-success">Hecho</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Pendientes de la propia ejecución</h3>
+  <table>
+    <thead>
+      <tr><th>Pendiente</th><th style="width: 110px;">Prioridad</th><th>Nota</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Título, meta description y <code>og:image</code> de la página de video CM06B</td>
+        <td><span class="badge badge-danger">Alta</span></td>
+        <td>El título mide 79 caracteres y Google lo trunca (~60); no hay meta description; sin <code>og:image</code> el enlace no genera tarjeta al compartirlo por WhatsApp, que es el canal de venta principal.</td>
+      </tr>
+      <tr>
+        <td>Verificación visual de las 6 fichas en escritorio y móvil</td>
+        <td><span class="badge badge-warning">Media</span></td>
+        <td>La verificación de HTML está hecha; falta la prueba de interfaz (reproducción, proporción, navegación de galería) tras los cambios de la galería.</td>
+      </tr>
+      <tr>
+        <td>Medir el efecto en GSC</td>
+        <td><span class="badge badge-warning">Media</span></td>
+        <td>La indexación de video tarda 2-4 semanas: revisar en octubre si la página dedicada elimina la incidencia y si aparecen impresiones de video. Si valida, replicar el patrón en los demás modelos.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Riesgo técnico activo — auto-actualización de Elementor</h3>
+  <div class="insight-warning insight">
+    <strong>El sitio se cayó por completo el 23-sep por una auto-actualización del hosting.</strong> SiteGround actualizó Elementor a 4.3.1; el sitio usa Elementor Pro 3.26.2 (instalado sin licencia, congelado desde feb-2025) y la combinación produce un error fatal en todas las páginas (500 durante ≈2,5 h hasta el rollback). El 24-sep a la mañana SiteGround volvió a actualizar solo, ahora a 4.2.4, que por ahora es tolerada — <strong>el mecanismo sigue activo y la siguiente actualización mayor puede repetir la caída</strong>.
+    <ul style="margin-left: 20px; margin-top: 8px;">
+      <li><strong>Acción inmediata (cliente, panel de SiteGround):</strong> desactivar la auto-actualización de Elementor.</li>
+      <li><strong>Decisión de fondo:</strong> el uso real de Elementor Pro es una sola plantilla (la de fichas de producto); se puede retirar Pro reconstruyendo esa plantilla con el constructor nativo del tema, sin comprar licencia de Elementor. Falta confirmar si existe licencia de Woodmart (ThemeForest) para futuras actualizaciones del tema.</li>
+    </ul>
+  </div>
+</section>
+
 </div>
 
 <footer>
-  Análisis preparado por MySEO Company · Nicolás Navarro · nicolas@myseocompany.co
+  Análisis preparado por MySEO Company · Nicolás Navarro · nicolas@myseocompany.co<br>
+  Actualizado el 24-sep-2026: re-auditoría de ejecución (video y riesgo técnico)
 </footer>
 
 <script>
@@ -619,7 +785,8 @@ const ytData = {
 const volumenData = {
   labels: ['empanada maker*','empanada press*','maquina para hacer empanadas','empanada machine','molde para empanadas','maquina para hacer arepas','desmechadora de carne','laminadora de masa'],
   usa: [2400, 1600, 480, 480, 480, 210, 40, 720],
-  col: [10, 10, 480, 10, 590, 590, 480, 1300]
+  col: [10, 10, 480, 10, 590, 590, 480, 1300],
+  esp: [10, 10, 170, 10, 390, 110, 70, 880]
 };
 const aiData = {
   labels: ['Jun (14d)','Jul','Ago','Sep (16d)'],
@@ -662,7 +829,8 @@ new Chart(document.getElementById('chartVolumen'), {
     labels: volumenData.labels,
     datasets: [
       { label: 'USA (búsquedas/mes)', data: volumenData.usa, backgroundColor: primaryColor },
-      { label: 'Colombia (búsquedas/mes)', data: volumenData.col, backgroundColor: secondaryColor }
+      { label: 'Colombia (búsquedas/mes)', data: volumenData.col, backgroundColor: secondaryColor },
+      { label: 'España (búsquedas/mes)', data: volumenData.esp, backgroundColor: '#3b82f6' }
     ]
   },
   options: { plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { footer: (items) => items[0].label.includes('*') ? 'Búsquedas dominadas por consumidor doméstico' : '' } } }, scales: { y: { title: { display: true, text: 'Búsquedas / mes' } } } }
