@@ -90,6 +90,7 @@ class Customer extends Authenticatable
         'position',
         'area_code',
         'phone',
+        'wa_id',
         'phone2',
         'contact_phone2',
         'email',

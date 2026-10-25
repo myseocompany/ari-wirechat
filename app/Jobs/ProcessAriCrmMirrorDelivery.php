@@ -43,19 +43,21 @@ class ProcessAriCrmMirrorDelivery implements ShouldQueue
             $payload = $delivery->payload;
             $integration = $delivery->integration;
 
-            $phone = preg_replace('/\D+/', '', (string) $payload['phone']) ?: null;
+            $phone = preg_replace('/\D+/', '', (string) ($payload['phone'] ?? '')) ?: null;
+            $waId = trim((string) ($payload['wa_id'] ?? '')) ?: null;
+            // Payloads legados cargaban el LID de WhatsApp (16+ dígitos, nunca un
+            // teléfono E.164 válido) dentro de "phone"; se enruta a wa_id.
+            if ($phone !== null && strlen($phone) > 15) {
+                $waId = $waId ?: $phone;
+                $phone = null;
+            }
             $contactMapping = AriCrmMirrorContact::query()->where('integration_id', $integration->id)->where('aricrm_contact_id', $payload['contact_id'])->lockForUpdate()->first();
             $customer = $contactMapping?->customer;
             if (! $customer) {
-                if ($phone) {
-                    AriCrmMirrorContact::query()
-                        ->where('integration_id', $integration->id)
-                        ->where('normalized_phone', $phone)
-                        ->lockForUpdate()
-                        ->first();
-                }
-
                 $customer = $this->findCustomerByNormalizedPhone($phone);
+                if (! $customer && $waId !== null) {
+                    $customer = Customer::query()->where('wa_id', $waId)->lockForUpdate()->first();
+                }
                 if (! $customer) {
                     $newCustomerStatusId = CustomerStatus::query()
                         ->where('name', 'Nuevo')
@@ -68,14 +70,27 @@ class ProcessAriCrmMirrorDelivery implements ShouldQueue
                     $customer = Customer::query()->create([
                         'name' => $payload['name'] ?: 'Cliente AriCRM',
                         'phone' => $phone,
+                        'wa_id' => $waId,
                         'status_id' => $newCustomerStatusId,
                     ]);
                 }
 
                 AriCrmMirrorContact::query()->create(['integration_id' => $integration->id, 'aricrm_contact_id' => $payload['contact_id'], 'customer_id' => $customer->id, 'normalized_phone' => $phone]);
             }
+            $customerUpdates = [];
             if (filled($payload['name']) && $customer->name !== $payload['name']) {
-                $customer->update(['name' => $payload['name']]);
+                $customerUpdates['name'] = $payload['name'];
+            }
+            // AriCRM unifica LID y teléfono con el tiempo; se rellenan cuando
+            // aparecen y el customer aún no los tiene.
+            if ($phone !== null && blank($customer->phone)) {
+                $customerUpdates['phone'] = $phone;
+            }
+            if ($waId !== null && blank($customer->wa_id)) {
+                $customerUpdates['wa_id'] = $waId;
+            }
+            if ($customerUpdates !== []) {
+                $customer->update($customerUpdates);
             }
 
             $conversationMapping = AriCrmMirrorConversation::query()->where('integration_id', $integration->id)->where('aricrm_conversation_id', $payload['conversation_id'])->lockForUpdate()->first();
