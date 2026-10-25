@@ -96,6 +96,7 @@
           'note' => $message->body ?: 'Mensaje sin texto',
           'conversation' => $conversationName,
           'direction' => $isCustomerMessage ? 'Entrante' : 'Saliente',
+          'is_customer_message' => $isCustomerMessage,
           'color' => $isCustomerMessage ? '#10b981' : '#334155',
           'url' => url('/chats/'.$message->conversation_id),
           'source_label' => $sourceLabel,
@@ -130,7 +131,7 @@
 
 <div class="space-y-3">
   @foreach($timeline as $item)
-    <div class="rounded-lg border border-slate-200 border-l-4 bg-white p-4 shadow-sm" style="border-left-color: {{ $item['color'] }};">
+    <div class="rounded-lg border border-slate-200 border-l-4 {{ $item['type'] === 'chat' && ! $item['is_customer_message'] ? 'bg-blue-50' : 'bg-white' }} p-4 shadow-sm" style="border-left-color: {{ $item['color'] }};">
       @if($item['type'] === 'action')
         <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div class="min-w-0 flex-1">

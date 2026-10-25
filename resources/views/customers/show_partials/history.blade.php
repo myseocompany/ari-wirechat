@@ -117,7 +117,7 @@
                 $body = $body !== '' ? $body : 'Mensaje sin texto';
             @endphp
 
-            <div class="border-b border-slate-200 py-3">
+            <div class="border-b border-slate-200 py-3 {{ $isCustomer ? '' : 'rounded-lg bg-blue-50 px-3' }}">
                 <div class="mb-1 text-xs text-slate-500">
                     <i class="fa fa-commenting"></i>
                     {{ $timestamp->format('d/m/Y H:i') }}
