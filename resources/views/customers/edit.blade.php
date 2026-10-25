@@ -52,8 +52,22 @@
       <input type="text" class="form-control" id="email" name="email" value="{{$model->email}}" placeholder="Correo Electronico...">
     </div>
 </div>
-  
-  
+
+  <div class="col-sm-3">
+    <div class="form-group">
+      <label for="instagram_url">Instagram:</label>
+      <input type="text" class="form-control" id="instagram_url" name="instagram_url" value="{{$model->instagram_url}}" placeholder="@usuario o URL del perfil...">
+    </div>
+  </div>
+
+  <div class="col-sm-3">
+    <div class="form-group">
+      <label for="instagram_followers">Seguidores Instagram:</label>
+      <input type="number" min="0" step="1" class="form-control" id="instagram_followers" name="instagram_followers" value="{{$model->instagram_followers}}" placeholder="Cantidad de seguidores...">
+    </div>
+  </div>
+
+
   <div class="col-sm-3">
     <div class="form-group">
       <label for="country">País:</label>

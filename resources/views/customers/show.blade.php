@@ -260,6 +260,24 @@
               <div class="text-xs text-slate-500">Email</div>
               <div class="text-sm text-slate-900">{{ $model->email }}</div>
             </div>
+            @php $instagramUrl = $model->getInstagramUrl(); @endphp
+            @if($instagramUrl || !is_null($model->instagram_followers))
+            <div class="space-y-0.5">
+              <div class="text-xs text-slate-500">Instagram</div>
+              <div class="flex flex-wrap items-center gap-2 text-sm text-slate-900">
+                @if($instagramUrl)
+                  <a href="{{ $instagramUrl }}" target="_blank" rel="noopener" class="text-sm text-blue-600 hover:underline">
+                    {{ '@'.$model->getInstagramHandle() }}
+                  </a>
+                @endif
+                @if(!is_null($model->instagram_followers))
+                  <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                    {{ number_format($model->instagram_followers, 0, ',', '.') }} seguidores
+                  </span>
+                @endif
+              </div>
+            </div>
+            @endif
             @if(!empty($model->country))
             <div class="space-y-0.5">
               <div class="text-xs text-slate-500">País</div>
