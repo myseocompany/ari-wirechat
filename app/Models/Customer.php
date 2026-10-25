@@ -105,8 +105,45 @@ class Customer extends Authenticatable
         'business_address',
         'business_city',
         'image_url',
+        'instagram_url',
+        'instagram_followers',
 
     ];
+
+    protected $casts = [
+        'instagram_followers' => 'integer',
+    ];
+
+    /**
+     * Handle de Instagram normalizado a partir de `instagram_url`, que puede venir
+     * guardado como handle suelto, como `@handle` o como URL completa del perfil.
+     */
+    public function getInstagramHandle(): ?string
+    {
+        $raw = trim((string) ($this->instagram_url ?? ''));
+
+        if ($raw === '') {
+            return null;
+        }
+
+        $handle = preg_replace('#^(https?://)?(www\.)?instagram\.com/#i', '', $raw);
+        $handle = (string) strtok($handle, '?#');
+        $handle = trim($handle, "/ \t\n\r\0\x0B");
+        $handle = ltrim($handle, '@/');
+
+        return $handle !== '' ? $handle : null;
+    }
+
+    /**
+     * URL canónica del perfil. Se construye desde el handle, nunca se devuelve el
+     * valor crudo, para que la vista no pueda recibir un href hacia otro destino.
+     */
+    public function getInstagramUrl(): ?string
+    {
+        $handle = $this->getInstagramHandle();
+
+        return $handle ? 'https://instagram.com/'.$handle : null;
+    }
 
     public function references()
     {

@@ -1840,6 +1840,8 @@ class CustomerController extends Controller
         $model->phone = $request->phone;
         $model->email = $request->email;
         $model->notes = $request->notes;
+        $model->instagram_url = $request->filled('instagram_url') ? trim($request->input('instagram_url')) : null;
+        $model->instagram_followers = $request->filled('instagram_followers') ? (int) $request->input('instagram_followers') : null;
         $model->count_empanadas = $request->count_empanadas;
         $model->phone2 = $request->phone2;
         $model->department = $request->department;
