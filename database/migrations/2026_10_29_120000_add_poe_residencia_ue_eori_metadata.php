@@ -60,7 +60,9 @@ return new class extends Migration
             ->exists();
 
         if (! $linked) {
+            // En producción `id` no es AUTO_INCREMENT: se asigna explícitamente
             DB::table('campaign_customer_meta_data')->insert([
+                'id' => (int) DB::table('campaign_customer_meta_data')->max('id') + 1,
                 'campaign_id' => self::POE_CAMPAIGN_ID,
                 'customer_meta_data_id' => self::GROUP_ID,
                 'created_at' => $now,

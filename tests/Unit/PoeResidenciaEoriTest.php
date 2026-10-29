@@ -38,7 +38,7 @@ function seedPoeCampaign(int $campaignId = 40): void
 
     // Orden de inserción del pivote distinto al deseado, para probar el orden por weight
     foreach ([34, 28, 20, 14] as $groupId) {
-        DB::table('campaign_customer_meta_data')->insert(['campaign_id' => $campaignId, 'customer_meta_data_id' => $groupId]);
+        DB::table('campaign_customer_meta_data')->insert(['id' => $groupId, 'campaign_id' => $campaignId, 'customer_meta_data_id' => $groupId]);
     }
 }
 
@@ -74,8 +74,9 @@ beforeEach(function () {
         $table->timestamps();
     });
 
+    // Igual que en producción: `id` sin AUTO_INCREMENT ni default
     Schema::create('campaign_customer_meta_data', function (Blueprint $table) {
-        $table->id();
+        $table->unsignedBigInteger('id');
         $table->unsignedBigInteger('campaign_id');
         $table->unsignedBigInteger('customer_meta_data_id');
         $table->timestamps();
@@ -159,7 +160,7 @@ it('places the residence block between destination and veracity', function () {
 
 it('does not show the residence block for other campaigns using the POE form', function () {
     DB::table('campaigns')->insert(['id' => 41, 'name' => 'Otra']);
-    DB::table('campaign_customer_meta_data')->insert(['campaign_id' => 41, 'customer_meta_data_id' => 28]);
+    DB::table('campaign_customer_meta_data')->insert(['id' => 999, 'campaign_id' => 41, 'customer_meta_data_id' => 28]);
 
     $html = $this->get('/metadata/677105/create/poe/41')->assertOk()->getContent();
 
@@ -233,4 +234,11 @@ it('shows the Maquiempanadas contact details in the POE footer', function () {
     expect($html)->toContain('href="https://www.youtube.com/@maquiempanadas"');
     expect($html)->toContain('href="https://www.facebook.com/maquiempanadasfans"');
     expect($html)->toContain('href="https://x.com/maquiempanadas"');
+});
+
+it('assigns the pivot id explicitly because production has no AUTO_INCREMENT on it', function () {
+    $pivot = DB::table('campaign_customer_meta_data')->where('customer_meta_data_id', 4000)->first();
+
+    expect($pivot)->not->toBeNull();
+    expect((int) $pivot->id)->toBe(35);
 });

@@ -55,6 +55,8 @@ Chrome headless (390px de ancho, móvil) dirigido por CDP sobre el HTML real ren
 
 - Ninguno en `/verify`. Los fallos de suite son preexistentes (ver tabla).
 
+- **Fallo en producción (deploy del 29/10/2026, 14:46 UTC)**: `php artisan migrate` falló con `SQLSTATE[HY000] 1364 Field 'id' doesn't have a default value` al insertar en `campaign_customer_meta_data`. Causa raíz: en producción esa tabla tiene `id int NOT NULL` como PRIMARY KEY **sin AUTO_INCREMENT** (`SHOW CREATE TABLE`), y el test usaba `$table->id()` (autoincremental), así que no lo detectó. Estado que quedó: filas 4000–4006 creadas y `weight` de los grupos aplicados, pivote sin crear, migración `Pending`; el formulario siguió funcionando sin el bloque. Decisión: la migración asigna el `id` del pivote explícitamente (`max(id) + 1`) y el test ahora crea el pivote como en producción (`id` sin autoincremento). Sin el arreglo, el test reproduce el mismo error (`NOT NULL constraint failed`). Como `up()` es idempotente, volver a correrla completa lo que faltó. Rama `fix/poe-eori-pivot-id`.
+
 ### `/code_review` (29/10/2026)
 
 | Eje | Marca | Justificación |
