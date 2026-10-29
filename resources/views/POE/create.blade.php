@@ -40,7 +40,10 @@
 
 			@if(isset($campaign->customerMetaData))
 			@foreach($campaign->customerMetaData as $item)
-		
+			@if($item->id == \App\Models\CustomerMetaData::POE_RESIDENCE_GROUP_ID)
+				@include('POE.partials.residencia_eori', ['group' => $item])
+			@else
+
 			<tr class="metadata_item" style="display:none">
 				<td>
 					<table class="table table-hover"  id="table_hover_{{$item->id}}">
@@ -106,6 +109,7 @@
 					</table>
 				</td>
 			</tr>
+			@endif
 			@endforeach
 				@endif
 		</tbody>
@@ -116,6 +120,8 @@
 			<input type="submit" class="btn btn-primary campo" value="Guardar" id="btn_submit" style="display:none">
 	</center>
 </form>
+
+@include('POE.partials.footer')
 </div>
 
 <style>

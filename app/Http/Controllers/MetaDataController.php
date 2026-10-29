@@ -276,7 +276,11 @@ public function createPoe($id, $cid){
 
     $model = Customer::find($id);
     $campaign = Campaign::find($cid);
-   
+    // El pivote no tiene orden propio: los grupos del POE se ordenan por weight
+    $campaign?->load(['customerMetaData' => function ($query) {
+        $query->orderBy('customer_meta_datas.weight')->orderBy('customer_meta_datas.id');
+    }]);
+
     return view('POE.create', compact('model','campaign'));
 }
 

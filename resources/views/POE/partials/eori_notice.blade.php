@@ -1,0 +1,2 @@
+<p class="mb-2">Le recordamos que, al residir en la Unión Europea o el Reino Unido, es posible que necesite contar con un número EORI (Economic Operators Registration and Identification) para realizar los trámites aduaneros correspondientes a la importación de su pedido.</p>
+<p class="mb-0">Este número puede solicitarse en línea ante la autoridad aduanera competente de su país. Le recomendamos verificar los requisitos aplicables según su lugar de residencia y las características de su importación.</p>

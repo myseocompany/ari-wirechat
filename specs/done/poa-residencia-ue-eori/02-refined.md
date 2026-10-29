@@ -46,14 +46,19 @@ Como cliente de MQE que reside en la Unión Europea o el Reino Unido, quiero que
 
 ## Supuestos
 
-- [CONFIRMAR] La pregunta de residencia es **obligatoria** (el cliente debe responder Sí o No para enviar).
-- [CONFIRMAR] La pregunta "¿Cuenta usted con un número EORI?" es **obligatoria cuando se muestra** (residencia = Sí), aunque cualquier respuesta permite enviar.
-- [CONFIRMAR] Ubicación: el bloque nuevo va después de "Información de destino" (país de entrega) y antes de "Veracidad de la información".
-- [CONFIRMAR] En los textos del aviso, "al residir en Europa" se cambia a "al residir en la Unión Europea o el Reino Unido", para ser coherente con la pregunta.
-- [CONFIRMAR] El bloque se muestra para todos los tipos de importación (Individual, Sociedad, etc.).
-- [CONFIRMAR] La campaña 40 es la única que usa el formulario POE en producción.
-- [CONFIRMAR] En el CRM basta con ver las respuestas en el acordeón POA; no se requiere filtro, columna en listados ni reporte.
-- [CONFIRMAR] No se pide capturar el número EORI (solo si lo tiene).
+Confirmados por la administración de MQE (WhatsApp, 29/10/2026 10:34):
+
+- [CONFIRMADO] La pregunta de residencia es **obligatoria** (el cliente debe responder Sí o No para enviar).
+- [CONFIRMADO] La pregunta "¿Cuenta usted con un número EORI?" es **obligatoria cuando se muestra** (residencia = Sí), aunque cualquier respuesta permite enviar.
+- [CONFIRMADO] Ubicación: el bloque nuevo va después de "Información de destino" (país de entrega) y antes de "Veracidad de la información".
+- [CONFIRMADO] En los textos del aviso, "al residir en Europa" se cambia a "al residir en la Unión Europea o el Reino Unido", para ser coherente con la pregunta.
+- [CONFIRMADO] El bloque se muestra para todos los tipos de importación, "incluso y especialmente" Individual.
+- [CONFIRMADO] No se captura el número EORI (solo si lo tiene).
+
+Verificados o inferidos por My SEO Company:
+
+- [VERIFICADO] La campaña 40 es la única que usa el formulario POE en producción (fuente: `campaign_customer_meta_data` en producción, 29/10/2026; los grupos 14/20/28/34 solo están vinculados a la campaña 40, y en los últimos 90 días las respuestas POE solo llegaron con `audience_id = 67`).
+- [INFERIDO] En el CRM basta con ver las respuestas en el acordeón POA, sin filtros, columnas ni reportes (respuesta 4 del 29/10/2026: "dejar en el POA CRM y que aparezca").
 
 ## Riesgos
 

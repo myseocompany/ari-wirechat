@@ -1,7 +1,7 @@
 ---
 slug: poa-residencia-ue-eori
 title: Pregunta de residencia UE/Reino Unido y aviso EORI en el formulario POE
-status: refined
+status: archived
 created: 2026-10-29
 author: Nicolás Navarro (My SEO Company)
 ---

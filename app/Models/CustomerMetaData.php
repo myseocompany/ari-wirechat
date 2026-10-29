@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class CustomerMetaData extends Model{
 	protected $table = "customer_meta_datas";
 
+	// Formulario POE: residencia UE/Reino Unido y número EORI (ver migración 2026_10_29_120000)
+	public const POE_RESIDENCE_GROUP_ID = 4000;
+	public const POE_EU_RESIDENT_QUESTION_ID = 4001;
+	public const POE_EORI_QUESTION_ID = 4002;
+	public const POE_EU_RESIDENT_YES = 'Sí';
+	public const POE_EORI_NO = 'No, aún no cuento con número EORI.';
+
 	public static function getOptions($id){
 		return CustomerMetaData::where('parent_id', $id)->get();
 	}
