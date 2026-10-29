@@ -34,7 +34,7 @@
     <div class="flex h-16 items-center justify-between gap-3">
       <div class="flex min-w-0 flex-1 items-center gap-4">
         <a class="hidden items-center lg:flex" href="/customers">
-          <img src="/img/Logo_MQE_normal-40px.png" alt="" class="h-10 w-auto">
+          <img src="/img/logo-mqe-2026.png" alt="MQE Maquiempanadas" class="h-10 w-auto">
         </a>
         <div class="hidden lg:flex lg:items-center lg:gap-4">
           @if (Auth::guest())

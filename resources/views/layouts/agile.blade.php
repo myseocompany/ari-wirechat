@@ -31,7 +31,7 @@
     <nav class="col-12">
       <div id="sidenav" class="d-flex flex-column h-100">
         <div id="brand">
-          <a class="navbar-brand" href="/customers/"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
+          <a class="navbar-brand" href="/customers/"><img src="/img/logo-mqe-2026.png" alt="MQE Maquiempanadas" height="40" style="height:40px;width:auto"></a>
 
           <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="fas fa-bars"></span>
@@ -68,7 +68,7 @@
     <nav class="col-sm-12 col-md-4 " >
       <div id="sidenav" class="d-flex flex-column h-100">
         <div id="brand">
-          <a class="navbar-brand" href="/customers/"><img src="/img/Logo_MQE_normal-40px.png" alt="" ></a>
+          <a class="navbar-brand" href="/customers/"><img src="/img/logo-mqe-2026.png" alt="MQE Maquiempanadas" height="40" style="height:40px;width:auto"></a>
 
           <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="fas fa-bars"></span>

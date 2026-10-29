@@ -6,7 +6,7 @@
 @section('content')
 
 <div class="container mt-4">
-	<div class="poe_logo" style="text-align:center"><img src="{{ asset('img/Logo_MQE_normal-40px.png') }}" alt=""></div>
+	<div class="poe_logo" style="text-align:center"><img src="{{ asset('img/logo-mqe-2026.png') }}" alt="MQE Maquiempanadas" style="height:60px;width:auto"></div>
 	
 
 	<form method="POST"  action="/metadata/{{$model->id}}/store/poe" class="form-control">
