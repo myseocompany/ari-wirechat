@@ -9,7 +9,18 @@
 	<div class="poe_logo" style="text-align:center"><img src="{{ asset('img/logo-mqe-2026.png') }}" alt="MQE Maquiempanadas" style="height:60px;width:auto"></div>
 	
 
-	<form method="POST"  action="/metadata/{{$model->id}}/store/poe" class="form-control">
+	@if($errors->any())
+	<div class="alert alert-danger" role="alert" id="poe_errors">
+		<strong>Revise el formulario:</strong>
+		<ul class="mb-0">
+			@foreach($errors->all() as $error)
+				<li>{{ $error }}</li>
+			@endforeach
+		</ul>
+	</div>
+	@endif
+
+	<form method="POST"  action="{{ $storeUrl }}" class="form-control">
 	 {{ csrf_field() }}
 
 
@@ -17,8 +28,6 @@
 
 	<table class="table">
 		<tbody>
-			<input type="hidden" name="campaign_id" value="{{$campaign->id}}" class="form-control">
-			<input type="hidden" name="audience_id" value="67" class="form-control">
 
 <br><br>
       <tr>
@@ -27,14 +36,11 @@
 		</div>
 		<div>Por favor marque la categoría a la que corresponde: </div>
 	<label ><strong>Importación de manera: </strong></label>
-      <select name="meta_34" id="category" class="form-control" onchange="updateForm(this)">
+      <select name="meta_{{ \App\Models\CustomerMetaData::POE_IMPORT_TYPE_ID }}" id="category" class="form-control" onchange="updateForm(this)">
         <option value="">Seleccione..</option>
-        <option value="Individual">Individual</option>
-        <option value="Sociedad">Sociedad</option>
-        <option value="Sociedad de responsabilidad limitada">Sociedad de responsabilidad limitada</option>
-        <option value="Corporación">Corporación</option>
-        <option value="Propietario único">Propietario único</option>
-        <option value="Compañía de responsabilidad limitada">Compañía de responsabilidad limitada</option>
+        @foreach(\App\Models\CustomerMetaData::POE_IMPORT_TYPES as $importType)
+        <option value="{{ $importType }}" @selected(old('meta_'.\App\Models\CustomerMetaData::POE_IMPORT_TYPE_ID) === $importType)>{{ $importType }}</option>
+        @endforeach
     </select>
     </tr>
 
@@ -66,7 +72,7 @@
                     <strong>{{$itemChild->value}}</strong>
 					
 											<input required="required" type="{{$itemChild->getInputType()}}" 
-											name="meta_{{$itemChild->id}}" placeholder="{{$itemChild->value}}"  
+											name="meta_{{$itemChild->id}}" placeholder="{{$itemChild->value}}" @if($itemChild->getInputType()=="text") value="{{ old('meta_'.$itemChild->id) }}" @elseif($itemChild->getInputType()=="checkbox" && old('meta_'.$itemChild->id)) checked @endif 
 											
 											class="@if($itemChild->getInputType()!="checkbox")form-control @else form-check-input @endif @if($itemChild->parent_id==14)bussinesMetaData @endif"
 											@if($itemChild->getInputType()=="checkbox") required="required" @endif>
@@ -84,7 +90,7 @@
 											  				
 											  			@else	
 
-												 		<input required type="{{$item->getInputType()}}"  name="meta_{{$itemChild->id}}" class="input form-control campo" value=""  >
+												 		<input required type="{{$item->getInputType()}}"  name="meta_{{$itemChild->id}}" class="input form-control campo" value="{{ old('meta_'.$itemChild->id) }}"  >
 												 	@endif	
 												 				
 												@else
@@ -93,7 +99,7 @@
 												@if($item->getInputType()=='file')
 
 												@else
-													<textarea id="msg"  name="meta_{{$itemChild->id}}" class="textinput form-control campo" value=""  required></textarea>
+													<textarea id="msg"  name="meta_{{$itemChild->id}}" class="textinput form-control campo" value=""  required>{{ old('meta_'.$itemChild->id) }}</textarea>
 												 @endif	
 											 @endif		
 										@endif
@@ -186,6 +192,10 @@
 	$( document ).ready(function() {
         console.log( "document loaded" );
 		$('.metadata_item').hide();
+		// Tras un error de validación el formulario vuelve con el tipo ya elegido
+		if ($('#category').val() !== "") {
+			updateForm();
+		}
 
     });
 	

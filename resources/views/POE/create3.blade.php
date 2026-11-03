@@ -27,7 +27,7 @@
 		</div>
 		<div>Por favor marque la categoría a la que corresponde: </div>
 	<label ><strong>Importación de manera: </strong></label>
-      <select name="meta_34" id="category" class="form-control" onchange="updateForm(this)">
+      <select name="meta_4007" id="category" class="form-control" onchange="updateForm(this)">
         <option value="">Selecione..</option>
         <option value="Individual">Individual</option>
         <option value="Sociedad">Sociedad</option>

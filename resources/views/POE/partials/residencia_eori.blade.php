@@ -18,7 +18,7 @@
 					@foreach($residenceQuestion->customerMetaDataChildren as $option)
 						<div class="form-check">
 							<input class="form-check-input poe-eu-resident" type="radio" required
-								name="meta_{{$residenceQuestion->id}}" id="meta_{{$residenceQuestion->id}}_{{$option->id}}" value="{{$option->value}}">
+								name="meta_{{$residenceQuestion->id}}" id="meta_{{$residenceQuestion->id}}_{{$option->id}}" value="{{$option->value}}" @checked(old('meta_'.$residenceQuestion->id) === $option->value)>
 							<label class="form-check-label" for="meta_{{$residenceQuestion->id}}_{{$option->id}}">{{$option->value}}</label>
 						</div>
 					@endforeach
@@ -35,7 +35,7 @@
 					@foreach($eoriQuestion->customerMetaDataChildren as $option)
 						<div class="form-check">
 							<input class="form-check-input poe-eori" type="radio" required disabled
-								name="meta_{{$eoriQuestion->id}}" id="meta_{{$eoriQuestion->id}}_{{$option->id}}" value="{{$option->value}}">
+								name="meta_{{$eoriQuestion->id}}" id="meta_{{$eoriQuestion->id}}_{{$option->id}}" value="{{$option->value}}" @checked(old('meta_'.$eoriQuestion->id) === $option->value)>
 							<label class="form-check-label" for="meta_{{$eoriQuestion->id}}_{{$option->id}}">{{$option->value}}</label>
 						</div>
 					@endforeach

@@ -6,7 +6,11 @@ use App\Listeners\UpdateLastLogin;
 use App\Listeners\WAToolboxListener;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -37,5 +41,20 @@ class AppServiceProvider extends ServiceProvider
 
         Event::listen(Login::class, UpdateLastLogin::class);
         Paginator::useBootstrap();
+
+        RateLimiter::for('poe-submit', function (Request $request) {
+            return Limit::perMinute(config('poe.submissions_per_minute'))
+                ->by($request->ip())
+                ->response(function (Request $request) {
+                    Log::warning('poe.rejected', [
+                        'reason' => 'rate_limited',
+                        'ip' => $request->ip(),
+                        'customer_id' => $request->route('id'),
+                        'campaign_id' => $request->query('cid'),
+                    ]);
+
+                    return response('Demasiados envíos. Intente de nuevo en un minuto.', 429);
+                });
+        });
     }
 }

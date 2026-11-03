@@ -526,8 +526,10 @@ Route::middleware('auth')->prefix('metadata')->group(function () {
 });
 
 // Define the route without the 'auth' middleware
-Route::get('metadata/{id}/create/poe/{cid}', [MetaDataController::class, 'createpoe'])->withoutMiddleware(['auth']);
-Route::post('metadata/{id}/store/poe', [MetaDataController::class, 'storepoe'])->withoutMiddleware(['auth']);
+Route::get('metadata/{id}/create/poe/{cid}', [MetaDataController::class, 'createpoe'])
+    ->name('poe.create')->middleware(\App\Http\Middleware\EnsurePoeLink::class)->withoutMiddleware(['auth']);
+Route::post('metadata/{id}/store/poe', [MetaDataController::class, 'storepoe'])
+    ->name('poe.store')->middleware([\App\Http\Middleware\EnsurePoeLink::class, 'throttle:poe-submit'])->withoutMiddleware(['auth']);
 
 // Audience Routes
 Route::middleware('auth')->prefix('audiences')->group(function () {

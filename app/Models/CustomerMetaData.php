@@ -14,6 +14,20 @@ class CustomerMetaData extends Model{
 	public const POE_EU_RESIDENT_YES = 'Sí';
 	public const POE_EORI_NO = 'No, aún no cuento con número EORI.';
 
+	// Formulario POE: tipo de importación (antes se guardaba bajo el id 34, ver migración 2026_11_03_100000)
+	public const POE_IMPORT_TYPE_ID = 4007;
+	public const POE_LEGACY_IMPORT_TYPE_ID = 34;
+	public const POE_INDIVIDUAL = 'Individual';
+	public const POE_COMPANY_GROUP_ID = 14;
+	public const POE_IMPORT_TYPES = [
+		'Individual',
+		'Sociedad',
+		'Sociedad de responsabilidad limitada',
+		'Corporación',
+		'Propietario único',
+		'Compañía de responsabilidad limitada',
+	];
+
 	public static function getOptions($id){
 		return CustomerMetaData::where('parent_id', $id)->get();
 	}

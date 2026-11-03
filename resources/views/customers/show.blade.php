@@ -99,7 +99,7 @@
                     <span class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700" aria-hidden="true">Buscar duplicados</span>
                   </a>
                 @endif
-                <button class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700" data-copy-text="https://arichat.co/metadata/{{$model->id}}/create/poe/40" size="5">POA</button>
+                <button class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700" data-copy-text="{{ \Illuminate\Support\Facades\URL::signedRoute('poe.create', ['id' => $model->id, 'cid' => 40]) }}" size="5">POA</button>
 
                 <form method="POST" action="{{ route('customers.send-welcome', $model->id) }}">
                   @csrf

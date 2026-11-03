@@ -172,8 +172,12 @@ it('AC7/AC8: stores residence and EORI answers even without EORI and sends nothi
     Mail::fake();
     Notification::fake();
 
+    // Formulario enviado desde un enlace previo al endurecimiento: `campaign_id` viaja en el cuerpo
     $this->post('/metadata/677105/store/poe', [
-        'audience_id' => 67,
+        'campaign_id' => 40,
+        'meta_4007' => 'Individual',
+        'meta_22' => 'Persona de prueba',
+        'meta_27' => 'on',
         'meta_32' => 'España',
         'meta_4001' => 'Sí',
         'meta_4002' => 'No, aún no cuento con número EORI.',
@@ -189,7 +193,10 @@ it('AC7/AC8: stores residence and EORI answers even without EORI and sends nothi
 
 it('AC9: stores only the residence answer when the customer is not a resident', function () {
     $this->post('/metadata/677105/store/poe', [
-        'audience_id' => 67,
+        'campaign_id' => 40,
+        'meta_4007' => 'Individual',
+        'meta_22' => 'Persona de prueba',
+        'meta_27' => 'on',
         'meta_32' => 'Colombia',
         'meta_4001' => 'No',
     ])->assertRedirect();

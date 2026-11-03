@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Validation\ValidationException;
+use App\Services\Poe\PoeSubmissionService;
 use DB;
 use Mail;
 
@@ -276,118 +280,52 @@ public function createPoe($id, $cid){
 
     $model = Customer::find($id);
     $campaign = Campaign::find($cid);
+
+    if (! $model || ! $campaign) {
+        Log::warning('poe.rejected', ['reason' => 'not_found', 'ip' => request()->ip(), 'customer_id' => $id, 'campaign_id' => $cid]);
+        abort(404);
+    }
+
     // El pivote no tiene orden propio: los grupos del POE se ordenan por weight
-    $campaign?->load(['customerMetaData' => function ($query) {
+    $campaign->load(['customerMetaData' => function ($query) {
         $query->orderBy('customer_meta_datas.weight')->orderBy('customer_meta_datas.id');
     }]);
 
-    return view('POE.create', compact('model','campaign'));
+    // La campaña viaja dentro de la URL firmada: el cliente no puede cambiarla
+    $storeUrl = URL::signedRoute('poe.store', ['id' => $model->id, 'cid' => $campaign->id]);
+
+    return view('POE.create', compact('model', 'campaign', 'storeUrl'));
 }
 
 
-public function storepoe(request $request, $id){
-    
-    $model = customer::find($id);
-        //dd($id);
-     $customer_id = $id;  
-   foreach ($request->all() as $key => $value) {
-       if (str_contains($key, 'meta_') ) { //determina si una cadena contiene una subcadena determinada
-           $meta_data_id = (int)substr($key,5);//quitamos meta_  
-           if(is_array($value)){
-               foreach ($value as $item  ) {
-                   $this->savecustomerMeta($request, $meta_data_id,$item, $customer_id);
-               }
-           }else
-           if( !is_null($value)){
-                $this->savecustomerMeta($request, $meta_data_id,$value, $customer_id);
-           }
-        }
-   }
+public function storepoe(Request $request, $id, PoeSubmissionService $service){
 
-   foreach ($request->all() as $key => $value) {
-       if (str_contains($key, 'radio_')) { //determina si una cadena contiene una subcadena determinada
-           $meta_data_id = (int)substr($key,6);//quitamos radio_  
-           if(is_array($value)){
-               foreach ($value as $item  ) {
-                   $this->savecustomerMeta($request, $meta_data_id,$item, $customer_id);
-               }
-           }else
-           if( !is_null($value)){
-                $this->savecustomerMeta($request, $meta_data_id,$value, $customer_id);
-           }
-        }
-   }
+    $model = Customer::find($id);
+    // Formularios abiertos antes del deploy no traen `cid` en la URL
+    $campaign = Campaign::find($request->query('cid', $request->input('campaign_id')));
 
-   foreach ($request->all() as $key => $value) {
-       if (str_contains($key, 'check_')) { //determina si una cadena contiene una subcadena determinada
-           $meta_data_id = (int)substr($key,6);//quitamos check_  
-           if(is_array($value)){
-               foreach ($value as $item  ) {
-                   $this->savecustomerMeta($request, $meta_data_id,$item,$model->id);
-               }
-           }else
-           if( !is_null($value)){
-                $this->savecustomerMeta($request, $meta_data_id,$value,$model->id);
-           }
-        }
-   }
+    if (! $model || ! $campaign) {
+        Log::warning('poe.rejected', ['reason' => 'not_found', 'ip' => $request->ip(), 'customer_id' => $id, 'campaign_id' => $request->query('cid')]);
+        abort(404);
+    }
 
-//dd($request->all());
-    foreach ($request->all() as $key => $value) {
-       if (str_contains($key, 'login_')) { //determina si una cadena contiene una subcadena determinada
-            
-           $meta_data_id = (int)substr($key,6);//quitamos login_  
-           if(is_array($value)){
-               $size = (sizeof($value))/4;
-               $position = 0 ;
-               for($i=0; $i<$size; $i++){
-                   foreach ($value as $key => $item  ) {
-                       if( !is_null($item)){
-                          $modelProject = new ProjectLogin;
-                           //$model->meta_data_id = $meta_data_id;
-                           $modelProject->project_id = $model->id;
-                           $modelProject->name       = $value[$position];
-                           $modelProject->url        = $value[$position+1];
-                           $modelProject->user       = $value[$position+2];
-                           $modelProject->password   = $value[$position+3];
-                           if($key == $position){
-                               $modelProject->save();
-                           }
-                       }
-                   }
-                   $position = $position+4;
-               }       
-           }
-       }
-   }
-     
-   $array = array("Logos de la empresa","Manual de marca","Activos de mercadeo (Imágenes, videos, textos)");
-      
+    try {
+        $service->store($campaign, $model->id, $request->all());
+    } catch (ValidationException $e) {
+        Log::warning('poe.rejected', [
+            'reason' => 'validation',
+            'ip' => $request->ip(),
+            'customer_id' => $model->id,
+            'campaign_id' => $campaign->id,
+            'fields' => array_keys($e->errors()),
+        ]);
 
+        return redirect(URL::signedRoute('poe.create', ['id' => $model->id, 'cid' => $campaign->id]))
+            ->withErrors($e->errors())
+            ->withInput($request->except(['_token']));
+    }
 
-   $files = $request->file();
-
-   foreach ($files as $key => $value) {
-       if($request->hasFile($key)){       
-           $modelDocument = new ProjectDocument;
-           $originName = $request->file($key)->getClientOriginalName();
-           $fileName = pathinfo($originName, PATHINFO_FILENAME);
-           $destinationPath = 'public/files/'.$request->project_id."/";
-           $extension = $request->file($key)->getClientOriginalExtension();
-           $fileName = $fileName.'_'.time().'.'.$extension;
-           $path = $request->file($key)->move($destinationPath,$fileName);
-           $url = asset($destinationPath.$fileName);  
-           $modelDocument->url = $url;
-           $modelDocument->project_id = $model->id;
-           $modelDocument->type_id = 5; 
-           //$modelDocument->description = "aaaa" ; 
-           $modelDocument-> save();
-       }
-   }
-
-     //$this->saveCustomer2($model->id,$request->nit,$request->position,$request->namecontact);
-      
-   return redirect('http://maquiempanadas.com/');
+    return redirect('http://maquiempanadas.com/');
 
 }
 
