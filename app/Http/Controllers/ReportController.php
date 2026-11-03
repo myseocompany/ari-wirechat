@@ -1336,6 +1336,23 @@ class ReportController extends Controller
         return view('reports.views.customers_lead_classifications', compact('model', 'fromDate', 'toDate', 'request', 'statuses', 'tags', 'users'));
     }
 
+    public function alimentecAplusDashboard(): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $files = glob(base_path('exports/alimentec_aplus_dashboard_*.html')) ?: [];
+
+        if ($files === []) {
+            abort(404);
+        }
+
+        usort($files, function (string $left, string $right): int {
+            return filemtime($right) <=> filemtime($left);
+        });
+
+        return response()->file($files[0], [
+            'Content-Type' => 'text/html; charset=UTF-8',
+        ]);
+    }
+
     public function wirechatIncomingMessages(WirechatIncomingMessagesReportRequest $request): View
     {
         [$fromDate, $toDate, $selectedRange] = $this->resolveWirechatMessagesDateRange($request);

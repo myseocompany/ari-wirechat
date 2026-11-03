@@ -429,6 +429,7 @@ Route::middleware('auth')->prefix('reports')->group(function () {
     Route::get('/views/twilio_calls_recovery', [TwilioCallRecoveryController::class, 'index'])->name('reports.twilio_calls_recovery');
     Route::post('/views/twilio_calls_recovery/queue', [TwilioCallRecoveryController::class, 'queue'])->name('reports.twilio_calls_recovery.queue');
     Route::get('/views/customers_lead_classifications', [ReportController::class, 'customersLeadClassifications']);
+    Route::get('/views/alimentec_aplus_dashboard', [ReportController::class, 'alimentecAplusDashboard'])->name('reports.alimentec_aplus_dashboard');
     Route::get('/views/wirechat_incoming_messages', [ReportController::class, 'wirechatIncomingMessages'])->name('reports.wirechat_incoming_messages');
     Route::post('/views/customers_lead_classifications/run', [ReportController::class, 'runCustomersLeadClassifications'])
         ->name('reports.customers_lead_classifications.run');
