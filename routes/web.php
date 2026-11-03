@@ -35,6 +35,7 @@ use App\Http\Controllers\RDTestController;
 use App\Http\Controllers\ReferencesController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SalesMapController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\TwilioCallRecoveryController;
@@ -61,6 +62,11 @@ Route::get('/', function () {
 Route::middleware('auth')->get('/design-system', function () {
     return view('design-system');
 })->name('design-system');
+
+// Mapa interno de ventas ganadas por país (análisis de territorio).
+Route::middleware('auth')
+    ->get('/reportes/mapa-ventas', [SalesMapController::class, 'index'])
+    ->name('reports.sales-map');
 
 Route::middleware('auth')->get('/customer-chats', CustomerAssignedConversations::class)->name('customer-chats');
 
