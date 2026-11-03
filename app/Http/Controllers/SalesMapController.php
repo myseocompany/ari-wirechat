@@ -35,7 +35,7 @@ class SalesMapController extends Controller
     {
         $customers = DB::table('customers')
             ->where('status_id', self::STATUS_GANADO_MAQUINAS)
-            ->select('id', 'country', 'phone', 'phone_wp', 'phone2')
+            ->select('id', 'name', 'business', 'city', 'country', 'phone', 'phone_wp', 'phone2')
             ->get();
 
         // Nombres oficiales desde la tabla `countries` (no se hardcodean).
@@ -53,9 +53,22 @@ class SalesMapController extends Controller
 
         $agregado = [];
         $porFuente = ['crm' => 0, 'telefono' => 0, 'sin_dato' => 0];
+        $clientes = [];
 
         foreach ($customers as $customer) {
             [$iso2, $fuente] = $this->resolverPais($customer, $resolver, $centroides, $nombrePorIso2, $iso2PorNombre);
+
+            // Detalle por cliente para el listado. La pagina esta tras `auth` y es
+            // interna, asi que aqui si corresponde identificar al cliente y enlazar
+            // a su ficha; el agregado por pais es solo la vista de arriba.
+            $clientes[] = [
+                'id' => $customer->id,
+                'nombre' => trim((string) $customer->name) ?: '(sin nombre)',
+                'empresa' => trim((string) $customer->business),
+                'ciudad' => trim((string) $customer->city),
+                'iso2' => $iso2 ?? 'SIN_PAIS',
+                'fuente' => $fuente,
+            ];
 
             if ($iso2 === null) {
                 $porFuente['sin_dato']++;
@@ -97,6 +110,10 @@ class SalesMapController extends Controller
 
         $sinCentroide = $countries->whereNull('lat')->pluck('iso2')->values();
 
+        $clientes = collect($clientes)
+            ->sortBy([['iso2', 'asc'], ['nombre', 'asc']])
+            ->values();
+
         return view('reports.sales_map', [
             'countries' => $countries,
             'mapeables' => $countries->whereNotNull('lat')->values(),
@@ -112,6 +129,19 @@ class SalesMapController extends Controller
                 ->values(),
             'maxVentas' => (int) ($countries->max('ventas') ?: 1),
             'mercadosReporteSeo' => count(self::MERCADOS_REPORTE_SEO),
+            'clientes' => $clientes,
+            'clientesPorPais' => $clientes->countBy('iso2'),
+            // Payload compacto para el listado: con 2.500 clientes, renderizar las
+            // filas en servidor llevaria el HTML de ~50 KB a ~2,4 MB, y solo se
+            // consulta un pais a la vez. i=id n=nombre e=empresa c=ciudad p=iso2 f=fuente
+            'clientesPayload' => $clientes->map(fn (array $c): array => [
+                'i' => $c['id'],
+                'n' => $c['nombre'],
+                'e' => $c['empresa'],
+                'c' => $c['ciudad'],
+                'p' => $c['iso2'],
+                'f' => $c['fuente'],
+            ])->values(),
         ]);
     }
 
