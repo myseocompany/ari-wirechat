@@ -2522,6 +2522,8 @@ class APIController extends Controller
             }
         }
 
+        $this->fillPhoneFromRdFallback($model, $data);
+
         $rdLeadId = $this->extractRdLeadId($data);
         if ($rdLeadId !== null) {
             $model->rd_lead_id = $rdLeadId;
@@ -2534,6 +2536,41 @@ class APIController extends Controller
         $facebookLeadId = $this->extractFacebookLeadId($data);
         if ($facebookLeadId !== null) {
             $model->facebook_id = $facebookLeadId;
+        }
+    }
+
+    /**
+     * Respaldo del teléfono para leads de RD Station que no traen
+     * `personal_phone` ni `mobile_phone`. Pasa con formularios de Meta
+     * conectados a RD sin mapeo de campos: el número llega solo en `phone`
+     * o dentro de la conversión. Sin esto el cliente queda sin teléfono.
+     * Se guarda en `phone2`, igual que `mobile_phone`, y solo dígitos.
+     */
+    private function fillPhoneFromRdFallback(Customer $model, array $data): void
+    {
+        if (filled($model->phone) || filled($model->phone2)) {
+            return;
+        }
+
+        $paths = ['phone'];
+        foreach (['last_conversion', 'first_conversion'] as $conversion) {
+            foreach (['phone_lead', 'Telefone principal', 'Telefone', 'Celular', 'celular'] as $key) {
+                $paths[] = "{$conversion}.content.{$key}";
+            }
+        }
+
+        foreach ($paths as $path) {
+            $value = data_get($data, $path);
+            if (! is_string($value) && ! is_numeric($value)) {
+                continue;
+            }
+
+            $digits = $this->normalizePhoneNumber((string) $value);
+            if (strlen($digits) >= 7) {
+                $model->phone2 = $digits;
+
+                return;
+            }
         }
     }
 
